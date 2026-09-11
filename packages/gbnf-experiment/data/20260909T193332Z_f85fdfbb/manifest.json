@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-09-09T19:33:32Z",
+  "completed_at": "2026-09-09T19:42:59Z",
+  "error": "The command executed was `/usr/bin/docker container run --cap-drop ALL --env HTTP_PROXY=http://agent-harness-sandbox-proxy-2f7dc89e4437:8888 --env HTTPS_PROXY=http://agent-harness-sandbox-proxy-2f7dc89e4437:8888 --env http_proxy=http://agent-harness-sandbox-proxy-2f7dc89e4437:8888 --env https_proxy=http://agent-harness-sandbox-proxy-2f7dc89e4437:8888 --env NO_PROXY=localhost,127.0.0.1 --network agent-harness-sandbox-jail-2f7dc89e4437 --rm --security-opt no-new-privileges --volume /tmp/tmpjaqsd2cp:/home/node/.claude:rw --volume /home/user/work/code/research/ports/packages/gbnf-experiment/data/20260909T193332Z_f85fdfbb/transcript:/home/node/.claude/projects:rw --volume /tmp/tmpexy_nim4/reference_implementation/source:/workspace/reference_implementation:ro --volume /tmp/tmpexy_nim4/reference_implementation/tests:/workspace/tests:ro --volume /home/user/work/code/research/ports/packages/gbnf-experiment/data/20260909T193332Z_f85fdfbb/ported_implementation:/workspace/ported_implementation:rw --workdir /workspace agent-harness-sandbox-claude:latest claude -p --dangerously-skip-permissions --disallowed-tools=WebSearch,WebFetch --effort high --output-format json --model claude-opus-5 Port reference_implementation/ to python in ported_implementation/.\nRun tests/ and iterate until green.\n`.\nIt returned with code 1\nThe content of stdout is '{\"duration_api_ms\":560593,\"stop_reason\":\"stop_sequence\",\"session_id\":\"f009ace6-a799-4b20-b447-94a04964ba6b\",\"total_cost_usd\":3.431075999999999,\"usage\":{\"input_tokens\":92,\"cache_creation_input_tokens\":76853,\"cache_read_input_tokens\":2832872,\"output_tokens\":49826,\"output_tokens_details\":{\"thinking_tokens\":16027},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":76853,\"ephemeral_5m_input_tokens\":0},\"inference_geo\":\"not_available\",\"iterations\":[],\"speed\":\"standard\"},\"modelUsage\":{\"claude-opus-5\":{\"inputTokens\":92,\"outputTokens\":49826,\"cacheReadInputTokens\":2832872,\"cacheCreationInputTokens\":76853,\"webSearchRequests\":0,\"costUSD\":3.431075999999999,\"contextWindow\":1000000,\"maxOutputTokens\":64000,\"thinkingTokens\":16027,\"canonicalModel\":\"claude-opus-5\",\"provider\":\"firstParty\",\"costBasis\":\"list\"}},\"permission_denials\":[],\"terminal_reason\":\"api_error\",\"fast_mode_state\":\"off\",\"fast_mode_disabled_reason\":\"sdk_opt_in_required\",\"subagent_stats\":{\"spawned\":0,\"requested\":{\"background\":0,\"foreground\":0,\"unset\":0},\"started_in_background\":0,\"max_depth\":0,\"spawned_by_subagents\":0,\"completed\":0,\"failed\":0,\"killed\":{\"parent\":0,\"user\":0,\"system\":0},\"refused\":{\"depth_limit\":0,\"concurrency_limit\":0,\"budget\":0},\"by_type\":{}},\"is_error\":true,\"num_turns\":49,\"subtype\":\"success\",\"api_error_status\":401,\"result\":\"Failed to authenticate. API Error: 401 OAuth access token has been revoked.\",\"type\":\"result\",\"duration_ms\":563653,\"uuid\":\"cb9addfe-c6a4-4c44-9a6f-e7c74291bdc5\",\"queued_turn_count\":0}\n'\nThe content of stderr can be found above the stacktrace (it wasn't captured).",
+  "condition": {
+    "name": "source-typescript_effort-high_model-claude-opus-5",
+    "source_language": "typescript",
+    "target_language": "python",
+    "include_python_tests": false,
+    "include_typescript_tests": false,
+    "effort": "high",
+    "model": "claude-opus-5"
+  },
+  "derivation": {
+    "gbnf_commit": "13f1aca495d11e160fffd68c4ba299a2415909d8"
+  },
+  "sandbox": {
+    "image_id": "sha256:66763a1d2a0a6823b420f43009d7b881c8dd098c4bcda321a334e29951392364"
+  },
+  "harness": {
+    "commit": "b0ad86d28c992799f2a3f9659dfae673f868836d",
+    "dirty": true
+  }
+}

@@ -1,0 +1,927 @@
+============================== get_serialized_rule_key_test.cpython-314-pytest-9.1.1.pyc
+
+--- def <module>(line 1) args=[]
+  L1:
+      LOAD_SMALL_INT             0
+      LOAD_CONST                 ('annotations',)
+      IMPORT_NAME                __future__
+      IMPORT_FROM                annotations
+      STORE_NAME                 annotations
+      POP_TOP                    
+  L3:
+      LOAD_SMALL_INT             0
+      LOAD_CONST                 None
+      IMPORT_NAME                builtins
+  L5:
+      LOAD_SMALL_INT             0
+      LOAD_CONST                 None
+      IMPORT_NAME                pytest
+      STORE_NAME                 pytest
+  L7:
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 ('KEY_TRANSLATION', 'get_serialized_rule_key')
+      IMPORT_NAME                get_serialized_rule_key
+      IMPORT_FROM                KEY_TRANSLATION
+      STORE_NAME                 KEY_TRANSLATION
+      IMPORT_FROM                get_serialized_rule_key
+      STORE_NAME                 get_serialized_rule_key
+      POP_TOP                    
+  L8:
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 ('RuleChar', 'RuleCharExclude', 'RuleEnd', 'RuleRef')
+      IMPORT_NAME                grammar_graph_types
+      IMPORT_FROM                RuleChar
+      STORE_NAME                 RuleChar
+      IMPORT_FROM                RuleCharExclude
+      STORE_NAME                 RuleCharExclude
+      IMPORT_FROM                RuleEnd
+      STORE_NAME                 RuleEnd
+      IMPORT_FROM                RuleRef
+      STORE_NAME                 RuleRef
+      POP_TOP                    
+  L11:
+      LOAD_NAME                  pytest
+      LOAD_ATTR                  fixture
+      LOAD_CONST                 True
+      LOAD_CONST                 ('autouse',)
+      CALL_KW                    1
+  L12:
+      LOAD_CONST                 <code mock_is_rule_end>
+      MAKE_FUNCTION              
+  L11:
+      CALL                       0
+  L12:
+      STORE_NAME                 mock_is_rule_end
+  L20:
+      LOAD_NAME                  pytest
+      LOAD_ATTR                  fixture
+      LOAD_CONST                 True
+      LOAD_CONST                 ('autouse',)
+      CALL_KW                    1
+  L21:
+      LOAD_CONST                 <code mock_is_rule_char>
+      MAKE_FUNCTION              
+  L20:
+      CALL                       0
+  L21:
+      STORE_NAME                 mock_is_rule_char
+  L29:
+      LOAD_NAME                  pytest
+      LOAD_ATTR                  fixture
+      LOAD_CONST                 True
+      LOAD_CONST                 ('autouse',)
+      CALL_KW                    1
+  L30:
+      LOAD_CONST                 <code mock_is_rule_char_exclude>
+      MAKE_FUNCTION              
+  L29:
+      CALL                       0
+  L30:
+      STORE_NAME                 mock_is_rule_char_exclude
+  L38:
+      LOAD_NAME                  pytest
+      LOAD_ATTR                  fixture
+      LOAD_CONST                 True
+      LOAD_CONST                 ('autouse',)
+      CALL_KW                    1
+  L39:
+      LOAD_CONST                 <code mock_is_rule_ref>
+      MAKE_FUNCTION              
+  L38:
+      CALL                       0
+  L39:
+      STORE_NAME                 mock_is_rule_ref
+  L47:
+      LOAD_CONST                 <code describe_get_serialized_rule_key>
+      MAKE_FUNCTION              
+      STORE_NAME                 describe_get_serialized_rule_key
+      LOAD_CONST                 None
+      RETURN_VALUE               
+
+--- <module>.def mock_is_rule_end(line 11) args=[]
+  L11:
+      RETURN_GENERATOR           
+      POP_TOP                    
+  L13:
+      LOAD_GLOBAL                patch + NULL
+  L14:
+      LOAD_CONST                 'gbnf.grammar_graph.get_serialized_rule_key.is_rule_end'
+  L15:
+      LOAD_CONST                 False
+  L13:
+      LOAD_CONST                 ('return_value',)
+      CALL_KW                    2
+      COPY                       1
+      LOAD_SPECIAL               __exit__
+      SWAP                       2
+      SWAP                       3
+      LOAD_SPECIAL               __enter__
+      CALL                       0
+  L16:
+      STORE_FAST                 mock
+  L17:
+      LOAD_FAST_BORROW           mock
+      YIELD_VALUE                0
+      POP_TOP                    
+  L13:
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      CALL                       3
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      PUSH_EXC_INFO              
+      WITH_EXCEPT_START          
+      RERAISE                    2
+      POP_TOP                    
+      POP_EXCEPT                 
+      POP_TOP                    
+      POP_TOP                    
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      COPY                       3
+      POP_EXCEPT                 
+      RERAISE                    1
+      CALL_INTRINSIC_1           INTRINSIC_STOPITERATION_ERROR
+      RERAISE                    1
+
+--- <module>.def mock_is_rule_char(line 20) args=[]
+  L20:
+      RETURN_GENERATOR           
+      POP_TOP                    
+  L22:
+      LOAD_GLOBAL                patch + NULL
+  L23:
+      LOAD_CONST                 'gbnf.grammar_graph.get_serialized_rule_key.is_rule_char'
+  L24:
+      LOAD_CONST                 False
+  L22:
+      LOAD_CONST                 ('return_value',)
+      CALL_KW                    2
+      COPY                       1
+      LOAD_SPECIAL               __exit__
+      SWAP                       2
+      SWAP                       3
+      LOAD_SPECIAL               __enter__
+      CALL                       0
+  L25:
+      STORE_FAST                 mock
+  L26:
+      LOAD_FAST_BORROW           mock
+      YIELD_VALUE                0
+      POP_TOP                    
+  L22:
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      CALL                       3
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      PUSH_EXC_INFO              
+      WITH_EXCEPT_START          
+      RERAISE                    2
+      POP_TOP                    
+      POP_EXCEPT                 
+      POP_TOP                    
+      POP_TOP                    
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      COPY                       3
+      POP_EXCEPT                 
+      RERAISE                    1
+      CALL_INTRINSIC_1           INTRINSIC_STOPITERATION_ERROR
+      RERAISE                    1
+
+--- <module>.def mock_is_rule_char_exclude(line 29) args=[]
+  L29:
+      RETURN_GENERATOR           
+      POP_TOP                    
+  L31:
+      LOAD_GLOBAL                patch + NULL
+  L32:
+      LOAD_CONST                 'gbnf.grammar_graph.get_serialized_rule_key.is_rule_char_exclude'
+  L33:
+      LOAD_CONST                 False
+  L31:
+      LOAD_CONST                 ('return_value',)
+      CALL_KW                    2
+      COPY                       1
+      LOAD_SPECIAL               __exit__
+      SWAP                       2
+      SWAP                       3
+      LOAD_SPECIAL               __enter__
+      CALL                       0
+  L34:
+      STORE_FAST                 mock
+  L35:
+      LOAD_FAST_BORROW           mock
+      YIELD_VALUE                0
+      POP_TOP                    
+  L31:
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      CALL                       3
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      PUSH_EXC_INFO              
+      WITH_EXCEPT_START          
+      RERAISE                    2
+      POP_TOP                    
+      POP_EXCEPT                 
+      POP_TOP                    
+      POP_TOP                    
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      COPY                       3
+      POP_EXCEPT                 
+      RERAISE                    1
+      CALL_INTRINSIC_1           INTRINSIC_STOPITERATION_ERROR
+      RERAISE                    1
+
+--- <module>.def mock_is_rule_ref(line 38) args=[]
+  L38:
+      RETURN_GENERATOR           
+      POP_TOP                    
+  L40:
+      LOAD_GLOBAL                patch + NULL
+  L41:
+      LOAD_CONST                 'gbnf.grammar_graph.get_serialized_rule_key.is_rule_ref'
+  L42:
+      LOAD_CONST                 False
+  L40:
+      LOAD_CONST                 ('return_value',)
+      CALL_KW                    2
+      COPY                       1
+      LOAD_SPECIAL               __exit__
+      SWAP                       2
+      SWAP                       3
+      LOAD_SPECIAL               __enter__
+      CALL                       0
+  L43:
+      STORE_FAST                 mock
+  L44:
+      LOAD_FAST_BORROW           mock
+      YIELD_VALUE                0
+      POP_TOP                    
+  L40:
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      CALL                       3
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      PUSH_EXC_INFO              
+      WITH_EXCEPT_START          
+      RERAISE                    2
+      POP_TOP                    
+      POP_EXCEPT                 
+      POP_TOP                    
+      POP_TOP                    
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      COPY                       3
+      POP_EXCEPT                 
+      RERAISE                    1
+      CALL_INTRINSIC_1           INTRINSIC_STOPITERATION_ERROR
+      RERAISE                    1
+
+--- <module>.def describe_get_serialized_rule_key(line 47) args=[]
+  L48:
+      LOAD_CONST                 <code test_returns_type_for_end_rules>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_returns_type_for_end_rules
+  L53:
+      LOAD_CONST                 <code test_returns_type_and_value_for_character_rules>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_returns_type_and_value_for_character_rules
+  L58:
+      LOAD_CONST                 <code test_returns_type_and_value_for_character_exclude_rules>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_returns_type_and_value_for_character_exclude_rules
+  L67:
+      LOAD_CONST                 <code test_returns_ref_type_with_value_for_reference_rules>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_returns_ref_type_with_value_for_reference_rules
+  L72:
+      LOAD_CONST                 <code test_throws_error_for_unknown_rule_types>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_throws_error_for_unknown_rule_types
+      LOAD_CONST                 None
+      RETURN_VALUE               
+
+--- describe_get_serialized_rule_key.def test_returns_type_for_end_rules(line 48) args=['mock_is_rule_end']
+  L49:
+      LOAD_CONST                 True
+      LOAD_FAST_BORROW           mock_is_rule_end
+      STORE_ATTR                 return_value
+  L50:
+      LOAD_GLOBAL                RuleEnd + NULL
+      CALL                       0
+      STORE_FAST                 rule
+  L51:
+      LOAD_GLOBAL                get_serialized_rule_key + NULL
+      LOAD_FAST_BORROW           rule
+      CALL                       1
+      LOAD_GLOBAL                KEY_TRANSLATION
+      LOAD_GLOBAL                RuleEnd
+      BINARY_OP                  []
+      FORMAT_SIMPLE              
+      COMPARE_OP                 ==
+      EXTENDED_ARG               1
+
+--- describe_get_serialized_rule_key.def test_returns_type_and_value_for_character_rules(line 53) args=['mock_is_rule_char']
+  L54:
+      LOAD_CONST                 True
+      LOAD_FAST_BORROW           mock_is_rule_char
+      STORE_ATTR                 return_value
+  L55:
+      LOAD_GLOBAL                RuleChar + NULL
+      LOAD_SMALL_INT             97
+      BUILD_LIST                 1
+      LOAD_CONST                 ('value',)
+      CALL_KW                    1
+      STORE_FAST                 rule
+  L56:
+      LOAD_GLOBAL                get_serialized_rule_key + NULL
+      LOAD_FAST_BORROW           rule
+      CALL                       1
+      LOAD_GLOBAL                KEY_TRANSLATION
+      LOAD_GLOBAL                RuleChar
+      BINARY_OP                  []
+      FORMAT_SIMPLE              
+      LOAD_CONST                 '-[97]'
+      BUILD_STRING               2
+      COMPARE_OP                 ==
+      EXTENDED_ARG               1
+
+--- describe_get_serialized_rule_key.def test_returns_type_and_value_for_character_exclude_rules(line 58) args=['mock_is_rule_char_exclude']
+  L61:
+      LOAD_CONST                 True
+      LOAD_FAST_BORROW           mock_is_rule_char_exclude
+      STORE_ATTR                 return_value
+  L62:
+      LOAD_GLOBAL                RuleCharExclude + NULL
+      LOAD_SMALL_INT             97
+      BUILD_LIST                 1
+      LOAD_CONST                 ('value',)
+      CALL_KW                    1
+      STORE_FAST                 rule
+  L64:
+      LOAD_GLOBAL                get_serialized_rule_key + NULL
+      LOAD_FAST_BORROW           rule
+      CALL                       1
+  L64:
+      LOAD_GLOBAL                KEY_TRANSLATION
+      LOAD_GLOBAL                RuleCharExclude
+      BINARY_OP                  []
+      FORMAT_SIMPLE              
+      LOAD_CONST                 '-[97]'
+      BUILD_STRING               2
+  L64:
+      COMPARE_OP                 ==
+  L63:
+      EXTENDED_ARG               1
+  L65:
+      LOAD_ATTR                  _call_reprcompare
+  L63:
+      LOAD_CONST                 ('==',)
+      BUILD_TUPLE                1
+      LOAD_CONST                 ('%(py3)s\n{%(py3)s = %(py0)s(%(py1)s)\n} == %(py6)s',)
+  L63:
+      BUILD_TUPLE                2
+      CALL                       4
+      LOAD_CONST                 'py0'
+      LOAD_CONST                 'get_serialized_rule_key'
+  L65:
+      LOAD_ATTR                  locals
+  L63:
+      CALL                       0
+      CONTAINS_OP                in
+  L65:
+      LOAD_ATTR                  _should_repr_global_name
+  L64:
+      LOAD_GLOBAL                get_serialized_rule_key
+  L63:
+      CALL                       1
+  L65:
+      LOAD_ATTR                  _saferepr
+  L64:
+      LOAD_GLOBAL                get_serialized_rule_key
+  L63:
+      CALL                       1
+      LOAD_CONST                 'get_serialized_rule_key'
+      LOAD_CONST                 'py1'
+      LOAD_CONST                 'rule'
+  L65:
+      LOAD_ATTR                  locals
+  L63:
+      CALL                       0
+      CONTAINS_OP                in
+  L65:
+      LOAD_ATTR                  _should_repr_global_name
+  L64:
+      LOAD_FAST_BORROW           rule
+  L63:
+      CALL                       1
+  L65:
+      LOAD_ATTR                  _saferepr
+  L64:
+      LOAD_FAST_BORROW           rule
+  L63:
+      CALL                       1
+      LOAD_CONST                 'rule'
+      LOAD_CONST                 'py3'
+  L65:
+      LOAD_ATTR                  _saferepr
+  L63:
+      CALL                       1
+      LOAD_CONST                 'py6'
+  L65:
+      LOAD_ATTR                  _saferepr
+  L63:
+      CALL                       1
+      BUILD_MAP                  4
+      BINARY_OP                  %
+      LOAD_CONST                 'assert %(py8)s'
+      LOAD_CONST                 'py8'
+      BUILD_MAP                  1
+      BINARY_OP                  %
+      LOAD_GLOBAL                AssertionError + NULL
+  L65:
+      LOAD_ATTR                  _format_explanation
+  L63:
+      CALL                       1
+      CALL                       1
+      RAISE_VARARGS              1
+      LOAD_CONST                 None
+      COPY                       1
+      COPY                       1
+      LOAD_CONST                 None
+      RETURN_VALUE               
+
+--- describe_get_serialized_rule_key.def test_returns_ref_type_with_value_for_reference_rules(line 67) args=['mock_is_rule_ref']
+  L68:
+      LOAD_CONST                 True
+      LOAD_FAST_BORROW           mock_is_rule_ref
+      STORE_ATTR                 return_value
+  L69:
+      LOAD_GLOBAL                RuleRef + NULL
+      LOAD_SMALL_INT             99
+      CALL                       1
+      STORE_FAST                 rule
+  L70:
+      LOAD_GLOBAL                get_serialized_rule_key + NULL
+      LOAD_FAST_BORROW           rule
+      CALL                       1
+      LOAD_CONST                 '3-99'
+      COMPARE_OP                 ==
+      EXTENDED_ARG               1
+
+--- describe_get_serialized_rule_key.def test_throws_error_for_unknown_rule_types(line 72) args=['mock_is_rule_end', 'mock_is_rule_char', 'mock_is_rule_char_exclude', 'mock_is_rule_ref']
+  L78:
+      LOAD_CONST                 False
+      LOAD_FAST_BORROW           mock_is_rule_end
+      STORE_ATTR                 return_value
+  L79:
+      LOAD_CONST                 False
+      LOAD_FAST_BORROW           mock_is_rule_char
+      STORE_ATTR                 return_value
+  L80:
+      LOAD_CONST                 False
+      LOAD_FAST_BORROW           mock_is_rule_char_exclude
+      STORE_ATTR                 return_value
+  L81:
+      LOAD_CONST                 False
+      LOAD_FAST_BORROW           mock_is_rule_ref
+      STORE_ATTR                 return_value
+  L82:
+      LOAD_CONST                 'type'
+      LOAD_CONST                 'UNKNOWN'
+      LOAD_CONST                 'value'
+      LOAD_CONST                 'something'
+      BUILD_MAP                  2
+      STORE_FAST                 rule
+  L83:
+      LOAD_GLOBAL                pytest
+      LOAD_ATTR                  raises
+  L84:
+      LOAD_GLOBAL                ValueError
+  L85:
+      LOAD_CONST                 "Unknown rule type: {'type': 'UNKNOWN', 'value': 'something'}"
+  L83:
+      LOAD_CONST                 ('match',)
+      CALL_KW                    2
+      COPY                       1
+      LOAD_SPECIAL               __exit__
+      SWAP                       2
+      SWAP                       3
+      LOAD_SPECIAL               __enter__
+      CALL                       0
+      POP_TOP                    
+  L87:
+      LOAD_GLOBAL                get_serialized_rule_key + NULL
+      LOAD_FAST_BORROW           rule
+      CALL                       1
+      POP_TOP                    
+  L83:
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      CALL                       3
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      PUSH_EXC_INFO              
+      WITH_EXCEPT_START          
+      RERAISE                    2
+      POP_TOP                    
+      POP_EXCEPT                 
+      POP_TOP                    
+      POP_TOP                    
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      COPY                       3
+      POP_EXCEPT                 
+      RERAISE                    1
+============================== get_parent_stack_id_test.cpython-314-pytest-9.1.1.pyc
+
+--- def <module>(line 1) args=[]
+  L1:
+      LOAD_SMALL_INT             0
+      LOAD_CONST                 ('annotations',)
+      IMPORT_NAME                __future__
+      IMPORT_FROM                annotations
+      STORE_NAME                 annotations
+      POP_TOP                    
+  L3:
+      LOAD_SMALL_INT             0
+      LOAD_CONST                 None
+      IMPORT_NAME                builtins
+  L5:
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 ('Color',)
+      IMPORT_NAME                colorize
+      IMPORT_FROM                Color
+      STORE_NAME                 Color
+      POP_TOP                    
+  L6:
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 ('get_parent_stack_id',)
+      IMPORT_NAME                get_parent_stack_id
+      IMPORT_FROM                get_parent_stack_id
+      STORE_NAME                 get_parent_stack_id
+      POP_TOP                    
+  L7:
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 ('RuleEnd',)
+      IMPORT_NAME                grammar_graph_types
+      IMPORT_FROM                RuleEnd
+      STORE_NAME                 RuleEnd
+      POP_TOP                    
+  L8:
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 ('GraphNode',)
+      IMPORT_NAME                graph_node
+      IMPORT_FROM                GraphNode
+      STORE_NAME                 GraphNode
+      POP_TOP                    
+  L9:
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 ('GraphPointer',)
+      IMPORT_NAME                graph_pointer
+      IMPORT_FROM                GraphPointer
+      STORE_NAME                 GraphPointer
+      POP_TOP                    
+  L12:
+      LOAD_CONST                 <code __annotate__>
+      MAKE_FUNCTION              
+      LOAD_CONST                 <code s>
+      MAKE_FUNCTION              
+      SET_FUNCTION_ATTRIBUTE     annotate
+      STORE_NAME                 s
+  L16:
+      LOAD_CONST                 <code __annotate__>
+      MAKE_FUNCTION              
+      LOAD_CONST                 <code mock_colorize>
+      MAKE_FUNCTION              
+      SET_FUNCTION_ATTRIBUTE     annotate
+      STORE_NAME                 mock_colorize
+  L20:
+      LOAD_NAME                  s
+      LOAD_NAME                  Color
+      LOAD_ATTR                  RED
+      CALL                       1
+      STORE_NAME                 red
+  L21:
+      LOAD_NAME                  s
+      LOAD_NAME                  Color
+      LOAD_ATTR                  GRAY
+      CALL                       1
+      STORE_NAME                 gray
+  L24:
+      LOAD_CONST                 (None,)
+      LOAD_CONST                 <code __annotate__>
+      MAKE_FUNCTION              
+      LOAD_CONST                 <code create_mock_pointer>
+      MAKE_FUNCTION              
+      SET_FUNCTION_ATTRIBUTE     annotate
+      SET_FUNCTION_ATTRIBUTE     defaults
+      STORE_NAME                 create_mock_pointer
+  L43:
+      LOAD_CONST                 <code describe_get_parent_stack_id>
+      MAKE_FUNCTION              
+      STORE_NAME                 describe_get_parent_stack_id
+      LOAD_CONST                 None
+      RETURN_VALUE               
+
+--- <module>.def __annotate__(line 12) args=['format']
+  L12:
+      LOAD_FAST_BORROW           format
+      LOAD_SMALL_INT             2
+      COMPARE_OP                 >
+      LOAD_COMMON_CONSTANT       NotImplementedError
+      RAISE_VARARGS              1
+      LOAD_CONST                 'str'
+      LOAD_CONST                 'str'
+      LOAD_CONST                 'return'
+      LOAD_CONST                 'str'
+      BUILD_MAP                  2
+      RETURN_VALUE               
+
+--- <module>.def s(line 12) args=['str']
+  L13:
+      LOAD_GLOBAL                json
+      LOAD_ATTR                  dumps
+      LOAD_FAST_BORROW           str
+      CALL                       1
+      RETURN_VALUE               
+
+--- <module>.def __annotate__(line 16) args=['format']
+  L16:
+      LOAD_FAST_BORROW           format
+      LOAD_SMALL_INT             2
+      COMPARE_OP                 >
+      LOAD_COMMON_CONSTANT       NotImplementedError
+      RAISE_VARARGS              1
+      LOAD_CONST                 'text'
+      LOAD_CONST                 'str | int'
+      LOAD_CONST                 'color'
+      LOAD_CONST                 'str'
+      LOAD_CONST                 'return'
+      LOAD_CONST                 'str'
+      BUILD_MAP                  3
+      RETURN_VALUE               
+
+--- <module>.def mock_colorize(line 16) args=['text', 'color']
+  L17:
+      LOAD_CONST                 '['
+      LOAD_GLOBAL                s + NULL
+      LOAD_FAST_BORROW           color
+      CALL                       1
+      FORMAT_SIMPLE              
+      LOAD_CONST                 ']:'
+      LOAD_FAST_BORROW           text
+      FORMAT_SIMPLE              
+      BUILD_STRING               4
+      RETURN_VALUE               
+
+--- <module>.def __annotate__(line 24) args=['format']
+  L24:
+      LOAD_FAST_BORROW           format
+      LOAD_SMALL_INT             2
+      COMPARE_OP                 >
+      LOAD_COMMON_CONSTANT       NotImplementedError
+      RAISE_VARARGS              1
+      LOAD_CONST                 'stack_id'
+  L25:
+      LOAD_CONST                 'int'
+  L24:
+      LOAD_CONST                 'path_id'
+  L26:
+      LOAD_CONST                 'int'
+  L24:
+      LOAD_CONST                 'step_id'
+  L27:
+      LOAD_CONST                 'int'
+  L24:
+      LOAD_CONST                 'parent'
+  L28:
+      LOAD_CONST                 'GraphPointer | None'
+  L24:
+      LOAD_CONST                 'return'
+  L29:
+      LOAD_CONST                 'GraphPointer'
+  L24:
+      BUILD_MAP                  5
+      RETURN_VALUE               
+
+--- <module>.def create_mock_pointer(line 24) args=['stack_id', 'path_id', 'step_id', 'parent']
+  L30:
+      LOAD_GLOBAL                GraphPointer + NULL
+  L31:
+      LOAD_GLOBAL                GraphNode + NULL
+  L32:
+      LOAD_GLOBAL                RuleEnd + NULL
+      CALL                       0
+  L34:
+      LOAD_CONST                 'stackId'
+      LOAD_FAST_BORROW           stack_id
+  L35:
+      LOAD_CONST                 'pathId'
+      LOAD_FAST_BORROW           path_id
+  L36:
+      LOAD_CONST                 'stepId'
+      LOAD_FAST_BORROW           step_id
+  L33:
+      BUILD_MAP                  3
+  L31:
+      CALL                       2
+  L39:
+      LOAD_FAST_BORROW           parent
+  L30:
+      CALL                       2
+      RETURN_VALUE               
+
+--- <module>.def describe_get_parent_stack_id(line 43) args=[]
+  L44:
+      LOAD_CONST                 <code test_returns_an_empty_string_if_no_parents>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_returns_an_empty_string_if_no_parents
+  L49:
+      LOAD_CONST                 <code test_returns_a_single_parent_id_colored_correctly>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_returns_a_single_parent_id_colored_correctly
+  L55:
+      LOAD_CONST                 <code test_returns_multiple_parent_ids_separated_by_colored_arrows>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_returns_multiple_parent_ids_separated_by_colored_arrows
+  L62:
+      LOAD_CONST                 <code test_handles_deep_nesting_of_pointers>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_handles_deep_nesting_of_pointers
+      LOAD_CONST                 None
+      RETURN_VALUE               
+
+--- describe_get_parent_stack_id.def test_returns_an_empty_string_if_no_parents(line 44) args=[]
+  L45:
+      LOAD_GLOBAL                create_mock_pointer + NULL
+      LOAD_SMALL_INT             1
+      LOAD_SMALL_INT             1
+      LOAD_SMALL_INT             1
+      CALL                       3
+      STORE_FAST                 pointer
+  L46:
+      LOAD_GLOBAL                get_parent_stack_id + NULL
+      LOAD_FAST_BORROW           pointer
+      LOAD_GLOBAL                mock_colorize
+      CALL                       2
+      STORE_FAST                 result
+  L47:
+      LOAD_CONST                 ''
+      COMPARE_OP                 ==
+
+--- describe_get_parent_stack_id.def test_returns_a_single_parent_id_colored_correctly(line 49) args=[]
+  L50:
+      LOAD_GLOBAL                create_mock_pointer + NULL
+      LOAD_SMALL_INT             1
+      LOAD_SMALL_INT             1
+      LOAD_SMALL_INT             1
+      CALL                       3
+      STORE_FAST                 parent_pointer
+  L51:
+      LOAD_GLOBAL                create_mock_pointer + NULL
+      LOAD_SMALL_INT             2
+      LOAD_SMALL_INT             2
+      LOAD_SMALL_INT             2
+      LOAD_FAST_BORROW           parent_pointer
+      CALL                       4
+      STORE_FAST                 pointer
+  L52:
+      LOAD_GLOBAL                get_parent_stack_id + NULL
+      LOAD_FAST_BORROW           pointer
+      LOAD_GLOBAL                mock_colorize
+      CALL                       2
+      STORE_FAST                 result
+  L53:
+      LOAD_CONST                 '['
+      LOAD_GLOBAL                red
+      FORMAT_SIMPLE              
+      LOAD_CONST                 ']:1,1,1'
+      BUILD_STRING               3
+      COMPARE_OP                 ==
+
+--- describe_get_parent_stack_id.def test_returns_multiple_parent_ids_separated_by_colored_arrows(line 55) args=[]
+  L56:
+      LOAD_GLOBAL                create_mock_pointer + NULL
+      LOAD_SMALL_INT             0
+      LOAD_SMALL_INT             0
+      LOAD_SMALL_INT             0
+      CALL                       3
+      STORE_FAST                 grandparent_pointer
+  L57:
+      LOAD_GLOBAL                create_mock_pointer + NULL
+      LOAD_SMALL_INT             1
+      LOAD_SMALL_INT             1
+      LOAD_SMALL_INT             1
+      LOAD_FAST_BORROW           grandparent_pointer
+      CALL                       4
+      STORE_FAST                 parent_pointer
+  L58:
+      LOAD_GLOBAL                create_mock_pointer + NULL
+      LOAD_SMALL_INT             2
+      LOAD_SMALL_INT             2
+      LOAD_SMALL_INT             2
+      LOAD_FAST_BORROW           parent_pointer
+      CALL                       4
+      STORE_FAST                 pointer
+  L59:
+      LOAD_GLOBAL                get_parent_stack_id + NULL
+      LOAD_FAST_BORROW           pointer
+      LOAD_GLOBAL                mock_colorize
+      CALL                       2
+      STORE_FAST                 result
+  L60:
+      LOAD_CONST                 '['
+      LOAD_GLOBAL                red
+      FORMAT_SIMPLE              
+      LOAD_CONST                 ']:1,1,1['
+      LOAD_GLOBAL                gray
+      FORMAT_SIMPLE              
+      LOAD_CONST                 ']:<-['
+      LOAD_GLOBAL                red
+      FORMAT_SIMPLE              
+      LOAD_CONST                 ']:0,0,0'
+      BUILD_STRING               7
+      COMPARE_OP                 ==
+
+--- describe_get_parent_stack_id.def test_handles_deep_nesting_of_pointers(line 62) args=[]
+  L63:
+      LOAD_GLOBAL                create_mock_pointer + NULL
+      LOAD_SMALL_INT             0
+      LOAD_SMALL_INT             0
+      LOAD_SMALL_INT             0
+      CALL                       3
+      STORE_FAST                 great_grandparent_pointer
+  L64:
+      LOAD_GLOBAL                create_mock_pointer + NULL
+      LOAD_SMALL_INT             1
+      LOAD_SMALL_INT             1
+      LOAD_SMALL_INT             1
+      LOAD_FAST_BORROW           great_grandparent_pointer
+      CALL                       4
+      STORE_FAST                 grandparent_pointer
+  L65:
+      LOAD_GLOBAL                create_mock_pointer + NULL
+      LOAD_SMALL_INT             2
+      LOAD_SMALL_INT             2
+      LOAD_SMALL_INT             2
+      LOAD_FAST_BORROW           grandparent_pointer
+      CALL                       4
+      STORE_FAST                 parent_pointer
+  L66:
+      LOAD_GLOBAL                create_mock_pointer + NULL
+      LOAD_SMALL_INT             3
+      LOAD_SMALL_INT             3
+      LOAD_SMALL_INT             3
+      LOAD_FAST_BORROW           parent_pointer
+      CALL                       4
+      STORE_FAST                 pointer
+  L67:
+      LOAD_GLOBAL                get_parent_stack_id + NULL
+      LOAD_FAST_BORROW           pointer
+      LOAD_GLOBAL                mock_colorize
+      CALL                       2
+      STORE_FAST                 result
+  L69:
+      LOAD_CONST                 '['
+      LOAD_GLOBAL                red
+      FORMAT_SIMPLE              
+      LOAD_CONST                 ']:2,2,2['
+      LOAD_GLOBAL                gray
+      FORMAT_SIMPLE              
+      LOAD_CONST                 ']:<-['
+      LOAD_GLOBAL                red
+      FORMAT_SIMPLE              
+      LOAD_CONST                 ']:1,1,1['
+      LOAD_GLOBAL                gray
+      FORMAT_SIMPLE              
+      LOAD_CONST                 ']:<-['
+      LOAD_GLOBAL                red
+      FORMAT_SIMPLE              
+      LOAD_CONST                 ']:0,0,0'
+      BUILD_STRING               11
+  L68:
+      STORE_FAST                 expectedOutput
+  L71:
+      LOAD_FAST_BORROW_LOAD_FAST_BORROW result, expectedOutput
+      COMPARE_OP                 ==

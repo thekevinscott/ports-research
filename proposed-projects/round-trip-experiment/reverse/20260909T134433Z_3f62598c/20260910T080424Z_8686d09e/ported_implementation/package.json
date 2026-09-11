@@ -1,0 +1,21 @@
+{
+  "name": "gbnf",
+  "version": "0.1.41",
+  "description": "A library for parsing GBNF grammars",
+  "license": "MIT",
+  "author": "Ambient Labs",
+  "keywords": [
+    "gbnf",
+    "grammar",
+    "grammar-parser"
+  ],
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run --config vitest.config.unit.ts"
+  }
+}

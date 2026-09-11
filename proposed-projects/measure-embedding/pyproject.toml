@@ -1,0 +1,31 @@
+[project]
+name = "measure-embedding"
+version = "0.1.0"
+description = "Per-file .npy embeddings of one python or typescript tree, and cosine distances between two embedded trees"
+readme = "README.md"
+authors = [
+    { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "click>=8.5.0",
+    "numpy>=2.3.4",
+    "tree-sitter>=0.25.2,<0.26",
+    "tree-sitter-python>=0.25.0",
+    "tree-sitter-typescript>=0.23.2",
+]
+
+[project.scripts]
+measure-embedding = "measure_embedding.cli:cli"
+
+[build-system]
+requires = ["uv_build>=0.9,<1.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-describe>=3.2.0",
+    "pytest-httpserver>=1.1.0",
+    "testing-conventions>=0.0.104",
+]

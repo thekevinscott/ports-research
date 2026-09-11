@@ -1,0 +1,855 @@
+########## grammar_parser/__init__.py
+     1	from .build_rule_stack import build_rule_stack
+     2	
+     3	__all__ = ['build_rule_stack']
+########## grammar_parser/build_rule_stack.py
+     1	import json
+     2	from typing import Any, List, Union
+     3	
+     4	from ..grammar_graph.rule_ref import RuleRef
+     5	from ..grammar_graph.type_guards import is_range, is_rule_end
+     6	from ..grammar_graph.types import RuleChar, RuleCharExclude, RuleEnd
+     7	from ..rules_builder.type_guards import (
+     8	    is_rule_def_alt,
+     9	    is_rule_def_char,
+    10	    is_rule_def_char_alt,
+    11	    is_rule_def_char_not,
+    12	    is_rule_def_char_rng_upper,
+    13	    is_rule_def_end,
+    14	    is_rule_def_ref,
+    15	)
+    16	from ..rules_builder.types import InternalRuleDef
+    17	
+    18	UnresolvedRule = Union[RuleChar, RuleCharExclude, RuleRef, RuleEnd]
+    19	
+    20	
+    21	def _make_char_rule(rule_def: InternalRuleDef) -> Union[RuleChar, RuleCharExclude]:
+    22	    value = list(rule_def.value)
+    23	    if is_rule_def_char_not(rule_def):
+    24	        return RuleCharExclude(value=value)
+    25	    return RuleChar(value=value)
+    26	
+    27	
+    28	def build_rule_stack(linear_rules: List[InternalRuleDef]) -> List[List[UnresolvedRule]]:
+    29	    paths: List[UnresolvedRule] = []
+    30	
+    31	    stack: List[List[UnresolvedRule]] = []
+    32	
+    33	    idx = 0
+    34	    while idx < len(linear_rules):
+    35	        rule_def = linear_rules[idx]
+    36	        if is_rule_def_char(rule_def) or is_rule_def_char_not(rule_def):
+    37	            # this could be a single char, or a range, or a sequence of alts; we don't
+    38	            # know until we step through it.
+    39	            char_rule = _make_char_rule(rule_def)
+    40	            idx += 1
+    41	            rule = linear_rules[idx] if idx < len(linear_rules) else None
+    42	            while idx < len(linear_rules) and (
+    43	                is_rule_def_char_rng_upper(rule) or is_rule_def_char_alt(rule)
+    44	            ):
+    45	                if is_rule_def_char_rng_upper(rule):
+    46	                    # previous rule value should be a number
+    47	                    prev_value: Any = char_rule.value.pop() if char_rule.value else None
+    48	                    if is_range(prev_value):
+    49	                        raise Exception(
+    50	                            'Unexpected range, expected a number but got an array: '
+    51	                            f'{json.dumps(prev_value)}'
+    52	                        )
+    53	                    if prev_value is None:
+    54	                        raise Exception('Unexpected undefined value')
+    55	                    char_rule.value.append([prev_value, rule.value])
+    56	                if is_rule_def_char_alt(rule):
+    57	                    char_rule.value.append(rule.value)
+    58	                idx += 1
+    59	                rule = linear_rules[idx] if idx < len(linear_rules) else None
+    60	            paths.append(char_rule)
+    61	        else:
+    62	            if is_rule_def_alt(rule_def):
+    63	                if not paths:
+    64	                    raise Exception('Encountered alt without anything before it')
+    65	                paths.append(RuleEnd())
+    66	                stack.append(paths)
+    67	                paths = []
+    68	            elif is_rule_def_end(rule_def):
+    69	                paths.append(RuleEnd())
+    70	            elif is_rule_def_ref(rule_def):
+    71	                paths.append(RuleRef(rule_def.value))
+    72	            elif is_rule_def_char_alt(rule_def):
+    73	                raise Exception(
+    74	                    'Encountered char alt, should be handled by above block: '
+    75	                    f'{rule_def.type}'
+    76	                )
+    77	            else:
+    78	                raise Exception(f'Unsupported rule type: {rule_def.type}')
+    79	            idx += 1
+    80	
+    81	    if not is_rule_end(paths[-1] if paths else None):
+    82	        paths.append(RuleEnd())
+    83	
+    84	    stack.append(paths)
+    85	
+    86	    return stack
+########## grammar_graph/__init__.py
+     1	from .generic_set import GenericSet
+     2	from .graph import Graph
+     3	from .graph_node import GraphNode, GraphNodeMeta
+     4	from .graph_pointer import GraphPointer
+     5	from .parse_state import ParseState
+     6	from .rule_ref import RuleRef
+     7	from .type_guards import is_range
+     8	from .types import (
+     9	    Range,
+    10	    ResolvedRule,
+    11	    RuleChar,
+    12	    RuleCharExclude,
+    13	    RuleEnd,
+    14	    RuleType,
+    15	    ValidInput,
+    16	    rule_to_dict,
+    17	)
+    18	
+    19	__all__ = [
+    20	    'GenericSet',
+    21	    'Graph',
+    22	    'GraphNode',
+    23	    'GraphNodeMeta',
+    24	    'GraphPointer',
+    25	    'ParseState',
+    26	    'RuleRef',
+    27	    'is_range',
+    28	    'Range',
+    29	    'ResolvedRule',
+    30	    'RuleChar',
+    31	    'RuleCharExclude',
+    32	    'RuleEnd',
+    33	    'RuleType',
+    34	    'ValidInput',
+    35	    'rule_to_dict',
+    36	]
+########## grammar_graph/colorize.py
+     1	from enum import Enum
+     2	from typing import Union
+     3	
+     4	
+     5	class Color(str, Enum):
+     6	    BLUE = '\x1b[34m'
+     7	    CYAN = '\x1b[36m'
+     8	    GREEN = '\x1b[32m'
+     9	    RED = '\x1b[31m'
+    10	    GRAY = '\x1b[90m'
+    11	    YELLOW = '\x1b[33m'
+    12	
+    13	
+    14	def colorize(string: Union[str, int], color: Color) -> str:
+    15	    return f'{color.value}{string}'
+    16	
+    17	
+    18	def no_color(string: Union[str, int], color: Color) -> str:
+    19	    return f'{string}'
+########## grammar_graph/generic_set.py
+     1	from typing import Callable, Dict, Generic, Iterator, Optional, TypeVar
+     2	
+     3	T = TypeVar('T')
+     4	K = TypeVar('K')
+     5	
+     6	
+     7	class GenericSet(Generic[T, K]):
+     8	    """An insertion-ordered set keyed by a derived key.
+     9	
+    10	    Adding an element whose key is already present is a no-op, so the first
+    11	    element seen for a key is the one the set keeps.
+    12	    """
+    13	
+    14	    def __init__(self, get_key: Callable[[T], K]):
+    15	        self.get_key = get_key
+    16	        self._keys: Dict[K, T] = {}
+    17	
+    18	    def add(self, el: T) -> None:
+    19	        key = self.get_key(el)
+    20	        if key not in self._keys:
+    21	            self._keys[key] = el
+    22	
+    23	    def delete(self, el: T) -> None:
+    24	        key = self.get_key(el)
+    25	        if key not in self._keys:
+    26	            raise Exception('Could not get ref')
+    27	        del self._keys[key]
+    28	
+    29	    def has(self, el: T) -> bool:
+    30	        key = self.get_key(el)
+    31	        return key in self._keys and self._keys[key] is el
+    32	
+    33	    def get(self, el: T) -> Optional[T]:
+    34	        return self._keys.get(self.get_key(el))
+    35	
+    36	    def __iter__(self) -> Iterator[T]:
+    37	        yield from list(self._keys.values())
+    38	
+    39	    @property
+    40	    def size(self) -> int:
+    41	        return len(self._keys)
+########## grammar_graph/get_input_as_code_points.py
+     1	from typing import List
+     2	
+     3	from .types import ValidInput
+     4	
+     5	
+     6	def get_input_as_code_points(src: ValidInput) -> List[int]:
+     7	    if not isinstance(src, str):
+     8	        return list(src) if isinstance(src, list) else [src]
+     9	
+    10	    return [ord(char) for char in src]
+########## grammar_graph/get_parent_stack_id.py
+     1	from typing import Any, Callable, List
+     2	
+     3	from .colorize import Color
+     4	
+     5	
+     6	def get_parent_stack_id(pointer: Any, col: Callable[..., str]) -> str:
+     7	    stack_ids: List[str] = []
+     8	    parent = pointer.parent
+     9	    while parent:
+    10	        meta = parent.node.meta
+    11	        stack_ids.append(f'{meta.stack_id},{meta.path_id},{meta.step_id}')
+    12	        parent = parent.parent
+    13	    return col('<-', Color.GRAY).join(col(id_, Color.RED) for id_ in stack_ids)
+########## grammar_graph/get_serialized_rule_key.py
+     1	import json
+     2	from typing import Any
+     3	
+     4	from .type_guards import is_rule_char, is_rule_char_excluded, is_rule_end, is_rule_ref
+     5	from .types import RuleType
+     6	
+     7	KEY_TRANSLATION = {
+     8	    RuleType.END: 0,
+     9	    RuleType.CHAR: 1,
+    10	    RuleType.CHAR_EXCLUDE: 2,
+    11	}
+    12	
+    13	
+    14	def get_serialized_rule_key(rule: Any) -> str:
+    15	    if is_rule_end(rule):
+    16	        return f'{KEY_TRANSLATION[RuleType.END]}'
+    17	
+    18	    if is_rule_char(rule) or is_rule_char_excluded(rule):
+    19	        value = json.dumps(rule.value, separators=(',', ':'))
+    20	        return f'{KEY_TRANSLATION[rule.type]}-{value}'
+    21	
+    22	    if is_rule_ref(rule):
+    23	        return f'3-{rule.value}'
+    24	
+    25	    raise Exception(f'Unknown rule type: {rule}')
+########## grammar_graph/graph.py
+     1	from typing import Any, Dict, Iterator, List, Optional, Tuple
+     2	
+     3	from ..utils.errors.input_parse_error import InputParseError
+     4	from ..utils.is_point_in_range import is_point_in_range
+     5	from .colorize import colorize, no_color
+     6	from .generic_set import GenericSet
+     7	from .get_input_as_code_points import get_input_as_code_points
+     8	from .get_serialized_rule_key import get_serialized_rule_key
+     9	from .graph_node import GraphNode, GraphNodeMeta
+    10	from .graph_pointer import GraphPointer
+    11	from .rule_ref import RuleRef
+    12	from .type_guards import (
+    13	    is_range,
+    14	    is_rule_char,
+    15	    is_rule_char_excluded,
+    16	    is_rule_end,
+    17	    is_rule_ref,
+    18	)
+    19	from .types import ValidInput
+    20	
+    21	RootNode = Dict[int, GraphNode]
+    22	Pointers = GenericSet[GraphPointer, str]
+    23	
+    24	
+    25	def make_pointers() -> Pointers:
+    26	    return GenericSet(lambda p: p.id)
+    27	
+    28	
+    29	class Graph:
+    30	    def __init__(
+    31	        self,
+    32	        grammar: str,
+    33	        stacked_rules: List[List[List[Any]]],
+    34	        root_id: int,
+    35	    ):
+    36	        self.grammar = grammar
+    37	        self.roots: Dict[int, RootNode] = {}
+    38	        self._previous_code_points: List[int] = []
+    39	
+    40	        rule_refs: List[RuleRef] = []
+    41	        unique_rules: GenericSet[Any, str] = GenericSet(get_serialized_rule_key)
+    42	        for stack_id in range(len(stacked_rules)):
+    43	            stack = stacked_rules[stack_id]
+    44	            nodes: RootNode = {}
+    45	            for path_id in range(len(stack)):
+    46	                path = stack[path_id]
+    47	                node: Optional[GraphNode] = None
+    48	                for step_id in range(len(path) - 1, -1, -1):
+    49	                    next_ = node
+    50	                    rule = stack[path_id][step_id]
+    51	                    unique_rules.add(rule)
+    52	                    if is_rule_ref(rule):
+    53	                        rule_refs.append(rule)
+    54	                    # rules coming in may be identical but have different references.
+    55	                    # here, we ensure we always use the same reference for an identical
+    56	                    # rule. this makes future comparisons easier.
+    57	                    unique_rule = unique_rules.get(rule)
+    58	                    if unique_rule is None:
+    59	                        raise Exception('Could not get unique rule')
+    60	                    node = GraphNode(
+    61	                        unique_rule,
+    62	                        GraphNodeMeta(stack_id=stack_id, path_id=path_id, step_id=step_id),
+    63	                        next_,
+    64	                    )
+    65	                if node is None:
+    66	                    raise Exception('Could not get node')
+    67	                nodes[path_id] = node
+    68	
+    69	            self.roots[stack_id] = nodes
+    70	
+    71	        root_node = self.roots.get(root_id)
+    72	        if root_node is None:
+    73	            raise Exception(f'Root node not found for value: {root_id}')
+    74	        self._root_node: RootNode = root_node
+    75	
+    76	        for rule_ref in rule_refs:
+    77	            referenced_nodes: List[GraphNode] = []
+    78	            for node in self._get_root_node(rule_ref.value).values():
+    79	                if node not in referenced_nodes:
+    80	                    referenced_nodes.append(node)
+    81	            rule_ref.nodes = referenced_nodes
+    82	
+    83	    def _get_root_node(self, value: int) -> RootNode:
+    84	        root_node = self.roots.get(value)
+    85	        if root_node is None:
+    86	            raise Exception(f'Root node not found for value: {value}')
+    87	        return root_node
+    88	
+    89	    def _get_initial_pointers(self) -> Pointers:
+    90	        pointers = make_pointers()
+    91	
+    92	        root_node = self._root_node
+    93	        if root_node is None:
+    94	            raise Exception('Root node is not defined')
+    95	
+    96	        for node, parent in self._fetch_nodes_for_root_node(root_node):
+    97	            pointer = GraphPointer(node, parent)
+    98	            for resolved_pointer in self._resolve_pointer(pointer):
+    99	                pointers.add(resolved_pointer)
+   100	        return pointers
+   101	
+   102	    def _set_valid(self, pointers: List[GraphPointer], valid: bool) -> None:
+   103	        for pointer in pointers:
+   104	            pointer.valid = valid
+   105	
+   106	    def _parse(self, current_pointers: Pointers, code_point: int) -> Pointers:
+   107	        for rule, graph_pointers in self._iterate_over_pointers(current_pointers):
+   108	            if is_rule_char(rule):
+   109	                valid = False
+   110	                for possible_code_point in rule.value:
+   111	                    if is_range(possible_code_point):
+   112	                        valid = is_point_in_range(code_point, possible_code_point)
+   113	                    else:
+   114	                        valid = code_point == possible_code_point
+   115	                    if valid:
+   116	                        break
+   117	                self._set_valid(graph_pointers, valid)
+   118	            elif is_rule_char_excluded(rule):
+   119	                valid = True
+   120	                for possible_code_point in rule.value:
+   121	                    if is_range(possible_code_point):
+   122	                        valid = not is_point_in_range(code_point, possible_code_point)
+   123	                    else:
+   124	                        valid = code_point != possible_code_point
+   125	                    if not valid:
+   126	                        break
+   127	                self._set_valid(graph_pointers, valid)
+   128	            elif not is_rule_end(rule):
+   129	                raise Exception(f'Unsupported rule: {rule}')
+   130	
+   131	        # a pointer's id is the sum of its node's id and its parent's id chain.
+   132	        # if two pointers share the same id, it means they point to the same node and
+   133	        # have identical parent chains. for the purposes of walking the graph, we only
+   134	        # need to keep one of them.
+   135	        next_pointers = make_pointers()
+   136	        for current_pointer in current_pointers:
+   137	            for unresolved_next_pointer in current_pointer.fetch_next():
+   138	                for resolved_next_pointer in self._resolve_pointer(
+   139	                    unresolved_next_pointer
+   140	                ):
+   141	                    next_pointers.add(resolved_next_pointer)
+   142	        return next_pointers
+   143	
+   144	    def _resolve_pointer(self, unresolved_pointer: GraphPointer) -> Iterator[GraphPointer]:
+   145	        for resolved_pointer in unresolved_pointer.resolve():
+   146	            if is_rule_ref(resolved_pointer.node.rule):
+   147	                raise Exception(
+   148	                    'Encountered a reference rule when building pointers to the graph'
+   149	                )
+   150	            if is_rule_end(resolved_pointer.node.rule) and resolved_pointer.parent:
+   151	                raise Exception(
+   152	                    'Encountered an ending rule with a parent when building pointers to '
+   153	                    'the graph'
+   154	                )
+   155	            yield resolved_pointer
+   156	
+   157	    def add(self, src: ValidInput, pointers: Optional[Pointers] = None) -> Pointers:
+   158	        if pointers is None:
+   159	            pointers = self._get_initial_pointers()
+   160	        code_points = get_input_as_code_points(src)
+   161	        for code_point_pos in range(len(code_points)):
+   162	            code_point = code_points[code_point_pos]
+   163	            pointers = self._parse(pointers, code_point)
+   164	            if pointers.size == 0:
+   165	                raise InputParseError(
+   166	                    code_points, code_point_pos, list(self._previous_code_points)
+   167	                )
+   168	        self._previous_code_points.extend(code_points)
+   169	        return pointers
+   170	
+   171	    def _fetch_nodes_for_root_node(
+   172	        self,
+   173	        root_nodes: RootNode,
+   174	        parent: Optional[GraphPointer] = None,
+   175	    ) -> Iterator[Tuple[GraphNode, Optional[GraphPointer]]]:
+   176	        """Yields either the node, or if a reference rule, the referenced node.
+   177	
+   178	        We need this function, as distinct from leveraging the logic in GraphPointer,
+   179	        because that needs a rule ref with already defined nodes; this function is used
+   180	        to _set_ those nodes.
+   181	        """
+   182	        for node in root_nodes.values():
+   183	            if is_rule_ref(node.rule):
+   184	                yield from self._fetch_nodes_for_root_node(
+   185	                    self._get_root_node(node.rule.value), GraphPointer(node, parent)
+   186	                )
+   187	            else:
+   188	                yield (node, parent)
+   189	
+   190	    def print(self, pointers: Optional[Pointers] = None, colors: bool = False) -> str:
+   191	        nodes = [list(node_map.values()) for node_map in self.roots.values()]
+   192	        graph_view: List[str] = []
+   193	        for root_node in nodes:
+   194	            for node in root_node:
+   195	                graph_view.append(
+   196	                    node.print(
+   197	                        colorize=colorize if colors else no_color,
+   198	                        pointers=pointers,
+   199	                        show_position=True,
+   200	                    )
+   201	                )
+   202	        joined = '\n'.join(graph_view)
+   203	        return f'\n{joined}'
+   204	
+   205	    def __repr__(self) -> str:
+   206	        return self.print(colors=True)
+   207	
+   208	    def _iterate_over_pointers(
+   209	        self, pointers: Pointers
+   210	    ) -> Iterator[Tuple[Any, List[GraphPointer]]]:
+   211	        # rules are de-duplicated by reference when the graph is built, so grouping by
+   212	        # identity groups every pointer that shares a rule.
+   213	        seen_rules: Dict[int, Tuple[Any, List[GraphPointer]]] = {}
+   214	        for pointer in pointers:
+   215	            rule = pointer.rule
+   216	            if is_rule_ref(rule):
+   217	                raise Exception(
+   218	                    'Encountered a reference rule in the graph, this should not happen'
+   219	                )
+   220	            seen_rule = seen_rules.get(id(rule))
+   221	            if seen_rule is None:
+   222	                seen_rules[id(rule)] = (rule, [pointer])
+   223	            else:
+   224	                seen_rule[1].append(pointer)
+   225	
+   226	        for rule, graph_pointers in seen_rules.values():
+   227	            yield (rule, graph_pointers)
+########## grammar_graph/graph_node.py
+     1	from dataclasses import dataclass
+     2	from typing import Any, Optional
+     3	
+     4	from .colorize import colorize
+     5	from .print import print_graph_node
+     6	
+     7	
+     8	@dataclass
+     9	class GraphNodeMeta:
+    10	    stack_id: int
+    11	    path_id: int
+    12	    step_id: int
+    13	
+    14	
+    15	class GraphNode:
+    16	    def __init__(
+    17	        self,
+    18	        rule: Any,
+    19	        meta: GraphNodeMeta,
+    20	        next_: Optional['GraphNode'] = None,
+    21	    ):
+    22	        self.rule = rule
+    23	        if meta is None:
+    24	            raise Exception('Meta is undefined')
+    25	        self.meta = meta
+    26	        self.next = next_
+    27	        self._id: Optional[str] = None
+    28	        self.print = print_graph_node(self)
+    29	
+    30	    @property
+    31	    def id(self) -> str:
+    32	        if not self._id:
+    33	            self._id = f'{self.meta.stack_id},{self.meta.path_id},{self.meta.step_id}'
+    34	        return self._id
+    35	
+    36	    def __repr__(self) -> str:
+    37	        return self.print(colorize=colorize, show_position=False)
+########## grammar_graph/graph_pointer.py
+     1	from typing import Any, Iterator, Optional
+     2	
+     3	from .colorize import colorize
+     4	from .graph_node import GraphNode
+     5	from .print import print_graph_pointer
+     6	from .type_guards import (
+     7	    is_graph_pointer_rule_char,
+     8	    is_graph_pointer_rule_char_exclude,
+     9	    is_graph_pointer_rule_end,
+    10	    is_graph_pointer_rule_ref,
+    11	    is_rule_end,
+    12	)
+    13	
+    14	
+    15	class GraphPointer:
+    16	    def __init__(self, node: GraphNode, parent: Optional['GraphPointer'] = None):
+    17	        if node is None:
+    18	            raise Exception('Node is undefined')
+    19	        self.node = node
+    20	        self.parent = parent
+    21	        self.id = f'{parent.id}-{node.id}' if parent is not None else node.id
+    22	        self._valid: Optional[bool] = None
+    23	        self.print = print_graph_pointer(self)
+    24	
+    25	    def resolve(self, resolved: bool = False) -> Iterator['GraphPointer']:
+    26	        """
+    27	        1. If the current node is an end node, and the pointer has a parent, return the
+    28	           parent's `fetch_next`; else return nothing.
+    29	        2. If the current node is a rule ref, yield the referenced nodes, _unless_
+    30	           resolved is true, in which case it returns next.
+    31	        3. If the current node is a char or range, we go to the next node. If none
+    32	           exists, throw an error.
+    33	        """
+    34	        if is_graph_pointer_rule_ref(self):
+    35	            if resolved:
+    36	                if self.node.next is None:
+    37	                    raise Exception(f'No next node: {self.node.id}')
+    38	                yield from GraphPointer(self.node.next, self.parent).resolve()
+    39	            else:
+    40	                for node in self.node.rule.nodes:
+    41	                    yield from GraphPointer(node, self).resolve()
+    42	        elif is_graph_pointer_rule_end(self):
+    43	            if self.parent is None:
+    44	                yield self
+    45	            else:
+    46	                yield from self.parent.resolve(True)
+    47	        elif is_graph_pointer_rule_char(self) or is_graph_pointer_rule_char_exclude(self):
+    48	            yield self
+    49	        else:
+    50	            raise Exception(f'Unknown rule: {self.node.rule}')
+    51	
+    52	    def fetch_next(self) -> Iterator['GraphPointer']:
+    53	        # if this pointer is invalid, then we don't return any new pointers
+    54	        if self._valid is False:
+    55	            return
+    56	
+    57	        # if this pointer is an end node, we return the parent's next node. If no
+    58	        # parent exists, we return nothing, since it's the end of the line.
+    59	        if is_rule_end(self.node.rule):
+    60	            if self.parent is not None:
+    61	                yield from self.parent.fetch_next()
+    62	        else:
+    63	            if self.node.next is None:
+    64	                raise Exception(f'No next node: {self.node.id}')
+    65	            pointer = GraphPointer(self.node.next, self.parent)
+    66	            yield from pointer.resolve()
+    67	
+    68	    @property
+    69	    def rule(self) -> Any:
+    70	        return self.node.rule
+    71	
+    72	    @property
+    73	    def valid(self) -> Optional[bool]:
+    74	        return self._valid
+    75	
+    76	    @valid.setter
+    77	    def valid(self, valid: bool) -> None:
+    78	        self._valid = valid
+    79	
+    80	    def __repr__(self) -> str:
+    81	        return self.print(colorize=colorize)
+########## grammar_graph/parse_state.py
+     1	import json
+     2	from typing import TYPE_CHECKING, Iterator, Set
+     3	
+     4	from .types import ResolvedRule, ValidInput, rule_to_dict
+     5	
+     6	if TYPE_CHECKING:  # pragma: no cover
+     7	    from .graph import Graph, Pointers
+     8	
+     9	
+    10	class ParseState:
+    11	    """An immutable view of where a parse currently stands.
+    12	
+    13	    Iterate it to see the rules that may come next; call ``add`` (or the state
+    14	    itself) with more input to get the next state.
+    15	    """
+    16	
+    17	    def __init__(self, graph: 'Graph', pointers: 'Pointers'):
+    18	        self._graph = graph
+    19	        self._pointers = pointers
+    20	
+    21	    def __call__(self, input_: ValidInput) -> 'ParseState':
+    22	        return self.add(input_)
+    23	
+    24	    def __iter__(self) -> Iterator[ResolvedRule]:
+    25	        yield from self.rules()
+    26	
+    27	    def rules(self) -> Iterator[ResolvedRule]:
+    28	        seen: Set[str] = set()
+    29	        for pointer in self._pointers:
+    30	            rule = pointer.rule
+    31	            key = json.dumps(rule_to_dict(rule), separators=(',', ':'))
+    32	            if key not in seen:
+    33	                seen.add(key)
+    34	                yield rule
+    35	
+    36	    def add(self, input_: ValidInput) -> 'ParseState':
+    37	        pointers = self._graph.add(input_, self._pointers)
+    38	        return ParseState(self._graph, pointers)
+    39	
+    40	    @property
+    41	    def size(self) -> int:
+    42	        return len(list(self.rules()))
+    43	
+    44	    def __len__(self) -> int:
+    45	        return self.size
+    46	
+    47	    def __bool__(self) -> bool:
+    48	        # a state is always a valid object, even when it offers no further rules
+    49	        return True
+    50	
+    51	    @property
+    52	    def grammar(self) -> str:
+    53	        return self._graph.grammar
+    54	
+    55	    def __repr__(self) -> str:
+    56	        return f'ParseState({[rule_to_dict(rule) for rule in self.rules()]})'
+########## grammar_graph/print.py
+     1	from typing import Any, Callable, List, Optional, Union
+     2	
+     3	from .colorize import Color
+     4	from .get_parent_stack_id import get_parent_stack_id
+     5	from .type_guards import is_range, is_rule_char, is_rule_ref
+     6	
+     7	
+     8	def print_graph_pointer(pointer: Any) -> Callable[..., str]:
+     9	    def print_(colorize: Callable[..., str]) -> str:
+    10	        return colorize(f'*{get_parent_stack_id(pointer, colorize)}', Color.RED)
+    11	
+    12	    return print_
+    13	
+    14	
+    15	def print_graph_node(node: Any) -> Callable[..., str]:
+    16	    def print_(
+    17	        colorize: Callable[..., str],
+    18	        pointers: Optional[Any] = None,
+    19	        show_position: bool = False,
+    20	    ) -> str:
+    21	        rule = node.rule
+    22	        col = colorize
+    23	
+    24	        parts: List[Union[str, int]] = []
+    25	        if show_position:
+    26	            parts.extend([
+    27	                col('{', Color.BLUE),
+    28	                col(node.id, Color.GRAY),
+    29	                col('}', Color.BLUE),
+    30	            ])
+    31	        if is_rule_char(rule):
+    32	            values = []
+    33	            for v in rule.value:
+    34	                if is_range(v):
+    35	                    values.append(''.join(col(chr(val), Color.YELLOW) for val in v))
+    36	                else:
+    37	                    values.append(_get_char(v))
+    38	            parts.extend([
+    39	                col('[', Color.GRAY),
+    40	                col(''.join(values), Color.YELLOW),
+    41	                col(']', Color.GRAY),
+    42	            ])
+    43	        elif is_rule_ref(rule):
+    44	            parts.append(
+    45	                col('Ref(', Color.GRAY)
+    46	                + col(f'{rule.value}', Color.GREEN)
+    47	                + col(')', Color.GRAY)
+    48	            )
+    49	        else:
+    50	            parts.append(col(rule.type.value, Color.YELLOW))
+    51	
+    52	        if pointers:
+    53	            for pointer in pointers:
+    54	                pointer_parts: List[str] = []
+    55	                if pointer.node is node:
+    56	                    pointer_parts.append(pointer.print(colorize=col))
+    57	                if pointer_parts:
+    58	                    parts.append(col('[', Color.GRAY))
+    59	                    parts.extend(pointer_parts)
+    60	                    parts.append(col(']', Color.GRAY))
+    61	
+    62	        rendered = [''.join(str(part) for part in parts)]
+    63	        if node.next is not None:
+    64	            rendered.append(
+    65	                node.next.print(
+    66	                    colorize=col, pointers=pointers, show_position=show_position
+    67	                )
+    68	            )
+    69	        return col('-> ', Color.GRAY).join(part for part in rendered if part)
+    70	
+    71	    return print_
+    72	
+    73	
+    74	def _get_char(char_code: int) -> str:
+    75	    char = chr(char_code)
+    76	    if char == '\n':
+    77	        return '\\n'
+    78	    return char
+########## grammar_graph/rule_ref.py
+     1	from typing import TYPE_CHECKING, List, Optional
+     2	
+     3	if TYPE_CHECKING:  # pragma: no cover
+     4	    from .graph_node import GraphNode
+     5	
+     6	
+     7	class RuleRef:
+     8	    """A reference to another rule, resolved to its nodes once the graph is built.
+     9	
+    10	    The reference implementation stores the nodes in a JS ``Set``; the nodes are
+    11	    already distinct, so a list preserves both uniqueness and iteration order.
+    12	    """
+    13	
+    14	    def __init__(self, value: int):
+    15	        self.value = value
+    16	        self._nodes: Optional[List['GraphNode']] = None
+    17	
+    18	    @property
+    19	    def nodes(self) -> List['GraphNode']:
+    20	        if self._nodes is None:
+    21	            raise Exception('Nodes are not set')
+    22	        return self._nodes
+    23	
+    24	    @nodes.setter
+    25	    def nodes(self, nodes: List['GraphNode']) -> None:
+    26	        self._nodes = list(nodes)
+########## grammar_graph/type_guards.py
+     1	from typing import Any
+     2	
+     3	from .rule_ref import RuleRef
+     4	from .types import RuleChar, RuleCharExclude, RuleEnd, RuleType
+     5	
+     6	
+     7	def is_rule_type(type_: Any = None) -> bool:
+     8	    return bool(type_) and type_ in tuple(RuleType)
+     9	
+    10	
+    11	def is_rule(rule: Any = None) -> bool:
+    12	    return isinstance(rule, (RuleChar, RuleCharExclude, RuleEnd, RuleRef))
+    13	
+    14	
+    15	def is_rule_ref(rule: Any = None) -> bool:
+    16	    return isinstance(rule, RuleRef)
+    17	
+    18	
+    19	def is_rule_end(rule: Any = None) -> bool:
+    20	    return isinstance(rule, RuleEnd)
+    21	
+    22	
+    23	def is_rule_char(rule: Any = None) -> bool:
+    24	    return isinstance(rule, RuleChar)
+    25	
+    26	
+    27	def is_rule_char_excluded(rule: Any = None) -> bool:
+    28	    return isinstance(rule, RuleCharExclude)
+    29	
+    30	
+    31	def is_range(rng: Any = None) -> bool:
+    32	    return (
+    33	        isinstance(rng, (list, tuple))
+    34	        and len(rng) == 2
+    35	        and all(isinstance(n, int) for n in rng)
+    36	    )
+    37	
+    38	
+    39	def is_graph_pointer_rule_ref(pointer: Any) -> bool:
+    40	    return is_rule_ref(pointer.rule)
+    41	
+    42	
+    43	def is_graph_pointer_rule_end(pointer: Any) -> bool:
+    44	    return is_rule_end(pointer.rule)
+    45	
+    46	
+    47	def is_graph_pointer_rule_char(pointer: Any) -> bool:
+    48	    return is_rule_char(pointer.rule)
+    49	
+    50	
+    51	def is_graph_pointer_rule_char_exclude(pointer: Any) -> bool:
+    52	    return is_rule_char_excluded(pointer.rule)
+########## grammar_graph/types.py
+     1	from dataclasses import dataclass, field
+     2	from enum import Enum
+     3	from typing import Any, Dict, List, Union
+     4	
+     5	
+     6	class RuleType(str, Enum):
+     7	    CHAR = 'char'
+     8	    CHAR_EXCLUDE = 'char_exclude'
+     9	    END = 'end'
+    10	
+    11	
+    12	# A range is a two element [start, end] list of code points.
+    13	Range = List[int]
+    14	RuleValue = List[Union[int, Range]]
+    15	
+    16	
+    17	@dataclass
+    18	class RuleChar:
+    19	    value: RuleValue = field(default_factory=list)
+    20	    type: RuleType = RuleType.CHAR
+    21	
+    22	
+    23	@dataclass
+    24	class RuleCharExclude:
+    25	    value: RuleValue = field(default_factory=list)
+    26	    type: RuleType = RuleType.CHAR_EXCLUDE
+    27	
+    28	
+    29	@dataclass
+    30	class RuleEnd:
+    31	    type: RuleType = RuleType.END
+    32	
+    33	
+    34	# UnresolvedRule = RuleChar | RuleCharExclude | RuleRef | RuleEnd
+    35	# RuleRefs should never be exposed to the end user.
+    36	ResolvedRule = Union[RuleChar, RuleCharExclude, RuleEnd]
+    37	
+    38	# ValidInput can either be a string, or a number indicating a code point.
+    39	# It CANNOT be a number representing a number; a number being a "number"
+    40	# (like "8") should be passed in as a string.
+    41	ValidInput = Union[str, int, List[int]]
+    42	
+    43	
+    44	def rule_to_dict(rule: Any) -> Dict[str, Any]:
+    45	    """The plain-data view of a rule, mirroring the reference implementation's
+    46	    JSON shape (``{"type": "char", "value": [102]}``)."""
+    47	    if isinstance(rule, RuleEnd):
+    48	        return {'type': rule.type.value}
+    49	    return {'type': rule.type.value, 'value': rule.value}

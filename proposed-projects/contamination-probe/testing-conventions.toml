@@ -1,0 +1,39 @@
+[[python.exempt]]
+path = "contamination_probe/__init__.py"
+rules = ["colocated-test"]
+reason = "re-export barrel; perturb_reference_tree is tested in its own module"
+
+[[python.exempt]]
+path = "contamination_probe/cli_test.py"
+rules = ["unmocked-collaborator"]
+reason = "click's CliRunner is the harness driving the unit"
+
+[[python.exempt]]
+path = "contamination_probe/discover_public_symbols_test.py"
+rules = ["unmocked-collaborator"]
+reason = "SymbolSite is a plain value type, imported only to build expected fixture values; a mocked dataclass would fail equality comparison"
+
+[[python.exempt]]
+path = "contamination_probe/rename_symbols_test.py"
+rules = ["unmocked-collaborator"]
+reason = "SymbolSite is a plain value type, imported only to construct the sites passed in; a mocked dataclass would fail equality comparison"
+
+[[python.exempt]]
+path = "contamination_probe/generate_synthetic_name_test.py"
+rules = ["unmocked-collaborator"]
+reason = "random.Random is the source of nondeterminism under test — the test asserts on real seeded output, which a mock can't stand in for"
+
+[[python.exempt]]
+path = "contamination_probe/perturb_reference_tree_test.py"
+rules = ["unmocked-collaborator"]
+reason = "discover_modules is a pure filesystem query, imported only to locate the moved file the assertion reads back — mocking it would just hardcode the path it's meant to discover"
+
+[[python.exempt]]
+path = "contamination_probe/reshuffle_file_layout_test.py"
+rules = ["unmocked-collaborator"]
+reason = "discover_modules is a pure filesystem query, imported only to locate files after the move — mocking it would just hardcode the path it's meant to discover"
+
+[[python.exempt]]
+path = "contamination_probe/move_resource_test.py"
+rules = ["unmocked-collaborator"]
+reason = "rope.base.project.Project is the refactoring engine move_resource operates through; a mocked project can't produce a real moved file to assert on"

@@ -1,0 +1,1008 @@
+"""Ported from tests/javascript/iteration/iteration-with-an-initial-string.test.ts.
+
+Generated from the JavaScript suite in /workspace/tests/javascript; the case
+tables are the originals, translated verbatim.
+"""
+
+import pytest
+
+from gbnf import GBNF
+
+CASES = [
+    [
+        'root ::= "foo"',
+        '',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "foo"',
+        'f',
+        [
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "foo"',
+        'fo',
+        [
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "foo"',
+        'foo',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= "foo" | "bar" ',
+        '',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+            {'type': 'char', 'value': [
+                98,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "foo" | "bar" ',
+        'f',
+        [
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "foo" | "bar" ',
+        'fo',
+        [
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "foo" | "bar" ',
+        'foo',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= "foo" | "bar" ',
+        'b',
+        [
+            {'type': 'char', 'value': [
+                97,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "foo" | "bar" ',
+        'ba',
+        [
+            {'type': 'char', 'value': [
+                114,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "foo" | "bar" ',
+        'bar',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= "foo" | "bar" | "baz"',
+        'ba',
+        [
+            {'type': 'char', 'value': [
+                114,
+            ]},
+            {'type': 'char', 'value': [
+                122,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "["',
+        '[',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= "]"',
+        ']',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= "[]"',
+        '[]',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= "{"',
+        '{',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= "}"',
+        '}',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= "{}"',
+        '{}',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= "[{}]"',
+        '[{}]',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [^f] "o"',
+        '',
+        [
+            {'type': 'char_exclude', 'value': [
+                102,
+            ]},
+        ],
+    ],
+    [
+        'root ::= [^f] "o"',
+        'a',
+        [
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        'root ::= [^A-Z]',
+        '',
+        [
+            {'type': 'char_exclude', 'value': [
+                [
+                    65,
+                    90,
+                ],
+            ]},
+        ],
+    ],
+    [
+        'root ::= [^A-Z0-9]',
+        '',
+        [
+            {'type': 'char_exclude', 'value': [
+                [
+                    65,
+                    90,
+                ],
+                [
+                    48,
+                    57,
+                ],
+            ]},
+        ],
+    ],
+    [
+        'root ::= [^A-Z0-9_-]',
+        '',
+        [
+            {'type': 'char_exclude', 'value': [
+                [
+                    65,
+                    90,
+                ],
+                [
+                    48,
+                    57,
+                ],
+                95,
+                45,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= foo\nfoo ::= "foo"',
+        '',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+        ],
+    ],
+    [
+        'root ::= foo\nfoo ::= "foo"\n',
+        'f',
+        [
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= foo\nfoo ::= "foo"\n',
+        'fo',
+        [
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        'root ::= foo\nfoo ::= "foo"',
+        'foo',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= f\nf ::= foo\nfoo ::= "foo"',
+        '',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= foo | "bar"\nfoo ::= "foo"\n',
+        '',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+            {'type': 'char', 'value': [
+                98,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= foo | "bar"\nfoo ::= "foo"',
+        'f',
+        [
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        'root ::= foo | "bar"\nfoo ::= "foo"',
+        'fo',
+        [
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        'root ::= foo | "bar"\nfoo ::= "foo"',
+        'foo',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= foo | "bar"\nfoo ::= "foo"',
+        'b',
+        [
+            {'type': 'char', 'value': [
+                97,
+            ]},
+        ],
+    ],
+    [
+        'root ::= foo | "bar"\nfoo ::= "foo"',
+        'ba',
+        [
+            {'type': 'char', 'value': [
+                114,
+            ]},
+        ],
+    ],
+    [
+        'root ::= foo | "bar"\nfoo ::= "foo"',
+        'bar',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        '\nroot ::= foo | bar\nfoo ::= "foo"\nbar ::= "bar"',
+        '',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+            {'type': 'char', 'value': [
+                98,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= foo | bar\nfoo ::= "foo"\nbar ::= "bar"',
+        'f',
+        [
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= foo | bar\nfoo ::= "foo"\nbar ::= "bar"',
+        'fo',
+        [
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= foo | bar\nfoo ::= "foo"\nbar ::= "bar"',
+        'foo',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        '\nroot ::= foo | bar\nfoo ::= "foo"\nbar ::= "bar"',
+        'b',
+        [
+            {'type': 'char', 'value': [
+                97,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= foo | bar\nfoo ::= "foo"\nbar ::= "bar"',
+        'ba',
+        [
+            {'type': 'char', 'value': [
+                114,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= foo | bar\nfoo ::= "foo"\nbar ::= "bar"',
+        'bar',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        '\nroot ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= "foo"\nbar ::= "bar"\nbaz ::= "baz"',
+        '',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+            {'type': 'char', 'value': [
+                98,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= "foo"\nbar ::= "bar"\nbaz ::= "baz"',
+        'f',
+        [
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= "foo"\nbar ::= "bar"\nbaz ::= "baz"',
+        'fo',
+        [
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= "foo"\nbar ::= "bar"\nbaz ::= "baz"',
+        'foo',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        '\nroot ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= "foo"\nbar ::= "bar"\nbaz ::= "baz"',
+        'b',
+        [
+            {'type': 'char', 'value': [
+                97,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= "foo"\nbar ::= "bar"\nbaz ::= "baz"',
+        'ba',
+        [
+            {'type': 'char', 'value': [
+                114,
+            ]},
+            {'type': 'char', 'value': [
+                122,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= "foo"\nbar ::= "bar"\nbaz ::= "baz"',
+        'bar',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        '\nroot ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= "foo"\nbar ::= "bar"\nbaz ::= "baz"',
+        'baz',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-z]',
+        '',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+            ]},
+        ],
+    ],
+    [
+        'root ::= [a-zA-Z]',
+        '',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+                [
+                    65,
+                    90,
+                ],
+            ]},
+        ],
+    ],
+    [
+        'root ::= [a-z]',
+        'a',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-z]',
+        'm',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-z]',
+        'z',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-zA-Z]',
+        'a',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-zA-Z]',
+        'Z',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-zA-Z0-9]',
+        'Z',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-zA-Z0-9]',
+        '0',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-zA-Z0-9]',
+        '9',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-z]?',
+        '',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-z]?',
+        'a',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-zA-Z]?',
+        'Z',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-zA-Z0-9]?',
+        '0',
+        [
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-z]+',
+        '',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+            ]},
+        ],
+    ],
+    [
+        'root ::= [a-z]+',
+        'l',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-zA-Z]+',
+        'Z',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+                [
+                    65,
+                    90,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-zA-Z]+',
+        'aZ',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+                [
+                    65,
+                    90,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-zA-Z]+',
+        'azAZ',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+                [
+                    65,
+                    90,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-z]*',
+        '',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-z]*',
+        'a',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-zA-Z]+',
+        'Z',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+                [
+                    65,
+                    90,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-zA-Z]+',
+        'abczABCZ',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+                [
+                    65,
+                    90,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [^f]+ "o"',
+        'aaa',
+        [
+            {'type': 'char_exclude', 'value': [
+                102,
+            ]},
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        'root ::= [^A-Z]+',
+        'abc',
+        [
+            {'type': 'char_exclude', 'value': [
+                [
+                    65,
+                    90,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [^A-Z0-9]*',
+        'abc',
+        [
+            {'type': 'char_exclude', 'value': [
+                [
+                    65,
+                    90,
+                ],
+                [
+                    48,
+                    57,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [^A-Z0-9_-]*',
+        'abc',
+        [
+            {'type': 'char_exclude', 'value': [
+                [
+                    65,
+                    90,
+                ],
+                [
+                    48,
+                    57,
+                ],
+                95,
+                45,
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        '\nroot ::= [a-z] | xyx\nxyx ::= "foo"',
+        'f',
+        [
+            {'type': 'end'},
+            {'type': 'char', 'value': [
+                111,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "foo" | "bar" | "baz" | "bazaar" | "barrington" ',
+        'bazaa',
+        [
+            {'type': 'char', 'value': [
+                114,
+            ]},
+        ],
+    ],
+    [
+        'root ::= ("bar" | "foo") "zyx"',
+        'bar',
+        [
+            {'type': 'char', 'value': [
+                122,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "z" ("bar" | "foo") "zzzz"',
+        'z',
+        [
+            {'type': 'char', 'value': [
+                98,
+            ]},
+            {'type': 'char', 'value': [
+                102,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "z" ("bar" | "foo") "zzz"',
+        'zbar',
+        [
+            {'type': 'char', 'value': [
+                122,
+            ]},
+        ],
+    ],
+    [
+        '\nroot  ::= termz ([-+*/] termz)* \ntermz  ::= [0-9]+',
+        '1',
+        [
+            {'type': 'char', 'value': [
+                [
+                    48,
+                    57,
+                ],
+            ]},
+            {'type': 'char', 'value': [
+                45,
+                43,
+                42,
+                47,
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        '\nroot  ::= expr "=" termy  \nexpr  ::= termy ([-+*/] termy)*\ntermy  ::= [0-9]+',
+        '1',
+        [
+            {'type': 'char', 'value': [
+                [
+                    48,
+                    57,
+                ],
+            ]},
+            {'type': 'char', 'value': [
+                45,
+                43,
+                42,
+                47,
+            ]},
+            {'type': 'char', 'value': [
+                61,
+            ]},
+        ],
+    ],
+    [
+        '\nroot  ::= (expr "=" terma "\n")+\nexpr  ::= terma ([-+*/] terma)*\nterma  ::= [0-9]+',
+        '1',
+        [
+            {'type': 'char', 'value': [
+                [
+                    48,
+                    57,
+                ],
+            ]},
+            {'type': 'char', 'value': [
+                45,
+                43,
+                42,
+                47,
+            ]},
+            {'type': 'char', 'value': [
+                61,
+            ]},
+        ],
+    ],
+    [
+        'root  ::= (expr "=" termb "\n")+\nexpr  ::= termb ([-+*/] termb)*\ntermb  ::= [0-9]+',
+        '1+',
+        [
+            {'type': 'char', 'value': [
+                [
+                    48,
+                    57,
+                ],
+            ]},
+        ],
+    ],
+    [
+        '\nroot  ::= (expr "=" termc "\n")+\nexpr  ::= termc ([-+*/] termc)*\ntermc  ::= [0-9]+',
+        '1=',
+        [
+            {'type': 'char', 'value': [
+                [
+                    48,
+                    57,
+                ],
+            ]},
+        ],
+    ],
+    [
+        'root  ::= (expr "=" termd "\n")+\nexpr  ::= termd ([-+*/] termd)*\ntermd  ::= [0-9]+',
+        '1+1',
+        [
+            {'type': 'char', 'value': [
+                [
+                    48,
+                    57,
+                ],
+            ]},
+            {'type': 'char', 'value': [
+                45,
+                43,
+                42,
+                47,
+            ]},
+            {'type': 'char', 'value': [
+                61,
+            ]},
+        ],
+    ],
+    [
+        'root  ::= (expr "=" term "\n")+\nexpr  ::= term ([-+*/] term)*\nterm  ::= [0-9]+',
+        '1=1',
+        [
+            {'type': 'char', 'value': [
+                [
+                    48,
+                    57,
+                ],
+            ]},
+            {'type': 'char', 'value': [
+                10,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "\\"" ( [^\\"abcdefghA-Z])* ',
+        '"is not only in its lyrism, its vow to sustin it in its poo-sion, its r,v:l\'y, it\'s tory,',
+        [
+            {'type': 'char_exclude', 'value': [
+                34,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+                [
+                    65,
+                    90,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= ( [^abcdefgh] | [b-z])* ',
+        'bcdefghzyxw0123ABCZ',
+        [
+            {'type': 'char_exclude', 'value': [
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+            ]},
+            {'type': 'char', 'value': [
+                [
+                    98,
+                    122,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+]
+
+@pytest.mark.parametrize('grammar,input,expected', CASES, ids=[str(i) for i in range(len(CASES))])
+def test_it_returns_parse_state_for_a_grammar_and_initial_string(grammar, input, expected):
+    state = GBNF(grammar)
+    state = state.add(input)
+    assert [rule.to_dict() for rule in state] == expected

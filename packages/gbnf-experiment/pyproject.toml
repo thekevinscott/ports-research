@@ -1,0 +1,33 @@
+[project]
+name = "gbnf-experiment"
+version = "0.1.0"
+description = "The GBNF porting experiment: derive a reference corpus, port it in a sandbox, grade the port by test pass rate"
+readme = "README.md"
+authors = [
+    { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "click>=8.5.0",
+    "porting-harness",
+    "pydantic-settings>=2.15.0",
+    "python-on-whales>=0.81.0",
+]
+
+[project.scripts]
+run-gbnf-experiment = "gbnf_experiment.cli:cli"
+
+[build-system]
+requires = ["uv_build>=0.9,<1.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+porting-harness = { path = "../porting-harness", editable = true }
+agent-harness-sandbox = { path = "../agent-harness-sandbox", editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-describe>=3.2.0",
+    "testing-conventions>=0.0.104",
+]

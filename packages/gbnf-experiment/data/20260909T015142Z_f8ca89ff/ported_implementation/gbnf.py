@@ -1,0 +1,40 @@
+from __future__ import annotations
+
+from typing import Any, List, Optional, Sequence
+
+from .grammar_graph.graph import Graph
+from .grammar_graph.parse_state import ParseState
+from .grammar_graph.types import UnresolvedRule, ValidInput
+from .grammar_parser.build_rule_stack import build_rule_stack
+from .rules_builder.rules_builder import RulesBuilder
+from .utils.errors.grammar_parse_error import GrammarParseError
+from .utils.js_compat import json_stringify
+
+__all__ = ["GBNF"]
+
+
+def GBNF(input: Any, initial_string: ValidInput = "") -> ParseState:
+    """Parse a GBNF grammar and return the resulting `ParseState`.
+
+    Raises `GrammarParseError` if the grammar is invalid, and `InputParseError`
+    if `initial_string` cannot be parsed by the grammar.
+    """
+    grammar = input if isinstance(input, str) else str(input)
+    builder = RulesBuilder(grammar)
+    rules, symbol_ids = builder.rules, builder.symbol_ids
+    if len(rules) == 0:
+        raise GrammarParseError(grammar, 0, "No rules were found")
+    if not symbol_ids.has("root"):
+        raise GrammarParseError(
+            grammar,
+            0,
+            "Grammar does not contain a root symbol. "
+            f"Available symbols are: {json_stringify(symbol_ids.keys())}",
+        )
+    root_id = symbol_ids.get("root")
+
+    stacked_rules: List[Optional[Sequence[Sequence[UnresolvedRule]]]] = [
+        build_rule_stack(rule) if rule is not None else None for rule in rules
+    ]
+    graph = Graph(grammar, stacked_rules, root_id)
+    return ParseState(graph, graph.add(initial_string))

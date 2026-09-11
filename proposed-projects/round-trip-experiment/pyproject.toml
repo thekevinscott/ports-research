@@ -1,0 +1,40 @@
+[project]
+name = "round-trip-experiment"
+version = "0.1.0"
+description = "Round-trip tooling: edit distance between codebases, and the reverse leg a banked port goes back through"
+readme = "README.md"
+authors = [
+    { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "click>=8.5.0",
+    "gbnf-experiment",
+    "pydantic-settings>=2.15.0",
+    # 0.26.0 corrupts memory under CPython 3.14: SIGBUS mid-walk or SIGSEGV in GC at exit.
+    "tree-sitter>=0.25.2,<0.26",
+    "tree-sitter-python>=0.25.0",
+    "tree-sitter-typescript>=0.23.2",
+    "rapidfuzz>=3.0",
+    "ruff>=0.14",
+    "measure-embedding",
+]
+
+[project.scripts]
+measure-code-distance = "round_trip_experiment.measure_code_distance_cli:cli"
+reverse-port = "round_trip_experiment.reverse_port_cli:cli"
+
+[build-system]
+requires = ["uv_build>=0.9,<1.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+gbnf-experiment = { path = "../../packages/gbnf-experiment", editable = true }
+measure-embedding = { path = "../measure-embedding", editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-describe>=3.2.0",
+    "testing-conventions>=0.0.104",
+]

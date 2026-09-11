@@ -1,0 +1,30 @@
+[project]
+name = "measure-ast"
+version = "0.1.0"
+description = "Tree-sitter AST size, depth and cyclomatic metrics over one python or typescript tree"
+readme = "README.md"
+authors = [
+    { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "click>=8.5.0",
+    # 0.26.0 corrupts memory under CPython 3.14: SIGBUS mid-walk or SIGSEGV in GC at exit.
+    "tree-sitter>=0.25.2,<0.26",
+    "tree-sitter-python>=0.25.0",
+    "tree-sitter-typescript>=0.23.2",
+]
+
+[project.scripts]
+measure-ast = "measure_ast.cli:cli"
+
+[build-system]
+requires = ["uv_build>=0.9,<1.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-describe>=3.2.0",
+    "testing-conventions>=0.0.104",
+]

@@ -1,0 +1,8946 @@
+[
+  {
+    "name": "single-char",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"a\""
+  },
+  {
+    "name": "literal",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            102
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            111
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            111
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"foo\""
+  },
+  {
+    "name": "literal-whole",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            102
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"foo\""
+  },
+  {
+    "name": "readme-yes-no",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            110
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            101
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root  ::= \"yes\" | \"no\""
+  },
+  {
+    "name": "readme-yes-no-alt",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            110
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            111
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root  ::= \"yes\" | \"no\""
+  },
+  {
+    "name": "readme-green-eggs",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            73
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            107
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            110
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root  ::= \"I like green eggs and ham\""
+  },
+  {
+    "name": "initial-string",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"abc\""
+  },
+  {
+    "name": "initial-code-points",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"abc\""
+  },
+  {
+    "name": "initial-single-code-point",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"abc\""
+  },
+  {
+    "name": "three-alts",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"a\" | \"b\" | \"c\""
+  },
+  {
+    "name": "shared-prefix-alts",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= \"ab\" | \"ac\""
+  },
+  {
+    "name": "char-class",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97,
+            98,
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [abc]"
+  },
+  {
+    "name": "char-range",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [a-z]"
+  },
+  {
+    "name": "char-range-multi",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              122
+            ],
+            [
+              65,
+              90
+            ],
+            [
+              48,
+              57
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [a-zA-Z0-9]"
+  },
+  {
+    "name": "char-range-and-alts",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              122
+            ],
+            95,
+            45
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [a-z_-]"
+  },
+  {
+    "name": "char-not",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            97,
+            98,
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            33
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [^abc] \"!\""
+  },
+  {
+    "name": "char-not-range",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            33
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [^a-z] \"!\""
+  },
+  {
+    "name": "char-class-trailing-hyphen",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97,
+            45
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [a-]"
+  },
+  {
+    "name": "star",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= \"a\"*"
+  },
+  {
+    "name": "star-empty",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= \"a\"*"
+  },
+  {
+    "name": "plus",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= \"a\"+"
+  },
+  {
+    "name": "optional",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"a\"? \"b\""
+  },
+  {
+    "name": "optional-present",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"a\"? \"b\""
+  },
+  {
+    "name": "star-class",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= [0-9]*"
+  },
+  {
+    "name": "plus-then-literal",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            46
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [0-9]+ \".\""
+  },
+  {
+    "name": "group",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= (\"a\" | \"b\") \"c\""
+  },
+  {
+    "name": "group-star",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= (\"ab\")*"
+  },
+  {
+    "name": "group-plus",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 3,
+    "grammar": "root ::= (\"ab\" | \"cd\")+"
+  },
+  {
+    "name": "nested-groups",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            100
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            100
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= ((\"a\" | \"b\") \"c\")+ \"d\""
+  },
+  {
+    "name": "rule-ref",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= a b\na ::= \"x\"\nb ::= \"y\""
+  },
+  {
+    "name": "rule-ref-forward",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            104
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= greeting \"!\"\ngreeting ::= \"hi\" | \"yo\""
+  },
+  {
+    "name": "recursive",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"a\" root | \"b\""
+  },
+  {
+    "name": "mutual-recursion",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= a\na ::= \"x\" b | \"x\"\nb ::= \"y\" a"
+  },
+  {
+    "name": "escape-newline",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"a\\n\""
+  },
+  {
+    "name": "escape-tab",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"a\\t\""
+  },
+  {
+    "name": "escape-cr",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"a\\r\""
+  },
+  {
+    "name": "escape-quote",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            34
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"\\\"\""
+  },
+  {
+    "name": "escape-backslash",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            92
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"\\\\\""
+  },
+  {
+    "name": "escape-bracket",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            91,
+            93
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [\\[\\]]"
+  },
+  {
+    "name": "escape-hex",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            65
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"\\x41\""
+  },
+  {
+    "name": "escape-unicode",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            233
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"\\u00e9\""
+  },
+  {
+    "name": "escape-unicode-range",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              65,
+              90
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [\\u0041-\\u005a]"
+  },
+  {
+    "name": "comment",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "# a comment\nroot ::= \"a\" # trailing\n"
+  },
+  {
+    "name": "comment-only-leading",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "#comment\nroot ::= \"a\""
+  },
+  {
+    "name": "crlf",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"a\"\r\nother ::= \"b\"\r\n"
+  },
+  {
+    "name": "blank-lines",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "\n\nroot ::= \"a\"\n\n"
+  },
+  {
+    "name": "multiline-rule",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= (\n  \"a\" |\n  \"b\"\n)"
+  },
+  {
+    "name": "trailing-whitespace",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"a\"   \n"
+  },
+  {
+    "name": "arithmetic",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            40
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              122
+            ],
+            [
+              48,
+              57
+            ],
+            95
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            45,
+            43,
+            42,
+            47
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            61
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            40
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            10
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            40
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 6,
+    "grammar": "\nroot  ::= (expr \"=\" ws term \"\\n\")+\nexpr  ::= term ([-+*/] term)*\nterm  ::= ident | num | \"(\" ws expr \")\" ws\nident ::= [a-z] [a-z0-9_]* ws\nnum   ::= [0-9]+ ws\nws    ::= [ \\t\\n]*\n"
+  },
+  {
+    "name": "arithmetic-expression",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            40
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            40
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            10
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            40
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 6,
+    "grammar": "\nroot  ::= (expr \"=\" ws term \"\\n\")+\nexpr  ::= term ([-+*/] term)*\nterm  ::= ident | num | \"(\" ws expr \")\" ws\nident ::= [a-z] [a-z0-9_]* ws\nnum   ::= [0-9]+ ws\nws    ::= [ \\t\\n]*\n"
+  },
+  {
+    "name": "arithmetic-invalid",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\na = 12 + 3\n       ^"
+  },
+  {
+    "name": "arithmetic-two-lines",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            40
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            40
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            40
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 6,
+    "grammar": "\nroot  ::= (expr \"=\" ws term \"\\n\")+\nexpr  ::= term ([-+*/] term)*\nterm  ::= ident | num | \"(\" ws expr \")\" ws\nident ::= [a-z] [a-z0-9_]* ws\nnum   ::= [0-9]+ ws\nws    ::= [ \\t\\n]*\n"
+  },
+  {
+    "name": "json-empty-object",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            123
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "\nroot   ::= object\nvalue  ::= object | array | string | number | (\"true\" | \"false\" | \"null\") ws\nobject ::=\n  \"{\" ws (\n            string \":\" ws value\n    (\",\" ws string \":\" ws value)*\n  )? \"}\" ws\narray  ::=\n  \"[\" ws (\n            value\n    (\",\" ws value)*\n  )? \"]\" ws\nstring ::=\n  \"\\\"\" (\n    [^\"\\\\] |\n    \"\\\\\" ([\"\\\\/bfnrt] | \"u\" [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F])\n  )* \"\\\"\" ws\nnumber ::= (\"-\"? ([0-9] | [1-9] [0-9]*)) (\".\" [0-9]+)? ([eE] [-+]? [0-9]+)? ws\nws ::= ([ \\t\\n] ws)?\n"
+  },
+  {
+    "name": "json-object",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            123
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            58
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            123
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            91
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            34
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            45
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              49,
+              57
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            116
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            102
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            110
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            46
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            101,
+            69
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            44
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            125
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              48,
+              57
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "\nroot   ::= object\nvalue  ::= object | array | string | number | (\"true\" | \"false\" | \"null\") ws\nobject ::=\n  \"{\" ws (\n            string \":\" ws value\n    (\",\" ws string \":\" ws value)*\n  )? \"}\" ws\narray  ::=\n  \"[\" ws (\n            value\n    (\",\" ws value)*\n  )? \"]\" ws\nstring ::=\n  \"\\\"\" (\n    [^\"\\\\] |\n    \"\\\\\" ([\"\\\\/bfnrt] | \"u\" [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F])\n  )* \"\\\"\" ws\nnumber ::= (\"-\"? ([0-9] | [1-9] [0-9]*)) (\".\" [0-9]+)? ([eE] [-+]? [0-9]+)? ws\nws ::= ([ \\t\\n] ws)?\n"
+  },
+  {
+    "name": "json-nested",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            123
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "\nroot   ::= object\nvalue  ::= object | array | string | number | (\"true\" | \"false\" | \"null\") ws\nobject ::=\n  \"{\" ws (\n            string \":\" ws value\n    (\",\" ws string \":\" ws value)*\n  )? \"}\" ws\narray  ::=\n  \"[\" ws (\n            value\n    (\",\" ws value)*\n  )? \"]\" ws\nstring ::=\n  \"\\\"\" (\n    [^\"\\\\] |\n    \"\\\\\" ([\"\\\\/bfnrt] | \"u\" [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F])\n  )* \"\\\"\" ws\nnumber ::= (\"-\"? ([0-9] | [1-9] [0-9]*)) (\".\" [0-9]+)? ([eE] [-+]? [0-9]+)? ws\nws ::= ([ \\t\\n] ws)?\n"
+  },
+  {
+    "name": "json-escapes",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            123
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "\nroot   ::= object\nvalue  ::= object | array | string | number | (\"true\" | \"false\" | \"null\") ws\nobject ::=\n  \"{\" ws (\n            string \":\" ws value\n    (\",\" ws string \":\" ws value)*\n  )? \"}\" ws\narray  ::=\n  \"[\" ws (\n            value\n    (\",\" ws value)*\n  )? \"]\" ws\nstring ::=\n  \"\\\"\" (\n    [^\"\\\\] |\n    \"\\\\\" ([\"\\\\/bfnrt] | \"u\" [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F])\n  )* \"\\\"\" ws\nnumber ::= (\"-\"? ([0-9] | [1-9] [0-9]*)) (\".\" [0-9]+)? ([eE] [-+]? [0-9]+)? ws\nws ::= ([ \\t\\n] ws)?\n"
+  },
+  {
+    "name": "json-number",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            123
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            32,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "\nroot   ::= object\nvalue  ::= object | array | string | number | (\"true\" | \"false\" | \"null\") ws\nobject ::=\n  \"{\" ws (\n            string \":\" ws value\n    (\",\" ws string \":\" ws value)*\n  )? \"}\" ws\narray  ::=\n  \"[\" ws (\n            value\n    (\",\" ws value)*\n  )? \"]\" ws\nstring ::=\n  \"\\\"\" (\n    [^\"\\\\] |\n    \"\\\\\" ([\"\\\\/bfnrt] | \"u\" [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F])\n  )* \"\\\"\" ws\nnumber ::= (\"-\"? ([0-9] | [1-9] [0-9]*)) (\".\" [0-9]+)? ([eE] [-+]? [0-9]+)? ws\nws ::= ([ \\t\\n] ws)?\n"
+  },
+  {
+    "name": "err-empty-grammar",
+    "ok": false,
+    "error": "GrammarParseError",
+    "message": "Failed to parse grammar: No rules were found\n\nNo input provided"
+  },
+  {
+    "name": "err-whitespace-grammar",
+    "ok": false,
+    "error": "GrammarParseError",
+    "message": "Failed to parse grammar: No rules were found\n\n   \n^"
+  },
+  {
+    "name": "err-undefined-rule",
+    "ok": false,
+    "error": "GrammarParseError",
+    "message": "Failed to parse grammar: Undefined rule identifier \"foo\"\n\nroot ::= foo\n         ^"
+  },
+  {
+    "name": "err-undefined-rule-multiline",
+    "ok": false,
+    "error": "GrammarParseError",
+    "message": "Failed to parse grammar: Undefined rule identifier \"bar\"\n\nroot ::= \"a\" bar\n             ^"
+  },
+  {
+    "name": "err-missing-equals",
+    "ok": false,
+    "error": "GrammarParseError",
+    "message": "Failed to parse grammar: Expecting ::= at 5\n\nroot \"a\"\n     ^"
+  },
+  {
+    "name": "err-missing-equals-partial",
+    "ok": false,
+    "error": "GrammarParseError",
+    "message": "Failed to parse grammar: Expecting ::= at 5\n\nroot := \"a\"\n     ^"
+  },
+  {
+    "name": "err-unterminated-string",
+    "ok": false,
+    "error": "GrammarParseError",
+    "message": "Failed to parse grammar: Unexpected end of grammar input, failed to complete parse\n\nroot ::= \"abc\n\n^"
+  },
+  {
+    "name": "err-unterminated-class",
+    "ok": false,
+    "error": "GrammarParseError",
+    "message": "Failed to parse grammar: Unexpected end of grammar input, failed to complete parse\n\nroot ::= [abc\n\n^"
+  },
+  {
+    "name": "err-unclosed-paren",
+    "ok": false,
+    "error": "GrammarParseError",
+    "message": "Failed to parse grammar: Expecting ')' at 13\n\nroot ::= (\"a\"\n\n^"
+  },
+  {
+    "name": "err-dangling-star",
+    "ok": false,
+    "error": "GrammarParseError",
+    "message": "Failed to parse grammar: Expecting preceding item to */+/? at 9\n\nroot ::= *\n         ^"
+  },
+  {
+    "name": "err-invalid-name-char",
+    "ok": false,
+    "error": "GrammarParseError",
+    "message": "Failed to parse grammar: Invalid character \"_\" when parsing name, only lowercase letters and hyphens are allowed.\n\nroot_1 ::= \"a\"\n    ^"
+  },
+  {
+    "name": "err-unknown-escape",
+    "ok": false,
+    "error": "GrammarParseError",
+    "message": "Failed to parse grammar: Unknown escape at \\\n\nroot ::= \"\\q\"\n          ^"
+  },
+  {
+    "name": "err-trailing-garbage",
+    "ok": false,
+    "error": "GrammarParseError",
+    "message": "Failed to parse grammar: Expecting newline or end at 13\n\nroot ::= \"a\" %\n             ^"
+  },
+  {
+    "name": "err-only-comment",
+    "ok": false,
+    "error": "GrammarParseError",
+    "message": "Failed to parse grammar: No rules were found\n\n# just a comment\n^"
+  },
+  {
+    "name": "err-self-recursive",
+    "ok": false,
+    "error": "RangeError",
+    "message": "Maximum call stack size exceeded"
+  },
+  {
+    "name": "err-nullable-star",
+    "ok": false,
+    "error": "RangeError",
+    "message": "Maximum call stack size exceeded"
+  },
+  {
+    "name": "err-nullable-plus",
+    "ok": false,
+    "error": "RangeError",
+    "message": "Maximum call stack size exceeded"
+  },
+  {
+    "name": "err-input-first-char",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nx\n^"
+  },
+  {
+    "name": "err-input-mid",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nax\n ^"
+  },
+  {
+    "name": "err-input-after-add",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nabz\n  ^"
+  },
+  {
+    "name": "err-input-past-end",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nabc\n  ^"
+  },
+  {
+    "name": "err-input-excluded",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\na\n^"
+  },
+  {
+    "name": "err-input-initial",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nx\n^"
+  },
+  {
+    "name": "fuzz-0-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"y\"\nrule-a ::= \"y\"+ | (\"bcz\") | [^2] ([a-d] [cc-f])+ \"1\"*\n"
+  },
+  {
+    "name": "fuzz-0-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"y\"\nrule-a ::= \"y\"+ | (\"bcz\") | [^2] ([a-d] [cc-f])+ \"1\"*\n"
+  },
+  {
+    "name": "fuzz-0-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n~\n^"
+  },
+  {
+    "name": "fuzz-1-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              100
+            ],
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              99,
+              102
+            ]
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= rule-a ([a-d] [x0] | [^a] (rule-b | rule-a)) \"ya\" | [^c-f]?\nrule-a ::= \"z\" \"ya2\"* | \"zz\"? [c-d0] rule-b? | \"2\"+\nrule-b ::= ([yx-z] \"acb\") \"0a\" [a-d]+ | [x] \"x\" | \"c\"+ (([z] [x-zx] | [^0c]) [^y]) \"2\"\n"
+  },
+  {
+    "name": "fuzz-1-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              100
+            ],
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              99,
+              102
+            ]
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= rule-a ([a-d] [x0] | [^a] (rule-b | rule-a)) \"ya\" | [^c-f]?\nrule-a ::= \"z\" \"ya2\"* | \"zz\"? [c-d0] rule-b? | \"2\"+\nrule-b ::= ([yx-z] \"acb\") \"0a\" [a-d]+ | [x] \"x\" | \"c\"+ (([z] [x-zx] | [^0c]) [^y]) \"2\"\n"
+  },
+  {
+    "name": "fuzz-1-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n29zyaW\n     ^"
+  },
+  {
+    "name": "fuzz-2-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              98
+            ],
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= (([y] [2] | [a-b2] \"ab\"))\nrule-a ::= (([1] [a1] | \"0c\" [y])) [x-{y] \"a\" | rule-c ([a-c])+\nrule-b ::= \"2x1\"+ ([22] \"bay\") \"yaz\" | [a] \"1z1\"+ [y]* | \"22x\"? \"a1\"? [yc-d]+\nrule-c ::= [^b] | [2a-d]\n"
+  },
+  {
+    "name": "fuzz-2-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              98
+            ],
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= (([y] [2] | [a-b2] \"ab\"))\nrule-a ::= (([1] [a1] | \"0c\" [y])) [x-{y] \"a\" | rule-c ([a-c])+\nrule-b ::= \"2x1\"+ ([22] \"bay\") \"yaz\" | [a] \"1z1\"+ [y]* | \"22x\"? \"a1\"? [yc-d]+\nrule-c ::= [^b] | [2a-d]\n"
+  },
+  {
+    "name": "fuzz-2-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n!2\n^"
+  },
+  {
+    "name": "fuzz-3-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            121,
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121,
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            98,
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              101
+            ],
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98,
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98,
+            [
+              97,
+              99
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [yy]+ rule-a\nrule-a ::= \"0cy\"? rule-b | [ba-c] | \"a\" [2y]\nrule-b ::= (([^bz]) [c] | (\"x02\" | [x])) \"z\" | [c-ex] [1a-b] \"cz\" | [b2]\n"
+  },
+  {
+    "name": "fuzz-3-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            121,
+            121
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [yy]+ rule-a\nrule-a ::= \"0cy\"? rule-b | [ba-c] | \"a\" [2y]\nrule-b ::= (([^bz]) [c] | (\"x02\" | [x])) \"z\" | [c-ex] [1a-b] \"cz\" | [b2]\n"
+  },
+  {
+    "name": "fuzz-3-mutated",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            121,
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [yy]+ rule-a\nrule-a ::= \"0cy\"? rule-b | [ba-c] | \"a\" [2y]\nrule-b ::= (([^bz]) [c] | (\"x02\" | [x])) \"z\" | [c-ex] [1a-b] \"cz\" | [b2]\n"
+  },
+  {
+    "name": "fuzz-4-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              97,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97,
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            98,
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            122,
+            [
+              97,
+              99
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99,
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99,
+            122
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= [^a-d]? rule-a+ (\"11z\" | \"2\") | [a1]+ [1]? | rule-a+ [cz]+\nrule-a ::= \"x\" rule-b ([za-c] \"0c\")?\nrule-b ::= \"1\" \"0za\" | [^bx]? \"xy\"* \"a20\"\nrule-c ::= [zc-f]* | \"y1\"+ [^x-y] | [2x-{]* [0]+\n"
+  },
+  {
+    "name": "fuzz-4-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              97,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97,
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [^a-d]? rule-a+ (\"11z\" | \"2\") | [a1]+ [1]? | rule-a+ [cz]+\nrule-a ::= \"x\" rule-b ([za-c] \"0c\")?\nrule-b ::= \"1\" \"0za\" | [^bx]? \"xy\"* \"a20\"\nrule-c ::= [zc-f]* | \"y1\"+ [^x-y] | [2x-{]* [0]+\n"
+  },
+  {
+    "name": "fuzz-4-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nxDxyx!a2\n     ^"
+  },
+  {
+    "name": "fuzz-5-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [^x-z] | [^1] (\"aa\" | \"cx\" \"b0b\") (\"a2\" | \"0\" rule-a)\nrule-a ::= \"a\"* \"z10\" | [c-e] (\"2\" \"2x\") | [z]+ \"2xy\"\n"
+  },
+  {
+    "name": "fuzz-5-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ]
+    ],
+    "size": 3,
+    "grammar": "root ::= [^x-z] | [^1] (\"aa\" | \"cx\" \"b0b\") (\"a2\" | \"0\" rule-a)\nrule-a ::= \"a\"* \"z10\" | [c-e] (\"2\" \"2x\") | [z]+ \"2xy\"\n"
+  },
+  {
+    "name": "fuzz-5-mutated",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [^x-z] | [^1] (\"aa\" | \"cx\" \"b0b\") (\"a2\" | \"0\" rule-a)\nrule-a ::= \"a\"* \"z10\" | [c-e] (\"2\" \"2x\") | [z]+ \"2xy\"\n"
+  },
+  {
+    "name": "fuzz-6-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"cyy\"\nrule-a ::= \"x\" | [2]* [bc-e]*\nrule-b ::= [yc] \"2c\" | [^2a-b]\n"
+  },
+  {
+    "name": "fuzz-6-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"cyy\"\nrule-a ::= \"x\" | [2]* [bc-e]*\nrule-b ::= [yc] \"2c\" | [^2a-b]\n"
+  },
+  {
+    "name": "fuzz-6-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n!yy\n^"
+  },
+  {
+    "name": "fuzz-7-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              98
+            ],
+            [
+              99,
+              102
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= rule-a (rule-b) | [a-bc-f] \"y\" | \"z\"? (\"z\" [x-z] | (\"2\" | [b]))+ [c-e0]\nrule-a ::= \"c\" [c-e]\nrule-b ::= [^x]+ | [^b]+\nrule-c ::= \"bb\"\n"
+  },
+  {
+    "name": "fuzz-7-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              98
+            ],
+            [
+              99,
+              102
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= rule-a (rule-b) | [a-bc-f] \"y\" | \"z\"? (\"z\" [x-z] | (\"2\" | [b]))+ [c-e0]\nrule-a ::= \"c\" [c-e]\nrule-b ::= [^x]+ | [^b]+\nrule-c ::= \"bb\"\n"
+  },
+  {
+    "name": "fuzz-7-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n~y\n^"
+  },
+  {
+    "name": "fuzz-8-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            49,
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              123
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= [^b] | [^1y] | rule-b\nrule-a ::= [a-ca] | rule-b* [1]+ | [^a-dx] \"z00\" [c-f0]?\nrule-b ::= [a] \"2\"? | \"2x\" ([c-fc] (\"b11\" \"y\") | \"20\") \"y0\" | [^x-{] \"0b\"\n"
+  },
+  {
+    "name": "fuzz-8-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            49,
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              123
+            ]
+          ]
+        }
+      ]
+    ],
+    "size": 5,
+    "grammar": "root ::= [^b] | [^1y] | rule-b\nrule-a ::= [a-ca] | rule-b* [1]+ | [^a-dx] \"z00\" [c-f0]?\nrule-b ::= [a] \"2\"? | \"2x\" ([c-fc] (\"b11\" \"y\") | \"20\") \"y0\" | [^x-{] \"0b\"\n"
+  },
+  {
+    "name": "fuzz-8-mutated",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            49,
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              123
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= [^b] | [^1y] | rule-b\nrule-a ::= [a-ca] | rule-b* [1]+ | [^a-dx] \"z00\" [c-f0]?\nrule-b ::= [a] \"2\"? | \"2x\" ([c-fc] (\"b11\" \"y\") | \"20\") \"y0\" | [^x-{] \"0b\"\n"
+  },
+  {
+    "name": "fuzz-9-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= rule-b \"c0a\"\nrule-a ::= ([z] \"x0a\") rule-c | rule-c+ rule-c | \"zy2\"+\nrule-b ::= rule-c | rule-c [b] (([c2] | \"a2b\" \"x1a\") [zc-e])+\nrule-c ::= \"xc\" \"2z\"? [zx] | [z] | \"0bx\"?\n"
+  },
+  {
+    "name": "fuzz-9-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= rule-b \"c0a\"\nrule-a ::= ([z] \"x0a\") rule-c | rule-c+ rule-c | \"zy2\"+\nrule-b ::= rule-c | rule-c [b] (([c2] | \"a2b\" \"x1a\") [zc-e])+\nrule-c ::= \"xc\" \"2z\"? [zx] | [z] | \"0bx\"?\n"
+  },
+  {
+    "name": "fuzz-9-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n0bxc0~\n     ^"
+  },
+  {
+    "name": "fuzz-10-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              101
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [c-e] [a] \"b\"\nrule-a ::= (\"ax\" \"c2c\")? | [c-f]*\nrule-b ::= \"x\"? | \"1z\" | \"22\"? ((\"ab1\" [x-{]) | [^az] \"0c\")? (\"y\" [1])\n"
+  },
+  {
+    "name": "fuzz-10-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              101
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [c-e] [a] \"b\"\nrule-a ::= (\"ax\" \"c2c\")? | [c-f]*\nrule-b ::= \"x\"? | \"1z\" | \"22\"? ((\"ab1\" [x-{]) | [^az] \"0c\")? (\"y\" [1])\n"
+  },
+  {
+    "name": "fuzz-10-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n~\n^"
+  },
+  {
+    "name": "fuzz-11-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"xb\"+ \"1\" | \"z0x\" rule-b rule-c | [z] \"0y\" \"a\"\nrule-a ::= (([^0] | [0c-f]))? [c-f1]? [c-dc]* | \"2ac\" [^ay] [c-f] | rule-c\nrule-b ::= \"0c\" (rule-c rule-c | [^0]) | \"1yb\" | [x]+\nrule-c ::= [2y] [^zx-z]+ | [y2] ((\"2y0\" \"2\" | [^z] [ab]) \"b\" | [cb] ([2x] \"xcb\" | \"x\"))\n"
+  },
+  {
+    "name": "fuzz-11-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"xb\"+ \"1\" | \"z0x\" rule-b rule-c | [z] \"0y\" \"a\"\nrule-a ::= (([^0] | [0c-f]))? [c-f1]? [c-dc]* | \"2ac\" [^ay] [c-f] | rule-c\nrule-b ::= \"0c\" (rule-c rule-c | [^0]) | \"1yb\" | [x]+\nrule-c ::= [2y] [^zx-z]+ | [y2] ((\"2y0\" \"2\" | [^z] [ab]) \"b\" | [cb] ([2x] \"xcb\" | \"x\"))\n"
+  },
+  {
+    "name": "fuzz-11-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nxbxb!\n    ^"
+  },
+  {
+    "name": "fuzz-12-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98,
+            120
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              99,
+              102
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [2]* \"z1\" | [bx] \"ac\" | [^c-f]\nrule-a ::= (rule-b (\"2x\") | \"yb2\")\nrule-b ::= [1b]\n"
+  },
+  {
+    "name": "fuzz-12-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98,
+            120
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              99,
+              102
+            ]
+          ]
+        }
+      ]
+    ],
+    "size": 4,
+    "grammar": "root ::= [2]* \"z1\" | [bx] \"ac\" | [^c-f]\nrule-a ::= (rule-b (\"2x\") | \"yb2\")\nrule-b ::= [1b]\n"
+  },
+  {
+    "name": "fuzz-12-mutated",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98,
+            120
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              99,
+              102
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [2]* \"z1\" | [bx] \"ac\" | [^c-f]\nrule-a ::= (rule-b (\"2x\") | \"yb2\")\nrule-b ::= [1b]\n"
+  },
+  {
+    "name": "fuzz-13-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              123
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              102
+            ],
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              123
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              102
+            ],
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= rule-a? \"11\" rule-b\nrule-a ::= \"b\" rule-b | [a]* rule-b\nrule-b ::= ([x-{] (\"x\" [a]) | \"b\") (\"z\") \"azb\" | [c-fx] [x-y] \"2z0\" | \"01c\" [c] [0]\n"
+  },
+  {
+    "name": "fuzz-13-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              123
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              102
+            ],
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              123
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              102
+            ],
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ]
+    ],
+    "size": 4,
+    "grammar": "root ::= rule-a? \"11\" rule-b\nrule-a ::= \"b\" rule-b | [a]* rule-b\nrule-b ::= ([x-{] (\"x\" [a]) | \"b\") (\"z\") \"azb\" | [c-fx] [x-y] \"2z0\" | \"01c\" [c] [0]\n"
+  },
+  {
+    "name": "fuzz-13-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n1Q01\n ^"
+  },
+  {
+    "name": "fuzz-14-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              100
+            ],
+            [
+              97,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48,
+            [
+              120,
+              123
+            ]
+          ]
+        },
+        {
+          "type": "end"
+        },
+        {
+          "type": "char",
+          "value": [
+            122,
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              98
+            ]
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            121,
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            121,
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [b] [^a-dz] rule-a\nrule-a ::= [c-da-d]* \"azz\"* [0x-{]? | ([zb] | \"2\" \"0y\") [0] rule-b?\nrule-b ::= (rule-c | [c]) (([c-e] [21]))+ | rule-c rule-c (\"y\") | [^yc]+ \"bx\"\nrule-c ::= \"1zz\" [c2] \"2a\" | \"2\"? [a-b] | [y] \"y1\"\n"
+  },
+  {
+    "name": "fuzz-14-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              98
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            121,
+            99
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              98
+            ]
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            121,
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ]
+    ],
+    "size": 3,
+    "grammar": "root ::= [b] [^a-dz] rule-a\nrule-a ::= [c-da-d]* \"azz\"* [0x-{]? | ([zb] | \"2\" \"0y\") [0] rule-b?\nrule-b ::= (rule-c | [c]) (([c-e] [21]))+ | rule-c rule-c (\"y\") | [^yc]+ \"bx\"\nrule-c ::= \"1zz\" [c2] \"2a\" | \"2\"? [a-b] | [y] \"y1\"\n"
+  },
+  {
+    "name": "fuzz-14-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nbF20y02aQby\n          ^"
+  },
+  {
+    "name": "fuzz-15-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99,
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"b\" [c1]\nrule-a ::= [2] | [2]* [xz] \"b\"\nrule-b ::= (\"x1\" | \"xz0\" \"c\") \"0cb\" | \"az\" [1]? | \"yb\" [zb] [^1]*\n"
+  },
+  {
+    "name": "fuzz-15-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"b\" [c1]\nrule-a ::= [2] | [2]* [xz] \"b\"\nrule-b ::= (\"x1\" | \"xz0\" \"c\") \"0cb\" | \"az\" [1]? | \"yb\" [zb] [^1]*\n"
+  },
+  {
+    "name": "fuzz-15-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n!c\n^"
+  },
+  {
+    "name": "fuzz-16-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= rule-c\nrule-a ::= ((\"0x0\" | rule-b rule-b)) \"z\" (\"zz0\" | [yb])\nrule-b ::= [xa-d] rule-c \"y\" | \"x\"* [^0b] rule-c? | \"cz\" [c-f]* rule-c*\nrule-c ::= \"0ca\"? \"x\"+ | [z] \"2\"*\n"
+  },
+  {
+    "name": "fuzz-16-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ]
+    ],
+    "size": 3,
+    "grammar": "root ::= rule-c\nrule-a ::= ((\"0x0\" | rule-b rule-b)) \"z\" (\"zz0\" | [yb])\nrule-b ::= [xa-d] rule-c \"y\" | \"x\"* [^0b] rule-c? | \"cz\" [c-f]* rule-c*\nrule-c ::= \"0ca\"? \"x\"+ | [z] \"2\"*\n"
+  },
+  {
+    "name": "fuzz-16-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n!\n^"
+  },
+  {
+    "name": "fuzz-17-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"2z\"\nrule-a ::= rule-b \"0\"+ | ([xx-z] [x-zx-{] | \"y\") [x-y]\nrule-b ::= (\"1yz\" [1c-e])\n"
+  },
+  {
+    "name": "fuzz-17-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"2z\"\nrule-a ::= rule-b \"0\"+ | ([xx-z] [x-zx-{] | \"y\") [x-y]\nrule-b ::= (\"1yz\" [1c-e])\n"
+  },
+  {
+    "name": "fuzz-17-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n2W\n ^"
+  },
+  {
+    "name": "fuzz-18-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= [0] (rule-c | \"1xa\")?\nrule-a ::= ([a-da] | [a-b] [xb]) | [x-y]? rule-b\nrule-b ::= (\"zaa\") [^a]* | \"2y\"\nrule-c ::= (\"bc\" \"y0y\") (\"bx2\" (\"0zb\" | [a-c]))*\n"
+  },
+  {
+    "name": "fuzz-18-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [0] (rule-c | \"1xa\")?\nrule-a ::= ([a-da] | [a-b] [xb]) | [x-y]? rule-b\nrule-b ::= (\"zaa\") [^a]* | \"2y\"\nrule-c ::= (\"bc\" \"y0y\") (\"bx2\" (\"0zb\" | [a-c]))*\n"
+  },
+  {
+    "name": "fuzz-18-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nW\n^"
+  },
+  {
+    "name": "fuzz-19-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            49,
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122,
+            [
+              97,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [1a] (\"a2\" [2c]) | [za-d] \"yz0\" | \"20\"+\nrule-a ::= \"zx\"? [z] | ((\"c\" \"by\" | \"xb\") \"a\") [a-b]\n"
+  },
+  {
+    "name": "fuzz-19-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            49,
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122,
+            [
+              97,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [1a] (\"a2\" [2c]) | [za-d] \"yz0\" | \"20\"+\nrule-a ::= \"zx\"? [z] | ((\"c\" \"by\" | \"xb\") \"a\") [a-b]\n"
+  },
+  {
+    "name": "fuzz-19-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nby!0\n  ^"
+  },
+  {
+    "name": "fuzz-20-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98,
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"xxy\" [bb] [c-ec-f]\nrule-a ::= \"z\" \"2\"+ [yx]* | \"0\" (\"b\") [^a-bx-y] | \"1x2\"? [1a-b]+ rule-b*\nrule-b ::= \"c\" [^x]+ \"c\"\n"
+  },
+  {
+    "name": "fuzz-20-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"xxy\" [bb] [c-ec-f]\nrule-a ::= \"z\" \"2\"+ [yx]* | \"0\" (\"b\") [^a-bx-y] | \"1x2\"? [1a-b]+ rule-b*\nrule-b ::= \"c\" [^x]+ \"c\"\n"
+  },
+  {
+    "name": "fuzz-20-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nWx\n^"
+  },
+  {
+    "name": "fuzz-21-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [1] | rule-a?\nrule-a ::= \"22a\" | \"x\" (rule-b | [x-{] \"c0z\") [1] | [^c] \"1x\"+\nrule-b ::= \"2\" [^a0]* | [a-dc] | \"1x\" (\"b\" [^y0] | \"c1z\") [a-c]\n"
+  },
+  {
+    "name": "fuzz-21-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [1] | rule-a?\nrule-a ::= \"22a\" | \"x\" (rule-b | [x-{] \"c0z\") [1] | [^c] \"1x\"+\nrule-b ::= \"2\" [^a0]* | [a-dc] | \"1x\" (\"b\" [^y0] | \"c1z\") [a-c]\n"
+  },
+  {
+    "name": "fuzz-21-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nx{cWz1\n   ^"
+  },
+  {
+    "name": "fuzz-22-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50,
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              100
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= ([22] [b] | \"1b\" [x-z]) \"xx\" | [y] [c-e] rule-b?\nrule-a ::= [^y] \"z0c\" rule-c | [00]+ (\"ab\")\nrule-b ::= \"c2\" [c-d]\nrule-c ::= [b] | [^y]\n"
+  },
+  {
+    "name": "fuzz-22-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50,
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              101
+            ]
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= ([22] [b] | \"1b\" [x-z]) \"xx\" | [y] [c-e] rule-b?\nrule-a ::= [^y] \"z0c\" rule-c | [00]+ (\"ab\")\nrule-b ::= \"c2\" [c-d]\nrule-c ::= [b] | [^y]\n"
+  },
+  {
+    "name": "fuzz-22-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nyec!\n   ^"
+  },
+  {
+    "name": "fuzz-23-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            98,
+            [
+              120,
+              121
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"2c\" | \"02\"? rule-a [a]\nrule-a ::= ([^bx-y] \"a\" | \"xa\") (([c] [c-ec-e]) \"ba\" | \"2c2\") | \"ya\" (\"1\" | \"22c\")\n"
+  },
+  {
+    "name": "fuzz-23-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            98,
+            [
+              120,
+              121
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= \"2c\" | \"02\"? rule-a [a]\nrule-a ::= ([^bx-y] \"a\" | \"xa\") (([c] [c-ec-e]) \"ba\" | \"2c2\") | \"ya\" (\"1\" | \"22c\")\n"
+  },
+  {
+    "name": "fuzz-23-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n2!\n ^"
+  },
+  {
+    "name": "fuzz-24-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99,
+            [
+              97,
+              100
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= rule-b \"y\"*\nrule-a ::= \"210\" ([b0] | [^x-y] ([b] [cc-f]))* [^b]\nrule-b ::= \"1ba\" ([ca-d] [x-{c]) ((\"za1\") ([^c]) | \"cy\" [^a-b]) | ([b] | \"cbx\") \"ay\" | \"2b0\"\n"
+  },
+  {
+    "name": "fuzz-24-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99,
+            [
+              97,
+              100
+            ]
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= rule-b \"y\"*\nrule-a ::= \"210\" ([b0] | [^x-y] ([b] [cc-f]))* [^b]\nrule-b ::= \"1ba\" ([ca-d] [x-{c]) ((\"za1\") ([^c]) | \"cy\" [^a-b]) | ([b] | \"cbx\") \"ay\" | \"2b0\"\n"
+  },
+  {
+    "name": "fuzz-24-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n1Wa\n ^"
+  },
+  {
+    "name": "fuzz-25-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              102
+            ],
+            49
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              97,
+              99
+            ],
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              97,
+              99
+            ],
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= [c-f1]? ([^a-c2] \"02\")? \"11\"+\nrule-a ::= [x-yc-f]* | [0b]? | rule-b \"z\" (\"0yc\" | [ax-{] (\"2\"))\nrule-b ::= \"xx\"* \"z2\"?\n"
+  },
+  {
+    "name": "fuzz-25-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              102
+            ],
+            49
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              97,
+              99
+            ],
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ]
+    ],
+    "size": 3,
+    "grammar": "root ::= [c-f1]? ([^a-c2] \"02\")? \"11\"+\nrule-a ::= [x-yc-f]* | [0b]? | rule-b \"z\" (\"0yc\" | [ax-{] (\"2\"))\nrule-b ::= \"xx\"* \"z2\"?\n"
+  },
+  {
+    "name": "fuzz-25-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nfQ1\n  ^"
+  },
+  {
+    "name": "fuzz-26-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              101
+            ],
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              101
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98,
+            [
+              99,
+              100
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              101
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98,
+            [
+              99,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [c-e0]+ \"y1\" | (\"c2\") (rule-c | rule-a \"b\") [^c-f]\nrule-a ::= [yy] rule-c | (\"1\" | (rule-b)) rule-b\nrule-b ::= [bc-d] [c-e]*\nrule-c ::= [b] \"cx0\"+ [x-z]\n"
+  },
+  {
+    "name": "fuzz-26-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              101
+            ],
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              101
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98,
+            [
+              99,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              99,
+              102
+            ]
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [c-e0]+ \"y1\" | (\"c2\") (rule-c | rule-a \"b\") [^c-f]\nrule-a ::= [yy] rule-c | (\"1\" | (rule-b)) rule-b\nrule-b ::= [bc-d] [c-e]*\nrule-c ::= [b] \"cx0\"+ [x-z]\n"
+  },
+  {
+    "name": "fuzz-26-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nc2bcx0c~\n       ^"
+  },
+  {
+    "name": "fuzz-27-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [2]* \"2\" | [0] | [a]\nrule-a ::= ([^ca]) [1] [^x-{x-z]+ | [^a-dx] | [^a] \"aaz\"\n"
+  },
+  {
+    "name": "fuzz-27-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ]
+    ],
+    "size": 3,
+    "grammar": "root ::= [2]* \"2\" | [0] | [a]\nrule-a ::= ([^ca]) [1] [^x-{x-z]+ | [^a-dx] | [^a] \"aaz\"\n"
+  },
+  {
+    "name": "fuzz-27-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n~\n^"
+  },
+  {
+    "name": "fuzz-28-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"0zx\" \"z\"* \"zzz\"? | [x] rule-b? [^bx-{]\nrule-a ::= \"yy\"* [c-f] [y]* | \"yyb\" \"0\" [x-{b]\nrule-b ::= \"ca\" | \"y\"+ \"1z\" | \"1\"+ [^b2]\n"
+  },
+  {
+    "name": "fuzz-28-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= \"0zx\" \"z\"* \"zzz\"? | [x] rule-b? [^bx-{]\nrule-a ::= \"yy\"* [c-f] [y]* | \"yyb\" \"0\" [x-{b]\nrule-b ::= \"ca\" | \"y\"+ \"1z\" | \"1\"+ [^b2]\n"
+  },
+  {
+    "name": "fuzz-28-mutated",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"0zx\" \"z\"* \"zzz\"? | [x] rule-b? [^bx-{]\nrule-a ::= \"yy\"* [c-f] [y]* | \"yyb\" \"0\" [x-{b]\nrule-b ::= \"ca\" | \"y\"+ \"1z\" | \"1\"+ [^b2]\n"
+  },
+  {
+    "name": "fuzz-29-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122,
+            [
+              120,
+              123
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              101
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "end"
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ]
+    ],
+    "size": 3,
+    "grammar": "root ::= \"2c0\"* (\"0\" | [zx-{] rule-a)? rule-c | \"b01\" | [c-e]* \"a\"+\nrule-a ::= (\"c\" | rule-c [^2]) | \"c10\" \"0\" [c-f]\nrule-b ::= [zc-f] \"y2c\"+ rule-c\nrule-c ::= [b]+\n"
+  },
+  {
+    "name": "fuzz-29-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122,
+            [
+              120,
+              123
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              101
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ]
+    ],
+    "size": 6,
+    "grammar": "root ::= \"2c0\"* (\"0\" | [zx-{] rule-a)? rule-c | \"b01\" | [c-e]* \"a\"+\nrule-a ::= (\"c\" | rule-c [^2]) | \"c10\" \"0\" [c-f]\nrule-b ::= [zc-f] \"y2c\"+ rule-c\nrule-c ::= [b]+\n"
+  },
+  {
+    "name": "fuzz-29-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n!\n^"
+  },
+  {
+    "name": "fuzz-30-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48,
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [00]? [a]\nrule-a ::= [^bc]?\nrule-b ::= \"cy0\"+ | (([x] rule-c) | \"y\" [a]) \"c2\" | ([xc-d] rule-c | \"2z\" [0x-y])\nrule-c ::= \"c\" | ([aa-b] \"0c\" | \"zy0\") | [0] [^cc-e]\n"
+  },
+  {
+    "name": "fuzz-30-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48,
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= [00]? [a]\nrule-a ::= [^bc]?\nrule-b ::= \"cy0\"+ | (([x] rule-c) | \"y\" [a]) \"c2\" | ([xc-d] rule-c | \"2z\" [0x-y])\nrule-c ::= \"c\" | ([aa-b] \"0c\" | \"zy0\") | [0] [^cc-e]\n"
+  },
+  {
+    "name": "fuzz-30-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n~a\n^"
+  },
+  {
+    "name": "fuzz-31-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              99,
+              102
+            ],
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              99
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              121
+            ]
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 6,
+    "grammar": "root ::= \"00b\" \"1\"* rule-b+ | \"x0\"? ([^c-fx] [^zx-{]) | ([a-c] | [x-y] rule-a)?\nrule-a ::= [x-yx-y] ([x-{] | [c-d]) (rule-b | [10])\nrule-b ::= [0y]?\n"
+  },
+  {
+    "name": "fuzz-32-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [^x-z] [xy]+ rule-b\nrule-a ::= [^0a-c] (rule-b | [^x])? \"21a\" | \"z00\" [aa-d] \"ayx\"+\nrule-b ::= \"ab\"+ \"z01\" [b]? | (\"zxb\" [ca-c]) \"z\" | [c0]+\n"
+  },
+  {
+    "name": "fuzz-32-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120,
+            121
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [^x-z] [xy]+ rule-b\nrule-a ::= [^0a-c] (rule-b | [^x])? \"21a\" | \"z00\" [aa-d] \"ayx\"+\nrule-b ::= \"ab\"+ \"z01\" [b]? | (\"zxb\" [ca-c]) \"z\" | [c0]+\n"
+  },
+  {
+    "name": "fuzz-32-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\noyz~\n   ^"
+  },
+  {
+    "name": "fuzz-33-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              99
+            ],
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              99
+            ],
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              102
+            ],
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= rule-b+ [c-fc]\nrule-a ::= \"2yx\" \"b\"\nrule-b ::= \"bxy\" \"0ca\" | \"10\" \"xb\" | (\"1y0\" | [a-ca] \"1y2\")\n"
+  },
+  {
+    "name": "fuzz-33-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              99
+            ],
+            97
+          ]
+        }
+      ]
+    ],
+    "size": 3,
+    "grammar": "root ::= rule-b+ [c-fc]\nrule-a ::= \"2yx\" \"b\"\nrule-b ::= \"bxy\" \"0ca\" | \"10\" \"xb\" | (\"1y0\" | [a-ca] \"1y2\")\n"
+  },
+  {
+    "name": "fuzz-33-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n!x\n^"
+  },
+  {
+    "name": "fuzz-34-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"z\" [^a-d]\nrule-a ::= rule-b\nrule-b ::= rule-c (\"ax1\") rule-c | \"zyx\"* \"z\"\nrule-c ::= [^c-fy] [^bc-f] | \"c2\"\n"
+  },
+  {
+    "name": "fuzz-34-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"z\" [^a-d]\nrule-a ::= rule-b\nrule-b ::= rule-c (\"ax1\") rule-c | \"zyx\"* \"z\"\nrule-c ::= [^c-fy] [^bc-f] | \"c2\"\n"
+  },
+  {
+    "name": "fuzz-34-mutated",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              97,
+              100
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"z\" [^a-d]\nrule-a ::= rule-b\nrule-b ::= rule-c (\"ax1\") rule-c | \"zyx\"* \"z\"\nrule-c ::= [^c-fy] [^bc-f] | \"c2\"\n"
+  },
+  {
+    "name": "fuzz-35-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              123
+            ],
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              123
+            ],
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              99
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            49,
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              123
+            ],
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              99
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              123
+            ],
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              99
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            49,
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= rule-b+ [^1b]\nrule-a ::= rule-c? \"11\" | \"0y\" | \"ac\"? \"x\"\nrule-b ::= (rule-c \"b02\") [2] | (\"cyy\") | \"2\"? \"zxx\" [^a-c]*\nrule-c ::= \"2y\" [x-{2]+ ([a-c])\n"
+  },
+  {
+    "name": "fuzz-35-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              123
+            ],
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              123
+            ],
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              99
+            ]
+          ]
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= rule-b+ [^1b]\nrule-a ::= rule-c? \"11\" | \"0y\" | \"ac\"? \"x\"\nrule-b ::= (rule-c \"b02\") [2] | (\"cyy\") | \"2\"? \"zxx\" [^a-c]*\nrule-c ::= \"2y\" [x-{2]+ ([a-c])\n"
+  },
+  {
+    "name": "fuzz-35-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n2y{bb0222yxyab0W\n               ^"
+  },
+  {
+    "name": "fuzz-36-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= [x] \"x0\"* \"2y2\"+\nrule-a ::= (([a-db] [ac-d]) [^0x-z] | ([c] \"b\")) | [c-dx-z]*\n"
+  },
+  {
+    "name": "fuzz-36-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [x] \"x0\"* \"2y2\"+\nrule-a ::= (([a-db] [ac-d]) [^0x-z] | ([c] \"b\")) | [c-dx-z]*\n"
+  },
+  {
+    "name": "fuzz-36-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nxx!x\n  ^"
+  },
+  {
+    "name": "fuzz-37-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= ((\"bc\" rule-a) \"x\") | \"xb2\" [a-b2]\nrule-a ::= [zx-z] | [c-d] | rule-c \"a\"\nrule-b ::= [x-zc-d]? [^c-e1]\nrule-c ::= [^c] \"x\" | \"2\"? \"2\" \"aa\" | [0c-f] ([2y])+\n"
+  },
+  {
+    "name": "fuzz-37-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= ((\"bc\" rule-a) \"x\") | \"xb2\" [a-b2]\nrule-a ::= [zx-z] | [c-d] | rule-c \"a\"\nrule-b ::= [x-zc-d]? [^c-e1]\nrule-c ::= [^c] \"x\" | \"2\"? \"2\" \"aa\" | [0c-f] ([2y])+\n"
+  },
+  {
+    "name": "fuzz-37-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nxb2!\n   ^"
+  },
+  {
+    "name": "fuzz-38-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              123
+            ],
+            99
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [^x-{c] \"x\" | [^b] ([y] [^c] | [c] ([c-f] \"zb\"))\nrule-a ::= [c-e] ([^b])\n"
+  },
+  {
+    "name": "fuzz-38-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              123
+            ],
+            99
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ]
+    ],
+    "size": 3,
+    "grammar": "root ::= [^x-{c] \"x\" | [^b] ([y] [^c] | [c] ([c-f] \"zb\"))\nrule-a ::= [c-e] ([^b])\n"
+  },
+  {
+    "name": "fuzz-38-mutated",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              123
+            ],
+            99
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [^x-{c] \"x\" | [^b] ([y] [^c] | [c] ([c-f] \"zb\"))\nrule-a ::= [c-e] ([^b])\n"
+  },
+  {
+    "name": "fuzz-39-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"x01\" rule-b [ax-{]\nrule-a ::= \"0\"? | rule-b (rule-b rule-b | [c-ex-y] rule-b) | rule-b [2]\nrule-b ::= \"ab\" | \"b1\"? ([c-fa-c] (\"2b1\" | \"c1\" [xx-y])) [x] | \"a\"* [a-c]\n"
+  },
+  {
+    "name": "fuzz-39-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"x01\" rule-b [ax-{]\nrule-a ::= \"0\"? | rule-b (rule-b rule-b | [c-ex-y] rule-b) | rule-b [2]\nrule-b ::= \"ab\" | \"b1\"? ([c-fa-c] (\"2b1\" | \"c1\" [xx-y])) [x] | \"a\"* [a-c]\n"
+  },
+  {
+    "name": "fuzz-39-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nx0W\n  ^"
+  },
+  {
+    "name": "fuzz-40-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              98
+            ],
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              123
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"2zz\"* [a-bz] | [x-{]\nrule-a ::= \"22z\" | (rule-b | [bx])+ | [x-z] [z] (([^0a-d] rule-c | [x] \"by\") | [^c-ea-d])\nrule-b ::= [y] | \"y2\" [c-ec-e]+ | \"0c\" rule-c+ \"20\"+\nrule-c ::= \"c0\" \"12\"+ | [a-b] (([xa-b] [x]) | [zx-z]) (\"x\" | ([b] [x-z] | [yx-y]) \"zx0\") | (\"y21\" \"c11\") (\"x1\" | [1])+\n"
+  },
+  {
+    "name": "fuzz-40-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              98
+            ],
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              123
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              98
+            ],
+            122
+          ]
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= \"2zz\"* [a-bz] | [x-{]\nrule-a ::= \"22z\" | (rule-b | [bx])+ | [x-z] [z] (([^0a-d] rule-c | [x] \"by\") | [^c-ea-d])\nrule-b ::= [y] | \"y2\" [c-ec-e]+ | \"0c\" rule-c+ \"20\"+\nrule-c ::= \"c0\" \"12\"+ | [a-b] (([xa-b] [x]) | [zx-z]) (\"x\" | ([b] [x-z] | [yx-y]) \"zx0\") | (\"y21\" \"c11\") (\"x1\" | [1])+\n"
+  },
+  {
+    "name": "fuzz-40-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n2zz2~z\n    ^"
+  },
+  {
+    "name": "fuzz-41-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= [^y] [^b] [1]+\nrule-a ::= \"zx\"\n"
+  },
+  {
+    "name": "fuzz-41-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [^y] [^b] [1]+\nrule-a ::= \"zx\"\n"
+  },
+  {
+    "name": "fuzz-41-mutated",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= [^y] [^b] [1]+\nrule-a ::= \"zx\"\n"
+  },
+  {
+    "name": "fuzz-42-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              98
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [a-b]\nrule-a ::= [^2] [^1]\nrule-b ::= \"x1z\"* | ([^xx])\nrule-c ::= [c-fa] [2a-b] [1c]\n"
+  },
+  {
+    "name": "fuzz-42-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              98
+            ]
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [a-b]\nrule-a ::= [^2] [^1]\nrule-b ::= \"x1z\"* | ([^xx])\nrule-c ::= [c-fa] [2a-b] [1c]\n"
+  },
+  {
+    "name": "fuzz-42-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nW\n^"
+  },
+  {
+    "name": "fuzz-43-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [x-z] (rule-b [a] | (\"bc\")) | \"bc\"+\nrule-a ::= [yz]+ | (\"1\" [x-zb]) [1]\nrule-b ::= \"c\" \"0\" [a-by]+ | \"b\"+ | \"2\" [x-{0]\n"
+  },
+  {
+    "name": "fuzz-43-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ]
+    ],
+    "size": 3,
+    "grammar": "root ::= [x-z] (rule-b [a] | (\"bc\")) | \"bc\"+\nrule-a ::= [yz]+ | (\"1\" [x-zb]) [1]\nrule-b ::= \"c\" \"0\" [a-by]+ | \"b\"+ | \"2\" [x-{0]\n"
+  },
+  {
+    "name": "fuzz-43-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\ny!c\n ^"
+  },
+  {
+    "name": "fuzz-44-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              100
+            ],
+            [
+              99,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99,
+            [
+              99,
+              102
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            122,
+            [
+              120,
+              121
+            ]
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= \"z\" [x-y0] | ([a-dc-d] [zx-y] | [x-z] rule-b) | [cc-f]\nrule-a ::= rule-b [2] | \"bz\" ([c-f] | \"zz\" rule-b)+\nrule-b ::= (\"bc\" \"0y\")\n"
+  },
+  {
+    "name": "fuzz-44-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              100
+            ],
+            [
+              99,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99,
+            [
+              99,
+              102
+            ]
+          ]
+        }
+      ]
+    ],
+    "size": 4,
+    "grammar": "root ::= \"z\" [x-y0] | ([a-dc-d] [zx-y] | [x-z] rule-b) | [cc-f]\nrule-a ::= rule-b [2] | \"bz\" ([c-f] | \"zz\" rule-b)+\nrule-b ::= (\"bc\" \"0y\")\n"
+  },
+  {
+    "name": "fuzz-44-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n~\n^"
+  },
+  {
+    "name": "fuzz-45-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            121,
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= (\"00\") \"xc\"+ | \"1za\" rule-a [^yx-{]* | [^yy] \"ax\"\nrule-a ::= [xy]\n"
+  },
+  {
+    "name": "fuzz-45-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            121,
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= (\"00\") \"xc\"+ | \"1za\" rule-a [^yx-{]* | [^yy] \"ax\"\nrule-a ::= [xy]\n"
+  },
+  {
+    "name": "fuzz-45-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n00xW\n   ^"
+  },
+  {
+    "name": "fuzz-46-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= (rule-a | [y]) | (\"22\" \"2\") ([1] rule-a | \"1\")* [x]? | [^y]\nrule-a ::= \"c1\"\n"
+  },
+  {
+    "name": "fuzz-46-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            121
+          ]
+        }
+      ]
+    ],
+    "size": 4,
+    "grammar": "root ::= (rule-a | [y]) | (\"22\" \"2\") ([1] rule-a | \"1\")* [x]? | [^y]\nrule-a ::= \"c1\"\n"
+  },
+  {
+    "name": "fuzz-46-mutated",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= (rule-a | [y]) | (\"22\" \"2\") ([1] rule-a | \"1\")* [x]? | [^y]\nrule-a ::= \"c1\"\n"
+  },
+  {
+    "name": "fuzz-47-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ],
+            [
+              97,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98,
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              121
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98,
+            97
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 3,
+    "grammar": "root ::= \"y0\" | ([x-za-d] ([^x] [x-z2])) ([^yx-{] [a-da-d] | \"1yx\" rule-b)? [c-fa-b] | \"zz\" rule-b rule-c?\nrule-a ::= [x-ya-b]? \"z11\" \"yz\"\nrule-b ::= \"ccy\"+ rule-c [a-d] | \"1\"* rule-c+\nrule-c ::= \"az0\" (\"2\" \"a\")? | [ba] | \"a\" [x-z1] [^x-y]\n"
+  },
+  {
+    "name": "fuzz-47-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ],
+            [
+              97,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98,
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              121
+            ]
+          ]
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= \"y0\" | ([x-za-d] ([^x] [x-z2])) ([^yx-{] [a-da-d] | \"1yx\" rule-b)? [c-fa-b] | \"zz\" rule-b rule-c?\nrule-a ::= [x-ya-b]? \"z11\" \"yz\"\nrule-b ::= \"ccy\"+ rule-c [a-d] | \"1\"* rule-c+\nrule-c ::= \"az0\" (\"2\" \"a\")? | [ba] | \"a\" [x-z1] [^x-y]\n"
+  },
+  {
+    "name": "fuzz-47-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nzz11bWz\n     ^"
+  },
+  {
+    "name": "fuzz-48-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 3,
+    "grammar": "root ::= \"0x\" rule-a? [1] | rule-a (\"yx\" | \"x0c\")*\nrule-a ::= \"c\" \"0\"\n"
+  },
+  {
+    "name": "fuzz-48-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"0x\" rule-a? [1] | rule-a (\"yx\" | \"x0c\")*\nrule-a ::= \"c\" \"0\"\n"
+  },
+  {
+    "name": "fuzz-48-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nQ0y\n^"
+  },
+  {
+    "name": "fuzz-49-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              102
+            ],
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121,
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              102
+            ],
+            99
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 3,
+    "grammar": "root ::= (\"c\" \"0\" | rule-c \"x\") | [y2] (rule-b (rule-a) | (\"a\" [^y])) | [x]* \"0\"\nrule-a ::= \"0x2\" [2] | \"ya0\"? [c-da]* (\"xz1\" | rule-c) | [bx-z]*\nrule-b ::= [az] [^x-z] rule-c | \"a0\"* \"zaz\"\nrule-c ::= \"2z\" \"ab\"* | [c-fc] (\"y\") [a-cx] | \"2\"\n"
+  },
+  {
+    "name": "fuzz-49-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              102
+            ],
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121,
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97,
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ]
+    ],
+    "size": 4,
+    "grammar": "root ::= (\"c\" \"0\" | rule-c \"x\") | [y2] (rule-b (rule-a) | (\"a\" [^y])) | [x]* \"0\"\nrule-a ::= \"0x2\" [2] | \"ya0\"? [c-da]* (\"xz1\" | rule-c) | [bx-z]*\nrule-b ::= [az] [^x-z] rule-c | \"a0\"* \"zaz\"\nrule-c ::= \"2z\" \"ab\"* | [c-fc] (\"y\") [a-cx] | \"2\"\n"
+  },
+  {
+    "name": "fuzz-49-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n2!F\n ^"
+  },
+  {
+    "name": "fuzz-50-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120,
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"a\" (\"ba\" (\"zab\" [x2]) | rule-a)\nrule-a ::= rule-b+ | \"bz1\" | [1] \"c\"\nrule-b ::= \"xz\"\n"
+  },
+  {
+    "name": "fuzz-50-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"a\" (\"ba\" (\"zab\" [x2]) | rule-a)\nrule-a ::= rule-b+ | \"bz1\" | [1] \"c\"\nrule-b ::= \"xz\"\n"
+  },
+  {
+    "name": "fuzz-50-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nab!\n  ^"
+  },
+  {
+    "name": "fuzz-51-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= rule-a?\nrule-a ::= [x-z] \"b\" | [x-z]* (\"0\" | (\"0b\" \"z\" | rule-b) [by]) | (\"c\" [y])\nrule-b ::= \"a\" | \"a\" \"x2\"+ | [1] \"ayz\"*\n"
+  },
+  {
+    "name": "fuzz-51-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ]
+    ],
+    "size": 5,
+    "grammar": "root ::= rule-a?\nrule-a ::= [x-z] \"b\" | [x-z]* (\"0\" | (\"0b\" \"z\" | rule-b) [by]) | (\"c\" [y])\nrule-b ::= \"a\" | \"a\" \"x2\"+ | [1] \"ayz\"*\n"
+  },
+  {
+    "name": "fuzz-51-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nQb\n^"
+  },
+  {
+    "name": "fuzz-52-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              97,
+              99
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120,
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121,
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120,
+            97
+          ]
+        },
+        {
+          "type": "end"
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120,
+            97
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 3,
+    "grammar": "root ::= rule-b? [xa] | ([ya] | \"b\" [x]) rule-c\nrule-a ::= ([x-z] ([^x-z] rule-c) | [b1] [^0])? \"c2a\" ([a] | [ya-b] \"by\")+ | [x-yx] [^a] \"z\" | [c-d1] [1]? [z]+\nrule-b ::= [^a-c]* rule-c | \"2b\" rule-c+\nrule-c ::= [x] [1] | [^z] | \"bx\" [^a]+\n"
+  },
+  {
+    "name": "fuzz-52-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              97,
+              99
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120,
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121,
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120,
+            97
+          ]
+        },
+        {
+          "type": "end"
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ]
+    ],
+    "size": 4,
+    "grammar": "root ::= rule-b? [xa] | ([ya] | \"b\" [x]) rule-c\nrule-a ::= ([x-z] ([^x-z] rule-c) | [b1] [^0])? \"c2a\" ([a] | [ya-b] \"by\")+ | [x-yx] [^a] \"z\" | [c-d1] [1]? [z]+\nrule-b ::= [^a-c]* rule-c | \"2b\" rule-c+\nrule-c ::= [x] [1] | [^z] | \"bx\" [^a]+\n"
+  },
+  {
+    "name": "fuzz-52-mutated",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              97,
+              99
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120,
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121,
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120,
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char_exclude",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120,
+            97
+          ]
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= rule-b? [xa] | ([ya] | \"b\" [x]) rule-c\nrule-a ::= ([x-z] ([^x-z] rule-c) | [b1] [^0])? \"c2a\" ([a] | [ya-b] \"by\")+ | [x-yx] [^a] \"z\" | [c-d1] [1]? [z]+\nrule-b ::= [^a-c]* rule-c | \"2b\" rule-c+\nrule-c ::= [x] [1] | [^z] | \"bx\" [^a]+\n"
+  },
+  {
+    "name": "fuzz-53-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            121
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 5,
+    "grammar": "root ::= (\"011\" (rule-b \"z\" | [^y])) \"yz1\" (([c-f] | \"b\" [c-d]) \"b00\" | \"2aa\" \"x0\") | [0]? rule-a\nrule-a ::= [1]+\nrule-b ::= \"yz\" \"y\" | \"1zz\" (\"bac\" \"x2\") | \"c\"\n"
+  },
+  {
+    "name": "fuzz-53-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= (\"011\" (rule-b \"z\" | [^y])) \"yz1\" (([c-f] | \"b\" [c-d]) \"b00\" | \"2aa\" \"x0\") | [0]? rule-a\nrule-a ::= [1]+\nrule-b ::= \"yz\" \"y\" | \"1zz\" (\"bac\" \"x2\") | \"c\"\n"
+  },
+  {
+    "name": "fuzz-53-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n01~\n  ^"
+  },
+  {
+    "name": "fuzz-54-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ],
+            [
+              120,
+              123
+            ]
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              122
+            ],
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48,
+            [
+              97,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48,
+            [
+              97,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= (\"zyb\" (\"ay1\") | [x-zx-{] \"2\") \"010\" (\"xa1\") | ([^x-z2]) rule-a [a-cx-z] | rule-a+\nrule-a ::= [0a-d] ([c-d] \"z\" | \"2\") | \"yb\" \"0a1\" [c]\n"
+  },
+  {
+    "name": "fuzz-54-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ],
+            [
+              120,
+              123
+            ]
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            [
+              120,
+              122
+            ],
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48,
+            [
+              97,
+              100
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            121
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= (\"zyb\" (\"ay1\") | [x-zx-{] \"2\") \"010\" (\"xa1\") | ([^x-z2]) rule-a [a-cx-z] | rule-a+\nrule-a ::= [0a-d] ([c-d] \"z\" | \"2\") | \"yb\" \"0a1\" [c]\n"
+  },
+  {
+    "name": "fuzz-54-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nsy!0\n  ^"
+  },
+  {
+    "name": "fuzz-55-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              102
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            48
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= [c-f] [0]*\nrule-a ::= [^yc] (\"c1\" \"yyx\") [c-e]*\n"
+  },
+  {
+    "name": "fuzz-55-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              102
+            ]
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [c-f] [0]*\nrule-a ::= [^yc] (\"c1\" \"yyx\") [c-e]*\n"
+  },
+  {
+    "name": "fuzz-55-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nd!\n ^"
+  },
+  {
+    "name": "fuzz-56-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"ayx\" \"c12\" [x]\nrule-a ::= [zy] [11] \"a\" | [^c-d]\nrule-b ::= \"byc\" | [ya-b] (([^2]) \"0\" | [x-{]) \"20a\"+ | [a] \"ab\"? \"0bb\"\n"
+  },
+  {
+    "name": "fuzz-56-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"ayx\" \"c12\" [x]\nrule-a ::= [zy] [11] \"a\" | [^c-d]\nrule-b ::= \"byc\" | [ya-b] (([^2]) \"0\" | [x-{]) \"20a\"+ | [a] \"ab\"? \"0bb\"\n"
+  },
+  {
+    "name": "fuzz-56-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nayWc1\n  ^"
+  },
+  {
+    "name": "fuzz-57-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              102
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120,
+            [
+              120,
+              123
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              121
+            ],
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              98
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= \"cx\" \"cz\" | (\"z1\") \"1\" | ([c-f] | rule-b [cy]) [ya-d] [^2]\nrule-a ::= rule-b | [x1]* | \"200\"+ rule-b\nrule-b ::= [xx-{] [a-b] | [x-ya]? \"c11\"\n"
+  },
+  {
+    "name": "fuzz-57-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            99
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              99,
+              102
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            120,
+            [
+              120,
+              123
+            ]
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              121
+            ],
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            49
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            [
+              97,
+              98
+            ]
+          ]
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= \"cx\" \"cz\" | (\"z1\") \"1\" | ([c-f] | rule-b [cy]) [ya-d] [^2]\nrule-a ::= rule-b | [x1]* | \"200\"+ rule-b\nrule-b ::= [xx-{] [a-b] | [x-ya]? \"c11\"\n"
+  },
+  {
+    "name": "fuzz-57-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\nzW1\n ^"
+  },
+  {
+    "name": "fuzz-58-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            98,
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48,
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            50
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= rule-c ([^b2] | [0z])\nrule-a ::= \"0ab\" \"ay\"\nrule-b ::= [^1]* [y] [^2] | (rule-c rule-c | [^x-{x-z]) [a-cc-e] | \"2\"* \"bc\"? [^ac]\nrule-c ::= (\"x\" \"x\" | ([z] \"yxc\")) \"2\"+ | \"ab2\"+\n"
+  },
+  {
+    "name": "fuzz-58-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            120
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            122
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            97
+          ]
+        },
+        {
+          "type": "char_exclude",
+          "value": [
+            98,
+            50
+          ]
+        },
+        {
+          "type": "char",
+          "value": [
+            48,
+            122
+          ]
+        }
+      ],
+      [
+        {
+          "type": "char",
+          "value": [
+            98
+          ]
+        },
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 2,
+    "grammar": "root ::= rule-c ([^b2] | [0z])\nrule-a ::= \"0ab\" \"ay\"\nrule-b ::= [^1]* [y] [^2] | (rule-c rule-c | [^x-{x-z]) [a-cc-e] | \"2\"* \"bc\"? [^ac]\nrule-c ::= (\"x\" \"x\" | ([z] \"yxc\")) \"2\"+ | \"ab2\"+\n"
+  },
+  {
+    "name": "fuzz-58-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\na~\n ^"
+  },
+  {
+    "name": "fuzz-59-valid",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ],
+            99
+          ]
+        }
+      ],
+      [
+        {
+          "type": "end"
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [x-zc] \"y\"\nrule-a ::= ([x-za-d] [a] | \"aza\")\nrule-b ::= \"bx0\" \"1zy\"? \"1c\" | [2x-{] \"b21\" | \"x\"? \"c\"\n"
+  },
+  {
+    "name": "fuzz-59-prefix",
+    "ok": true,
+    "steps": [
+      [
+        {
+          "type": "char",
+          "value": [
+            [
+              120,
+              122
+            ],
+            99
+          ]
+        }
+      ]
+    ],
+    "size": 1,
+    "grammar": "root ::= [x-zc] \"y\"\nrule-a ::= ([x-za-d] [a] | \"aza\")\nrule-b ::= \"bx0\" \"1zy\"? \"1c\" | [2x-{] \"b21\" | \"x\"? \"c\"\n"
+  },
+  {
+    "name": "fuzz-59-mutated",
+    "ok": false,
+    "error": "InputParseError",
+    "message": "Failed to parse input string:\n\n!y\n^"
+  }
+]

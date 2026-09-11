@@ -1,0 +1,74 @@
+[[python.exempt]]
+path = "round_trip_experiment/__init__.py"
+rules = ["colocated-test"]
+reason = "re-export barrel; the entry points are tested in their own modules"
+
+[[python.exempt]]
+path = "round_trip_experiment/measure_code_distance_cli_test.py"
+rules = ["unmocked-collaborator"]
+reason = "click's CliRunner is the harness driving the unit"
+
+[[python.exempt]]
+path = "round_trip_experiment/reverse_port_cli.py"
+rules = ["one-function-per-file"]
+reason = "stage, record and run are click subcommands registered on the one group; each is a wiring shim over functions tested in their own modules"
+
+[[python.exempt]]
+path = "round_trip_experiment/reverse_port_cli_test.py"
+rules = ["unmocked-collaborator", "no-first-party-patch"]
+reason = "click's CliRunner is the harness driving the unit; reverse_leg, record_forward and the subprocess are patched at their cli import bindings so no test can launch a port"
+
+[[python.exempt]]
+path = "round_trip_experiment/reverse_leg_test.py"
+rules = ["no-first-party-patch"]
+reason = "the unit is the composition, so its collaborators are patched at their import bindings; reverse_condition stays real because it is a pure value transform"
+
+[[python.exempt]]
+path = "round_trip_experiment/stage_port_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the unit is a copy and a symlink; tmp_path is the input and the tree it leaves behind is the assertion"
+
+[[python.exempt]]
+path = "round_trip_experiment/check_staged_derivation_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the unit is a read of the staged tree; a mocked Path would only restate which paths the check looks at"
+
+[[python.exempt]]
+path = "round_trip_experiment/record_forward_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the unit is a rewrite of a manifest file; the bytes on disk are what the assertions are about"
+
+[[python.exempt]]
+path = "round_trip_experiment/reverse_run_directory_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the unit is a directory listing; tmp_path is the input, not a collaborator"
+
+[[python.exempt]]
+path = "round_trip_experiment/token_stream_test.py"
+rules = ["unmocked-collaborator"]
+reason = "token_stream walks real tree-sitter trees; the expected streams are only meaningful against the grammar's actual leaves"
+
+[[python.exempt]]
+path = "round_trip_experiment/measure_code_distance_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the distance over real parses of tmp files is the unit; mocking collect_files, token_stream and rapidfuzz would leave only dict assembly"
+
+[[python.exempt]]
+path = "round_trip_experiment/measure_code_distance_cli.py"
+rules = ["one-function-per-file"]
+reason = "levenshtein and git-diff are click subcommands registered on the one group; each is a wiring shim over a measure tested in its own module"
+
+[[python.exempt]]
+path = "round_trip_experiment/format_tree_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the unit is the formatter invocation; a mocked subprocess would only restate the argv, so real ruff over tmp_path files is the assertion"
+
+[[python.exempt]]
+path = "round_trip_experiment/normalize_tree_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the unit is the bytes the normalization leaves on disk; mocking strip_comments and the formatter would leave only a copy loop"
+
+[[python.exempt]]
+path = "round_trip_experiment/measure_git_diff_test.py"
+rules = ["unmocked-collaborator", "no-first-party-patch"]
+reason = "git_diff_stats is patched at its import binding because unit tests never shell out to git; normalize_tree stays real so the line counts and the identical count are measured, not asserted twice"

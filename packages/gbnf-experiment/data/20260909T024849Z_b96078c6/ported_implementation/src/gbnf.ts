@@ -1,0 +1,31 @@
+import { buildRuleStack } from "./grammar-parser/build-rule-stack.ts";
+import { Graph } from "./grammar-graph/graph.ts";
+import { ParseState } from "./grammar-graph/parse-state.ts";
+import { RulesBuilder } from "./rules-builder/rules-builder.ts";
+import { GrammarParseError } from "./utils/errors/grammar-parse-error.ts";
+
+export const GBNF = (grammar: string, initialString = ""): ParseState => {
+  if (typeof grammar !== "string") {
+    throw new Error("grammar must be a string");
+  }
+
+  if (typeof initialString !== "string") {
+    throw new Error("input must be a string");
+  }
+
+  const rulesBuilder = new RulesBuilder(grammar);
+  const { rules, symbolIds } = rulesBuilder;
+  if (rules.length === 0) {
+    throw new GrammarParseError(grammar, 0, "No rules were found");
+  }
+  const rootId = symbolIds.get("root");
+  if (rootId === undefined) {
+    throw new GrammarParseError(grammar, 0, "Grammar does not contain a 'root' symbol");
+  }
+
+  const stackedRules = rules.map((rule) => buildRuleStack(rule));
+  const graph = new Graph(grammar, stackedRules, rootId);
+  return new ParseState(graph, graph.add(initialString));
+};
+
+export default GBNF;

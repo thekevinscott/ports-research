@@ -1,0 +1,26 @@
+[project]
+name = "measure-complexity-curve"
+version = "0.1.0"
+description = "Fingerprint a GBNF port's time-complexity shape against a corpus of grammars of increasing size"
+readme = "README.md"
+authors = [
+    { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "click>=8.5.0",
+]
+
+[project.scripts]
+measure-complexity-curve = "measure_complexity_curve.cli:cli"
+
+[build-system]
+requires = ["uv_build>=0.9,<1.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-describe>=3.2.0",
+    "testing-conventions>=0.0.104",
+]

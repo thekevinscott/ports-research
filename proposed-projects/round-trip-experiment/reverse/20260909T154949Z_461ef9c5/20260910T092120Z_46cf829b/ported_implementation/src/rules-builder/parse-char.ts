@@ -1,0 +1,45 @@
+import { GrammarParseError } from '../utils/errors/grammar-parse-error.js';
+
+export const parseChar = (src: string, pos: number): [number, number] => {
+  if (src[pos] === '\\') {
+    const escape = src[pos + 1];
+    switch (escape) {
+      case 'x':
+        return [parseInt(src.substring(pos + 2, pos + 4), 16), 4];
+      case 'u':
+        return [parseInt(src.substring(pos + 2, pos + 6), 16), 6];
+      case 'U':
+        return [parseInt(src.substring(pos + 2, pos + 10), 16), 10];
+      case 't':
+        return ['\t'.charCodeAt(0), 2];
+      case 'r':
+        return ['\r'.charCodeAt(0), 2];
+      case 'n':
+        return ['\n'.charCodeAt(0), 2];
+      case '"':
+      case '[':
+      case ']':
+        return [src.charCodeAt(pos + 1), 2];
+      case '\\': {
+        const codePoint = src.codePointAt(pos + 1);
+        if (codePoint === undefined) {
+          throw new GrammarParseError(src, pos, 'Could not get code point for character');
+        }
+        return [codePoint, 2];
+      }
+      default:
+        throw new GrammarParseError(src, pos, `Unknown escape at ${src[pos]}`);
+    }
+  }
+
+  if (!src[pos]) {
+    throw new GrammarParseError(
+      src,
+      pos,
+      'Unexpected end of grammar input, failed to complete parse',
+    );
+  }
+  // `inc` counts code units so that a surrogate pair is consumed as the one character it is
+  const codePoint = src.codePointAt(pos) as number;
+  return [codePoint, String.fromCodePoint(codePoint).length];
+};

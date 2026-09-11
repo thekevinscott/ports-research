@@ -1,0 +1,33 @@
+# Harvested paper corpus — 741MB, reproducible from harvest_citations.py
+papers/
+
+# Upstream clone with a live remote; stays a nested repo
+gbnf-experiment/repo/
+
+# Python
+__pycache__/
+*.py[oc]
+.venv/
+venv/
+build/
+dist/
+wheels/
+*.egg-info
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+__marimo__/
+
+# Node
+node_modules/
+.vite/
+
+.claude/
+
+# Removed from the published repo in 0b1d77a. A local copy is restored on this
+# machine to take a screenshot; it must not come back into the tree.
+/webapp/
+
+# Session handoffs, audits and dated analysis batches. Kept on disk, out of
+# the published repo.
+/notes/

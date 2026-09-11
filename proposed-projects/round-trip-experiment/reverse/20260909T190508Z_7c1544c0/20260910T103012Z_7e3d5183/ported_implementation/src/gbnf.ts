@@ -1,0 +1,38 @@
+import { Graph } from './grammar-graph/graph.js';
+import { ParseState } from './grammar-graph/parse-state.js';
+import { ValidInput } from './grammar-graph/types.js';
+import type { UnresolvedRule } from './grammar-parser/build-rule-stack.js';
+import { buildRuleStack } from './grammar-parser/build-rule-stack.js';
+import { RulesBuilder } from './rules-builder/index.js';
+import { GrammarParseError } from './utils/errors/grammar-parse-error.js';
+import { dumps } from './utils/json.js';
+
+/** Parse a GBNF grammar, returning the state of a parse over `initialString`. */
+export const GBNF = (
+  input: string,
+  initialString: ValidInput = ''
+): ParseState => {
+  const grammar = typeof input === 'string' ? input : String(input);
+  const builder = new RulesBuilder(grammar);
+  const { rules, symbolIds } = builder;
+  if (rules.length === 0) {
+    throw new GrammarParseError(grammar, 0, 'No rules were found');
+  }
+  if (!symbolIds.has('root')) {
+    throw new GrammarParseError(
+      grammar,
+      0,
+      'Grammar does not contain a root symbol. Available symbols are: ' +
+        `${dumps([...symbolIds.keys()])}`
+    );
+  }
+  const rootId = symbolIds.get('root');
+
+  const stackedRules: (UnresolvedRule[][] | undefined)[] = rules.map((rule) =>
+    rule !== undefined ? buildRuleStack(rule) : undefined
+  );
+  const graph = new Graph(grammar, stackedRules, rootId);
+  return new ParseState(graph, graph.add(initialString));
+};
+
+export default GBNF;
