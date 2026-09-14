@@ -1,0 +1,21 @@
+[project]
+name = "agent-harness-sandbox"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "click>=8.5.0",
+    "python-on-whales>=0.81.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.9,<1.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-describe>=3.2.0",
+    "testing-conventions>=0.0.104",
+]
