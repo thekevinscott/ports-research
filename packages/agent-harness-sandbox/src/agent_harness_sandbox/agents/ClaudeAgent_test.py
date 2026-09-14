@@ -46,6 +46,10 @@ def describe_the_container():
     def it_names_its_own_image(agent):
         assert agent.image == "agent-harness-sandbox-claude:latest"
 
+    def it_binds_host_home_by_keyword_only(claude_home):
+        with pytest.raises(TypeError):
+            ClaudeAgent(claude_home)
+
     def it_points_at_its_own_dockerfile(agent):
         assert agent.dockerfile.name == "Dockerfile.claude"
 
