@@ -1,0 +1,20 @@
+[
+  "root ::= \"foo\"",
+  "root ::= \"foo\" | \"bar\"",
+  "root ::= (\"foo\" | \"bar\")",
+  "root ::= (\"foo\" | \"bar\")?",
+  "root ::= (\"foo\" | \"bar\")*",
+  "root ::= (\"foo\" | \"bar\")+",
+  "root ::= [a-z]",
+  "root ::= [a-zA-Z]",
+  "root ::= [a-zA-Z0-9]",
+  "root ::= [a-zA-Z0-9]*",
+  "root ::= [a-zA-Z0-9]?",
+  "root ::= [a-z]+",
+  "root ::= [a-zA-Z0-9]+",
+  "root ::= ([a-zA-Z0-9])*",
+  "root ::= ([a-zA-Z0-9])?",
+  "root ::= ([a-zA-Z0-9])+",
+  "\n  root ::= foo\n  foo ::= \"foo\"",
+  "\n  root ::= foo\n  foo ::= \"foo\" | \"bar\" | ([a-z])?\n  "
+]

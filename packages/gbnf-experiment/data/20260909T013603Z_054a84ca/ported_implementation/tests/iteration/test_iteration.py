@@ -1,0 +1,249 @@
+"""Ported from tests/javascript/iteration/iteration.test.ts.
+
+Generated from the JavaScript suite in /workspace/tests/javascript; the case
+tables are the originals, translated verbatim.
+"""
+
+import pytest
+
+from gbnf import GBNF
+
+CASES = [
+    [
+        'root ::= "foo"',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "foo" | "bar" ',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+            {'type': 'char', 'value': [
+                98,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "foo" | "bar" | "gaz"',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+            {'type': 'char', 'value': [
+                98,
+            ]},
+            {'type': 'char', 'value': [
+                103,
+            ]},
+        ],
+    ],
+    [
+        'root ::= "foo" | "bar" | "baz"',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+            {'type': 'char', 'value': [
+                98,
+            ]},
+        ],
+    ],
+    [
+        'root ::= [^x]',
+        [
+            {'type': 'char_exclude', 'value': [
+                120,
+            ]},
+        ],
+    ],
+    [
+        'root ::= [^f] "o"',
+        [
+            {'type': 'char_exclude', 'value': [
+                102,
+            ]},
+        ],
+    ],
+    [
+        'root ::= [^A-Z]',
+        [
+            {'type': 'char_exclude', 'value': [
+                [
+                    65,
+                    90,
+                ],
+            ]},
+        ],
+    ],
+    [
+        'root ::= [^A-Z0-9]',
+        [
+            {'type': 'char_exclude', 'value': [
+                [
+                    65,
+                    90,
+                ],
+                [
+                    48,
+                    57,
+                ],
+            ]},
+        ],
+    ],
+    [
+        'root ::= [^A-Z0-9_-]',
+        [
+            {'type': 'char_exclude', 'value': [
+                [
+                    65,
+                    90,
+                ],
+                [
+                    48,
+                    57,
+                ],
+                95,
+                45,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= foo\nfoo ::= "foo"\n  ',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= f\nf ::= foo\nfoo ::= "foo"\n  ',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= foo | "bar"\nfoo ::= "foo"',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+            {'type': 'char', 'value': [
+                98,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= foo | bar\nfoo ::= "foo"\nbar ::= "bar"\n  ',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+            {'type': 'char', 'value': [
+                98,
+            ]},
+        ],
+    ],
+    [
+        '\nroot ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= "foo"\nbar ::= "bar"\nbaz ::= "baz"\n  ',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+            {'type': 'char', 'value': [
+                98,
+            ]},
+        ],
+    ],
+    [
+        'root ::= [a-z]',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+            ]},
+        ],
+    ],
+    [
+        'root ::= [a-zA-Z]',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+                [
+                    65,
+                    90,
+                ],
+            ]},
+        ],
+    ],
+    [
+        'root ::= [a-z]?',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        'root ::= [a-z]+',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+            ]},
+        ],
+    ],
+    [
+        'root ::= [a-z]*',
+        [
+            {'type': 'char', 'value': [
+                [
+                    97,
+                    122,
+                ],
+            ]},
+            {'type': 'end'},
+        ],
+    ],
+    [
+        '\n  root ::= "foo"\n  foo ::= "foo"',
+        [
+            {'type': 'char', 'value': [
+                102,
+            ]},
+        ],
+    ],
+    [
+        '\n  root  ::= (expr "=" term "\\n")+\n  expr  ::= term ([-+*/] term)*\n  term  ::= [0-9]+\n  ',
+        [
+            {'type': 'char', 'value': [
+                [
+                    48,
+                    57,
+                ],
+            ]},
+        ],
+    ],
+]
+
+@pytest.mark.parametrize('grammar,expected', CASES, ids=[str(i) for i in range(len(CASES))])
+def test_it_returns_parse_state_for_a_grammar(grammar, expected):
+    state = GBNF(grammar)
+    assert [rule.to_dict() for rule in state] == expected

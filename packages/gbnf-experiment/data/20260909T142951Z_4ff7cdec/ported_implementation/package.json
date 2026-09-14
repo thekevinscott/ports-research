@@ -1,0 +1,21 @@
+{
+  "name": "gbnf",
+  "version": "0.0.30",
+  "description": "A library for parsing GBNF grammars",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "vitest run --config vitest.config.unit.ts"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.3"
+  },
+  "license": "MIT"
+}

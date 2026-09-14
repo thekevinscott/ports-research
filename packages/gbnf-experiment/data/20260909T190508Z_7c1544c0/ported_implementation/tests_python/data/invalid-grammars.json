@@ -1,0 +1,42 @@
+[
+  [
+    "",
+    0,
+    "No rules were found"
+  ],
+  [
+    "root = \"foo\"",
+    5,
+    "Expecting ::= at 5"
+  ],
+  [
+    "root ::= foo\nfoo := \"foo\"\n  ",
+    17,
+    "Expecting ::= at 17"
+  ],
+  [
+    "root ::= foo",
+    9,
+    "Undefined rule identifier \"foo\""
+  ],
+  [
+    "root ::= foo\nbar ::= \"bar\"\n  ",
+    9,
+    "Undefined rule identifier \"foo\""
+  ],
+  [
+    "root ::= foo\nfoo ::= baz\nbar ::= \"bar\"\n  ",
+    21,
+    "Undefined rule identifier \"baz\""
+  ],
+  [
+    "root ::= foo ::= bar",
+    13,
+    "Expecting newline or end at 13"
+  ],
+  [
+    "root ::= ([a-z]\nfoo ::= \"foo\"\n  ",
+    20,
+    "Expecting ')' at 20"
+  ]
+]

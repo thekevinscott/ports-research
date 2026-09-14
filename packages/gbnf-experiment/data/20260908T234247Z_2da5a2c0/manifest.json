@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-09-08T23:42:47Z",
+  "completed_at": "2026-09-09T00:04:20Z",
+  "condition": {
+    "name": "source-typescript_effort-high_model-claude-opus-5",
+    "source_language": "typescript",
+    "target_language": "python",
+    "include_python_tests": false,
+    "include_typescript_tests": false,
+    "effort": "high",
+    "model": "claude-opus-5"
+  },
+  "derivation": {
+    "gbnf_commit": "13f1aca495d11e160fffd68c4ba299a2415909d8"
+  },
+  "sandbox": {
+    "image_id": "sha256:590feb8a61074db4b766945f83fcc667940f619a35c57bfae234f149371264f4"
+  },
+  "harness": {
+    "commit": "7f09c9ba503d957788ae4b07a04227f28c5f78b6",
+    "dirty": true
+  }
+}

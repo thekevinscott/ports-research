@@ -1,0 +1,765 @@
+{
+  "colors": {
+    "BLUE": "\u001b[34m",
+    "CYAN": "\u001b[36m",
+    "GREEN": "\u001b[32m",
+    "RED": "\u001b[31m",
+    "GRAY": "\u001b[90m",
+    "YELLOW": "\u001b[33m"
+  },
+  "colorize": [
+    {
+      "args": [
+        "hello",
+        "\u001b[34m"
+      ],
+      "result": "\u001b[34mhello"
+    },
+    {
+      "args": [
+        123,
+        "\u001b[31m"
+      ],
+      "result": "\u001b[31m123"
+    }
+  ],
+  "isWordChar": [
+    {
+      "args": [
+        "a"
+      ],
+      "result": true
+    },
+    {
+      "args": [
+        "z"
+      ],
+      "result": true
+    },
+    {
+      "args": [
+        "A"
+      ],
+      "result": true
+    },
+    {
+      "args": [
+        "Z"
+      ],
+      "result": true
+    },
+    {
+      "args": [
+        "0"
+      ],
+      "result": false
+    },
+    {
+      "args": [
+        "9"
+      ],
+      "result": false
+    },
+    {
+      "args": [
+        "-"
+      ],
+      "result": false
+    },
+    {
+      "args": [
+        "_"
+      ],
+      "result": false
+    },
+    {
+      "args": [
+        " "
+      ],
+      "result": false
+    },
+    {
+      "args": [
+        "\n"
+      ],
+      "result": false
+    },
+    {
+      "args": [
+        "["
+      ],
+      "result": false
+    },
+    {
+      "args": [
+        "ぁ"
+      ],
+      "result": false
+    }
+  ],
+  "parseSpace": [
+    {
+      "args": [
+        "   abc",
+        0,
+        false
+      ],
+      "result": 3
+    },
+    {
+      "args": [
+        "   abc",
+        0,
+        true
+      ],
+      "result": 3
+    },
+    {
+      "args": [
+        "\n\n abc",
+        0,
+        false
+      ],
+      "result": 0
+    },
+    {
+      "args": [
+        "\n\n abc",
+        0,
+        true
+      ],
+      "result": 3
+    },
+    {
+      "args": [
+        "# comment\nabc",
+        0,
+        false
+      ],
+      "result": 9
+    },
+    {
+      "args": [
+        "# comment\nabc",
+        0,
+        true
+      ],
+      "result": 10
+    },
+    {
+      "args": [
+        "abc",
+        0,
+        true
+      ],
+      "result": 0
+    },
+    {
+      "args": [
+        "  \t \r\n x",
+        0,
+        true
+      ],
+      "result": 7
+    },
+    {
+      "args": [
+        "  \t \r\n x",
+        0,
+        false
+      ],
+      "result": 4
+    },
+    {
+      "args": [
+        "",
+        0,
+        true
+      ],
+      "result": 0
+    },
+    {
+      "args": [
+        "a",
+        5,
+        true
+      ],
+      "result": 5
+    }
+  ],
+  "parseName": [
+    {
+      "args": [
+        "root ::= x",
+        0
+      ],
+      "result": "root"
+    },
+    {
+      "args": [
+        "foo-bar ::= x",
+        0
+      ],
+      "result": "foo-bar"
+    },
+    {
+      "args": [
+        "foo_bar ::= x",
+        0
+      ],
+      "result": "foo_bar"
+    },
+    {
+      "args": [
+        "  root",
+        2
+      ],
+      "result": "root"
+    },
+    {
+      "args": [
+        "123",
+        0
+      ],
+      "error": "GrammarParseError",
+      "message": "Failed to parse grammar: Failed to find a valid name\n\n123\n^"
+    },
+    {
+      "args": [
+        "",
+        0
+      ],
+      "error": "GrammarParseError",
+      "message": "Failed to parse grammar: Failed to find a valid name\n\nNo input provided"
+    },
+    {
+      "args": [
+        "root",
+        4
+      ],
+      "error": "GrammarParseError",
+      "message": "Failed to parse grammar: Failed to find a valid name\n\nroot\n    ^"
+    }
+  ],
+  "parseChar": [
+    {
+      "args": [
+        "a",
+        0
+      ],
+      "result": [
+        97,
+        1
+      ]
+    },
+    {
+      "args": [
+        "abc",
+        1
+      ],
+      "result": [
+        98,
+        1
+      ]
+    },
+    {
+      "args": [
+        "\\x41",
+        0
+      ],
+      "result": [
+        65,
+        4
+      ]
+    },
+    {
+      "args": [
+        "\\u0041",
+        0
+      ],
+      "result": [
+        65,
+        6
+      ]
+    },
+    {
+      "args": [
+        "\\U0001F4A9",
+        0
+      ],
+      "result": [
+        128169,
+        10
+      ]
+    },
+    {
+      "args": [
+        "\\t",
+        0
+      ],
+      "result": [
+        9,
+        2
+      ]
+    },
+    {
+      "args": [
+        "\\r",
+        0
+      ],
+      "result": [
+        13,
+        2
+      ]
+    },
+    {
+      "args": [
+        "\\n",
+        0
+      ],
+      "result": [
+        10,
+        2
+      ]
+    },
+    {
+      "args": [
+        "\\\"",
+        0
+      ],
+      "result": [
+        34,
+        2
+      ]
+    },
+    {
+      "args": [
+        "\\[",
+        0
+      ],
+      "result": [
+        91,
+        2
+      ]
+    },
+    {
+      "args": [
+        "\\]",
+        0
+      ],
+      "result": [
+        93,
+        2
+      ]
+    },
+    {
+      "args": [
+        "\\\\",
+        0
+      ],
+      "result": [
+        92,
+        2
+      ]
+    },
+    {
+      "args": [
+        "\\q",
+        0
+      ],
+      "error": "GrammarParseError",
+      "message": "Failed to parse grammar: Unknown escape at \\\n\n\\q\n^"
+    },
+    {
+      "args": [
+        "a",
+        1
+      ],
+      "error": "GrammarParseError",
+      "message": "Failed to parse grammar: Unexpected end of grammar input, failed to complete parse\n\na\n ^"
+    },
+    {
+      "args": [
+        "",
+        0
+      ],
+      "error": "GrammarParseError",
+      "message": "Failed to parse grammar: Unexpected end of grammar input, failed to complete parse\n\nNo input provided"
+    }
+  ],
+  "buildErrorPosition": [
+    {
+      "args": [
+        "",
+        0
+      ],
+      "result": [
+        "No input provided"
+      ]
+    },
+    {
+      "args": [
+        "abc",
+        0
+      ],
+      "result": [
+        "abc",
+        "^"
+      ]
+    },
+    {
+      "args": [
+        "abc",
+        2
+      ],
+      "result": [
+        "abc",
+        "  ^"
+      ]
+    },
+    {
+      "args": [
+        "abc",
+        5
+      ],
+      "result": [
+        "abc",
+        "     ^"
+      ]
+    },
+    {
+      "args": [
+        "abc\ndef",
+        4
+      ],
+      "result": [
+        "abc",
+        "def",
+        " ^"
+      ]
+    },
+    {
+      "args": [
+        "abc\ndef\nghi",
+        9
+      ],
+      "error": "IndexError",
+      "message": "list index out of range"
+    },
+    {
+      "args": [
+        "a\nb\nc\nd\ne",
+        7
+      ],
+      "error": "IndexError",
+      "message": "list index out of range"
+    },
+    {
+      "args": [
+        "abc\n\ndef",
+        5
+      ],
+      "result": [
+        "abc",
+        "",
+        "  ^"
+      ]
+    }
+  ],
+  "getInputAsString": [
+    {
+      "args": [
+        "abc"
+      ],
+      "result": "abc"
+    },
+    {
+      "args": [
+        97
+      ],
+      "result": "a"
+    },
+    {
+      "args": [
+        [
+          97,
+          98,
+          99
+        ]
+      ],
+      "result": "abc"
+    },
+    {
+      "args": [
+        []
+      ],
+      "result": ""
+    }
+  ],
+  "getInputAsCodePoints": [
+    {
+      "args": [
+        "abc"
+      ],
+      "result": [
+        97,
+        98,
+        99
+      ]
+    },
+    {
+      "args": [
+        99
+      ],
+      "result": [
+        99
+      ]
+    },
+    {
+      "args": [
+        [
+          99,
+          100,
+          101
+        ]
+      ],
+      "result": [
+        99,
+        100,
+        101
+      ]
+    },
+    {
+      "args": [
+        ""
+      ],
+      "result": []
+    },
+    {
+      "args": [
+        "あ"
+      ],
+      "result": [
+        12354
+      ]
+    },
+    {
+      "args": [
+        "😀"
+      ],
+      "result": [
+        128512
+      ]
+    }
+  ],
+  "isPointInRange": [
+    {
+      "args": [
+        5,
+        [
+          0,
+          10
+        ]
+      ],
+      "result": true
+    },
+    {
+      "args": [
+        0,
+        [
+          0,
+          10
+        ]
+      ],
+      "result": true
+    },
+    {
+      "args": [
+        10,
+        [
+          0,
+          10
+        ]
+      ],
+      "result": true
+    },
+    {
+      "args": [
+        11,
+        [
+          0,
+          10
+        ]
+      ],
+      "result": false
+    },
+    {
+      "args": [
+        -1,
+        [
+          0,
+          10
+        ]
+      ],
+      "result": false
+    }
+  ],
+  "getSerializedRuleKey": [
+    {
+      "rule": {
+        "type": "end"
+      },
+      "result": "0"
+    },
+    {
+      "rule": {
+        "type": "char",
+        "value": [
+          97
+        ]
+      },
+      "result": "1-[97]"
+    },
+    {
+      "rule": {
+        "type": "char",
+        "value": [
+          [
+            97,
+            122
+          ],
+          65
+        ]
+      },
+      "result": "1-[[97, 122], 65]"
+    },
+    {
+      "rule": {
+        "type": "char_exclude",
+        "value": [
+          10
+        ]
+      },
+      "result": "2-[10]"
+    },
+    {
+      "rule": {
+        "type": "ref",
+        "value": 99
+      },
+      "result": "3-99"
+    }
+  ],
+  "getParentStackId": [
+    {
+      "ids": [
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "plain": "",
+      "colorized": ""
+    },
+    {
+      "ids": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "plain": "0,0,0",
+      "colorized": "\u001b[31m0,0,0"
+    },
+    {
+      "ids": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "plain": "1,1,1<-0,0,0",
+      "colorized": "\u001b[31m1,1,1\u001b[90m<-\u001b[31m0,0,0"
+    }
+  ],
+  "printGraphNode": [
+    {
+      "name": "char",
+      "showPosition": false,
+      "plain": "[A]",
+      "colorized": "\u001b[90m[\u001b[33mA\u001b[90m]"
+    },
+    {
+      "name": "char-with-position",
+      "showPosition": true,
+      "plain": "{0,1,2}[A]",
+      "colorized": "\u001b[34m{\u001b[90m0,1,2\u001b[34m}\u001b[90m[\u001b[33mA\u001b[90m]"
+    },
+    {
+      "name": "char-range",
+      "showPosition": false,
+      "plain": "[az]",
+      "colorized": "\u001b[90m[\u001b[33m\u001b[33ma\u001b[33mz\u001b[90m]"
+    },
+    {
+      "name": "char-newline",
+      "showPosition": false,
+      "plain": "[\\n]",
+      "colorized": "\u001b[90m[\u001b[33m\\n\u001b[90m]"
+    },
+    {
+      "name": "char-mixed",
+      "showPosition": true,
+      "plain": "{0,1,2}[acz\\n]",
+      "colorized": "\u001b[34m{\u001b[90m0,1,2\u001b[34m}\u001b[90m[\u001b[33m\u001b[33ma\u001b[33mcz\\n\u001b[90m]"
+    },
+    {
+      "name": "ref",
+      "showPosition": true,
+      "plain": "{0,1,2}Ref(200)",
+      "colorized": "\u001b[34m{\u001b[90m0,1,2\u001b[34m}\u001b[90mRef(\u001b[32m200\u001b[90m)"
+    },
+    {
+      "name": "chained",
+      "showPosition": true,
+      "plain": "{0,1,2}[A]-> {0,1,2}[B]",
+      "colorized": "\u001b[34m{\u001b[90m0,1,2\u001b[34m}\u001b[90m[\u001b[33mA\u001b[90m]\u001b[90m-> \u001b[34m{\u001b[90m0,1,2\u001b[34m}\u001b[90m[\u001b[33mB\u001b[90m]"
+    }
+  ],
+  "printGraphPointer": [
+    {
+      "ids": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          2,
+          3
+        ]
+      ],
+      "plain": "*0,0,0",
+      "colorized": "\u001b[31m*\u001b[31m0,0,0"
+    }
+  ]
+}

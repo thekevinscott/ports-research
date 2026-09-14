@@ -1,0 +1,8 @@
+from __future__ import annotations
+
+from collections.abc import Sequence
+
+
+def is_point_in_range(point: int, rng: Sequence[int]) -> bool:
+    start, end = rng[0], rng[1]
+    return start <= point <= end

@@ -1,0 +1,2 @@
+- [Workspace read-only mounts](workspace-readonly-mounts.md) — only ported_implementation/ is writable; tests/ and reference_implementation/ are read-only.
+- [Offline node tooling](workspace-offline-node-tooling.md) — no npm registry, no tsc; global vitest symlinked into /workspace/node_modules.

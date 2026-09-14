@@ -1,0 +1,512 @@
+{
+  "grammar": [
+    {
+      "grammar": "",
+      "message": "Failed to parse grammar: No rules were found\n\nNo input provided"
+    },
+    {
+      "grammar": "root = \"foo\"",
+      "message": "Failed to parse grammar: Expecting ::= at 5\n\nroot = \"foo\"\n     ^"
+    },
+    {
+      "grammar": "root ::= foo\nfoo := \"foo\"\n  ",
+      "message": "Failed to parse grammar: Expecting ::= at 17\n\nroot ::= foo\nfoo := \"foo\"\n     ^"
+    },
+    {
+      "grammar": "root ::= foo",
+      "message": "Failed to parse grammar: Undefined rule identifier \"foo\"\n\nroot ::= foo\n         ^"
+    },
+    {
+      "grammar": "root ::= foo\nbar ::= \"bar\"\n  ",
+      "message": "Failed to parse grammar: Undefined rule identifier \"foo\"\n\nroot ::= foo\n         ^"
+    },
+    {
+      "grammar": "root ::= foo\nfoo ::= baz\nbar ::= \"bar\"\n  ",
+      "message": "Failed to parse grammar: Undefined rule identifier \"baz\"\n\nroot ::= foo\nfoo ::= baz\n         ^"
+    },
+    {
+      "grammar": "root ::= foo ::= bar",
+      "message": "Failed to parse grammar: Expecting newline or end at 13\n\nroot ::= foo ::= bar\n             ^"
+    },
+    {
+      "grammar": "root ::= ([a-z]\nfoo ::= \"foo\"\n  ",
+      "message": "Failed to parse grammar: Expecting ')' at 20\n\nroot ::= ([a-z]\nfoo ::= \"foo\"\n     ^"
+    }
+  ],
+  "input": [
+    {
+      "grammar": "root ::= \"foo\"",
+      "input": "2",
+      "message": "Failed to parse input string:\n\n2\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\n2\n^",
+      "src": "2"
+    },
+    {
+      "grammar": "root ::= \"foo\"",
+      "input": "b",
+      "message": "Failed to parse input string:\n\nb\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nb\n^",
+      "src": "b"
+    },
+    {
+      "grammar": "root ::= \"foo\"",
+      "input": "f1",
+      "message": "Failed to parse input string:\n\nf1\n ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nf1\n ^",
+      "src": "f1"
+    },
+    {
+      "grammar": "root ::= \"foo\"",
+      "input": "fo1",
+      "message": "Failed to parse input string:\n\nfo1\n  ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfo1\n  ^",
+      "src": "fo1"
+    },
+    {
+      "grammar": "root ::= \"foo\"",
+      "input": "fooo",
+      "message": "Failed to parse input string:\n\nfooo\n   ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfooo\n   ^",
+      "src": "fooo"
+    },
+    {
+      "grammar": "root ::= \"foo\"",
+      "input": "fooooooo",
+      "message": "Failed to parse input string:\n\nfooooooo\n   ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfooooooo\n   ^",
+      "src": "fooooooo"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\"",
+      "input": "1",
+      "message": "Failed to parse input string:\n\n1\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\n1\n^",
+      "src": "1"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\"",
+      "input": "z",
+      "message": "Failed to parse input string:\n\nz\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nz\n^",
+      "src": "z"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\"",
+      "input": "f1",
+      "message": "Failed to parse input string:\n\nf1\n ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nf1\n ^",
+      "src": "f1"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\"",
+      "input": "b1",
+      "message": "Failed to parse input string:\n\nb1\n ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nb1\n ^",
+      "src": "b1"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\"",
+      "input": "fo1",
+      "message": "Failed to parse input string:\n\nfo1\n  ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfo1\n  ^",
+      "src": "fo1"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\"",
+      "input": "ba1",
+      "message": "Failed to parse input string:\n\nba1\n  ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nba1\n  ^",
+      "src": "ba1"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\"",
+      "input": "fooo",
+      "message": "Failed to parse input string:\n\nfooo\n   ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfooo\n   ^",
+      "src": "fooo"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\"",
+      "input": "barrr",
+      "message": "Failed to parse input string:\n\nbarrr\n   ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nbarrr\n   ^",
+      "src": "barrr"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\" | \"baz\"",
+      "input": "1",
+      "message": "Failed to parse input string:\n\n1\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\n1\n^",
+      "src": "1"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\" | \"baz\"",
+      "input": "z",
+      "message": "Failed to parse input string:\n\nz\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nz\n^",
+      "src": "z"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\" | \"baz\"",
+      "input": "f1",
+      "message": "Failed to parse input string:\n\nf1\n ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nf1\n ^",
+      "src": "f1"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\" | \"baz\"",
+      "input": "b1",
+      "message": "Failed to parse input string:\n\nb1\n ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nb1\n ^",
+      "src": "b1"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\" | \"baz\"",
+      "input": "fo1",
+      "message": "Failed to parse input string:\n\nfo1\n  ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfo1\n  ^",
+      "src": "fo1"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\" | \"baz\"",
+      "input": "bal",
+      "message": "Failed to parse input string:\n\nbal\n  ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nbal\n  ^",
+      "src": "bal"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\" | \"baz\"",
+      "input": "fooo",
+      "message": "Failed to parse input string:\n\nfooo\n   ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfooo\n   ^",
+      "src": "fooo"
+    },
+    {
+      "grammar": "root ::= \"foo\" | \"bar\" | \"baz\"",
+      "input": "bazrr",
+      "message": "Failed to parse input string:\n\nbazrr\n   ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nbazrr\n   ^",
+      "src": "bazrr"
+    },
+    {
+      "grammar": "root ::= [^a]",
+      "input": "a",
+      "message": "Failed to parse input string:\n\na\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\na\n^",
+      "src": "a"
+    },
+    {
+      "grammar": "root ::= [^abc]",
+      "input": "b",
+      "message": "Failed to parse input string:\n\nb\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nb\n^",
+      "src": "b"
+    },
+    {
+      "grammar": "root ::= [^a-z]",
+      "input": "z",
+      "message": "Failed to parse input string:\n\nz\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nz\n^",
+      "src": "z"
+    },
+    {
+      "grammar": "root ::= [^a-zA-Z]",
+      "input": "X",
+      "message": "Failed to parse input string:\n\nX\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nX\n^",
+      "src": "X"
+    },
+    {
+      "grammar": "root ::= [^a-zA-Z0-9]",
+      "input": "8",
+      "message": "Failed to parse input string:\n\n8\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\n8\n^",
+      "src": "8"
+    },
+    {
+      "grammar": "\n  root ::= foo\n  foo ::= \"foo\"",
+      "input": "1",
+      "message": "Failed to parse input string:\n\n1\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\n1\n^",
+      "src": "1"
+    },
+    {
+      "grammar": "\n  root ::= foo\n  foo ::= \"foo\"",
+      "input": "b",
+      "message": "Failed to parse input string:\n\nb\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nb\n^",
+      "src": "b"
+    },
+    {
+      "grammar": "\n  root ::= foo\n  foo ::= \"foo\"",
+      "input": "f1",
+      "message": "Failed to parse input string:\n\nf1\n ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nf1\n ^",
+      "src": "f1"
+    },
+    {
+      "grammar": "\n  root ::= foo\n  foo ::= \"foo\"",
+      "input": "fo1",
+      "message": "Failed to parse input string:\n\nfo1\n  ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfo1\n  ^",
+      "src": "fo1"
+    },
+    {
+      "grammar": "\n  root ::= foo\n  foo ::= \"foo\"",
+      "input": "fooo",
+      "message": "Failed to parse input string:\n\nfooo\n   ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfooo\n   ^",
+      "src": "fooo"
+    },
+    {
+      "grammar": "\n  root::=foo|\"bar\"\n  foo::=\"foo\"",
+      "input": "1",
+      "message": "Failed to parse input string:\n\n1\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\n1\n^",
+      "src": "1"
+    },
+    {
+      "grammar": "\n  root::=foo|\"bar\"\n  foo::=\"foo\"",
+      "input": "z",
+      "message": "Failed to parse input string:\n\nz\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nz\n^",
+      "src": "z"
+    },
+    {
+      "grammar": "\n  root::=foo|\"bar\"\n  foo::=\"foo\"",
+      "input": "f1",
+      "message": "Failed to parse input string:\n\nf1\n ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nf1\n ^",
+      "src": "f1"
+    },
+    {
+      "grammar": "\n  root::=foo|\"bar\"\n  foo::=\"foo\"",
+      "input": "b1",
+      "message": "Failed to parse input string:\n\nb1\n ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nb1\n ^",
+      "src": "b1"
+    },
+    {
+      "grammar": "\n  root::=foo|\"bar\"\n  foo::=\"foo\"",
+      "input": "fo1",
+      "message": "Failed to parse input string:\n\nfo1\n  ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfo1\n  ^",
+      "src": "fo1"
+    },
+    {
+      "grammar": "\n  root::=foo|\"bar\"\n  foo::=\"foo\"",
+      "input": "fooo",
+      "message": "Failed to parse input string:\n\nfooo\n   ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfooo\n   ^",
+      "src": "fooo"
+    },
+    {
+      "grammar": "\n  root::=foo|\"bar\"\n  foo::=\"foo\"",
+      "input": "barr",
+      "message": "Failed to parse input string:\n\nbarr\n   ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nbarr\n   ^",
+      "src": "barr"
+    },
+    {
+      "grammar": "\n  root::= foo | bar\n  foo::=\"foo\"\n  bar::=\"bar\"",
+      "input": "1",
+      "message": "Failed to parse input string:\n\n1\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\n1\n^",
+      "src": "1"
+    },
+    {
+      "grammar": "\n  root::= foo | bar\n  foo::=\"foo\"\n  bar::=\"bar\"",
+      "input": "z",
+      "message": "Failed to parse input string:\n\nz\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nz\n^",
+      "src": "z"
+    },
+    {
+      "grammar": "\n  root::= foo | bar\n  foo::=\"foo\"\n  bar::=\"bar\"",
+      "input": "f1",
+      "message": "Failed to parse input string:\n\nf1\n ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nf1\n ^",
+      "src": "f1"
+    },
+    {
+      "grammar": "\n  root::= foo | bar\n  foo::=\"foo\"\n  bar::=\"bar\"",
+      "input": "b1",
+      "message": "Failed to parse input string:\n\nb1\n ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nb1\n ^",
+      "src": "b1"
+    },
+    {
+      "grammar": "\n  root::= foo | bar\n  foo::=\"foo\"\n  bar::=\"bar\"",
+      "input": "fo1",
+      "message": "Failed to parse input string:\n\nfo1\n  ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfo1\n  ^",
+      "src": "fo1"
+    },
+    {
+      "grammar": "\n  root::= foo | bar\n  foo::=\"foo\"\n  bar::=\"bar\"",
+      "input": "fooo",
+      "message": "Failed to parse input string:\n\nfooo\n   ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfooo\n   ^",
+      "src": "fooo"
+    },
+    {
+      "grammar": "\n  root::= foo | bar\n  foo::=\"foo\"\n  bar::=\"bar\"",
+      "input": "barr",
+      "message": "Failed to parse input string:\n\nbarr\n   ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nbarr\n   ^",
+      "src": "barr"
+    },
+    {
+      "grammar": "\n  root ::= f | b\n  f ::= fo\n  b ::= ba\n  fo ::= foo\n  ba ::= bar | baz\n  foo ::= \"foo\"\n  bar ::= \"bar\"\n  baz ::= \"baz\"\n  ",
+      "input": "1",
+      "message": "Failed to parse input string:\n\n1\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\n1\n^",
+      "src": "1"
+    },
+    {
+      "grammar": "\n  root ::= f | b\n  f ::= fo\n  b ::= ba\n  fo ::= foo\n  ba ::= bar | baz\n  foo ::= \"foo\"\n  bar ::= \"bar\"\n  baz ::= \"baz\"",
+      "input": "z",
+      "message": "Failed to parse input string:\n\nz\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nz\n^",
+      "src": "z"
+    },
+    {
+      "grammar": "\n  root ::= f | b\n  f ::= fo\n  b ::= ba\n  fo ::= foo\n  ba ::= bar | baz\n  foo ::= \"foo\"\n  bar ::= \"bar\"\n  baz ::= \"baz\"",
+      "input": "f1",
+      "message": "Failed to parse input string:\n\nf1\n ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nf1\n ^",
+      "src": "f1"
+    },
+    {
+      "grammar": "\n  root ::= f | b\n  f ::= fo\n  b ::= ba\n  fo ::= foo\n  ba ::= bar | baz\n  foo ::= \"foo\"\n  bar ::= \"bar\"\n  baz ::= \"baz\"",
+      "input": "b1",
+      "message": "Failed to parse input string:\n\nb1\n ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nb1\n ^",
+      "src": "b1"
+    },
+    {
+      "grammar": "\n  root ::= f | b\n  f ::= fo\n  b ::= ba\n  fo ::= foo\n  ba ::= bar | baz\n  foo ::= \"foo\"\n  bar ::= \"bar\"\n  baz ::= \"baz\"",
+      "input": "fo1",
+      "message": "Failed to parse input string:\n\nfo1\n  ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfo1\n  ^",
+      "src": "fo1"
+    },
+    {
+      "grammar": "\n  root ::= f | b\n  f ::= fo\n  b ::= ba\n  fo ::= foo\n  ba ::= bar | baz\n  foo ::= \"foo\"\n  bar ::= \"bar\"\n  baz ::= \"baz\"",
+      "input": "fooo",
+      "message": "Failed to parse input string:\n\nfooo\n   ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nfooo\n   ^",
+      "src": "fooo"
+    },
+    {
+      "grammar": "\n  root ::= f | b\n  f ::= fo\n  b ::= ba\n  fo ::= foo\n  ba ::= bar | baz\n  foo ::= \"foo\"\n  bar ::= \"bar\"\n  baz ::= \"baz\"",
+      "input": "barr",
+      "message": "Failed to parse input string:\n\nbarr\n   ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nbarr\n   ^",
+      "src": "barr"
+    },
+    {
+      "grammar": "\n  root ::= f | b\n  f ::= fo\n  b ::= ba\n  fo ::= foo\n  ba ::= bar | baz\n  foo ::= \"foo\"\n  bar ::= \"bar\"\n  baz ::= \"baz\"",
+      "input": "bazr",
+      "message": "Failed to parse input string:\n\nbazr\n   ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nbazr\n   ^",
+      "src": "bazr"
+    },
+    {
+      "grammar": "root ::= [a-z]",
+      "input": "A",
+      "message": "Failed to parse input string:\n\nA\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nA\n^",
+      "src": "A"
+    },
+    {
+      "grammar": "root ::= [a-z]",
+      "input": "0",
+      "message": "Failed to parse input string:\n\n0\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\n0\n^",
+      "src": "0"
+    },
+    {
+      "grammar": "root ::= [a-z]",
+      "input": "az",
+      "message": "Failed to parse input string:\n\naz\n ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\naz\n ^",
+      "src": "az"
+    },
+    {
+      "grammar": "root ::= [a-z]?",
+      "input": "A",
+      "message": "Failed to parse input string:\n\nA\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nA\n^",
+      "src": "A"
+    },
+    {
+      "grammar": "root ::= [a-z]?",
+      "input": "0",
+      "message": "Failed to parse input string:\n\n0\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\n0\n^",
+      "src": "0"
+    },
+    {
+      "grammar": "root ::= [a-z]?",
+      "input": "az",
+      "message": "Failed to parse input string:\n\naz\n ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\naz\n ^",
+      "src": "az"
+    },
+    {
+      "grammar": "root ::= [a-z]+",
+      "input": "A",
+      "message": "Failed to parse input string:\n\nA\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nA\n^",
+      "src": "A"
+    },
+    {
+      "grammar": "root ::= [a-z]+",
+      "input": "0",
+      "message": "Failed to parse input string:\n\n0\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\n0\n^",
+      "src": "0"
+    },
+    {
+      "grammar": "root ::= [a-z]+",
+      "input": "az0",
+      "message": "Failed to parse input string:\n\naz0\n  ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\naz0\n  ^",
+      "src": "az0"
+    },
+    {
+      "grammar": "root ::= [a-z]*",
+      "input": "A",
+      "message": "Failed to parse input string:\n\nA\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\nA\n^",
+      "src": "A"
+    },
+    {
+      "grammar": "root ::= [a-z]*",
+      "input": "0",
+      "message": "Failed to parse input string:\n\n0\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\n0\n^",
+      "src": "0"
+    },
+    {
+      "grammar": "root ::= [a-z]*",
+      "input": "az0",
+      "message": "Failed to parse input string:\n\naz0\n  ^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\naz0\n  ^",
+      "src": "az0"
+    },
+    {
+      "grammar": "root ::= ( [^abcdefgh] | [b-z])*",
+      "input": "a",
+      "message": "Failed to parse input string:\n\na\n^",
+      "errorForMostRecentInput": "Failed to parse input string:\n\na\n^",
+      "src": "a"
+    }
+  ],
+  "incremental": {
+    "message": "Failed to parse input string:\n\nbaz\n  ^",
+    "errorForMostRecentInput": "Failed to parse input string:\n\nz\n^",
+    "src": "baz"
+  }
+}

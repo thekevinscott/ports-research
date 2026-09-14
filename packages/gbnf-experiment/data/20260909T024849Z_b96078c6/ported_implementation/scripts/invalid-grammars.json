@@ -1,0 +1,17 @@
+[
+  ["empty grammar", ""],
+  ["only whitespace", "   \n  "],
+  ["only a comment", "# just a comment\n"],
+  ["missing ::=", "root"],
+  ["missing ::= with value", "root \"foo\""],
+  ["name starting with a digit", "123 ::= \"foo\""],
+  ["undefined rule identifier", "root ::= foo"],
+  ["undefined rule identifier, nested", "root ::= foo\nfoo ::= bar"],
+  ["modifier without preceding item", "root ::= *"],
+  ["unclosed group", "root ::= (\"a\""],
+  ["unterminated string", "root ::= \"foo"],
+  ["unterminated character class", "root ::= [a-z"],
+  ["unknown escape", "root ::= \"\\q\""],
+  ["trailing garbage", "root ::= \"a\" )"],
+  ["missing root symbol", "foo ::= \"bar\""]
+]

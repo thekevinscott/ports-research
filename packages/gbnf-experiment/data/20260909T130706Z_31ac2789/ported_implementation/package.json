@@ -1,0 +1,26 @@
+{
+  "name": "gbnf",
+  "version": "0.0.30",
+  "description": "A library for parsing GBNF grammars",
+  "type": "module",
+  "main": "./index.ts",
+  "module": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./index.ts": "./index.ts",
+    "./src/index.ts": "./src/index.ts",
+    "./package.json": "./package.json",
+    "./*": "./src/*",
+    "./src/*": "./src/*"
+  },
+  "files": [
+    "index.ts",
+    "src"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "license": "MIT"
+}

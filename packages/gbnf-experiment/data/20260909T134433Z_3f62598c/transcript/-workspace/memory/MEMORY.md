@@ -1,0 +1,1 @@
+- [GBNF Python port testing](gbnf-python-port.md) — JS-only suite drives the Python tests via JSON fixtures; differential harness runs the reference TS in node

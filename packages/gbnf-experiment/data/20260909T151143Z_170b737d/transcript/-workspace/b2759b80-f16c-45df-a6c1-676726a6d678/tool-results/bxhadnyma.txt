@@ -1,0 +1,374 @@
+
+@@@@@@@@@@ get_parent_stack_id_test.cpython-314-pytest-9.1.1.pyc
+### def <module>()
+  L1: OAD_SMALL_INT 0 ; OAD_CONST 1 (('annotations',)) ; IMPORT_NAME 0 (__future__) ; IMPORT_FROM 1 (annotations) ; STORE_NAME 1 (annotations)
+  L3: OAD_SMALL_INT 0 ; OAD_CONST 2 (None) ; IMPORT_NAME 2 (builtins) ; OAD_SMALL_INT 0 ; OAD_CONST 2 (None) ; IMPORT_NAME 4 (_pytest.assertion.rewrite) ; IMPORT_FROM 5 (assertion) ; IMPORT_FROM 6 (rewrite) ; OAD_SMALL_INT 0 ; OAD_CONST 2 (None) ; IMPORT_NAME 8 (json) ; STORE_NAME 8 (json)
+  L5: OAD_SMALL_INT 1 ; OAD_CONST 3 (('Color',)) ; IMPORT_NAME 9 (colorize) ; IMPORT_FROM 10 (Color) ; STORE_NAME 10 (Color)
+  L6: OAD_SMALL_INT 1 ; OAD_CONST 4 (('get_parent_stack_id',)) ; IMPORT_NAME 11 (get_parent_stack_id) ; IMPORT_FROM 11 (get_parent_stack_id) ; STORE_NAME 11 (get_parent_stack_id)
+  L7: OAD_SMALL_INT 1 ; OAD_CONST 5 (('RuleEnd',)) ; IMPORT_NAME 12 (grammar_graph_types) ; IMPORT_FROM 13 (RuleEnd) ; STORE_NAME 13 (RuleEnd)
+  L8: OAD_SMALL_INT 1 ; OAD_CONST 6 (('GraphNode',)) ; IMPORT_NAME 14 (graph_node) ; IMPORT_FROM 15 (GraphNode) ; STORE_NAME 15 (GraphNode)
+  L9: OAD_SMALL_INT 1 ; OAD_CONST 7 (('GraphPointer',)) ; IMPORT_NAME 16 (graph_pointer) ; IMPORT_FROM 17 (GraphPointer) ; STORE_NAME 17 (GraphPointer) ; SET_FUNCTION_ATTRIBUTE 16 (annotate) ; STORE_NAME 18 (s) ; SET_FUNCTION_ATTRIBUTE 16 (annotate) ; STORE_NAME 19 (mock_colorize)
+  L20: OAD_NAME 18 (s) ; OAD_NAME 10 (Color) ; OAD_ATTR 40 (RED) ; CALL 1 ; STORE_NAME 21 (red)
+  L21: OAD_NAME 18 (s) ; OAD_NAME 10 (Color) ; OAD_ATTR 44 (GRAY) ; CALL 1 ; STORE_NAME 23 (gray)
+  L24: OAD_CONST 15 ((None,)) ; SET_FUNCTION_ATTRIBUTE 16 (annotate) ; SET_FUNCTION_ATTRIBUTE 1 (defaults) ; STORE_NAME 24 (create_mock_pointer) ; STORE_NAME 25 (describe_get_parent_stack_id) ; OAD_CONST 2 (None)
+  ### def __annotate__('format',)
+    L12: OAD_FAST_BORROW 0 (format) ; OAD_SMALL_INT 2 ; COMPARE_OP 132 (>)
+  ### def s('str',)
+    L13: OAD_GLOBAL 0 (json) ; OAD_ATTR 2 (dumps) ; OAD_FAST_BORROW 0 (str) ; CALL 1
+  ### def __annotate__('format',)
+    L16: OAD_FAST_BORROW 0 (format) ; OAD_SMALL_INT 2 ; COMPARE_OP 132 (>)
+  ### def mock_colorize('text', 'color')
+    L17: OAD_CONST 0 ('[') ; OAD_GLOBAL 1 (s + NULL) ; OAD_FAST_BORROW 1 (color) ; CALL 1 ; FORMAT_SIMPLE ; OAD_CONST 1 (']:') ; OAD_FAST_BORROW 0 (text) ; FORMAT_SIMPLE ; BUILD_STRING 4
+  ### def __annotate__('format',)
+    L24: BUILD_MAP 5
+    L25: OAD_CONST 2 ('int')
+    L24: BUILD_MAP 5
+    L26: OAD_CONST 2 ('int')
+    L24: BUILD_MAP 5
+    L27: OAD_CONST 2 ('int')
+    L24: BUILD_MAP 5
+    L28: OAD_CONST 6 ('GraphPointer | None')
+    L24: BUILD_MAP 5
+    L29: OAD_CONST 8 ('GraphPointer')
+    L24: BUILD_MAP 5
+  ### def create_mock_pointer('stack_id', 'path_id', 'step_id', 'parent')
+    L30: CALL 2
+    L31: CALL 2
+    L32: OAD_GLOBAL 5 (RuleEnd + NULL) ; CALL 0
+    L34: OAD_CONST 0 ('stackId') ; OAD_FAST_BORROW 0 (stack_id)
+    L35: OAD_CONST 1 ('pathId') ; OAD_FAST_BORROW 1 (path_id)
+    L36: OAD_CONST 2 ('stepId') ; OAD_FAST_BORROW 2 (step_id)
+    L33: BUILD_MAP 3
+    L31: CALL 2
+    L39: OAD_FAST_BORROW 3 (parent)
+    L30: CALL 2
+  ### def describe_get_parent_stack_id()
+    L43: STORE_FAST 0 (test_returns_an_empty_string_if_no_parents) ; STORE_FAST 1 (test_returns_a_single_parent_id_colored_correctly) ; STORE_FAST 2 (test_returns_multiple_parent_ids_separated_by_colored_arrows) ; STORE_FAST 3 (test_handles_deep_nesting_of_pointers) ; OAD_CONST 4 (None)
+    ### def test_returns_an_empty_string_if_no_parents()
+      L45: OAD_GLOBAL 1 (create_mock_pointer + NULL) ; OAD_SMALL_INT 1 ; OAD_SMALL_INT 1 ; OAD_SMALL_INT 1 ; CALL 3 ; STORE_FAST 0 (pointer)
+      L46: OAD_GLOBAL 3 (get_parent_stack_id + NULL) ; OAD_FAST_BORROW 0 (pointer) ; OAD_GLOBAL 4 (mock_colorize) ; CALL 2 ; STORE_FAST 1 (result)
+      L47: OAD_CONST 1 ('') ; COMPARE_OP 72 (==)
+    ### def test_returns_a_single_parent_id_colored_correctly()
+      L50: OAD_GLOBAL 1 (create_mock_pointer + NULL) ; OAD_SMALL_INT 1 ; OAD_SMALL_INT 1 ; OAD_SMALL_INT 1 ; CALL 3 ; STORE_FAST 0 (parent_pointer)
+      L51: OAD_GLOBAL 1 (create_mock_pointer + NULL) ; OAD_SMALL_INT 2 ; OAD_SMALL_INT 2 ; OAD_SMALL_INT 2 ; OAD_FAST_BORROW 0 (parent_pointer) ; CALL 4 ; STORE_FAST 1 (pointer)
+      L52: OAD_GLOBAL 3 (get_parent_stack_id + NULL) ; OAD_FAST_BORROW 1 (pointer) ; OAD_GLOBAL 4 (mock_colorize) ; CALL 2 ; STORE_FAST 2 (result)
+      L53: OAD_CONST 1 ('[') ; OAD_GLOBAL 6 (red) ; FORMAT_SIMPLE ; OAD_CONST 2 (']:1,1,1') ; BUILD_STRING 3 ; COMPARE_OP 72 (==)
+    ### def test_returns_multiple_parent_ids_separated_by_colored_arrows()
+      L56: OAD_GLOBAL 1 (create_mock_pointer + NULL) ; OAD_SMALL_INT 0 ; OAD_SMALL_INT 0 ; OAD_SMALL_INT 0 ; CALL 3 ; STORE_FAST 0 (grandparent_pointer)
+      L57: OAD_GLOBAL 1 (create_mock_pointer + NULL) ; OAD_SMALL_INT 1 ; OAD_SMALL_INT 1 ; OAD_SMALL_INT 1 ; OAD_FAST_BORROW 0 (grandparent_pointer) ; CALL 4 ; STORE_FAST 1 (parent_pointer)
+      L58: OAD_GLOBAL 1 (create_mock_pointer + NULL) ; OAD_SMALL_INT 2 ; OAD_SMALL_INT 2 ; OAD_SMALL_INT 2 ; OAD_FAST_BORROW 1 (parent_pointer) ; CALL 4 ; STORE_FAST 2 (pointer)
+      L59: OAD_GLOBAL 3 (get_parent_stack_id + NULL) ; OAD_FAST_BORROW 2 (pointer) ; OAD_GLOBAL 4 (mock_colorize) ; CALL 2 ; STORE_FAST 3 (result)
+      L60: OAD_CONST 1 ('[') ; OAD_GLOBAL 6 (red) ; FORMAT_SIMPLE ; OAD_CONST 2 (']:1,1,1[') ; OAD_GLOBAL 8 (gray) ; FORMAT_SIMPLE ; OAD_CONST 3 (']:<-[') ; OAD_GLOBAL 6 (red) ; FORMAT_SIMPLE ; OAD_CONST 4 (']:0,0,0') ; BUILD_STRING 7 ; COMPARE_OP 72 (==)
+    ### def test_handles_deep_nesting_of_pointers()
+      L63: OAD_GLOBAL 1 (create_mock_pointer + NULL) ; OAD_SMALL_INT 0 ; OAD_SMALL_INT 0 ; OAD_SMALL_INT 0 ; CALL 3 ; STORE_FAST 0 (great_grandparent_pointer)
+      L64: OAD_GLOBAL 1 (create_mock_pointer + NULL) ; OAD_SMALL_INT 1 ; OAD_SMALL_INT 1 ; OAD_SMALL_INT 1 ; OAD_FAST_BORROW 0 (great_grandparent_pointer) ; CALL 4 ; STORE_FAST 1 (grandparent_pointer)
+      L65: OAD_GLOBAL 1 (create_mock_pointer + NULL) ; OAD_SMALL_INT 2 ; OAD_SMALL_INT 2 ; OAD_SMALL_INT 2 ; OAD_FAST_BORROW 1 (grandparent_pointer) ; CALL 4 ; STORE_FAST 2 (parent_pointer)
+      L66: OAD_GLOBAL 1 (create_mock_pointer + NULL) ; OAD_SMALL_INT 3 ; OAD_SMALL_INT 3 ; OAD_SMALL_INT 3 ; OAD_FAST_BORROW 2 (parent_pointer) ; CALL 4 ; STORE_FAST 3 (pointer)
+      L67: OAD_GLOBAL 3 (get_parent_stack_id + NULL) ; OAD_FAST_BORROW 3 (pointer) ; OAD_GLOBAL 4 (mock_colorize) ; CALL 2 ; STORE_FAST 4 (result)
+      L69: OAD_CONST 1 ('[') ; OAD_GLOBAL 6 (red) ; FORMAT_SIMPLE ; OAD_CONST 2 (']:2,2,2[') ; OAD_GLOBAL 8 (gray) ; FORMAT_SIMPLE ; OAD_CONST 3 (']:<-[') ; OAD_GLOBAL 6 (red) ; FORMAT_SIMPLE ; OAD_CONST 4 (']:1,1,1[') ; OAD_GLOBAL 8 (gray) ; FORMAT_SIMPLE ; OAD_CONST 3 (']:<-[') ; OAD_GLOBAL 6 (red) ; FORMAT_SIMPLE ; OAD_CONST 5 (']:0,0,0') ; BUILD_STRING 11
+      L68: STORE_FAST 5 (expectedOutput)
+      L71: OAD_FAST_BORROW_LOAD_FAST_BORROW 69 (result, expectedOutput) ; COMPARE_OP 72 (==)
+
+@@@@@@@@@@ get_serialized_rule_key_test.cpython-314-pytest-9.1.1.pyc
+### def <module>()
+  L1: OAD_SMALL_INT 0 ; OAD_CONST 1 (('annotations',)) ; IMPORT_NAME 0 (__future__) ; IMPORT_FROM 1 (annotations) ; STORE_NAME 1 (annotations)
+  L3: OAD_SMALL_INT 0 ; OAD_CONST 2 (None) ; IMPORT_NAME 2 (builtins) ; OAD_SMALL_INT 0 ; OAD_CONST 2 (None) ; IMPORT_NAME 4 (_pytest.assertion.rewrite) ; IMPORT_FROM 5 (assertion) ; IMPORT_FROM 6 (rewrite) ; OAD_SMALL_INT 0 ; OAD_CONST 3 (('patch',)) ; IMPORT_NAME 8 (unittest.mock) ; IMPORT_FROM 9 (patch) ; STORE_NAME 9 (patch)
+  L5: OAD_SMALL_INT 0 ; OAD_CONST 2 (None) ; IMPORT_NAME 10 (pytest) ; STORE_NAME 10 (pytest)
+  L7: OAD_SMALL_INT 1 ; OAD_CONST 4 (('KEY_TRANSLATION', 'get_serialized_rule_key')) ; IMPORT_NAME 11 (get_serialized_rule_key) ; IMPORT_FROM 12 (KEY_TRANSLATION) ; STORE_NAME 12 (KEY_TRANSLATION) ; IMPORT_FROM 11 (get_serialized_rule_key) ; STORE_NAME 11 (get_serialized_rule_key)
+  L8: OAD_SMALL_INT 1 ; OAD_CONST 5 (('RuleChar', 'RuleCharExclude', 'RuleEnd', 'RuleRef')) ; IMPORT_NAME 13 (grammar_graph_types) ; IMPORT_FROM 14 (RuleChar) ; STORE_NAME 14 (RuleChar) ; IMPORT_FROM 15 (RuleCharExclude) ; STORE_NAME 15 (RuleCharExclude) ; IMPORT_FROM 16 (RuleEnd) ; STORE_NAME 16 (RuleEnd) ; IMPORT_FROM 17 (RuleRef) ; STORE_NAME 17 (RuleRef)
+  L11: CALL 0
+  L11: CALL 0
+  L12: STORE_NAME 19 (mock_is_rule_end)
+  L20: CALL 0
+  L20: CALL 0
+  L21: STORE_NAME 20 (mock_is_rule_char)
+  L29: CALL 0
+  L29: CALL 0
+  L30: STORE_NAME 21 (mock_is_rule_char_exclude)
+  L38: CALL 0
+  L38: CALL 0
+  L39: STORE_NAME 22 (mock_is_rule_ref) ; STORE_NAME 23 (describe_get_serialized_rule_key) ; OAD_CONST 2 (None)
+  ### def mock_is_rule_end()
+    L11: RETURN_GENERATOR
+    L13: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L14: OAD_CONST 0 ('gbnf.grammar_graph.get_serialized_rule_key.is_rule_end')
+    L15: OAD_CONST 1 (False)
+    L13: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L16: STORE_FAST 0 (mock)
+    L17: OAD_FAST_BORROW 0 (mock) ; YIELD_VALUE 0
+    L13: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+  ### def mock_is_rule_char()
+    L20: RETURN_GENERATOR
+    L22: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L23: OAD_CONST 0 ('gbnf.grammar_graph.get_serialized_rule_key.is_rule_char')
+    L24: OAD_CONST 1 (False)
+    L22: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L25: STORE_FAST 0 (mock)
+    L26: OAD_FAST_BORROW 0 (mock) ; YIELD_VALUE 0
+    L22: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+  ### def mock_is_rule_char_exclude()
+    L29: RETURN_GENERATOR
+    L31: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L32: OAD_CONST 0 ('gbnf.grammar_graph.get_serialized_rule_key.is_rule_char_exclude')
+    L33: OAD_CONST 1 (False)
+    L31: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L34: STORE_FAST 0 (mock)
+    L35: OAD_FAST_BORROW 0 (mock) ; YIELD_VALUE 0
+    L31: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+  ### def mock_is_rule_ref()
+    L38: RETURN_GENERATOR
+    L40: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L41: OAD_CONST 0 ('gbnf.grammar_graph.get_serialized_rule_key.is_rule_ref')
+    L42: OAD_CONST 1 (False)
+    L40: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L43: STORE_FAST 0 (mock)
+    L44: OAD_FAST_BORROW 0 (mock) ; YIELD_VALUE 0
+    L40: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+  ### def describe_get_serialized_rule_key()
+    L47: STORE_FAST 0 (test_returns_type_for_end_rules) ; STORE_FAST 1 (test_returns_type_and_value_for_character_rules) ; STORE_FAST 2 (test_returns_type_and_value_for_character_exclude_rules) ; STORE_FAST 3 (test_returns_ref_type_with_value_for_reference_rules) ; STORE_FAST 4 (test_throws_error_for_unknown_rule_types) ; OAD_CONST 5 (None)
+    ### def test_returns_type_for_end_rules('mock_is_rule_end',)
+      L49: OAD_CONST 0 (True) ; OAD_FAST_BORROW 0 (mock_is_rule_end) ; STORE_ATTR 0 (return_value)
+      L50: OAD_GLOBAL 3 (RuleEnd + NULL) ; CALL 0 ; STORE_FAST 1 (rule)
+      L51: OAD_GLOBAL 5 (get_serialized_rule_key + NULL) ; OAD_FAST_BORROW 1 (rule) ; CALL 1 ; OAD_GLOBAL 6 (KEY_TRANSLATION) ; OAD_GLOBAL 2 (RuleEnd) ; BINARY_OP 26 ([]) ; FORMAT_SIMPLE ; COMPARE_OP 72 (==)
+    ### def test_returns_type_and_value_for_character_rules('mock_is_rule_char',)
+      L54: OAD_CONST 0 (True) ; OAD_FAST_BORROW 0 (mock_is_rule_char) ; STORE_ATTR 0 (return_value)
+      L55: OAD_GLOBAL 3 (RuleChar + NULL) ; OAD_SMALL_INT 97 ; BUILD_LIST 1 ; OAD_CONST 1 (('value',)) ; CALL_KW 1 ; STORE_FAST 1 (rule)
+      L56: OAD_GLOBAL 5 (get_serialized_rule_key + NULL) ; OAD_FAST_BORROW 1 (rule) ; CALL 1 ; OAD_GLOBAL 6 (KEY_TRANSLATION) ; OAD_GLOBAL 2 (RuleChar) ; BINARY_OP 26 ([]) ; FORMAT_SIMPLE ; OAD_CONST 2 ('-[97]') ; BUILD_STRING 2 ; COMPARE_OP 72 (==)
+    ### def test_returns_type_and_value_for_character_exclude_rules('mock_is_rule_char_exclude',)
+      L61: OAD_CONST 0 (True) ; OAD_FAST_BORROW 0 (mock_is_rule_char_exclude) ; STORE_ATTR 0 (return_value)
+      L62: OAD_GLOBAL 3 (RuleCharExclude + NULL) ; OAD_SMALL_INT 97 ; BUILD_LIST 1 ; OAD_CONST 1 (('value',)) ; CALL_KW 1 ; STORE_FAST 1 (rule)
+      L64: OAD_FAST_BORROW 1 (rule)
+      L64: OAD_FAST_BORROW 1 (rule)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L64: OAD_FAST_BORROW 1 (rule)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L64: OAD_FAST_BORROW 1 (rule)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L64: OAD_FAST_BORROW 1 (rule)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L64: OAD_FAST_BORROW 1 (rule)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+      L63: CALL 1 ; CALL 1 ; RAISE_VARARGS 1 ; LOAD_CONST 11 (None) ; OAD_CONST 11 (None)
+    ### def test_returns_ref_type_with_value_for_reference_rules('mock_is_rule_ref',)
+      L68: OAD_CONST 0 (True) ; OAD_FAST_BORROW 0 (mock_is_rule_ref) ; STORE_ATTR 0 (return_value)
+      L69: OAD_GLOBAL 3 (RuleRef + NULL) ; OAD_SMALL_INT 99 ; CALL 1 ; STORE_FAST 1 (rule)
+      L70: OAD_GLOBAL 5 (get_serialized_rule_key + NULL) ; OAD_FAST_BORROW 1 (rule) ; CALL 1 ; OAD_CONST 1 ('3-99') ; COMPARE_OP 72 (==)
+    ### def test_throws_error_for_unknown_rule_types('mock_is_rule_end', 'mock_is_rule_char', 'mock_is_rule_char_exclude', 'mock_is_rule_ref')
+      L78: OAD_CONST 0 (False) ; OAD_FAST_BORROW 0 (mock_is_rule_end) ; STORE_ATTR 0 (return_value)
+      L79: OAD_CONST 0 (False) ; OAD_FAST_BORROW 1 (mock_is_rule_char) ; STORE_ATTR 0 (return_value)
+      L80: OAD_CONST 0 (False) ; OAD_FAST_BORROW 2 (mock_is_rule_char_exclude) ; STORE_ATTR 0 (return_value)
+      L81: OAD_CONST 0 (False) ; OAD_FAST_BORROW 3 (mock_is_rule_ref) ; STORE_ATTR 0 (return_value)
+      L82: OAD_CONST 1 ('type') ; OAD_CONST 2 ('UNKNOWN') ; OAD_CONST 3 ('value') ; OAD_CONST 4 ('something') ; BUILD_MAP 2 ; STORE_FAST 4 (rule)
+      L83: LOAD_CONST 7 (None) ; OAD_CONST 7 (None) ; OAD_CONST 7 (None) ; CALL 3 ; OAD_CONST 7 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+      L84: OAD_GLOBAL 6 (ValueError)
+      L85: OAD_CONST 5 ("Unknown rule type: {'type': 'UNKNOWN', 'value': 'something'}")
+      L83: LOAD_CONST 7 (None) ; OAD_CONST 7 (None) ; OAD_CONST 7 (None) ; CALL 3 ; OAD_CONST 7 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+      L87: OAD_GLOBAL 9 (get_serialized_rule_key + NULL) ; OAD_FAST_BORROW 4 (rule) ; CALL 1
+      L83: LOAD_CONST 7 (None) ; OAD_CONST 7 (None) ; OAD_CONST 7 (None) ; CALL 3 ; OAD_CONST 7 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+
+@@@@@@@@@@ graph_node_test.cpython-314-pytest-9.1.1.pyc
+### def <module>()
+  L1: OAD_SMALL_INT 0 ; OAD_CONST 1 (('annotations',)) ; IMPORT_NAME 0 (__future__) ; IMPORT_FROM 1 (annotations) ; STORE_NAME 1 (annotations)
+  L3: OAD_SMALL_INT 0 ; OAD_CONST 2 (None) ; IMPORT_NAME 2 (builtins) ; OAD_SMALL_INT 0 ; OAD_CONST 2 (None) ; IMPORT_NAME 4 (_pytest.assertion.rewrite) ; IMPORT_FROM 5 (assertion) ; IMPORT_FROM 6 (rewrite) ; OAD_SMALL_INT 0 ; OAD_CONST 3 (('TYPE_CHECKING',)) ; IMPORT_NAME 8 (typing) ; IMPORT_FROM 9 (TYPE_CHECKING) ; STORE_NAME 9 (TYPE_CHECKING)
+  L4: OAD_SMALL_INT 0 ; OAD_CONST 4 (('patch',)) ; IMPORT_NAME 10 (unittest.mock) ; IMPORT_FROM 11 (patch) ; STORE_NAME 11 (patch)
+  L6: OAD_SMALL_INT 0 ; OAD_CONST 2 (None) ; IMPORT_NAME 12 (pytest) ; STORE_NAME 12 (pytest)
+  L8: OAD_SMALL_INT 1 ; OAD_CONST 5 (('GraphNode', 'GraphNodeMeta', 'PrintOpts')) ; IMPORT_NAME 13 (graph_node) ; IMPORT_FROM 14 (GraphNode) ; STORE_NAME 14 (GraphNode) ; IMPORT_FROM 15 (GraphNodeMeta) ; STORE_NAME 15 (GraphNodeMeta) ; IMPORT_FROM 16 (PrintOpts) ; STORE_NAME 16 (PrintOpts)
+  L9: OAD_SMALL_INT 1 ; OAD_CONST 6 (('RuleRef',)) ; IMPORT_NAME 17 (rule_ref) ; IMPORT_FROM 18 (RuleRef) ; STORE_NAME 18 (RuleRef)
+  L11: OAD_NAME 9 (TYPE_CHECKING)
+  L15: CALL 0
+  L15: CALL 0
+  L16: STORE_NAME 20 (mock_print_graph_node) ; STORE_NAME 21 (describe_graph_node) ; OAD_CONST 2 (None)
+  ### def mock_print_graph_node()
+    L15: RETURN_GENERATOR
+    L17: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L18: OAD_CONST 0 ('gbnf.grammar_graph.graph_node.print_graph_node')
+    L17: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L19: STORE_FAST 0 (mock_print_graph_node) ; SET_FUNCTION_ATTRIBUTE 16 (annotate) ; STORE_FAST 1 (mock_print_graph_node_inner)
+    L24: OAD_FAST_BORROW_LOAD_FAST_BORROW 16 (mock_print_graph_node_inner, mock_print_graph_node) ; STORE_ATTR 1 (return_value)
+    L25: OAD_FAST_BORROW 0 (mock_print_graph_node) ; YIELD_VALUE 0
+    L17: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    ### def __annotate__('format',)
+      L21: OAD_FAST_BORROW 0 (format) ; OAD_SMALL_INT 2 ; COMPARE_OP 132 (>)
+    ### def mock_print_graph_node_inner('_opts',)
+      L22: OAD_CONST 0 ('mocked_response')
+  ### def describe_graph_node()
+    L29: OAD_CONST 0 ('stackId') ; OAD_SMALL_INT 1 ; OAD_CONST 1 ('pathId') ; OAD_SMALL_INT 2 ; OAD_CONST 2 ('stepId') ; OAD_SMALL_INT 3 ; BUILD_MAP 3 ; STORE_DEREF 5 (meta)
+    L30: OAD_GLOBAL 1 (RuleRef + NULL) ; OAD_SMALL_INT 42 ; CALL 1 ; STORE_DEREF 6 (rule)
+    L32: OAD_FAST_BORROW 5 (meta) ; OAD_FAST_BORROW 6 (rule) ; BUILD_TUPLE 2 ; SET_FUNCTION_ATTRIBUTE 8 (closure) ; STORE_FAST 0 (test_construct_with_rule_and_meta)
+    L37: OAD_FAST_BORROW 6 (rule) ; BUILD_TUPLE 1 ; SET_FUNCTION_ATTRIBUTE 8 (closure) ; STORE_FAST 1 (test_throw_if_meta_is_undefined)
+    L41: OAD_FAST_BORROW 5 (meta) ; OAD_FAST_BORROW 6 (rule) ; BUILD_TUPLE 2 ; SET_FUNCTION_ATTRIBUTE 8 (closure) ; STORE_FAST 2 (test_correctly_calculate_and_cache_its_id)
+    L47: OAD_FAST_BORROW 5 (meta) ; OAD_FAST_BORROW 6 (rule) ; BUILD_TUPLE 2 ; SET_FUNCTION_ATTRIBUTE 8 (closure) ; STORE_FAST 3 (test_delegate_print_to_the_print_graph_node_function)
+    L54: OAD_FAST_BORROW 5 (meta) ; OAD_FAST_BORROW 6 (rule) ; BUILD_TUPLE 2 ; SET_FUNCTION_ATTRIBUTE 8 (closure) ; STORE_FAST 4 (test_handle_next_node_linkage) ; OAD_CONST 8 (None)
+    ### def test_construct_with_rule_and_meta()
+      L33: OAD_GLOBAL 1 (GraphNode + NULL) ; OAD_DEREF 6 (rule) ; OAD_DEREF 5 (meta) ; CALL 2 ; STORE_FAST 0 (node)
+      L34: OAD_FAST_BORROW 0 (node) ; OAD_ATTR 2 (rule) ; OAD_DEREF 6 (rule) ; COMPARE_OP 72 (==)
+      L35: OAD_FAST_BORROW 0 (node) ; OAD_ATTR 20 (meta) ; OAD_DEREF 5 (meta) ; COMPARE_OP 72 (==)
+    ### def test_throw_if_meta_is_undefined()
+      L38: LOAD_CONST 2 (None) ; OAD_CONST 2 (None) ; OAD_CONST 2 (None) ; CALL 3 ; OAD_CONST 2 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+      L39: OAD_GLOBAL 7 (GraphNode + NULL) ; OAD_DEREF 0 (rule) ; OAD_CONST 2 (None) ; CALL 2
+      L38: LOAD_CONST 2 (None) ; OAD_CONST 2 (None) ; OAD_CONST 2 (None) ; CALL 3 ; OAD_CONST 2 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    ### def test_correctly_calculate_and_cache_its_id()
+      L42: OAD_GLOBAL 1 (GraphNode + NULL) ; OAD_DEREF 7 (rule) ; OAD_DEREF 6 (meta) ; CALL 2 ; STORE_FAST 0 (node)
+      L43: OAD_FAST_BORROW 0 (node) ; OAD_ATTR 2 (id) ; OAD_CONST 0 ('1,2,3') ; COMPARE_OP 72 (==)
+      L44: OAD_CONST 8 ('stackId') ; OAD_SMALL_INT 4 ; OAD_CONST 9 ('pathId') ; OAD_SMALL_INT 5 ; OAD_CONST 10 ('stepId') ; OAD_SMALL_INT 6 ; BUILD_MAP 3 ; OAD_FAST_BORROW 0 (node) ; STORE_ATTR 10 (meta)
+      L45: OAD_FAST_BORROW 0 (node) ; OAD_ATTR 2 (id) ; OAD_CONST 0 ('1,2,3') ; COMPARE_OP 72 (==)
+    ### def test_delegate_print_to_the_print_graph_node_function('mock_print_graph_node',)
+      L48: OAD_GLOBAL 1 (GraphNode + NULL) ; OAD_DEREF 4 (rule) ; OAD_DEREF 3 (meta) ; CALL 2 ; STORE_FAST 1 (node)
+      L49: OAD_CONST 0 ('colorize') ; OAD_CONST 2 ('show_position') ; OAD_CONST 3 (False) ; BUILD_MAP 2 ; STORE_FAST 2 (opts)
+      L50: OAD_FAST_BORROW 1 (node) ; OAD_ATTR 3 (print + NULL|self) ; OAD_FAST_BORROW 2 (opts) ; CALL 1
+      L52: OAD_FAST_BORROW 0 (mock_print_graph_node) ; OAD_ATTR 5 (assert_called_with + NULL|self) ; OAD_FAST_BORROW 1 (node) ; CALL 1 ; OAD_CONST 4 (None)
+      ### def <lambda>('x', '_y')
+        L49: OAD_GLOBAL 1 (str + NULL) ; OAD_FAST_BORROW 0 (x) ; CALL 1
+    ### def test_handle_next_node_linkage()
+      L55: OAD_GLOBAL 1 (GraphNode + NULL) ; OAD_GLOBAL 3 (RuleRef + NULL) ; OAD_SMALL_INT 43 ; CALL 1 ; OAD_DEREF 6 (meta) ; CALL 2 ; STORE_FAST 0 (nextNode)
+      L56: OAD_GLOBAL 1 (GraphNode + NULL) ; OAD_DEREF 7 (rule) ; OAD_DEREF 6 (meta) ; OAD_FAST_BORROW 0 (nextNode) ; CALL 3 ; STORE_FAST 1 (node)
+      L57: OAD_FAST_BORROW 1 (node) ; OAD_ATTR 4 (next) ; OAD_FAST_BORROW 0 (nextNode) ; COMPARE_OP 72 (==)
+
+@@@@@@@@@@ graph_pointer_test.cpython-314-pytest-9.1.1.pyc
+### def <module>()
+  L1: OAD_SMALL_INT 0 ; OAD_CONST 1 (('annotations',)) ; IMPORT_NAME 0 (__future__) ; IMPORT_FROM 1 (annotations) ; STORE_NAME 1 (annotations)
+  L3: OAD_SMALL_INT 0 ; OAD_CONST 2 (None) ; IMPORT_NAME 2 (builtins) ; OAD_SMALL_INT 0 ; OAD_CONST 2 (None) ; IMPORT_NAME 4 (_pytest.assertion.rewrite) ; IMPORT_FROM 5 (assertion) ; IMPORT_FROM 6 (rewrite) ; OAD_SMALL_INT 0 ; OAD_CONST 3 (('patch',)) ; IMPORT_NAME 8 (unittest.mock) ; IMPORT_FROM 9 (patch) ; STORE_NAME 9 (patch)
+  L5: OAD_SMALL_INT 0 ; OAD_CONST 2 (None) ; IMPORT_NAME 10 (pytest) ; STORE_NAME 10 (pytest)
+  L7: OAD_SMALL_INT 1 ; OAD_CONST 4 (('RuleChar', 'RuleCharExclude', 'RuleEnd')) ; IMPORT_NAME 11 (grammar_graph_types) ; IMPORT_FROM 12 (RuleChar) ; STORE_NAME 12 (RuleChar) ; IMPORT_FROM 13 (RuleCharExclude) ; STORE_NAME 13 (RuleCharExclude) ; IMPORT_FROM 14 (RuleEnd) ; STORE_NAME 14 (RuleEnd)
+  L12: OAD_SMALL_INT 1 ; OAD_CONST 5 (('GraphNode',)) ; IMPORT_NAME 15 (graph_node) ; IMPORT_FROM 16 (GraphNode) ; STORE_NAME 16 (GraphNode)
+  L13: OAD_SMALL_INT 1 ; OAD_CONST 6 (('GraphPointer',)) ; IMPORT_NAME 17 (graph_pointer) ; IMPORT_FROM 18 (GraphPointer) ; STORE_NAME 18 (GraphPointer)
+  L14: OAD_SMALL_INT 1 ; OAD_CONST 7 (('is_graph_pointer_rule_char', 'is_graph_pointer_rule_end')) ; IMPORT_NAME 19 (type_guards) ; IMPORT_FROM 20 (is_graph_pointer_rule_char) ; STORE_NAME 20 (is_graph_pointer_rule_char) ; IMPORT_FROM 21 (is_graph_pointer_rule_end) ; STORE_NAME 21 (is_graph_pointer_rule_end)
+  L20: CALL 0
+  L20: CALL 0
+  L21: STORE_NAME 23 (mock_is_graph_pointer_rule_ref)
+  L28: CALL 0
+  L28: CALL 0
+  L29: STORE_NAME 24 (mock_is_graph_pointer_rule_end)
+  L36: CALL 0
+  L36: CALL 0
+  L37: STORE_NAME 25 (mock_is_graph_pointer_rule_char)
+  L45: CALL 0
+  L45: CALL 0
+  L46: STORE_NAME 26 (mock_is_graph_pointer_rule_char_exclude) ; STORE_NAME 27 (describe_graph_pointer) ; OAD_CONST 2 (None)
+  ### def mock_is_graph_pointer_rule_ref()
+    L20: RETURN_GENERATOR
+    L22: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L23: OAD_CONST 0 ('gbnf.grammar_graph.graph_pointer.is_graph_pointer_rule_ref') ; OAD_CONST 1 (False)
+    L22: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L24: STORE_FAST 0 (mock)
+    L25: OAD_FAST_BORROW 0 (mock) ; YIELD_VALUE 0
+    L22: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+  ### def mock_is_graph_pointer_rule_end()
+    L28: RETURN_GENERATOR
+    L30: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L31: OAD_CONST 0 ('gbnf.grammar_graph.graph_pointer.is_graph_pointer_rule_end') ; OAD_CONST 1 (False)
+    L30: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L32: STORE_FAST 0 (mock)
+    L33: OAD_FAST_BORROW 0 (mock) ; YIELD_VALUE 0
+    L30: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+  ### def mock_is_graph_pointer_rule_char()
+    L36: RETURN_GENERATOR
+    L38: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L39: OAD_CONST 0 ('gbnf.grammar_graph.graph_pointer.is_graph_pointer_rule_char')
+    L40: OAD_CONST 1 (False)
+    L38: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L41: STORE_FAST 0 (mock)
+    L42: OAD_FAST_BORROW 0 (mock) ; YIELD_VALUE 0
+    L38: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+  ### def mock_is_graph_pointer_rule_char_exclude()
+    L45: RETURN_GENERATOR
+    L47: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L48: OAD_CONST 0 ('gbnf.grammar_graph.graph_pointer.is_graph_pointer_rule_char_exclude')
+    L49: OAD_CONST 1 (False)
+    L47: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    L50: STORE_FAST 0 (mock)
+    L51: OAD_FAST_BORROW 0 (mock) ; YIELD_VALUE 0
+    L47: LOAD_CONST 3 (None) ; OAD_CONST 3 (None) ; OAD_CONST 3 (None) ; CALL 3 ; OAD_CONST 3 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+  ### def describe_graph_pointer()
+    L54: STORE_FAST 0 (test_constructor) ; STORE_FAST 1 (test_it_raises_error_if_node_is_undefined) ; STORE_FAST 2 (test_it_initializes_correctly_with_node_and_parent) ; STORE_FAST 3 (describe_resolve) ; OAD_CONST 4 (None)
+    ### def test_constructor()
+      L56: OAD_GLOBAL 1 (GraphNode + NULL) ; OAD_GLOBAL 3 (RuleEnd + NULL) ; CALL 0 ; OAD_CONST 0 ('stackId') ; OAD_SMALL_INT 1 ; OAD_CONST 1 ('pathId') ; OAD_SMALL_INT 2 ; OAD_CONST 2 ('stepId') ; OAD_SMALL_INT 3 ; BUILD_MAP 3 ; CALL 2 ; STORE_FAST 0 (node)
+      L57: OAD_GLOBAL 5 (GraphPointer + NULL) ; OAD_FAST_BORROW 0 (node) ; CALL 1 ; STORE_FAST 1 (pointer)
+      L58: OAD_FAST_BORROW 1 (pointer) ; OAD_ATTR 6 (node) ; OAD_FAST_BORROW 0 (node) ; COMPARE_OP 72 (==)
+      L59: OAD_FAST_BORROW 1 (pointer) ; OAD_ATTR 24 (id) ; OAD_CONST 11 ('1,2,3') ; COMPARE_OP 72 (==)
+      L60: OAD_FAST_BORROW 1 (pointer) ; OAD_ATTR 26 (parent) ; OAD_CONST 10 (None) ; IS_OP 0 (is)
+    ### def test_it_raises_error_if_node_is_undefined()
+      L63: LOAD_CONST 2 (None) ; OAD_CONST 2 (None) ; OAD_CONST 2 (None) ; CALL 3 ; OAD_CONST 2 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+      L64: OAD_GLOBAL 7 (GraphPointer + NULL) ; OAD_CONST 2 (None) ; CALL 1
+      L63: LOAD_CONST 2 (None) ; OAD_CONST 2 (None) ; OAD_CONST 2 (None) ; CALL 3 ; OAD_CONST 2 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+    ### def test_it_initializes_correctly_with_node_and_parent()
+      L67: CALL 2 ; STORE_FAST 0 (parent_node)
+      L68: OAD_GLOBAL 3 (RuleChar + NULL) ; OAD_SMALL_INT 97 ; BUILD_LIST 1 ; OAD_CONST 1 (('value',)) ; CALL_KW 1 ; OAD_CONST 2 ('stackId') ; OAD_SMALL_INT 1 ; OAD_CONST 3 ('pathId') ; OAD_SMALL_INT 2 ; OAD_CONST 4 ('stepId') ; OAD_SMALL_INT 3 ; BUILD_MAP 3
+      L67: CALL 2 ; STORE_FAST 0 (parent_node)
+      L70: CALL 2 ; STORE_FAST 1 (child_node)
+      L71: OAD_GLOBAL 3 (RuleChar + NULL) ; OAD_SMALL_INT 98 ; BUILD_LIST 1 ; OAD_CONST 1 (('value',)) ; CALL_KW 1 ; OAD_CONST 2 ('stackId') ; OAD_SMALL_INT 4 ; OAD_CONST 3 ('pathId') ; OAD_SMALL_INT 5 ; OAD_CONST 4 ('stepId') ; OAD_SMALL_INT 6 ; BUILD_MAP 3
+      L70: CALL 2 ; STORE_FAST 1 (child_node)
+      L73: OAD_GLOBAL 5 (GraphPointer + NULL) ; OAD_FAST_BORROW 0 (parent_node) ; CALL 1 ; STORE_FAST 2 (parent_pointer)
+      L74: OAD_GLOBAL 5 (GraphPointer + NULL) ; OAD_FAST_BORROW_LOAD_FAST_BORROW 18 (child_node, parent_pointer) ; CALL 2 ; STORE_FAST 3 (child_pointer)
+      L75: OAD_FAST_BORROW 3 (child_pointer) ; OAD_ATTR 6 (parent) ; OAD_FAST_BORROW 2 (parent_pointer) ; COMPARE_OP 72 (==)
+      L76: OAD_FAST_BORROW 3 (child_pointer) ; OAD_ATTR 24 (id) ; OAD_CONST 13 ('1,2,3-4,5,6') ; COMPARE_OP 72 (==)
+    ### def describe_resolve()
+      L78: STORE_FAST 0 (test_it_raises_error_on_unknown_rule_types) ; STORE_FAST 1 (test_it_yields_a_char_rule) ; STORE_FAST 2 (test_it_yields_a_char_excluded_rule) ; STORE_FAST 3 (test_it_yields_an_end_rule_without_a_parent) ; STORE_FAST 4 (test_it_yields_an_end_rule_with_a_parent) ; STORE_FAST 5 (test_it_yields_an_end_rule_with_a_grandparent) ; STORE_FAST 6 (test_it_yields_an_end_rule_with_a_parent_that_is_not_an_end_with_a_grandparent) ; OAD_CONST 7 (None)
+      ### def test_it_raises_error_on_unknown_rule_types()
+        L80: CALL 2 ; STORE_FAST 0 (node)
+        L81: OAD_GLOBAL 2 (type) ; OAD_CONST 0 ('UNKNOWN_RULE_TYPE') ; BUILD_MAP 1 ; OAD_CONST 1 ('stackId') ; OAD_SMALL_INT 1 ; OAD_CONST 2 ('pathId') ; OAD_SMALL_INT 2 ; OAD_CONST 3 ('stepId') ; OAD_SMALL_INT 3 ; BUILD_MAP 3
+        L80: CALL 2 ; STORE_FAST 0 (node)
+        L83: OAD_GLOBAL 5 (GraphPointer + NULL) ; OAD_FAST_BORROW 0 (node) ; CALL 1 ; STORE_FAST 1 (pointer)
+        L84: LOAD_CONST 6 (None) ; OAD_CONST 6 (None) ; OAD_CONST 6 (None) ; CALL 3 ; OAD_CONST 6 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+        L85: OAD_GLOBAL 13 (list + NULL) ; OAD_FAST_BORROW 1 (pointer) ; OAD_ATTR 15 (resolve + NULL|self) ; CALL 0 ; CALL 1
+        L84: LOAD_CONST 6 (None) ; OAD_CONST 6 (None) ; OAD_CONST 6 (None) ; CALL 3 ; OAD_CONST 6 (None) ; PUSH_EXC_INFO ; WITH_EXCEPT_START
+      ### def test_it_yields_a_char_rule('mock_is_graph_pointer_rule_char',)
+        L88: OAD_CONST 0 (True) ; OAD_FAST_BORROW 0 (mock_is_graph_pointer_rule_char) ; STORE_ATTR 0 (return_value)
+        L89: OAD_GLOBAL 3 (RuleChar + NULL) ; OAD_SMALL_INT 97 ; BUILD_LIST 1 ; OAD_CONST 1 (('value',)) ; CALL_KW 1 ; STORE_FAST 1 (rule)
+        L90: OAD_GLOBAL 5 (GraphNode + NULL) ; OAD_FAST_BORROW 1 (rule) ; OAD_CONST 2 ('stackId') ; OAD_SMALL_INT 1 ; OAD_CONST 3 ('pathId') ; OAD_SMALL_INT 2 ; OAD_CONST 4 ('stepId') ; OAD_SMALL_INT 3 ; BUILD_MAP 3 ; CALL 2 ; STORE_FAST 2 (node)
+        L91: OAD_GLOBAL 7 (GraphPointer + NULL) ; OAD_FAST_BORROW 2 (node) ; CALL 1 ; STORE_FAST 3 (pointer)
+        L92: OAD_FAST_BORROW 3 (pointer) ; OAD_ATTR 8 (resolve) ; CALL 0 ; OAD_GLOBAL 11 (list + NULL) ; CALL 1 ; BUILD_LIST 1 ; COMPARE_OP 72 (==)
+      ### def test_it_yields_a_char_excluded_rule('mock_is_graph_pointer_rule_char_exclude',)
+        L97: OAD_CONST 0 (True) ; OAD_FAST_BORROW 0 (mock_is_graph_pointer_rule_char_exclude) ; STORE_ATTR 0 (return_value)
+        L98: OAD_GLOBAL 3 (RuleCharExclude + NULL) ; OAD_SMALL_INT 97 ; BUILD_LIST 1 ; OAD_CONST 1 (('value',)) ; CALL_KW 1 ; STORE_FAST 1 (rule)
+        L99: OAD_GLOBAL 5 (GraphNode + NULL) ; OAD_FAST_BORROW 1 (rule) ; OAD_CONST 2 ('stackId') ; OAD_SMALL_INT 1 ; OAD_CONST 3 ('pathId') ; OAD_SMALL_INT 2 ; OAD_CONST 4 ('stepId') ; OAD_SMALL_INT 3 ; BUILD_MAP 3 ; CALL 2 ; STORE_FAST 2 (node)
+        L100: OAD_GLOBAL 7 (GraphPointer + NULL) ; OAD_FAST_BORROW 2 (node) ; CALL 1 ; STORE_FAST 3 (pointer)
+        L101: OAD_FAST_BORROW 3 (pointer) ; OAD_ATTR 8 (resolve) ; CALL 0 ; OAD_GLOBAL 11 (list + NULL) ; CALL 1 ; BUILD_LIST 1 ; COMPARE_OP 72 (==)
+      ### def test_it_yields_an_end_rule_without_a_parent('mock_is_graph_pointer_rule_end',)
+        L104: OAD_CONST 0 (True) ; OAD_FAST_BORROW 0 (mock_is_graph_pointer_rule_end) ; STORE_ATTR 0 (return_value)
+        L105: OAD_GLOBAL 3 (RuleEnd + NULL) ; CALL 0 ; STORE_FAST 1 (rule)
+        L106: OAD_GLOBAL 5 (GraphNode + NULL) ; OAD_FAST_BORROW 1 (rule) ; OAD_CONST 1 ('stackId') ; OAD_SMALL_INT 1 ; OAD_CONST 2 ('pathId') ; OAD_SMALL_INT 2 ; OAD_CONST 3 ('stepId') ; OAD_SMALL_INT 3 ; BUILD_MAP 3 ; CALL 2 ; STORE_FAST 2 (node)
+        L107: OAD_GLOBAL 7 (GraphPointer + NULL) ; OAD_FAST_BORROW 2 (node) ; CALL 1 ; STORE_FAST 3 (pointer)
+        L108: OAD_FAST_BORROW 3 (pointer) ; OAD_ATTR 8 (resolve) ; CALL 0 ; OAD_GLOBAL 11 (list + NULL) ; CALL 1 ; BUILD_LIST 1 ; COMPARE_OP 72 (==)
+      ### def test_it_yields_an_end_rule_with_a_parent('mock_is_graph_pointer_rule_end',)
+        L111: OAD_CONST 0 (True) ; OAD_FAST_BORROW 0 (mock_is_graph_pointer_rule_end) ; STORE_ATTR 0 (return_value)
+        L112: OAD_GLOBAL 3 (RuleEnd + NULL) ; CALL 0 ; STORE_FAST 1 (rule)
+        L113: OAD_GLOBAL 5 (GraphNode + NULL) ; OAD_FAST_BORROW 1 (rule) ; OAD_CONST 1 ('stackId') ; OAD_SMALL_INT 2 ; OAD_CONST 2 ('pathId') ; OAD_SMALL_INT 1 ; OAD_CONST 3 ('stepId') ; OAD_SMALL_INT 1 ; BUILD_MAP 3 ; CALL 2 ; STORE_FAST 2 (parent_node)
+        L114: OAD_GLOBAL 7 (GraphPointer + NULL) ; OAD_FAST_BORROW 2 (parent_node) ; CALL 1 ; STORE_FAST 3 (parent_pointer)
+        L115: OAD_GLOBAL 5 (GraphNode + NULL) ; OAD_FAST_BORROW 1 (rule) ; OAD_CONST 1 ('stackId') ; OAD_SMALL_INT 1 ; OAD_CONST 2 ('pathId') ; OAD_SMALL_INT 1 ; OAD_CONST 3 ('stepId') ; OAD_SMALL_INT 1 ; BUILD_MAP 3 ; CALL 2 ; STORE_FAST 4 (child_node)
+        L116: OAD_GLOBAL 7 (GraphPointer + NULL) ; OAD_FAST_BORROW_LOAD_FAST_BORROW 67 (child_node, parent_pointer) ; CALL 2 ; STORE_FAST 5 (child_pointer)
+        L117: OAD_FAST_BORROW 5 (child_pointer) ; OAD_ATTR 8 (resolve) ; CALL 0 ; OAD_GLOBAL 11 (list + NULL) ; CALL 1 ; BUILD_LIST 1 ; COMPARE_OP 72 (==)
+      ### def test_it_yields_an_end_rule_with_a_grandparent('mock_is_graph_pointer_rule_end',)
+        L122: OAD_CONST 0 (True) ; OAD_FAST_BORROW 0 (mock_is_graph_pointer_rule_end) ; STORE_ATTR 0 (return_value)
+        L123: OAD_GLOBAL 3 (RuleEnd + NULL) ; CALL 0 ; STORE_FAST 1 (rule)
+        L124: OAD_GLOBAL 5 (GraphNode + NULL) ; OAD_FAST_BORROW 1 (rule) ; OAD_CONST 1 ('stackId') ; OAD_SMALL_INT 2 ; OAD_CONST 2 ('pathId') ; OAD_SMALL_INT 1 ; OAD_CONST 3 ('stepId') ; OAD_SMALL_INT 1 ; BUILD_MAP 3 ; CALL 2 ; STORE_FAST 2 (grandparent_node)
+        L125: OAD_GLOBAL 7 (GraphPointer + NULL) ; OAD_FAST_BORROW 2 (grandparent_node) ; CALL 1 ; STORE_FAST 3 (grandparent_pointer)
+        L126: OAD_GLOBAL 5 (GraphNode + NULL) ; OAD_FAST_BORROW 1 (rule) ; OAD_CONST 1 ('stackId') ; OAD_SMALL_INT 2 ; OAD_CONST 2 ('pathId') ; OAD_SMALL_INT 1 ; OAD_CONST 3 ('stepId') ; OAD_SMALL_INT 1 ; BUILD_MAP 3 ; CALL 2 ; STORE_FAST 4 (parent_node)
+        L127: OAD_GLOBAL 7 (GraphPointer + NULL) ; OAD_FAST_BORROW_LOAD_FAST_BORROW 67 (parent_node, grandparent_pointer) ; CALL 2 ; STORE_FAST 5 (parent_pointer)
+        L128: OAD_GLOBAL 5 (GraphNode + NULL) ; OAD_FAST_BORROW 1 (rule) ; OAD_CONST 1 ('stackId') ; OAD_SMALL_INT 1 ; OAD_CONST 2 ('pathId') ; OAD_SMALL_INT 1 ; OAD_CONST 3 ('stepId') ; OAD_SMALL_INT 1 ; BUILD_MAP 3 ; CALL 2 ; STORE_FAST 6 (child_node)
+        L129: OAD_GLOBAL 7 (GraphPointer + NULL) ; OAD_FAST_BORROW_LOAD_FAST_BORROW 101 (child_node, parent_pointer) ; CALL 2 ; STORE_FAST 7 (child_pointer)
+        L130: OAD_FAST_BORROW 7 (child_pointer) ; OAD_ATTR 8 (resolve) ; CALL 0 ; OAD_GLOBAL 11 (list + NULL) ; CALL 1 ; BUILD_LIST 1 ; COMPARE_OP 72 (==)
+      ### def test_it_yields_an_end_rule_with_a_parent_that_is_not_an_end_with_a_grandparent('mock_is_graph_pointer_rule_end', 'mock_is_graph_pointer_rule_char')
+        L136: OAD_GLOBAL 0 (is_graph_pointer_rule_end) ; OAD_FAST_BORROW 0 (mock_is_graph_pointer_rule_end) ; STORE_ATTR 1 (side_effect)
+        L137: OAD_GLOBAL 4 (is_graph_pointer_rule_char) ; OAD_FAST_BORROW 1 (mock_is_graph_pointer_rule_char) ; STORE_ATTR 1 (side_effect)
+        L138: OAD_GLOBAL 7 (RuleEnd + NULL) ; CALL 0 ; STORE_FAST 2 (rule)
+        L139: OAD_GLOBAL 9 (GraphNode + NULL) ; OAD_FAST_BORROW 2 (rule) ; OAD_CONST 0 ('stackId') ; OAD_SMALL_INT 2 ; OAD_CONST 1 ('pathId') ; OAD_SMALL_INT 1 ; OAD_CONST 2 ('stepId') ; OAD_SMALL_INT 1 ; BUILD_MAP 3 ; CALL 2 ; STORE_FAST 3 (grandparent_node)
+        L140: OAD_GLOBAL 11 (GraphPointer + NULL) ; OAD_FAST_BORROW 3 (grandparent_node) ; CALL 1 ; STORE_FAST 4 (grandparent_pointer)
+        L141: CALL 2 ; STORE_FAST 5 (parent_node)
+        L142: OAD_GLOBAL 13 (RuleChar + NULL) ; OAD_SMALL_INT 97 ; BUILD_LIST 1 ; OAD_CONST 3 (('value',)) ; CALL_KW 1 ; OAD_CONST 0 ('stackId') ; OAD_SMALL_INT 2 ; OAD_CONST 1 ('pathId') ; OAD_SMALL_INT 1 ; OAD_CONST 2 ('stepId') ; OAD_SMALL_INT 1 ; BUILD_MAP 3
+        L141: CALL 2 ; STORE_FAST 5 (parent_node)
+        L144: OAD_GLOBAL 11 (GraphPointer + NULL) ; OAD_FAST_BORROW_LOAD_FAST_BORROW 84 (parent_node, grandparent_pointer) ; CALL 2 ; STORE_FAST 6 (parent_pointer)
+        L145: OAD_GLOBAL 9 (GraphNode + NULL) ; OAD_FAST_BORROW 2 (rule) ; OAD_CONST 0 ('stackId') ; OAD_SMALL_INT 1 ; OAD_CONST 1 ('pathId') ; OAD_SMALL_INT 1 ; OAD_CONST 2 ('stepId') ; OAD_SMALL_INT 1 ; BUILD_MAP 3 ; CALL 2 ; STORE_FAST 7 (child_node)
+        L146: OAD_GLOBAL 11 (GraphPointer + NULL) ; OAD_FAST_BORROW_LOAD_FAST_BORROW 118 (child_node, parent_pointer) ; CALL 2 ; STORE_FAST 8 (child_pointer)
+        L147: OAD_FAST_BORROW 8 (child_pointer) ; OAD_ATTR 14 (resolve) ; CALL 0 ; OAD_GLOBAL 17 (list + NULL) ; CALL 1 ; BUILD_LIST 1 ; COMPARE_OP 72 (==)
