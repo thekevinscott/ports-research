@@ -8,7 +8,7 @@ metadata:
   modified: 2026-09-09T01:14:35.513Z
 ---
 
-`/workspace/tests` is mounted read-only (`rpool/ROOT/... type zfs (ro,relatime,...)`) and is
+`/workspace/tests` is mounted read-only (`pool/ROOT/... type zfs (ro,relatime,...)`) and is
 empty — nothing can be written there. As of 2026-09-09 the GBNF TypeScript port therefore keeps
 its test suite in `/workspace/ported_implementation/test/`, and the root `package.json` test
 script globs both paths (`node --test 'tests/**/*.test.ts' 'ported_implementation/test/**/*.test.ts'`)
