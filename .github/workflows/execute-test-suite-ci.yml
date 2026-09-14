@@ -1,0 +1,22 @@
+name: execute-test-suite CI
+
+on:
+  pull_request:
+    paths:
+      - 'packages/execute-test-suite/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  execute-test-suite:
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    with:
+      source: packages/execute-test-suite/src
+      # Work lands here as stacked PRs, so the diff-scoped gates cannot assume
+      # the default `origin/main`.
+      base: origin/${{ github.base_ref }}

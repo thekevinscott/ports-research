@@ -1,0 +1,22 @@
+name: generate-embedding CI
+
+on:
+  pull_request:
+    paths:
+      - 'packages/generate-embedding/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  generate-embedding:
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    with:
+      source: packages/generate-embedding/src
+      # Work lands here as stacked PRs, so the diff-scoped gates cannot assume
+      # the default `origin/main`.
+      base: origin/${{ github.base_ref }}

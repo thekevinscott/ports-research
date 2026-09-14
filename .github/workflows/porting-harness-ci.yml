@@ -1,0 +1,22 @@
+name: porting-harness CI
+
+on:
+  pull_request:
+    paths:
+      - 'packages/porting-harness/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  porting-harness:
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    with:
+      source: packages/porting-harness/src
+      # Work lands here as stacked PRs, so the diff-scoped gates cannot assume
+      # the default `origin/main`.
+      base: origin/${{ github.base_ref }}
