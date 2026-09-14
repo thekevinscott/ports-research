@@ -1,2 +1,5 @@
 test-unit:
     uv run pytest src -x -q
+
+test-integration:
+    uv run pytest tests/integration -x -q
