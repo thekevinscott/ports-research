@@ -18,8 +18,17 @@ Three recipes per package, and nothing else: `just test-unit` (colocated `_test.
 
 Integration and e2e drive the package's public entry point with inputs and assert on outputs. They never import an internal function or constant, and never build their own `docker.run`.
 
+## CI workflows
+
+One workflow file per package/lane (`.github/workflows/<package>-ci.yml`), triggered by that lane's own paths on `pull_request` — the pattern in `thekevinscott/dirsql`. A change to a package runs that package's checks and nothing else; a change to no lane runs nothing.
+
+Lanes deliberately do not list their own file as a trigger. Stacked branches carry every sibling lane file in their diff, so a self-trigger would fire every lane on every package PR and defeat the filtering. A lane-file edit is exercised by the next PR that touches that package.
+
+No inline scripts in workflow YAML. Use native mechanisms — `paths:` filters, reusable-workflow inputs, matrix — instead of `run:` blocks implementing logic like change detection; when logic is genuinely needed, it lives in a committed script or composite action, not inline in the workflow.
+
 ## Testing — when a defect shows up in the wild
 
 - **A bug observed is a test owed.** Anything that misbehaved in a real run — a crash, a leak, a silent wrong result, an orphaned resource, a value quietly dropped — gets captured as a reproducible test. The test fails first on the current code, then the fix turns it green. A fix without a test proving the defect is a fix that comes back.
 - **Reproduce the mechanism, not the incident.** Test the condition that caused it — the teardown path that leaked, the branch that dropped the value — not the exact command that happened to trip it. If the trigger itself isn't coverable (a SIGKILL, a real outage), test the layer that should survive it and note in the test why the trigger is out of scope.
 - **One defect, one named test.** The name states the behavior being guaranteed, so a later reader knows what breaks if it goes red.
+

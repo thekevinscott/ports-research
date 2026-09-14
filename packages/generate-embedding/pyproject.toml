@@ -1,7 +1,7 @@
 [project]
-name = "harvest"
+name = "generate-embedding"
 version = "0.1.0"
-description = "Harvest the arXiv paper corpus behind the literature survey: download cited papers, title-resolve the rest, convert to markdown"
+description = "Generate an embedding for one code file against an OpenAI-compatible /v1/embeddings endpoint"
 readme = "README.md"
 authors = [
     { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }
@@ -9,15 +9,21 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "click>=8.5.0",
-    "pymupdf4llm>=0.0.17",
+    "httpx>=0.28.1",
+    "numpy>=2.3.4",
+    "pydantic-settings>=2.15.0",
 ]
 
 [project.scripts]
-harvest = "harvest.cli:cli"
+generate-embedding = "generate_embedding.cli:cli"
 
 [build-system]
 requires = ["uv_build>=0.10.11,<0.11.0"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+# Colocated tests are development code; keep them out of the wheel and sdist.
+source-exclude = ["*_test.py", "**/*_test.py"]
 
 [dependency-groups]
 dev = [

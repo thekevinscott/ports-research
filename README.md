@@ -119,16 +119,6 @@ with the repo.
 Session handoffs, audits and dated analysis batches are kept on disk under
 `internal/`, outside the published repo.
 
-## CI
-
-`.github/workflows/pr-monitor.yml` runs
-[pr-monitor](https://github.com/thekevinscott/pr-monitor) as the `CI Gate`
-check on every pull request. It predicts the checks a PR will produce and holds
-until exactly that set has reported and passed, so branch protection needs one
-required check rather than a list that has to be edited every time a workflow
-is added. There is nothing else in CI yet, so the gate currently passes on an
-empty set.
-
 ## Conventions
 
 Root `AGENTS.md` covers the test tiers (`just test-unit`, `test-integration`,

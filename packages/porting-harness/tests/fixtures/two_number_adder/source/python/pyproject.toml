@@ -1,0 +1,21 @@
+[project]
+name = "two-number-adder"
+version = "1.0.0"
+description = "Adds two finite numbers."
+requires-python = ">=3.14"
+dependencies = []
+
+[build-system]
+requires = ["uv_build>=0.9,<1.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+python_files = ["*_test.py"]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "pytest-describe==3.2.0",
+]
