@@ -1,0 +1,2 @@
+class AgentHarnessSandboxError(Exception):
+    pass
