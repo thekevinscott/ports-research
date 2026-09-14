@@ -1,0 +1,39 @@
+[[python.exempt]]
+path = "measure_embedding/__init__.py"
+rules = ["colocated-test"]
+reason = "re-export barrel; embed_codebase and compare_embeddings are tested in their own modules"
+
+[[python.exempt]]
+path = "measure_embedding/cli.py"
+rules = ["one-function-per-file"]
+reason = "embed and compare are click subcommands registered on the one group; each is a five-line wiring shim over a function tested in its own module"
+
+[[python.exempt]]
+path = "measure_embedding/cli_test.py"
+rules = ["unmocked-collaborator", "no-first-party-patch"]
+reason = "click's CliRunner is the harness driving the unit; embed_codebase and compare_embeddings are patched at their cli import binding to test argument wiring"
+
+[[python.exempt]]
+path = "measure_embedding/embed_codebase_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the embedder is injected as a fake; the walk over real tmp files and the .npy files it leaves behind are the unit"
+
+[[python.exempt]]
+path = "measure_embedding/load_unit_rows_test.py"
+rules = ["unmocked-collaborator"]
+reason = "loading real .npy files from a tmp directory is the unit; a mocked numpy would only restate the expected rows"
+
+[[python.exempt]]
+path = "measure_embedding/compare_embeddings_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the arithmetic over real numpy arrays loaded from tmp .npy files is the unit; a mocked array would only restate the expected numbers"
+
+[[python.exempt]]
+path = "measure_embedding/chamfer_distance_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the arithmetic over real numpy arrays is the unit; a mocked array would only restate the expected numbers"
+
+[[python.exempt]]
+path = "measure_embedding/load_lengths_test.py"
+rules = ["unmocked-collaborator"]
+reason = "reading a real index.json from a tmp directory is the unit; numpy is only the type the lengths come back as"
