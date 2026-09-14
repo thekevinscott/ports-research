@@ -3,7 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from agent_harness_sandbox import ClaudeAgent, run_agent_harness_sandbox
+from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
+from agent_harness_sandbox.run_agent_harness_sandbox import run_agent_harness_sandbox
 
 MODEL = "claude-opus-5"
 EFFORT = "low"

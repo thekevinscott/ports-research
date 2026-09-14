@@ -2,8 +2,8 @@ import hashlib
 from pathlib import Path
 import json
 
-from agent_harness_sandbox import Agent
-from porting_harness import run_porting_harness
+from agent_harness_sandbox.agents.agent import Agent
+from porting_harness.run_porting_harness import run_porting_harness
 from .condition_name import condition_name
 from .prepare_filesystem import PreparedFilesystem
 

@@ -1,6 +1,6 @@
 import click
 
-from agent_harness_sandbox import ClaudeAgent
+from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
 
 from .run_gbnf_experiment import run_gbnf_experiment
 

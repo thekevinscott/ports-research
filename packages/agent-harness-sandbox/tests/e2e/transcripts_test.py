@@ -8,7 +8,8 @@ non-root `node` user, neither of which a mocked docker can prove.
 
 import pytest
 
-from agent_harness_sandbox import AgentHarnessSandboxError, run_agent_harness_sandbox
+from agent_harness_sandbox.errors import AgentHarnessSandboxError
+from agent_harness_sandbox.run_agent_harness_sandbox import run_agent_harness_sandbox
 
 SLUG = "-workspace"
 
