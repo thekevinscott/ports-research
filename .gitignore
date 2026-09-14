@@ -1,4 +1,4 @@
-# Harvested paper corpus — 741MB, reproducible from harvest_citations.py
+# Harvested paper corpus — 741MB, reproducible from scripts/harvest
 papers/
 
 # Upstream clone with a live remote; stays a nested repo

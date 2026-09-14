@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Harvest arxiv-cited papers from the 54 seed papers.
 
 For each seed paper (papers/<slug>/paper.md), slice the References section, extract inline
@@ -10,9 +9,8 @@ import json
 import pathlib
 import re
 import time
-import urllib.request
 
-PAPERS = pathlib.Path(__file__).resolve().parent / "papers"
+from harvest.download import download
 
 # arxiv ids of the 54 seeds (so we don't re-download a seed under an id-named dir).
 SEED_IDS = {
@@ -46,29 +44,15 @@ def ids_in(md: str) -> set[str]:
     return out
 
 
-def download(arxiv_id: str, dest: pathlib.Path) -> bool:
-    url = f"https://arxiv.org/pdf/{arxiv_id}"
-    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    try:
-        with urllib.request.urlopen(req, timeout=60) as r:
-            data = r.read()
-    except Exception:
-        return False
-    if not data.startswith(b"%PDF"):
-        return False
-    dest.write_bytes(data)
-    return True
-
-
-def main() -> None:
-    seeds = sorted(d for d in PAPERS.iterdir() if d.is_dir() and (d / "paper.md").exists())
-    have = set(SEED_IDS) | {d.name for d in PAPERS.iterdir() if d.is_dir()}
+def harvest(papers: pathlib.Path) -> None:
+    seeds = sorted(d for d in papers.iterdir() if d.is_dir() and (d / "paper.md").exists())
+    have = set(SEED_IDS) | {d.name for d in papers.iterdir() if d.is_dir()}
     downloaded = skipped_have = failed = 0
     for d in seeds:
         cited = ids_in((d / "paper.md").read_text(errors="ignore"))
         cited = {c for c in cited if c not in SEED_IDS}
         for cid in sorted(cited):
-            target = PAPERS / cid
+            target = papers / cid
             if cid in have or target.exists():
                 skipped_have += 1
                 continue
@@ -87,7 +71,3 @@ def main() -> None:
             time.sleep(0.5)  # be polite to arxiv
         print(f"[{d.name}] cited_arxiv={len(cited)}  running_total={downloaded}", flush=True)
     print(f"DONE downloaded={downloaded} already_had={skipped_have} not_found={failed}")
-
-
-if __name__ == "__main__":
-    main()
