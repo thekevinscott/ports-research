@@ -1,0 +1,32 @@
+[project]
+name = "execute-test-suite"
+version = "0.1.0"
+description = "Run gbnf's derived test suite against one ported implementation and report pass/fail counts"
+readme = "README.md"
+authors = [
+    { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "click>=8.5.0",
+    "gbnf-experiment",
+]
+
+[project.scripts]
+execute-test-suite = "execute_test_suite.cli:cli"
+
+[build-system]
+requires = ["uv_build>=0.9,<1.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+gbnf-experiment = { path = "../gbnf-experiment", editable = true }
+porting-harness = { path = "../porting-harness", editable = true }
+agent-harness-sandbox = { path = "../agent-harness-sandbox", editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-describe>=3.2.0",
+    "testing-conventions>=0.0.104",
+]
