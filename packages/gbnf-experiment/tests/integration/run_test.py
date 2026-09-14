@@ -6,11 +6,11 @@ import pytest
 from click.testing import CliRunner
 from python_on_whales.exceptions import DockerException
 
-from agent_harness_sandbox import ClaudeAgent
+from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
 from gbnf_experiment import run_gbnf_experiment
 from gbnf_experiment.cli import cli
 from gbnf_experiment.config import derivation_cache_key, settings
-from porting_harness import PROMPT_PATH
+from porting_harness.run_porting_harness import PROMPT_PATH
 
 CONFIG = {
     "agent": ClaudeAgent(),

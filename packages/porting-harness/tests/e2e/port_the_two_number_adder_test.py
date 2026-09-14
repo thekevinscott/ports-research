@@ -18,8 +18,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import pytest
-from agent_harness_sandbox import ClaudeAgent
-from porting_harness import run_porting_harness
+from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
+from porting_harness.run_porting_harness import run_porting_harness
 
 TARGET_LANGUAGE = {"typescript": "python", "python": "typescript"}
 
