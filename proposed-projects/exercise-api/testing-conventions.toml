@@ -1,0 +1,24 @@
+[[python.exempt]]
+path = "exercise_api/__init__.py"
+rules = ["colocated-test"]
+reason = "empty package marker; the CLI is tested in cli_test.py"
+
+[[python.exempt]]
+path = "exercise_api/cli_test.py"
+rules = ["unmocked-collaborator"]
+reason = "click's CliRunner is the harness driving the unit"
+
+[[python.exempt]]
+path = "exercise_api/grammar_strategy.py"
+rules = ["one-function-per-file"]
+reason = "mutually recursive hypothesis composites (item <-> alternatives); splitting them forces a circular import"
+
+[[python.exempt]]
+path = "exercise_api/generate_cases_test.py"
+rules = ["unmocked-collaborator"]
+reason = "hypothesis strategies are plain value types; the mocked case_strategy returns a real one because hypothesis's own engine is the collaborator under test"
+
+[[python.exempt]]
+path = "exercise_api/case_strategy_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the composite is exercised through hypothesis's given, which draws real values from its collaborator strategies; mocked strategies cannot be drawn from"
