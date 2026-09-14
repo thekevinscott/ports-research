@@ -29,10 +29,10 @@ def proxy_log(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def options(transcripts, proxy_log):
+def options(transcripts, proxy_log, claude_home):
     def build(**overrides):
         return {
-            "agent": ClaudeAgent(),
+            "agent": ClaudeAgent(host_home=claude_home),
             "inputs": {},
             "outputs": {},
             "envs": {},
@@ -134,7 +134,7 @@ def describe_run_agent_harness_sandbox():
 def describe_a_second_agent():
     def it_runs_pis_image_with_pis_credentials(docker, pi_home, docker_calls, options, builds):
         run_agent_harness_sandbox(
-            "1+1", **options(agent=PiAgent(provider="openrouter"), effort="minimal", model="m")
+            "1+1", **options(agent=PiAgent(provider="openrouter", host_home=pi_home), effort="minimal", model="m")
         )
         [call] = docker_calls
         assert call["tag"] == "agent-harness-sandbox-pi:latest"
@@ -146,7 +146,7 @@ def describe_a_second_agent():
         docker, pi_home, docker_calls, options, transcripts
     ):
         run_agent_harness_sandbox(
-            "1+1", **options(agent=PiAgent(provider="openrouter"), effort="minimal", model="m")
+            "1+1", **options(agent=PiAgent(provider="openrouter", host_home=pi_home), effort="minimal", model="m")
         )
         [call] = docker_calls
         by_target = {target: src for src, target, _ in call["volumes"]}
@@ -156,7 +156,7 @@ def describe_a_second_agent():
         (pi_home / "auth.json").unlink()
         with pytest.raises(AgentHarnessSandboxError, match="does not exist"):
             run_agent_harness_sandbox(
-                "1+1", **options(agent=PiAgent(provider="openrouter"), effort="minimal", model="m")
+                "1+1", **options(agent=PiAgent(provider="openrouter", host_home=pi_home), effort="minimal", model="m")
             )
 
 

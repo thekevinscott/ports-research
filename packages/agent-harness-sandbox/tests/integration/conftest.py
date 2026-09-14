@@ -9,8 +9,7 @@ def claude_home(tmp_path: Path) -> Path:
     home = tmp_path / "claude-home"
     home.mkdir()
     (home / ".credentials.json").write_text("{}")
-    with patch("agent_harness_sandbox.agents.ClaudeAgent.CLAUDE_HOME", home):
-        yield home
+    return home
 
 
 @pytest.fixture
@@ -19,8 +18,7 @@ def pi_home(tmp_path: Path) -> Path:
     home.mkdir()
     (home / "auth.json").write_text("{}")
     (home / "models.json").write_text("{}")
-    with patch("agent_harness_sandbox.agents.PiAgent.PI_HOME", home):
-        yield home
+    return home
 
 
 @pytest.fixture
@@ -35,41 +33,42 @@ def builds() -> list[str]:
 
 @pytest.fixture
 def docker(docker_calls, builds):
+    """Hold the daemon back and let everything above it run.
+
+    The runner and the lockdown share one `python_on_whales.docker`, so the
+    doubles go on that object rather than on each module that imported it —
+    which is also the shape a real run has.
+    """
     with (
-        patch("agent_harness_sandbox.run_agent_harness_sandbox.docker", autospec=True) as m,
-        patch("agent_harness_sandbox.utils.lockdown.docker", autospec=True) as proxy,
-        patch("agent_harness_sandbox.utils.lockdown.docker_cli", autospec=True),
+        patch("python_on_whales.docker.build", autospec=True) as build,
+        patch("python_on_whales.docker.run", autospec=True) as run,
+        patch("python_on_whales.docker.logs", autospec=True) as logs,
+        patch("python_on_whales.docker.network", autospec=True) as network,
+        patch("python_on_whales.docker.container", autospec=True),
+        patch("python_on_whales.utils.run", autospec=True),
     ):
-        proxy.run.return_value = "proxy-container"
-        proxy.logs.return_value = ""
-        proxy.network.docker_cmd = ["docker"]
+        network.docker_cmd = ["docker"]
+        logs.return_value = ""
 
         def record_build(_context, tags, **_options):
             builds.append(tags)
 
-        m.build.side_effect = record_build
-        proxy.build.side_effect = record_build
+        build.side_effect = record_build
 
-        def fake_run(
-            tag,
-            cmd,
-            envs=None,
-            volumes=None,
-            remove=None,
-            workdir=None,
-            networks=None,
-            cap_drop=None,
-            security_options=None,
-        ):
+        def record_run(tag, cmd=None, **options):
+            # The proxy sidecar is the lockdown's own plumbing, not the run under test.
+            if options.get("detach"):
+                return "proxy-container"
+            volumes = options["volumes"]
             docker_calls.append(
                 {
                     "tag": tag,
                     "cmd": cmd,
-                    "envs": envs,
+                    "envs": options.get("envs"),
                     "volumes": volumes,
-                    "networks": networks,
-                    "cap_drop": cap_drop,
-                    "security_options": security_options,
+                    "networks": options.get("networks"),
+                    "cap_drop": options.get("cap_drop"),
+                    "security_options": options.get("security_options"),
                     "files": {
                         target: sorted(p.name for p in Path(src).iterdir())
                         for src, target, _ in volumes
@@ -78,5 +77,5 @@ def docker(docker_calls, builds):
             )
             return "container output"
 
-        m.run.side_effect = fake_run
-        yield m
+        run.side_effect = record_run
+        yield run

@@ -3,8 +3,17 @@ from unittest.mock import patch
 
 import pytest
 
-from agent_harness_sandbox.errors import AgentHarnessSandboxError
 from agent_harness_sandbox.agents.PiAgent import PiAgent
+
+
+class SandboxError(Exception):
+    """Stands in for the package's error type, a collaborator like any other."""
+
+
+@pytest.fixture(autouse=True)
+def sandbox_error():
+    with patch("agent_harness_sandbox.agents.PiAgent.AgentHarnessSandboxError", SandboxError):
+        yield
 
 
 def flag(command: list[str], name: str) -> str:
@@ -15,8 +24,8 @@ MODEL = "anthropic/claude-opus-4"
 
 
 @pytest.fixture
-def agent():
-    return PiAgent(provider="openrouter")
+def agent(pi_home):
+    return PiAgent(provider="openrouter", host_home=pi_home)
 
 
 @pytest.fixture
@@ -32,8 +41,7 @@ def pi_home(tmp_path):
     home.mkdir()
     (home / "auth.json").write_text('{"key": "k"}')
     (home / "models.json").write_text('{"providers": []}')
-    with patch("agent_harness_sandbox.agents.PiAgent.PI_HOME", home):
-        yield home
+    return home
 
 
 @pytest.fixture
@@ -70,15 +78,15 @@ def describe_the_provider():
 
     def it_refuses_a_local_provider_with_no_host_configured():
         with patch.dict(os.environ, {}, clear=True):
-            with pytest.raises(AgentHarnessSandboxError, match="PI_AGENT_HOST"):
+            with pytest.raises(SandboxError, match="PI_AGENT_HOST"):
                 PiAgent(provider="tower")
 
     def it_rejects_a_provider_it_has_no_allowlist_for():
-        with pytest.raises(AgentHarnessSandboxError, match="anthropic"):
+        with pytest.raises(SandboxError, match="anthropic"):
             PiAgent(provider="anthropic")
 
     def it_lists_the_providers_it_knows():
-        with pytest.raises(AgentHarnessSandboxError, match="openrouter, tower"):
+        with pytest.raises(SandboxError, match="openrouter, tower"):
             PiAgent(provider="")
 
 
@@ -110,12 +118,12 @@ def describe_command():
             assert flag(agent.command("hi", effort=level, model=MODEL), "--thinking") == level
 
         def it_rejects_the_level_only_claude_has(agent):
-            with pytest.raises(AgentHarnessSandboxError, match="max"):
+            with pytest.raises(SandboxError, match="max"):
                 agent.command("hi", effort="max", model=MODEL)
 
         def it_lists_the_valid_levels(agent):
             with pytest.raises(
-                AgentHarnessSandboxError, match="off, minimal, low, medium, high, xhigh"
+                SandboxError, match="off, minimal, low, medium, high, xhigh"
             ):
                 agent.command("hi", effort="", model=MODEL)
 
@@ -144,10 +152,10 @@ def describe_stage_auth():
 
     def it_refuses_a_host_with_no_key(agent, pi_home, destination):
         (pi_home / "auth.json").unlink()
-        with pytest.raises(AgentHarnessSandboxError, match="auth.json does not exist"):
+        with pytest.raises(SandboxError, match="auth.json does not exist"):
             agent.stage_auth(destination)
 
     def it_refuses_a_host_with_no_provider_catalogue(agent, pi_home, destination):
         (pi_home / "models.json").unlink()
-        with pytest.raises(AgentHarnessSandboxError, match="models.json does not exist"):
+        with pytest.raises(SandboxError, match="models.json does not exist"):
             agent.stage_auth(destination)

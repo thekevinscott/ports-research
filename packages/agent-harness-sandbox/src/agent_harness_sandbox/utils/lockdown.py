@@ -5,8 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from uuid import uuid4
 
-from python_on_whales import docker
-from python_on_whales.utils import run as docker_cli
+from python_on_whales import docker, utils as docker_utils
 
 from ..config import PROXY_DIR, PROXY_IMAGE, PROXY_PORT
 
@@ -54,7 +53,11 @@ def lockdown(
     networks = []
     try:
         # python-on-whales' network.create wraps no --internal, and --internal is the point.
-        docker_cli([*docker.network.docker_cmd, "network", "create", "--internal", jail.network])
+        # Reached through the module, not bound by name, so a test can patch it
+        # where it lives instead of reaching into this one.
+        docker_utils.run(
+            [*docker.network.docker_cmd, "network", "create", "--internal", jail.network]
+        )
         networks.append(jail.network)
         docker.network.create(egress)
         networks.append(egress)

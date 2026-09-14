@@ -36,13 +36,14 @@ class PiAgent:
     home = "/home/node/.pi/agent"
     transcripts = "/home/node/.pi/agent/sessions"
 
-    def __init__(self, provider: str):
+    def __init__(self, provider: str, *, host_home: Path = PI_HOME):
         if provider not in PROVIDERS:
             raise AgentHarnessSandboxError(
                 f"unknown provider {provider!r}: expected {', '.join(PROVIDERS)}"
             )
         self.provider = provider
         self.allow = resolve_allow(provider)
+        self.host_home = host_home
 
     def command(self, prompt: str, *, effort: str, model: str) -> list[str]:
         if effort not in EFFORT_LEVELS:
@@ -65,7 +66,7 @@ class PiAgent:
 
     def stage_auth(self, destination: Path) -> None:
         for name in AUTH_FILENAMES:
-            source = PI_HOME / name
+            source = self.host_home / name
             if not source.exists():
                 raise AgentHarnessSandboxError(f"{source} does not exist")
             shutil.copy(source, destination)

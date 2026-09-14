@@ -3,7 +3,16 @@ from unittest.mock import patch
 import pytest
 
 from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
-from agent_harness_sandbox.errors import AgentHarnessSandboxError
+
+
+class SandboxError(Exception):
+    """Stands in for the package's error type, a collaborator like any other."""
+
+
+@pytest.fixture(autouse=True)
+def sandbox_error():
+    with patch("agent_harness_sandbox.agents.ClaudeAgent.AgentHarnessSandboxError", SandboxError):
+        yield
 
 
 def flag(command: list[str], name: str) -> str:
@@ -14,8 +23,8 @@ MODEL = "claude-opus-5"
 
 
 @pytest.fixture
-def agent():
-    return ClaudeAgent()
+def agent(claude_home):
+    return ClaudeAgent(host_home=claude_home)
 
 
 @pytest.fixture
@@ -23,8 +32,7 @@ def claude_home(tmp_path):
     home = tmp_path / "claude-home"
     home.mkdir()
     (home / ".credentials.json").write_text('{"token": "t"}')
-    with patch("agent_harness_sandbox.agents.ClaudeAgent.CLAUDE_HOME", home):
-        yield home
+    return home
 
 
 @pytest.fixture
@@ -72,15 +80,15 @@ def describe_command():
             assert flag(agent.command("hi", effort=level, model=MODEL), "--effort") == level
 
         def it_rejects_an_unknown_level(agent):
-            with pytest.raises(AgentHarnessSandboxError, match="hihg"):
+            with pytest.raises(SandboxError, match="hihg"):
                 agent.command("hi", effort="hihg", model=MODEL)
 
         def it_lists_the_valid_levels(agent):
-            with pytest.raises(AgentHarnessSandboxError, match="low, medium, high, xhigh, max"):
+            with pytest.raises(SandboxError, match="low, medium, high, xhigh, max"):
                 agent.command("hi", effort="", model=MODEL)
 
         def it_rejects_a_differently_cased_level(agent):
-            with pytest.raises(AgentHarnessSandboxError):
+            with pytest.raises(SandboxError):
                 agent.command("hi", effort="High", model=MODEL)
 
     def describe_model():
@@ -136,5 +144,5 @@ def describe_stage_auth():
 
     def it_refuses_a_host_with_no_credentials(agent, claude_home, destination):
         (claude_home / ".credentials.json").unlink()
-        with pytest.raises(AgentHarnessSandboxError, match="does not exist"):
+        with pytest.raises(SandboxError, match="does not exist"):
             agent.stage_auth(destination)

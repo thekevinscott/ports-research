@@ -19,8 +19,8 @@ def docker():
 
 @pytest.fixture
 def docker_cli():
-    with patch("agent_harness_sandbox.utils.lockdown.docker_cli", autospec=True) as m:
-        yield m
+    with patch("agent_harness_sandbox.utils.lockdown.docker_utils", autospec=True) as m:
+        yield m.run
 
 
 @pytest.fixture

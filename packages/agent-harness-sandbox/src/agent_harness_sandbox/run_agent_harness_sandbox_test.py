@@ -3,8 +3,17 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from agent_harness_sandbox.errors import AgentHarnessSandboxError
 from agent_harness_sandbox.run_agent_harness_sandbox import run_agent_harness_sandbox
+
+class SandboxError(Exception):
+    """Stands in for the package's error type, a collaborator like any other."""
+
+
+@pytest.fixture(autouse=True)
+def sandbox_error():
+    with patch("agent_harness_sandbox.run_agent_harness_sandbox.AgentHarnessSandboxError", SandboxError):
+        yield
+
 
 AGENT = {
     "image": "an-agent:latest",
@@ -214,7 +223,7 @@ def describe_volumes():
 
     def it_refuses_a_source_that_is_not_there(run, tmp_path):
         """docker answers a missing source by creating it root-owned, which nobody wants."""
-        with pytest.raises(AgentHarnessSandboxError, match="does not exist"):
+        with pytest.raises(SandboxError, match="does not exist"):
             run(inputs={tmp_path / "gone": "/work/in"})
 
 

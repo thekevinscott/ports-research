@@ -20,6 +20,9 @@ class ClaudeAgent:
     transcripts = "/home/node/.claude/projects"
     allow = ("api.anthropic.com",)
 
+    def __init__(self, *, host_home: Path = CLAUDE_HOME) -> None:
+        self.host_home = host_home
+
     def command(self, prompt: str, *, effort: str, model: str) -> list[str]:
         if effort not in EFFORT_LEVELS:
             raise AgentHarnessSandboxError(
@@ -41,7 +44,7 @@ class ClaudeAgent:
         ]
 
     def stage_auth(self, destination: Path) -> None:
-        source = CLAUDE_HOME / CREDENTIALS_FILENAME
+        source = self.host_home / CREDENTIALS_FILENAME
         if not source.exists():
             raise AgentHarnessSandboxError(f"{source} does not exist")
         shutil.copy(source, destination)
