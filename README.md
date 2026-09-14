@@ -108,22 +108,16 @@ Claude Code. The sandbox's egress allowlist is `api.anthropic.com` only.
 
 ## Notes
 
-`notes/` holds session handoffs and dated analysis batches. Start with the
-newest `notes/SESSION_HANDOFF_*.md`; `SESSION_HANDOFF.md` precedes it, and
-`OPEN_ITEMS.md`, `SESSION_REPORT.md` and `MULTI_HARNESS_RESEARCH.md` sit
-alongside. Each core package and execute-test-suite has a handoff at
-`notes/HANDOFF-<package>.md`. `notes/FIDELITY_AUDIT_2026-09-07.md` audits the
-harness as an instrument.
+`notes/SANDBOX.md` is an account of the container isolation the porting agent
+runs under: what the sandbox mounts, what it withholds, and what it does not
+cover.
 
-`notes/analysis-2026-09-08/` is a scoring batch: `run_analysis.py` runs
-execute-test-suite, compare-ports and measure-complexity-curve over every run
-into `results/`, and `runs_hook.py` and `consensus_hook.py` are dirsql hooks
-that expose those results as tables. `run_analysis.py` reads its reference
-trees from the deleted `webapp/`, so it no longer runs as written.
+`papers/` at the repo root is a 741MB arXiv corpus, gitignored and rebuildable
+with `scripts/harvest`. The literature survey that reads it is not published
+with the repo.
 
-`papers/` at the repo root (gitignored; filled by `harvest_*.py`), root
-`SYNTHESIS.md` and `notes/LANDSCAPE.md` are a literature survey that predates
-the experiment.
+Session handoffs, audits and dated analysis batches are kept on disk under
+`internal/`, outside the published repo.
 
 ## Conventions
 

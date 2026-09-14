@@ -28,6 +28,6 @@ node_modules/
 # machine to take a screenshot; it must not come back into the tree.
 /webapp/
 
-# Session handoffs, audits and dated analysis batches. Kept on disk, out of
-# the published repo.
-/notes/
+# Session handoffs, audits, dated analysis batches and the literature survey.
+# Kept on disk, out of the published repo. Published notes live in /notes/.
+/internal/
