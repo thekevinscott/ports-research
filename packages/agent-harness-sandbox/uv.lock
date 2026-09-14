@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.14"
 
 [options]
-exclude-newer = "2026-09-05T17:47:06.137202285Z"
+exclude-newer = "2026-09-11T17:42:45.900364318Z"
 exclude-newer-span = "P3D"
 
 [[package]]
@@ -17,6 +17,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "coverage" },
     { name = "pytest" },
     { name = "pytest-describe" },
     { name = "testing-conventions" },
@@ -30,6 +31,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "coverage", specifier = ">=7.16.0" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-describe", specifier = ">=3.2.0" },
     { name = "testing-conventions", specifier = ">=0.0.104" },

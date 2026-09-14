@@ -26,6 +26,7 @@ agent-harness-sandbox = { path = "../agent-harness-sandbox", editable = true }
 
 [dependency-groups]
 dev = [
+    "coverage>=7.16.0",
     "pytest>=9.1.1",
     "pytest-describe>=3.2.0",
     "testing-conventions>=0.0.104",
