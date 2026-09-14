@@ -23,3 +23,17 @@ Integration and e2e drive the package's public entry point with inputs and asser
 - **A bug observed is a test owed.** Anything that misbehaved in a real run — a crash, a leak, a silent wrong result, an orphaned resource, a value quietly dropped — gets captured as a reproducible test. The test fails first on the current code, then the fix turns it green. A fix without a test proving the defect is a fix that comes back.
 - **Reproduce the mechanism, not the incident.** Test the condition that caused it — the teardown path that leaked, the branch that dropped the value — not the exact command that happened to trip it. If the trigger itself isn't coverable (a SIGKILL, a real outage), test the layer that should survive it and note in the test why the trigger is out of scope.
 - **One defect, one named test.** The name states the behavior being guaranteed, so a later reader knows what breaks if it goes red.
+
+<!-- testing-conventions:begin v1 hash=8976b69aa9b0 -->
+## Testing conventions
+
+This repository enforces [testing-conventions](https://thekevinscott.github.io/testing-conventions/) in CI. The contract:
+
+- Start every change with the docs update and red integration/e2e tests; CI witnesses them fail before the implementation lands.
+- Colocate a unit test with every source file, and mock every collaborator in unit tests.
+- Clear the coverage floor and kill the mutants on every line you touch.
+- Ship each capability at parity across Python, TypeScript, and Rust.
+- An exemption carries a written reason showing the isolation techniques you tried; near-zero is the bar.
+
+Machine-readable contract: https://thekevinscott.github.io/testing-conventions/llms.txt
+<!-- testing-conventions:end -->
