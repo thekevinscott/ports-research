@@ -1,9 +1,4 @@
 [[python.exempt]]
-path = "porting_harness/__init__.py"
-rules = ["colocated-test"]
-reason = "re-export barrel; run_porting_harness is tested in its own module"
-
-[[python.exempt]]
 path = "tests/fixtures/two_number_adder/source/python/tests/add_test.py"
 rules = ["unknown-tier"]
 reason = "not this package's test — it is the suite that ships inside the fixture package the harness ports, and the e2e assertions are about it being carried into the container intact"
