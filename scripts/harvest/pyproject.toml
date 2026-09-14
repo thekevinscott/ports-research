@@ -1,0 +1,26 @@
+[project]
+name = "harvest"
+version = "0.1.0"
+description = "Harvest the arXiv paper corpus behind the literature survey: download cited papers, title-resolve the rest, convert to markdown"
+readme = "README.md"
+authors = [
+    { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "click>=8.5.0",
+    "pymupdf4llm>=0.0.17",
+]
+
+[project.scripts]
+harvest = "harvest.cli:cli"
+
+[build-system]
+requires = ["uv_build>=0.10.11,<0.11.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-describe>=3.2.0",
+]
