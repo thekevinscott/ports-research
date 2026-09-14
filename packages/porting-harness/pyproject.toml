@@ -15,6 +15,10 @@ dependencies = [
 requires = ["uv_build>=0.10.11,<0.11.0"]
 build-backend = "uv_build"
 
+[tool.uv.build-backend]
+# Colocated tests are development code; keep them out of the wheel and sdist.
+source-exclude = ["*_test.py", "**/*_test.py"]
+
 [tool.uv.sources]
 agent-harness-sandbox = { path = "../agent-harness-sandbox", editable = true }
 
