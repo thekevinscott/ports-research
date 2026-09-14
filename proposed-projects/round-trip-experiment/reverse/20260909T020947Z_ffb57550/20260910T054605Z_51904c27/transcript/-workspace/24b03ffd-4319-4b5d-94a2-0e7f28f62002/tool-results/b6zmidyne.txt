@@ -1,0 +1,1689 @@
+===== ./GBNF.ts =====
+import { Graph } from './grammar-graph/graph.js';
+import { ParseState } from './grammar-graph/parse-state.js';
+import { buildRuleStack } from './grammar-parser/build-rule-stack.js';
+import { RulesBuilder } from './rules-builder/rules-builder.js';
+import { GrammarParseError } from './utils/errors/index.js';
+
+export const GBNF = (grammar: string, initialString = ''): ParseState => {
+  if (typeof grammar !== 'string') {
+    throw new Error('grammar must be a string');
+  }
+
+  if (typeof initialString !== 'string') {
+    throw new Error('input must be a string');
+  }
+
+  const { rules, symbolIds } = new RulesBuilder(grammar);
+  if (rules.length === 0) {
+    throw new GrammarParseError(grammar, 0, 'No rules were found');
+  }
+  const rootId = symbolIds.get('root');
+  if (rootId === undefined) {
+    throw new GrammarParseError(
+      grammar,
+      0,
+      "Grammar does not contain a 'root' symbol",
+    );
+  }
+
+  const stackedRules = rules.map((rule) => buildRuleStack(rule));
+  const graph = new Graph(grammar, stackedRules, rootId);
+  return new ParseState(graph, graph.add(initialString));
+};
+===== ./grammar-graph/colorize.ts =====
+export const Color = {
+  BLUE: '\x1b[34m',
+  CYAN: '\x1b[36m',
+  GREEN: '\x1b[32m',
+  RED: '\x1b[31m',
+  GRAY: '\x1b[90m',
+  YELLOW: '\x1b[33m',
+} as const;
+
+export const colorize = (text: string | number, color: string): string =>
+  `${color}${text}`;
+===== ./grammar-graph/get-input-as-code-points.ts =====
+import type { ValidInput } from './grammar-graph-types.js';
+
+export const getCodePoint = (char: string): number => {
+  const codePoint = char.codePointAt(0);
+  if (codePoint === undefined) {
+    throw new Error(`Could not get code point for character: ${char}`);
+  }
+  return codePoint;
+};
+
+export const getInputAsCodePoints = (src: ValidInput): number[] => {
+  if (typeof src === 'number') {
+    return [src];
+  }
+
+  if (Array.isArray(src)) {
+    for (const c of src) {
+      if (!Number.isInteger(c)) {
+        throw new Error(
+          `code_point must be an integer for ${c} if src is a list`,
+        );
+      }
+    }
+    return src;
+  }
+
+  if (typeof src === 'string') {
+    return Array.from(src).map(getCodePoint);
+  }
+
+  throw new Error(`Invalid input type: ${typeof src}`);
+};
+===== ./grammar-graph/get-parent-stack-id.ts =====
+import { Color } from './colorize.js';
+import type { Colorize } from './grammar-graph-types.js';
+import type { GraphPointer } from './graph-pointer.js';
+
+export const getParentStackId = (
+  pointer: GraphPointer,
+  col: Colorize,
+): string => {
+  const stackIds: string[] = [];
+  let parent: GraphPointer | undefined = pointer.parent;
+  while (parent) {
+    const { stackId, pathId, stepId } = parent.node.meta;
+    stackIds.push(`${stackId},${pathId},${stepId}`);
+    parent = parent.parent;
+  }
+  const arrow = col('<-', Color.GRAY);
+  return stackIds.map((stackId) => col(stackId, Color.RED)).join(arrow);
+};
+===== ./grammar-graph/get-serialized-rule-key.ts =====
+import type { UnresolvedRule } from './grammar-graph-types.js';
+import { RuleType } from './rule-type.js';
+import {
+  isRuleChar,
+  isRuleCharExclude,
+  isRuleEnd,
+  isRuleRef,
+} from './type-guards.js';
+
+const KEY_TRANSLATION = {
+  [RuleType.END]: 0,
+  [RuleType.CHAR]: 1,
+  [RuleType.CHAR_EXCLUDE]: 2,
+  [RuleType.REF]: 3,
+} as const;
+
+export const getSerializedRuleKey = (rule: UnresolvedRule): string => {
+  if (isRuleEnd(rule)) {
+    return `${KEY_TRANSLATION[RuleType.END]}`;
+  }
+
+  if (isRuleChar(rule)) {
+    return `${KEY_TRANSLATION[RuleType.CHAR]}-${JSON.stringify(rule.value)}`;
+  }
+
+  if (isRuleCharExclude(rule)) {
+    return `${KEY_TRANSLATION[RuleType.CHAR_EXCLUDE]}-${JSON.stringify(rule.value)}`;
+  }
+
+  if (isRuleRef(rule)) {
+    return `${KEY_TRANSLATION[RuleType.REF]}-${rule.value}`;
+  }
+
+  throw new Error(`Unknown rule type: ${JSON.stringify(rule)}`);
+};
+===== ./grammar-graph/grammar-graph-types.ts =====
+import { validateNonEmpty } from '../utils/validate-non-empty.js';
+import type { GraphPointer } from './graph-pointer.js';
+import type { Pointers } from './pointers.js';
+import type { RuleRef } from './rule-ref.js';
+import { RuleType } from './rule-type.js';
+
+export type Colorize = (text: string | number, color: string) => string;
+
+export interface PrintOpts {
+  pointers?: Pointers;
+  colorize: Colorize;
+  showPosition?: boolean;
+}
+
+export type Range = [number, number];
+
+export interface RuleChar {
+  type: RuleType.CHAR;
+  value: (number | Range)[];
+}
+
+export interface RuleCharExclude {
+  type: RuleType.CHAR_EXCLUDE;
+  value: (number | Range)[];
+}
+
+export interface RuleEnd {
+  type: RuleType.END;
+}
+
+export const ruleChar = (value: (number | Range)[]): RuleChar => ({
+  type: RuleType.CHAR,
+  value: validateNonEmpty([...value]),
+});
+
+export const ruleCharExclude = (
+  value: (number | Range)[],
+): RuleCharExclude => ({
+  type: RuleType.CHAR_EXCLUDE,
+  value: validateNonEmpty([...value]),
+});
+
+export const ruleEnd = (): RuleEnd => ({ type: RuleType.END });
+
+export type UnresolvedRule = RuleChar | RuleCharExclude | RuleRef | RuleEnd;
+
+// RuleRefs should never be exposed to the end user.
+export type ResolvedRule = RuleCharExclude | RuleChar | RuleEnd;
+
+// ValidInput can either be a string, or a number indicating a code point.
+// It CANNOT be a number representing a number; a number intended as input (like "8")
+// should be passed in as a string.
+export type ValidInput = string | number | number[];
+
+export type ResolvedGraphPointer = GraphPointer<ResolvedRule>;
+===== ./grammar-graph/graph-node.ts =====
+import type { PrintOpts, UnresolvedRule } from './grammar-graph-types.js';
+import { printGraphNode } from './print.js';
+
+export interface GraphNodeMeta {
+  stackId: number;
+  pathId: number;
+  stepId: number;
+}
+
+export class GraphNode<T extends UnresolvedRule = UnresolvedRule> {
+  // `rule` is readonly so that `GraphNode` stays covariant in `T`; a mutable
+  // property would make narrowed nodes unassignable to `GraphNode`.
+  readonly rule: T;
+  readonly next: GraphNode | undefined;
+  readonly meta: GraphNodeMeta;
+  #id: string | undefined = undefined;
+
+  constructor(
+    rule: T,
+    meta: GraphNodeMeta | undefined,
+    nextNode?: GraphNode | undefined,
+  ) {
+    this.rule = rule;
+    if (meta === undefined) {
+      throw new Error('Meta is undefined');
+    }
+    this.meta = meta;
+    this.next = nextNode;
+  }
+
+  get id(): string {
+    if (this.#id === undefined) {
+      this.#id = `${this.meta.stackId},${this.meta.pathId},${this.meta.stepId}`;
+    }
+    return this.#id;
+  }
+
+  print(opts: PrintOpts): string {
+    return printGraphNode(this)(opts);
+  }
+}
+===== ./grammar-graph/graph-pointer.ts =====
+import type {
+  PrintOpts,
+  ResolvedGraphPointer,
+  UnresolvedRule,
+} from './grammar-graph-types.js';
+import { GraphNode } from './graph-node.js';
+import { printGraphPointer } from './print.js';
+import {
+  isGraphPointerRuleChar,
+  isGraphPointerRuleCharExclude,
+  isGraphPointerRuleEnd,
+  isGraphPointerRuleRef,
+  isRuleEnd,
+} from './type-guards.js';
+
+export type GraphPointerKey = string;
+
+export class GraphPointer<T extends UnresolvedRule = UnresolvedRule> {
+  readonly node: GraphNode<T>;
+  readonly parent: GraphPointer | undefined;
+  readonly id: GraphPointerKey;
+  #valid: boolean | undefined = undefined;
+
+  constructor(node: GraphNode<T>, parent?: GraphPointer | undefined) {
+    if (node === undefined) {
+      throw new Error('Node is undefined');
+    }
+    this.node = node;
+    this.parent = parent;
+    this.id = parent ? `${parent.id}-${node.id}` : node.id;
+  }
+
+  get rule(): T {
+    return this.node.rule;
+  }
+
+  get valid(): boolean | undefined {
+    return this.#valid;
+  }
+
+  set valid(valid: boolean) {
+    this.#valid = valid;
+  }
+
+  print(opts: PrintOpts): string {
+    return printGraphPointer(this)(opts);
+  }
+
+  /**
+   * Resolve the graph pointer.
+   *
+   * @param resolved Whether the pointer has already been resolved.
+   */
+  *resolve(resolved = false): Generator<ResolvedGraphPointer> {
+    const pointer: GraphPointer = this;
+    if (isGraphPointerRuleRef(pointer)) {
+      if (resolved) {
+        if (!pointer.node.next) {
+          throw new Error(`No next node: ${pointer.node.id}`);
+        }
+        yield* new GraphPointer(pointer.node.next, pointer.parent).resolve();
+      } else {
+        for (const node of pointer.rule.nodes) {
+          yield* new GraphPointer(node, pointer).resolve();
+        }
+      }
+    } else if (isGraphPointerRuleEnd(pointer)) {
+      if (!pointer.parent) {
+        yield pointer;
+      } else {
+        yield* pointer.parent.resolve(true);
+      }
+    } else if (
+      isGraphPointerRuleChar(pointer) ||
+      isGraphPointerRuleCharExclude(pointer)
+    ) {
+      yield pointer;
+    } else {
+      throw new Error(`Unknown rule: ${JSON.stringify(pointer.node.rule)}`);
+    }
+  }
+
+  /**
+   * Fetch the next resolved graph pointer.
+   */
+  *fetchNext(): Generator<GraphPointer> {
+    // If this pointer is invalid, then we don't return any new pointers
+    if (!this.valid) {
+      return;
+    }
+
+    // If this pointer is an end node, we return the parent's next node.
+    // If no parent exists, we return nothing, since it's the end of the line.
+    if (isRuleEnd(this.node.rule)) {
+      if (this.parent) {
+        yield* this.parent.fetchNext();
+      }
+    } else {
+      if (!this.node.next) {
+        throw new Error(`No next node: ${this.node.id}`);
+      }
+      const pointer = new GraphPointer(this.node.next, this.parent);
+      yield* pointer.resolve();
+    }
+  }
+}
+===== ./grammar-graph/graph.ts =====
+import { InputParseError } from '../utils/errors/index.js';
+import { isPointInRange } from '../utils/is-point-in-range.js';
+import { colorize } from './colorize.js';
+import { getInputAsCodePoints } from './get-input-as-code-points.js';
+import { getSerializedRuleKey } from './get-serialized-rule-key.js';
+import type {
+  ResolvedGraphPointer,
+  UnresolvedRule,
+  ValidInput,
+} from './grammar-graph-types.js';
+import { GraphNode } from './graph-node.js';
+import { GraphPointer } from './graph-pointer.js';
+import { Pointers } from './pointers.js';
+import type { RuleRef } from './rule-ref.js';
+import {
+  isRange,
+  isRuleChar,
+  isRuleCharExclude,
+  isRuleEnd,
+  isRuleRef,
+} from './type-guards.js';
+
+export type RootNode = Map<number, GraphNode>;
+
+export class Graph {
+  #roots = new Map<number, RootNode>();
+  #rootNode: RootNode;
+  grammar: string;
+  previousCodePoints: number[] = [];
+
+  constructor(
+    grammar: string,
+    stackedRules: UnresolvedRule[][][],
+    rootId: number,
+  ) {
+    this.grammar = grammar;
+    const ruleRefs: RuleRef[] = [];
+    const uniqueRules = new Map<string, UnresolvedRule>();
+
+    for (let stackId = 0; stackId < stackedRules.length; stackId++) {
+      const stack = stackedRules[stackId];
+      const nodes: RootNode = new Map();
+      for (let pathId = 0; pathId < stack.length; pathId++) {
+        const path = stack[pathId];
+        let node: GraphNode | undefined = undefined;
+        for (let stepId = path.length - 1; stepId >= 0; stepId--) {
+          const nextNode: GraphNode | undefined = node;
+          const rule = stack[pathId][stepId];
+          uniqueRules.set(getSerializedRuleKey(rule), rule);
+          if (isRuleRef(rule)) {
+            ruleRefs.push(rule);
+          }
+          // rules coming in may be identical but have different references.
+          // here, we ensure we always use the same reference for an identical rule.
+          // this makes future comparisons easier.
+          const uniqueRule = uniqueRules.get(getSerializedRuleKey(rule));
+          if (uniqueRule === undefined) {
+            throw new Error('Could not get unique rule');
+          }
+          node = new GraphNode(
+            uniqueRule,
+            { stackId, pathId, stepId },
+            nextNode,
+          );
+        }
+
+        if (node === undefined) {
+          throw new Error('Could not get node');
+        }
+        nodes.set(pathId, node);
+      }
+      this.#roots.set(stackId, nodes);
+    }
+
+    const rootNode = this.#roots.get(rootId);
+    if (rootNode === undefined) {
+      throw new Error(`Root node not found for value: ${rootId}`);
+    }
+    this.#rootNode = rootNode;
+
+    for (const ruleRef of ruleRefs) {
+      ruleRef.nodes = new Set(this.#getRootNode(ruleRef.value).values());
+    }
+  }
+
+  #getRootNode(value: number): RootNode {
+    const rootNode = this.#roots.get(value);
+    if (rootNode === undefined) {
+      throw new Error(`Root node not found for value: ${value}`);
+    }
+    return rootNode;
+  }
+
+  #getInitialPointers(): Pointers {
+    const pointers = new Pointers();
+
+    const rootNode = this.#rootNode;
+    if (rootNode === undefined) {
+      throw new Error('Root node is not defined');
+    }
+
+    for (const [node, parent] of this.#fetchNodesForRootNode(rootNode)) {
+      const pointer = new GraphPointer(node, parent);
+      for (const resolvedPointer of this.#resolvePointer(pointer)) {
+        pointers.add(resolvedPointer);
+      }
+    }
+    return pointers;
+  }
+
+  #setValid(pointers: GraphPointer[], valid: boolean): void {
+    for (const pointer of pointers) {
+      pointer.valid = valid;
+    }
+  }
+
+  #parse(currentPointers: Pointers, codePoint: number): Pointers {
+    for (const [rule, graphPointers] of this.#iterateOverPointers(
+      currentPointers,
+    )) {
+      if (isRuleChar(rule)) {
+        let valid = false;
+        for (const possibleCodePoint of rule.value) {
+          if (valid === true) {
+            // already valid; nothing left to check
+          } else if (isRange(possibleCodePoint)) {
+            if (isPointInRange(codePoint, possibleCodePoint)) {
+              valid = true;
+            }
+          } else if (codePoint === possibleCodePoint) {
+            valid = true;
+          }
+        }
+        this.#setValid(graphPointers, valid);
+      } else if (isRuleCharExclude(rule)) {
+        let valid = true;
+        for (const possibleCodePoint of rule.value) {
+          if (valid === false) {
+            // already invalid; nothing left to check
+          } else if (isRange(possibleCodePoint)) {
+            if (isPointInRange(codePoint, possibleCodePoint)) {
+              valid = false;
+            }
+          } else if (codePoint === possibleCodePoint) {
+            valid = false;
+          }
+        }
+        this.#setValid(graphPointers, valid);
+      } else if (!isRuleEnd(rule)) {
+        throw new Error(`Unsupported rule: ${JSON.stringify(rule)}`);
+      }
+    }
+
+    // a pointer's id is the sum of its node's id and its parent's id chain.
+    // if two pointers share the same id, it means they point to the same node and have identical parent chains.
+    // for the purposes of walking the graph, we only need to keep one of them.
+    const nextPointers = new Pointers();
+    for (const currentPointer of currentPointers) {
+      for (const unresolvedNextPointer of currentPointer.fetchNext()) {
+        for (const resolvedNextPointer of this.#resolvePointer(
+          unresolvedNextPointer,
+        )) {
+          nextPointers.add(resolvedNextPointer);
+        }
+      }
+    }
+    return nextPointers;
+  }
+
+  *#resolvePointer(
+    unresolvedPointer: GraphPointer,
+  ): Generator<ResolvedGraphPointer> {
+    for (const resolvedPointer of unresolvedPointer.resolve()) {
+      if (isRuleRef(resolvedPointer.node.rule)) {
+        throw new Error(
+          'Encountered a reference rule when building pointers to the graph',
+        );
+      }
+      if (
+        isRuleEnd(resolvedPointer.node.rule) &&
+        resolvedPointer.parent !== undefined
+      ) {
+        throw new Error(
+          'Encountered an ending rule with a parent when building pointers to the graph',
+        );
+      }
+      yield resolvedPointer;
+    }
+  }
+
+  add(src: ValidInput, pointers?: Pointers): Pointers {
+    if (typeof src !== 'string') {
+      throw new Error('src must be a string in graph.add');
+    }
+    let currentPointers =
+      pointers && pointers.size > 0 ? pointers : this.#getInitialPointers();
+
+    const codePoints = getInputAsCodePoints(src);
+    for (const codePoint of codePoints) {
+      if (!Number.isInteger(codePoint)) {
+        throw new Error('code_point must be an integer!');
+      }
+    }
+
+    for (let codePointPos = 0; codePointPos < codePoints.length; codePointPos++) {
+      const codePoint = codePoints[codePointPos];
+      currentPointers = this.#parse(currentPointers, codePoint);
+      if (currentPointers.size === 0) {
+        throw new InputParseError(
+          codePoints,
+          codePointPos,
+          this.previousCodePoints,
+        );
+      }
+    }
+    this.previousCodePoints.push(...codePoints);
+    return currentPointers;
+  }
+
+  // generator that yields either the node, or if a reference rule, the referenced node
+  // we need this function, as distinct from leveraging the logic in GraphPointer,
+  // because that needs a rule ref with already defined nodes; this function is used to _set_ those nodes
+  *#fetchNodesForRootNode(
+    rootNodes: RootNode,
+    parent?: GraphPointer | undefined,
+  ): Generator<[GraphNode, GraphPointer | undefined]> {
+    for (const node of rootNodes.values()) {
+      const rule = node.rule;
+      if (isRuleRef(rule)) {
+        yield* this.#fetchNodesForRootNode(
+          this.#getRootNode(rule.value),
+          new GraphPointer(node, parent),
+        );
+      } else {
+        yield [node, parent];
+      }
+    }
+  }
+
+  print(pointers?: Pointers, colors = false): string {
+    const nodes: GraphNode[][] = [...this.#roots.values()].map((rootNode) => [
+      ...rootNode.values(),
+    ]);
+    const graphView: string[] = [];
+    for (const rootNode of nodes) {
+      for (const node of rootNode) {
+        graphView.push(
+          node.print({
+            pointers: pointers ?? new Pointers(),
+            showPosition: true,
+            colorize: colors ? colorize : (s) => `${s}`,
+          }),
+        );
+      }
+    }
+
+    return graphView.join('\n');
+  }
+
+  *#iterateOverPointers(
+    pointers: Pointers,
+  ): Generator<[UnresolvedRule, GraphPointer[]]> {
+    const seenRules = new Map<UnresolvedRule, GraphPointer[]>();
+    for (const pointer of pointers) {
+      const rule = pointer.rule;
+      if (isRuleRef(rule)) {
+        throw new Error('Encountered a reference rule in the graph');
+      }
+
+      let seenRule = seenRules.get(rule);
+      if (seenRule === undefined) {
+        seenRule = [];
+        seenRules.set(rule, seenRule);
+      }
+      seenRule.push(pointer);
+    }
+
+    yield* seenRules;
+  }
+}
+===== ./grammar-graph/parse-state.ts =====
+import type { ResolvedRule } from './grammar-graph-types.js';
+import type { Graph } from './graph.js';
+import type { Pointers } from './pointers.js';
+
+export class ParseState {
+  #graph: Graph;
+  #pointers: Pointers;
+
+  constructor(graph: Graph, pointers: Pointers) {
+    this.#graph = graph;
+    this.#pointers = pointers;
+  }
+
+  *[Symbol.iterator](): IterableIterator<ResolvedRule> {
+    yield* this.rules();
+  }
+
+  *rules(): Generator<ResolvedRule> {
+    const rules = new Set<string>();
+    for (const pointer of this.#pointers) {
+      const rule = pointer.rule as ResolvedRule;
+      const key = JSON.stringify(rule);
+      if (!rules.has(key)) {
+        rules.add(key);
+        yield rule;
+      }
+    }
+  }
+
+  add(text: string): ParseState {
+    if (typeof text !== 'string') {
+      throw new Error('input text must be of type string');
+    }
+    const pointers = this.#graph.add(text, this.#pointers);
+    return new ParseState(this.#graph, pointers);
+  }
+
+  get size(): number {
+    return [...this.rules()].length;
+  }
+
+  get grammar(): string {
+    return this.#graph.grammar;
+  }
+}
+===== ./grammar-graph/pointers.ts =====
+import type { GraphPointer, GraphPointerKey } from './graph-pointer.js';
+
+export class Pointers {
+  #pointers = new Map<GraphPointerKey, GraphPointer>();
+
+  constructor(...pointers: GraphPointer[]) {
+    for (const pointer of pointers) {
+      this.add(pointer);
+    }
+  }
+
+  add(pointer: GraphPointer): void {
+    this.#pointers.set(pointer.id, pointer);
+  }
+
+  *[Symbol.iterator](): IterableIterator<GraphPointer> {
+    yield* this.#pointers.values();
+  }
+
+  get size(): number {
+    return this.#pointers.size;
+  }
+}
+===== ./grammar-graph/print.ts =====
+import { Color } from './colorize.js';
+import type { PrintOpts } from './grammar-graph-types.js';
+import type { GraphNode } from './graph-node.js';
+import type { GraphPointer } from './graph-pointer.js';
+import { getParentStackId } from './get-parent-stack-id.js';
+import { isRange, isRuleChar, isRuleRef } from './type-guards.js';
+
+export const printGraphPointer =
+  (pointer: GraphPointer) =>
+  (opts: PrintOpts): string => {
+    const col = opts.colorize;
+    return col(`*${getParentStackId(pointer, col)}`, Color.RED);
+  };
+
+export const printGraphNode =
+  (node: GraphNode) =>
+  (opts: PrintOpts): string => {
+    const { pointers, colorize: col } = opts;
+    const showPosition = opts.showPosition ?? false;
+    const rule = node.rule;
+    const parts: string[] = [];
+    if (showPosition) {
+      parts.push(
+        col('{', Color.BLUE),
+        col(node.id, Color.GRAY),
+        col('}', Color.BLUE),
+      );
+    }
+
+    if (isRuleChar(rule)) {
+      parts.push(
+        col('[', Color.GRAY),
+        col(
+          rule.value
+            .map((v) =>
+              isRange(v)
+                ? v.map((val) => col(getChar(val), Color.YELLOW)).join('')
+                : getChar(v),
+            )
+            .join(''),
+          Color.YELLOW,
+        ),
+        col(']', Color.GRAY),
+      );
+    } else if (isRuleRef(rule)) {
+      parts.push(
+        col('Ref(', Color.GRAY),
+        col(rule.value, Color.GREEN),
+        col(')', Color.GRAY),
+      );
+    } else {
+      parts.push(col(rule.type, Color.YELLOW));
+    }
+
+    if (pointers && pointers.size > 0) {
+      for (const pointer of pointers) {
+        const pointerParts: string[] = [];
+        if (pointer.node === node) {
+          pointerParts.push(pointer.print(opts));
+        }
+
+        if (pointerParts.length > 0) {
+          parts.push(
+            col('[', Color.GRAY),
+            col(pointerParts.join(''), Color.YELLOW),
+            col(']', Color.GRAY),
+          );
+        }
+      }
+    }
+
+    const partsToReturn = [parts.join('')];
+    if (node.next) {
+      partsToReturn.push(node.next.print(opts));
+    }
+
+    return partsToReturn.join(col('-> ', Color.GRAY));
+  };
+
+export const getChar = (charCode: number): string => {
+  const char = String.fromCodePoint(charCode);
+  if (char === '\n') {
+    return '\\n';
+  }
+  return char;
+};
+===== ./grammar-graph/rule-ref.ts =====
+import type { GraphNode } from './graph-node.js';
+import { RuleType } from './rule-type.js';
+
+export class RuleRef {
+  readonly type = RuleType.REF;
+  value: number;
+  #nodes: Set<GraphNode> | undefined = undefined;
+
+  constructor(value: number) {
+    this.value = value;
+  }
+
+  get nodes(): Set<GraphNode> {
+    if (this.#nodes === undefined) {
+      throw new Error('Nodes are not set');
+    }
+    return this.#nodes;
+  }
+
+  set nodes(nodes: Set<GraphNode>) {
+    this.#nodes = nodes;
+  }
+}
+===== ./grammar-graph/rule-type.ts =====
+export enum RuleType {
+  CHAR = 'char',
+  CHAR_EXCLUDE = 'char_exclude',
+  REF = 'ref',
+  END = 'end',
+}
+===== ./grammar-graph/type-guards.ts =====
+import type {
+  Range,
+  RuleChar,
+  RuleCharExclude,
+  RuleEnd,
+  UnresolvedRule,
+} from './grammar-graph-types.js';
+import type { GraphPointer } from './graph-pointer.js';
+import type { RuleRef } from './rule-ref.js';
+import { RuleType } from './rule-type.js';
+
+export const isRule = (rule: unknown): rule is UnresolvedRule =>
+  typeof rule === 'object' &&
+  rule !== null &&
+  'type' in rule &&
+  [
+    RuleType.CHAR,
+    RuleType.CHAR_EXCLUDE,
+    RuleType.END,
+    RuleType.REF,
+  ].includes((rule as UnresolvedRule).type);
+
+export const isRuleRef = (rule?: UnresolvedRule): rule is RuleRef =>
+  rule?.type === RuleType.REF;
+
+export const isRuleEnd = (rule?: UnresolvedRule): rule is RuleEnd =>
+  rule?.type === RuleType.END;
+
+export const isRuleChar = (rule?: UnresolvedRule): rule is RuleChar =>
+  rule?.type === RuleType.CHAR;
+
+export const isRuleCharExclude = (
+  rule?: UnresolvedRule,
+): rule is RuleCharExclude => rule?.type === RuleType.CHAR_EXCLUDE;
+
+export const isRange = (input: unknown): input is Range =>
+  Array.isArray(input) &&
+  input.length === 2 &&
+  input.every((n) => Number.isInteger(n));
+
+export const isGraphPointerRuleRef = (
+  pointer: GraphPointer,
+): pointer is GraphPointer<RuleRef> => isRuleRef(pointer.rule);
+
+export const isGraphPointerRuleEnd = (
+  pointer: GraphPointer,
+): pointer is GraphPointer<RuleEnd> => isRuleEnd(pointer.rule);
+
+export const isGraphPointerRuleChar = (
+  pointer: GraphPointer,
+): pointer is GraphPointer<RuleChar> => isRuleChar(pointer.rule);
+
+export const isGraphPointerRuleCharExclude = (
+  pointer: GraphPointer,
+): pointer is GraphPointer<RuleCharExclude> => isRuleCharExclude(pointer.rule);
+===== ./grammar-parser/build-rule-stack.ts =====
+import type {
+  Range,
+  RuleChar,
+  RuleCharExclude,
+  UnresolvedRule,
+} from '../grammar-graph/grammar-graph-types.js';
+import {
+  ruleChar,
+  ruleCharExclude,
+  ruleEnd,
+} from '../grammar-graph/grammar-graph-types.js';
+import { RuleRef } from '../grammar-graph/rule-ref.js';
+import { isRange, isRuleEnd } from '../grammar-graph/type-guards.js';
+import {
+  isRuleDefAlt,
+  isRuleDefChar,
+  isRuleDefCharAlt,
+  isRuleDefCharNot,
+  isRuleDefCharRngUpper,
+  isRuleDefEnd,
+  isRuleDefRef,
+  type InternalRuleDef,
+  type InternalRuleDefChar,
+  type InternalRuleDefCharNot,
+} from '../rules-builder/rules-builder-types.js';
+
+export const makeCharRule = (
+  ruleDef: InternalRuleDefChar | InternalRuleDefCharNot,
+): RuleChar | RuleCharExclude => {
+  const value = ruleDef.value as (number | Range)[];
+  if (isRuleDefCharNot(ruleDef)) {
+    return ruleCharExclude(value);
+  }
+  if (isRuleDefChar(ruleDef)) {
+    return ruleChar(value);
+  }
+
+  throw new Error(
+    `Unsupported rule type for make_char_rule: ${JSON.stringify(ruleDef)}`,
+  );
+};
+
+export const buildRuleStack = (
+  linearRules: InternalRuleDef[],
+): UnresolvedRule[][] => {
+  let paths: UnresolvedRule[] = [];
+  const stack: UnresolvedRule[][] = [];
+  let idx = 0;
+
+  while (idx < linearRules.length) {
+    const ruleDef = linearRules[idx];
+    if (isRuleDefChar(ruleDef) || isRuleDefCharNot(ruleDef)) {
+      // this could be a single char, or a range, or a sequence of alts; we don't know until we step through it.
+      const charRule = makeCharRule(ruleDef);
+      idx += 1;
+      let rule: InternalRuleDef | undefined = linearRules[idx];
+      while (
+        idx < linearRules.length &&
+        (isRuleDefCharRngUpper(rule) || isRuleDefCharAlt(rule))
+      ) {
+        if (isRuleDefCharRngUpper(rule)) {
+          // previous rule value should be a number
+          const prevValue = charRule.value.pop();
+          if (isRange(prevValue)) {
+            throw new Error(
+              `Unexpected range, expected a number but got an array: ${JSON.stringify(prevValue)}`,
+            );
+          }
+          if (prevValue === undefined) {
+            throw new Error('Unexpected undefined value');
+          }
+
+          charRule.value.push([prevValue, rule.value]);
+        }
+        if (isRuleDefCharAlt(rule)) {
+          charRule.value.push(rule.value);
+        }
+        idx += 1;
+        rule = linearRules[idx];
+      }
+      paths.push(charRule);
+    } else {
+      if (isRuleDefAlt(ruleDef)) {
+        if (paths.length === 0) {
+          throw new Error('Encountered alt without anything before it');
+        }
+        paths.push(ruleEnd());
+        stack.push(paths);
+        paths = [];
+      } else if (isRuleDefEnd(ruleDef)) {
+        paths.push(ruleEnd());
+      } else if (isRuleDefRef(ruleDef)) {
+        paths.push(new RuleRef(ruleDef.value));
+      } else if (isRuleDefCharAlt(ruleDef)) {
+        throw new Error(
+          `Encountered char alt, should be handled by above block: ${JSON.stringify(ruleDef)}`,
+        );
+      } else {
+        throw new Error(`Unsupported rule type: ${JSON.stringify(ruleDef)}`);
+      }
+      idx += 1;
+    }
+  }
+
+  if (!isRuleEnd(paths[paths.length - 1])) {
+    paths.push(ruleEnd());
+  }
+
+  stack.push(paths);
+  return stack;
+};
+===== ./index.ts =====
+import { GBNF } from './GBNF.js';
+
+export default GBNF;
+export { GBNF };
+
+export { GrammarParseError, InputParseError } from './utils/errors/index.js';
+export { RuleType } from './grammar-graph/rule-type.js';
+export { RuleRef } from './grammar-graph/rule-ref.js';
+export { ParseState } from './grammar-graph/parse-state.js';
+export { Graph } from './grammar-graph/graph.js';
+export { GraphNode } from './grammar-graph/graph-node.js';
+export { GraphPointer } from './grammar-graph/graph-pointer.js';
+export { Pointers } from './grammar-graph/pointers.js';
+export { RulesBuilder } from './rules-builder/rules-builder.js';
+export { buildRuleStack } from './grammar-parser/build-rule-stack.js';
+export type {
+  Range,
+  ResolvedRule,
+  RuleChar,
+  RuleCharExclude,
+  RuleEnd,
+  UnresolvedRule,
+  ValidInput,
+} from './grammar-graph/grammar-graph-types.js';
+===== ./rules-builder/is-word-char.ts =====
+export const isWordChar = (c: string): boolean => /[a-zA-Z]/.test(c);
+===== ./rules-builder/parse-char.ts =====
+import { GrammarParseError } from '../utils/errors/index.js';
+
+const ESCAPE_SEQUENCES: Record<string, number> = {
+  t: 9,
+  r: 13,
+  n: 10,
+};
+
+const LITERAL_ESCAPES = ['"', '[', ']', '\\'];
+
+export const parseChar = (src: string, pos: number): [number, number] => {
+  if (pos >= src.length) {
+    throw new GrammarParseError(
+      src,
+      pos,
+      'Unexpected end of grammar input, failed to complete parse',
+    );
+  }
+
+  if (src[pos] === '\\') {
+    const next = src[pos + 1];
+    if (next === 'x') {
+      return [parseInt(src.slice(pos + 2, pos + 4), 16), 4];
+    }
+    if (next === 'u') {
+      return [parseInt(src.slice(pos + 2, pos + 6), 16), 6];
+    }
+    if (next === 'U') {
+      return [parseInt(src.slice(pos + 2, pos + 10), 16), 10];
+    }
+    if (next in ESCAPE_SEQUENCES) {
+      return [ESCAPE_SEQUENCES[next], 2];
+    }
+    if (LITERAL_ESCAPES.includes(next)) {
+      return [next.charCodeAt(0), 2];
+    }
+    throw new GrammarParseError(src, pos, `Unknown escape at ${src[pos]}`);
+  }
+
+  const codePoint = src.codePointAt(pos);
+  if (codePoint === undefined) {
+    throw new GrammarParseError(src, pos, `Unknown character at ${pos}`);
+  }
+  return [codePoint, 1];
+};
+===== ./rules-builder/parse-name.ts =====
+import { GrammarParseError } from '../utils/errors/index.js';
+import { isWordChar } from './is-word-char.js';
+
+export const PARSE_NAME_ERROR = 'Failed to find a valid name';
+
+export const VALID_NAME_SEPARATORS = ['-', '_'];
+
+export const parseName = (grammar: string, pos: number): string => {
+  let name = '';
+  while (
+    pos < grammar.length &&
+    (isWordChar(grammar[pos]) || VALID_NAME_SEPARATORS.includes(grammar[pos]))
+  ) {
+    name += grammar[pos];
+    pos += 1;
+  }
+  if (!name) {
+    throw new GrammarParseError(grammar, pos, PARSE_NAME_ERROR);
+  }
+  return name;
+};
+===== ./rules-builder/parse-space.ts =====
+export const parseSpace = (
+  src: string,
+  pos: number,
+  newlineOk: boolean,
+): number => {
+  while (
+    pos < src.length &&
+    (src[pos] === ' ' ||
+      src[pos] === '\t' ||
+      src[pos] === '#' ||
+      (newlineOk && (src[pos] === '\r' || src[pos] === '\n')))
+  ) {
+    if (src[pos] === '#') {
+      while (pos < src.length && src[pos] !== '\r' && src[pos] !== '\n') {
+        pos += 1;
+      }
+    } else {
+      pos += 1;
+    }
+  }
+  return pos;
+};
+===== ./rules-builder/rules-builder-types.ts =====
+export enum InternalRuleType {
+  CHAR = 'char',
+  CHAR_RNG_UPPER = 'char_rng_upper',
+  CHAR_ALT = 'char_alt',
+  CHAR_NOT = 'char_not',
+  REF = 'ref',
+  ALT = 'alt',
+  END = 'end',
+}
+
+export interface InternalRuleDefChar {
+  type: InternalRuleType.CHAR;
+  value: number[];
+}
+
+export interface InternalRuleDefCharNot {
+  type: InternalRuleType.CHAR_NOT;
+  value: number[];
+}
+
+export interface InternalRuleDefCharAlt {
+  type: InternalRuleType.CHAR_ALT;
+  value: number;
+}
+
+export interface InternalRuleDefCharRngUpper {
+  type: InternalRuleType.CHAR_RNG_UPPER;
+  value: number;
+}
+
+export interface InternalRuleDefReference {
+  type: InternalRuleType.REF;
+  value: number;
+}
+
+export interface InternalRuleDefAlt {
+  type: InternalRuleType.ALT;
+}
+
+export interface InternalRuleDefEnd {
+  type: InternalRuleType.END;
+}
+
+export type InternalRuleDef =
+  | InternalRuleDefChar
+  | InternalRuleDefCharNot
+  | InternalRuleDefCharAlt
+  | InternalRuleDefCharRngUpper
+  | InternalRuleDefReference
+  | InternalRuleDefAlt
+  | InternalRuleDefEnd;
+
+export type InternalRuleDefCharOrAltChar =
+  | InternalRuleDefChar
+  | InternalRuleDefCharAlt;
+
+export const internalRuleDefChar = (value: number[]): InternalRuleDefChar => ({
+  type: InternalRuleType.CHAR,
+  value: [...value],
+});
+
+export const internalRuleDefCharNot = (
+  value: number[],
+): InternalRuleDefCharNot => ({
+  type: InternalRuleType.CHAR_NOT,
+  value: [...value],
+});
+
+export const internalRuleDefCharAlt = (
+  value: number,
+): InternalRuleDefCharAlt => ({ type: InternalRuleType.CHAR_ALT, value });
+
+export const internalRuleDefCharRngUpper = (
+  value: number,
+): InternalRuleDefCharRngUpper => ({
+  type: InternalRuleType.CHAR_RNG_UPPER,
+  value,
+});
+
+export const internalRuleDefReference = (
+  value: number,
+): InternalRuleDefReference => ({ type: InternalRuleType.REF, value });
+
+export const internalRuleDefAlt = (): InternalRuleDefAlt => ({
+  type: InternalRuleType.ALT,
+});
+
+export const internalRuleDefEnd = (): InternalRuleDefEnd => ({
+  type: InternalRuleType.END,
+});
+
+export const isRuleDefAlt = (
+  rule?: InternalRuleDef,
+): rule is InternalRuleDefAlt => rule?.type === InternalRuleType.ALT;
+
+export const isRuleDefRef = (
+  rule?: InternalRuleDef,
+): rule is InternalRuleDefReference => rule?.type === InternalRuleType.REF;
+
+export const isRuleDefEnd = (
+  rule?: InternalRuleDef,
+): rule is InternalRuleDefEnd => rule?.type === InternalRuleType.END;
+
+export const isRuleDefChar = (
+  rule?: InternalRuleDef,
+): rule is InternalRuleDefChar => rule?.type === InternalRuleType.CHAR;
+
+export const isRuleDefCharNot = (
+  rule?: InternalRuleDef,
+): rule is InternalRuleDefCharNot => rule?.type === InternalRuleType.CHAR_NOT;
+
+export const isRuleDefCharAlt = (
+  rule?: InternalRuleDef,
+): rule is InternalRuleDefCharAlt => rule?.type === InternalRuleType.CHAR_ALT;
+
+export const isRuleDefCharRngUpper = (
+  rule?: InternalRuleDef,
+): rule is InternalRuleDefCharRngUpper =>
+  rule?.type === InternalRuleType.CHAR_RNG_UPPER;
+===== ./rules-builder/rules-builder.ts =====
+import { GrammarParseError } from '../utils/errors/index.js';
+import { isWordChar } from './is-word-char.js';
+import { parseChar } from './parse-char.js';
+import { parseName } from './parse-name.js';
+import { parseSpace } from './parse-space.js';
+import {
+  InternalRuleType,
+  internalRuleDefAlt,
+  internalRuleDefChar,
+  internalRuleDefCharAlt,
+  internalRuleDefCharNot,
+  internalRuleDefCharRngUpper,
+  internalRuleDefEnd,
+  internalRuleDefReference,
+  isRuleDefRef,
+  type InternalRuleDef,
+} from './rules-builder-types.js';
+import { SymbolIds } from './symbol-ids.js';
+
+export const getOutElements = (
+  typeOfRule: InternalRuleType,
+  startcharValue: number,
+): InternalRuleDef => {
+  switch (typeOfRule) {
+    case InternalRuleType.CHAR:
+      return internalRuleDefChar([startcharValue]);
+    case InternalRuleType.CHAR_NOT:
+      return internalRuleDefCharNot([startcharValue]);
+    case InternalRuleType.CHAR_RNG_UPPER:
+      return internalRuleDefCharRngUpper(startcharValue);
+    case InternalRuleType.ALT:
+      return internalRuleDefAlt();
+    case InternalRuleType.END:
+      return internalRuleDefEnd();
+    case InternalRuleType.CHAR_ALT:
+      return internalRuleDefCharAlt(startcharValue);
+    default:
+      throw new Error(`Invalid type: ${typeOfRule}`);
+  }
+};
+
+export class RulesBuilder {
+  pos = 0;
+  symbolIds = new SymbolIds();
+  rules: InternalRuleDef[][] = [];
+  src: string;
+  start: number;
+  timeLimit: number;
+
+  constructor(src: string, limit = 1000) {
+    this.src = src;
+    this.start = performance.now() / 1000;
+    this.timeLimit = limit;
+    this.parse(src);
+  }
+
+  parse(src: string): void {
+    this.pos = parseSpace(src, 0, true);
+    while (this.pos < src.length) {
+      this.parseRule(src);
+    }
+
+    // Validate the state to ensure that all rules are defined
+    for (const rule of this.rules) {
+      for (const elem of rule) {
+        if (isRuleDefRef(elem)) {
+          const ruleExists =
+            elem.value < this.rules.length && this.rules[elem.value].length > 0;
+          if (!ruleExists) {
+            const missingRuleName = this.symbolIds.reverseGet(elem.value);
+            let missingRulePos = this.symbolIds.getPos(missingRuleName);
+
+            // Skip over the ::= and any whitespace
+            while (
+              missingRulePos < src.length &&
+              (src[missingRulePos] === ':' ||
+                src[missingRulePos] === '=' ||
+                /\s/.test(src[missingRulePos]))
+            ) {
+              missingRulePos += 1;
+            }
+
+            throw new GrammarParseError(
+              src,
+              missingRulePos,
+              `Undefined rule identifier "${missingRuleName}"`,
+            );
+          }
+        }
+      }
+    }
+  }
+
+  parseRule(src: string): void {
+    const name = parseName(src, this.pos);
+    this.pos = parseSpace(src, this.pos + name.length, false);
+    const ruleId = this.getSymbolId(name, name.length);
+
+    this.pos = parseSpace(src, this.pos, true);
+    if (
+      !(
+        this.pos + 2 < src.length && // Ensure the position + 2 is within bounds
+        src[this.pos] === ':' &&
+        src[this.pos + 1] === ':' &&
+        src[this.pos + 2] === '='
+      )
+    ) {
+      throw new GrammarParseError(src, this.pos, `Expecting ::= at ${this.pos}`);
+    }
+    this.pos += 3;
+    this.pos = parseSpace(src, this.pos, true);
+
+    this.parseAlternates(name, ruleId);
+
+    // Check if this.pos is within the bounds of src before checking for a carriage return
+    if (this.pos < src.length && src[this.pos] === '\r') {
+      this.pos += src[this.pos + 1] === '\n' ? 2 : 1;
+    } else if (this.pos < src.length && src[this.pos] === '\n') {
+      this.pos += 1;
+    } else if (this.pos < src.length && src[this.pos]) {
+      throw new GrammarParseError(
+        src,
+        this.pos,
+        `Expecting newline or end at ${this.pos}`,
+      );
+    }
+    this.pos = parseSpace(src, this.pos, true);
+  }
+
+  getSymbolId(src: string, length: number): number {
+    const nextId = this.symbolIds.size;
+    const key = src.slice(0, length);
+    if (!this.symbolIds.has(key)) {
+      this.symbolIds.set(key, nextId, this.pos);
+    }
+    return this.symbolIds.get(key) as number;
+  }
+
+  generateSymbolId(baseName: string): number {
+    const nextId = this.symbolIds.size;
+    this.symbolIds.set(`${baseName}_${nextId}`, nextId, this.pos);
+    return nextId;
+  }
+
+  addRule(ruleId: number, rule: InternalRuleDef[]): void {
+    while (this.rules.length <= ruleId) {
+      this.rules.push([]);
+    }
+    this.rules[ruleId] = rule;
+  }
+
+  checkDuration(): void {
+    if (performance.now() / 1000 - this.start > this.timeLimit) {
+      throw new GrammarParseError(
+        this.src,
+        this.pos,
+        `Duration of ${this.timeLimit} exceeded`,
+      );
+    }
+  }
+
+  parseSequence(
+    ruleName: string,
+    outElements: InternalRuleDef[],
+    depth = 0,
+  ): void {
+    const isNested = depth !== 0;
+    const src = this.src;
+    let lastSymStart = outElements.length;
+
+    while (this.pos < src.length) {
+      if (src[this.pos] === '"') {
+        this.pos += 1;
+        lastSymStart = outElements.length;
+        while (src[this.pos] !== '"') {
+          this.checkDuration();
+          const [value, incPos] = parseChar(src, this.pos);
+          outElements.push(internalRuleDefChar([value]));
+          this.pos += incPos;
+        }
+        this.pos = parseSpace(src, this.pos + 1, isNested);
+      } else if (src[this.pos] === '[') {
+        this.pos += 1;
+        let startType = InternalRuleType.CHAR;
+        if (src[this.pos] === '^') {
+          this.pos += 1;
+          startType = InternalRuleType.CHAR_NOT;
+        }
+        lastSymStart = outElements.length;
+        while (src[this.pos] !== ']') {
+          this.checkDuration();
+          const type =
+            lastSymStart < outElements.length
+              ? InternalRuleType.CHAR_ALT
+              : startType;
+          const [startcharValue, incPos] = parseChar(src, this.pos);
+          this.pos += incPos;
+          outElements.push(getOutElements(type, startcharValue));
+
+          if (src[this.pos] === '-' && src[this.pos + 1] !== ']') {
+            this.pos += 1;
+            const [endcharValue, endIncPos] = parseChar(src, this.pos);
+            outElements.push(internalRuleDefCharRngUpper(endcharValue));
+            this.pos += endIncPos;
+          }
+        }
+        this.pos = parseSpace(src, this.pos + 1, isNested);
+      } else if (isWordChar(src[this.pos])) {
+        const name = parseName(src, this.pos);
+        const refRuleId = this.getSymbolId(name, name.length);
+        this.pos += name.length;
+        this.pos = parseSpace(src, this.pos, isNested);
+
+        lastSymStart = outElements.length;
+        outElements.push(internalRuleDefReference(refRuleId));
+      } else if (src[this.pos] === '(') {
+        this.pos = parseSpace(src, this.pos + 1, true);
+        const subRuleId = this.generateSymbolId(ruleName);
+        this.parseAlternates(ruleName, subRuleId, depth + 1);
+        lastSymStart = outElements.length;
+        outElements.push(internalRuleDefReference(subRuleId));
+        if (src[this.pos] !== ')') {
+          throw new GrammarParseError(
+            src,
+            this.pos,
+            `Expecting ')' at ${this.pos}`,
+          );
+        }
+        this.pos = parseSpace(src, this.pos + 1, isNested);
+      } else if ('*+?'.includes(src[this.pos])) {
+        if (lastSymStart === outElements.length) {
+          throw new GrammarParseError(
+            src,
+            this.pos,
+            `Expecting preceding item to */+/? at ${this.pos}`,
+          );
+        }
+        const subRuleId = this.generateSymbolId(ruleName);
+        const subRule = outElements.slice(lastSymStart);
+        if ('*+'.includes(src[this.pos])) {
+          subRule.push(internalRuleDefReference(subRuleId));
+        }
+        subRule.push(internalRuleDefAlt());
+        if (src[this.pos] === '+') {
+          subRule.push(...outElements.slice(lastSymStart));
+        }
+        subRule.push(internalRuleDefEnd());
+        this.addRule(subRuleId, subRule);
+        outElements.splice(
+          lastSymStart,
+          outElements.length - lastSymStart,
+          internalRuleDefReference(subRuleId),
+        );
+        this.pos = parseSpace(src, this.pos + 1, isNested);
+      } else {
+        break;
+      }
+    }
+  }
+
+  parseAlternates(ruleName: string, ruleId: number, depth = 0): void {
+    const src = this.src;
+    const rule: InternalRuleDef[] = [];
+    this.parseSequence(ruleName, rule, depth);
+    // Ensure that this.pos is within bounds before checking src[this.pos]
+    while (this.pos < src.length && src[this.pos] === '|') {
+      this.checkDuration();
+      rule.push(internalRuleDefAlt());
+      this.pos = parseSpace(src, this.pos + 1, true);
+      this.parseSequence(ruleName, rule, depth);
+    }
+    rule.push(internalRuleDefEnd());
+    this.addRule(ruleId, rule);
+  }
+}
+===== ./rules-builder/symbol-ids.ts =====
+export class SymbolIds {
+  #map = new Map<string, number>();
+  #pos = new Map<string, number>();
+  #reverseMap = new Map<number, string>();
+
+  *[Symbol.iterator](): IterableIterator<[string, number]> {
+    yield* this.#map;
+  }
+
+  entries(): IterableIterator<[string, number]> {
+    return this.#map.entries();
+  }
+
+  get size(): number {
+    return this.#map.size;
+  }
+
+  get(key: string): number | undefined {
+    return this.#map.get(key);
+  }
+
+  set(key: string, value: number, pos: number): void {
+    this.#map.set(key, value);
+    this.#reverseMap.set(value, key);
+    this.#pos.set(key, pos);
+  }
+
+  has(key: string): boolean {
+    return this.#map.has(key);
+  }
+
+  reverseGet(key: number): string {
+    const val = this.#reverseMap.get(key);
+    if (val === undefined) {
+      throw new Error(`SymbolIds does not contain value: ${key}`);
+    }
+    return val;
+  }
+
+  getPos(key: string): number {
+    const val = this.#pos.get(key);
+    if (val === undefined) {
+      throw new Error(`SymbolIds does not contain key: ${key}`);
+    }
+    return val;
+  }
+}
+===== ./utils/errors/build-error-position.ts =====
+import { getLengthInCodePoints } from './get-input-as-string.js';
+
+export const MAXIMUM_NUMBER_OF_ERROR_LINES_TO_SHOW = 3;
+
+export const buildErrorPosition = (src: string, pos: number): string[] => {
+  if (src === '') {
+    return ['No input provided'];
+  }
+  const lines = src.split('\n');
+  const srcLength = getLengthInCodePoints(src);
+
+  let lineIdx = 0;
+  while (
+    lines[lineIdx] &&
+    pos > getLengthInCodePoints(lines[lineIdx]) - 1 &&
+    pos < srcLength
+  ) {
+    pos -= getLengthInCodePoints(lines[lineIdx]);
+    lineIdx += 1;
+  }
+
+  const linesToShow = lines.slice(
+    Math.max(0, lineIdx - (MAXIMUM_NUMBER_OF_ERROR_LINES_TO_SHOW - 1)),
+    lineIdx + 1,
+  );
+
+  return [...linesToShow, `${' '.repeat(Math.max(0, pos))}^`];
+};
+===== ./utils/errors/errors-types.ts =====
+export type ValidInput = string | number | number[];
+===== ./utils/errors/get-input-as-string.ts =====
+import type { ValidInput } from './errors-types.js';
+
+export const getInputAsString = (src: ValidInput): string => {
+  if (typeof src === 'string') {
+    return src;
+  }
+  if (typeof src === 'number') {
+    return String.fromCodePoint(src);
+  }
+  return src.map((codePoint) => String.fromCodePoint(codePoint)).join('');
+};
+
+// Lengths and positions are counted in code points, matching how the parser
+// walks its input.
+export const getLengthInCodePoints = (src: string): number =>
+  Array.from(src).length;
+===== ./utils/errors/grammar-parse-error.ts =====
+import { buildErrorPosition } from './build-error-position.js';
+
+export const GRAMMAR_PARSER_ERROR_HEADER_MESSAGE = (reason: string): string =>
+  `Failed to parse grammar: ${reason}`;
+
+const buildMessage = (grammar: string, pos: number, reason: string): string =>
+  [
+    GRAMMAR_PARSER_ERROR_HEADER_MESSAGE(reason),
+    '',
+    ...buildErrorPosition(grammar, pos),
+  ].join('\n');
+
+export class GrammarParseError extends Error {
+  grammar: string;
+  pos: number;
+  reason: string;
+
+  constructor(grammar: string, pos: number, reason: string) {
+    super(buildMessage(grammar, pos, reason));
+    Object.setPrototypeOf(this, GrammarParseError.prototype);
+    this.name = 'GrammarParseError';
+    this.grammar = grammar;
+    this.pos = pos;
+    this.reason = reason;
+  }
+}
+===== ./utils/errors/index.ts =====
+export { GrammarParseError } from './grammar-parse-error.js';
+export { InputParseError } from './input-parse-error.js';
+export type { ValidInput } from './errors-types.js';
+===== ./utils/errors/input-parse-error.ts =====
+import { buildErrorPosition } from './build-error-position.js';
+import type { ValidInput } from './errors-types.js';
+import {
+  getInputAsString,
+  getLengthInCodePoints,
+} from './get-input-as-string.js';
+
+export const INPUT_PARSER_ERROR_HEADER_MESSAGE =
+  'Failed to parse input string:';
+
+const buildMessage = (
+  mostRecentInput: ValidInput,
+  pos: number,
+  previousInput: ValidInput,
+): string => {
+  const previous = getInputAsString(previousInput);
+  return [
+    INPUT_PARSER_ERROR_HEADER_MESSAGE,
+    '',
+    ...buildErrorPosition(
+      `${previous}${getInputAsString(mostRecentInput)}`,
+      pos + getLengthInCodePoints(previous),
+    ),
+  ].join('\n');
+};
+
+export class InputParseError extends Error {
+  mostRecentInput: ValidInput;
+  pos: number;
+  previousInput: ValidInput;
+
+  constructor(
+    mostRecentInput: ValidInput,
+    pos: number,
+    previousInput: ValidInput = '',
+  ) {
+    super(buildMessage(mostRecentInput, pos, previousInput));
+    Object.setPrototypeOf(this, InputParseError.prototype);
+    this.name = 'InputParseError';
+    this.mostRecentInput = mostRecentInput;
+    this.pos = pos;
+    this.previousInput = previousInput;
+  }
+
+  get src(): string {
+    return `${getInputAsString(this.previousInput)}${getInputAsString(this.mostRecentInput)}`;
+  }
+
+  get errorForMostRecentInput(): string {
+    return [
+      INPUT_PARSER_ERROR_HEADER_MESSAGE,
+      '',
+      ...buildErrorPosition(getInputAsString(this.mostRecentInput), this.pos),
+    ].join('\n');
+  }
+}
+===== ./utils/is-point-in-range.ts =====
+import type { Range } from '../grammar-graph/grammar-graph-types.js';
+
+export const isPointInRange = (point: number, givenRange: Range): boolean => {
+  if (!Number.isInteger(point)) {
+    throw new Error('point must be an integer');
+  }
+  return point >= givenRange[0] && point <= givenRange[1];
+};
+===== ./utils/validate-non-empty.ts =====
+export const validateNonEmpty = <T>(value: T[]): T[] => {
+  if (!value.length) {
+    throw new Error('Value cannot be empty.');
+  }
+  return value;
+};

@@ -1,0 +1,44 @@
+NOTICE    Sep 10 06:22:01.493 [1]: Initializing tinyproxy ...
+NOTICE    Sep 10 06:22:01.493 [1]: Reloading config file (/etc/tinyproxy/tinyproxy.conf)
+INFO      Sep 10 06:22:01.493 [1]: Added address [0.0.0.0] to listen addresses.
+INFO      Sep 10 06:22:01.493 [1]: Adding Port [443] to the list allowed by CONNECT
+NOTICE    Sep 10 06:22:01.493 [1]: Reloading config file finished
+INFO      Sep 10 06:22:01.493 [1]: listen_sock called with addr = '0.0.0.0'
+INFO      Sep 10 06:22:01.493 [1]: trying to listen on host[0.0.0.0], family[2], socktype[1], proto[6]
+INFO      Sep 10 06:22:01.493 [1]: listening on fd [3]
+INFO      Sep 10 06:22:01.493 [1]: Not running as root, so not changing UID/GID.
+INFO      Sep 10 06:22:01.493 [1]: Setting the various signals.
+INFO      Sep 10 06:22:01.493 [1]: Starting main loop. Accepting connections.
+CONNECT   Sep 10 06:22:01.783 [1]: Connect (file descriptor 4): 172.20.0.3
+CONNECT   Sep 10 06:22:01.783 [1]: Request (file descriptor 4): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Sep 10 06:22:01.783 [1]: No upstream proxy for api.anthropic.com
+INFO      Sep 10 06:22:01.783 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Sep 10 06:22:01.784 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Sep 10 06:22:01.790 [1]: Established connection to host "api.anthropic.com" using file descriptor 5.
+INFO      Sep 10 06:22:01.790 [1]: Not sending client headers to remote machine
+CONNECT   Sep 10 06:22:01.821 [1]: Connect (file descriptor 6): 172.20.0.3
+CONNECT   Sep 10 06:22:01.823 [1]: Request (file descriptor 6): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Sep 10 06:22:01.823 [1]: No upstream proxy for api.anthropic.com
+INFO      Sep 10 06:22:01.823 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Sep 10 06:22:01.823 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Sep 10 06:22:01.828 [1]: Established connection to host "api.anthropic.com" using file descriptor 7.
+INFO      Sep 10 06:22:01.828 [1]: Not sending client headers to remote machine
+CONNECT   Sep 10 06:22:01.874 [1]: Connect (file descriptor 8): 172.20.0.3
+CONNECT   Sep 10 06:22:01.874 [1]: Request (file descriptor 8): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Sep 10 06:22:01.874 [1]: No upstream proxy for api.anthropic.com
+INFO      Sep 10 06:22:01.874 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Sep 10 06:22:01.874 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Sep 10 06:22:01.880 [1]: Established connection to host "api.anthropic.com" using file descriptor 9.
+INFO      Sep 10 06:22:01.880 [1]: Not sending client headers to remote machine
+INFO      Sep 10 06:22:02.042 [1]: Closed connection between local client (fd:6) and remote client (fd:7)
+CONNECT   Sep 10 06:22:02.056 [1]: Connect (file descriptor 6): 172.20.0.3
+CONNECT   Sep 10 06:22:02.056 [1]: Request (file descriptor 6): CONNECT mcp-proxy.anthropic.com:443 HTTP/1.1
+NOTICE    Sep 10 06:22:02.056 [1]: Proxying refused on filtered domain "mcp-proxy.anthropic.com"
+CONNECT   Sep 10 06:22:02.056 [1]: Connect (file descriptor 7): 172.20.0.3
+CONNECT   Sep 10 06:22:02.056 [1]: Connect (file descriptor 10): 172.20.0.3
+CONNECT   Sep 10 06:22:02.056 [1]: Request (file descriptor 7): CONNECT mcp-proxy.anthropic.com:443 HTTP/1.1
+CONNECT   Sep 10 06:22:02.056 [1]: Request (file descriptor 10): CONNECT mcp-proxy.anthropic.com:443 HTTP/1.1
+NOTICE    Sep 10 06:22:02.056 [1]: Proxying refused on filtered domain "mcp-proxy.anthropic.com"
+NOTICE    Sep 10 06:22:02.056 [1]: Proxying refused on filtered domain "mcp-proxy.anthropic.com"
+INFO      Sep 10 06:22:02.063 [1]: Closed connection between local client (fd:4) and remote client (fd:5)
+INFO      Sep 10 06:31:34.405 [1]: Closed connection between local client (fd:8) and remote client (fd:9)
