@@ -1,9 +1,1 @@
-[[python.exempt]]
-path = "generate_embedding/__init__.py"
-rules = ["colocated-test"]
-reason = "re-export barrel; embed_file and write_vector are tested in their own modules"
 
-[[python.exempt]]
-path = "generate_embedding/cli_test.py"
-rules = ["unmocked-collaborator", "no-first-party-patch"]
-reason = "click's CliRunner is the harness driving the unit; embed_file talks to a real network endpoint, so it is patched at its cli module import binding to test argument wiring and the --output branch without a live server"
