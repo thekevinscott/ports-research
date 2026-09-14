@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from agent_harness_sandbox import Agent, run_agent_harness_sandbox
+from agent_harness_sandbox.agents.agent import Agent
+from agent_harness_sandbox.run_agent_harness_sandbox import run_agent_harness_sandbox
 
 from .render_prompt import render_prompt
 

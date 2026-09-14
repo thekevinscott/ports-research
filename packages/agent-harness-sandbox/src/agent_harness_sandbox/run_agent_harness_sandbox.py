@@ -3,7 +3,7 @@ from tempfile import TemporaryDirectory
 
 from python_on_whales import docker
 
-from .agents import Agent
+from .agents.agent import Agent
 from .config import (
     BASE_DOCKERFILE,
     BASE_IMAGE,

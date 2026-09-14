@@ -2,12 +2,10 @@ from pathlib import Path
 
 import pytest
 
-from agent_harness_sandbox import (
-    AgentHarnessSandboxError,
-    ClaudeAgent,
-    PiAgent,
-    run_agent_harness_sandbox,
-)
+from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
+from agent_harness_sandbox.agents.PiAgent import PiAgent
+from agent_harness_sandbox.errors import AgentHarnessSandboxError
+from agent_harness_sandbox.run_agent_harness_sandbox import run_agent_harness_sandbox
 
 BUILDS = [
     "agent-harness-sandbox-base:latest",
