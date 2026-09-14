@@ -1,0 +1,26 @@
+[project]
+name = "porting-harness"
+version = "0.1.0"
+description = "Runs one sandboxed porting pass through the agent-harness-sandbox container"
+readme = "README.md"
+authors = [
+    { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "agent-harness-sandbox",
+]
+
+[build-system]
+requires = ["uv_build>=0.10.11,<0.11.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+agent-harness-sandbox = { path = "../agent-harness-sandbox", editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-describe>=3.2.0",
+    "testing-conventions>=0.0.104",
+]
