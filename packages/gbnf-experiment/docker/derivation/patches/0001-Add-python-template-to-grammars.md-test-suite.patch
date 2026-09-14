@@ -1,0 +1,42 @@
+From 077855bf0883bd661dc4800072428b5af8e29d27 Mon Sep 17 00:00:00 2001
+From: thekevinbot <248217931+thekevinbot@users.noreply.github.com>
+Date: Fri, 4 Sep 2026 16:55:18 -0400
+Subject: [PATCH] Add python template to grammars.md test suite
+
+---
+ packages/gbnf/test/iteration/grammars.md | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/packages/gbnf/test/iteration/grammars.md b/packages/gbnf/test/iteration/grammars.md
+index 4c1cc7d..72b2ac8 100644
+--- a/packages/gbnf/test/iteration/grammars.md
++++ b/packages/gbnf/test/iteration/grammars.md
+@@ -98,3 +98,26 @@ test.for($cases_three as [
+ });
+ ```
+
++```python
++def _load_cases():
++    import json
++    from pathlib import Path
++
++    grammars_dir = Path(__file__).parent / "grammars"
++    cases = []
++    for grammar_path in sorted(grammars_dir.glob("*.gbnf")):
++        json_path = grammar_path.with_suffix(".json")
++        grammar = grammar_path.read_text()
++        for test_case in json.loads(json_path.read_text()):
++            cases.append((grammar_path.stem, test_case, grammar))
++    if not cases:
++        raise Exception("No grammar test cases found")
++    return cases
++
++@pytest.mark.parametrize(("key", "test_case", "grammar"), _load_cases())
++def test_it_parses_a_known_valid_grammar(key, test_case, grammar):
++    state = GBNF(grammar)
++    for char in test_case:
++        state = state.add(char)
++```
++
+--
+2.43.0
