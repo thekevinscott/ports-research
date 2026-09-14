@@ -1,0 +1,44 @@
+[[python.exempt]]
+path = "agent_harness_sandbox/__init__.py"
+rules = ["colocated-test"]
+reason = "re-export barrel"
+
+[[python.exempt]]
+path = "agent_harness_sandbox/utils/__init__.py"
+rules = ["colocated-test"]
+reason = "re-export barrel"
+
+[[python.exempt]]
+path = "agent_harness_sandbox/config.py"
+rules = ["colocated-test"]
+reason = "literal constants; a colocated test could only restate them"
+
+[[python.exempt]]
+path = "agent_harness_sandbox/agent.py"
+rules = ["colocated-test"]
+reason = "a typing.Protocol declares no behaviour; a colocated test could only restate the signatures"
+
+[[python.exempt]]
+path = "agent_harness_sandbox/ClaudeAgent_test.py"
+rules = ["unmocked-collaborator"]
+reason = "AgentHarnessSandboxError is imported only to assert the raise; a mocked exception type cannot be caught"
+
+[[python.exempt]]
+path = "agent_harness_sandbox/PiAgent_test.py"
+rules = ["unmocked-collaborator"]
+reason = "AgentHarnessSandboxError is imported only to assert the raise; a mocked exception type cannot be caught"
+
+[[python.exempt]]
+path = "agent_harness_sandbox/resolve_agent_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the agents are the lookup table's payload, so a mocked one would leave nothing to resolve, and AgentHarnessSandboxError is imported only to assert the raise"
+
+[[python.exempt]]
+path = "agent_harness_sandbox/run_agent_harness_sandbox_test.py"
+rules = ["unmocked-collaborator"]
+reason = "AgentHarnessSandboxError is imported only to assert the raise; a mocked exception type cannot be caught"
+
+[[python.exempt]]
+path = "tests/integration/conftest.py"
+rules = ["no-first-party-patch", "no-constant-patch"]
+reason = "docker and docker_cli are the container runtime, patched at their first-party use-site bindings because the module-level import binds them before a test can reach python_on_whales; each agent's host home is read at import time, so overriding it any other way means a required home parameter on the public entry point that every caller has to thread"

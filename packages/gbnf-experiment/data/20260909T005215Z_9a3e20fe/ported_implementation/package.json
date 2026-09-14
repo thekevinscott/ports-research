@@ -1,0 +1,14 @@
+{
+  "name": "gbnf",
+  "version": "0.0.30",
+  "description": "A library for parsing GBNF grammars",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.6.0"
+  }
+}

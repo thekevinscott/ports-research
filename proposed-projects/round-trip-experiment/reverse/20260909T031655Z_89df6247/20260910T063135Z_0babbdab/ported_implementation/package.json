@@ -1,0 +1,9 @@
+{
+  "name": "gbnf",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "vitest run --config vitest.config.unit.ts"
+  }
+}

@@ -1,0 +1,28 @@
+[project]
+name = "analysis"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "altair>=6.2.2",
+    "cachetta>=0.7.0",
+    "dirsql>=0.4.39",
+    "gbnf-experiment",
+    "marimo>=0.24.0",
+    "polars>=1.44.1",
+    "pygount>=3.2.0",
+    "scikit-learn>=1.9.0",
+    "scipy>=1.18.1",
+    "vl-convert-python>=1.9.0.post1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-describe>=3.2.0",
+]
+
+[tool.marimo.runtime]
+watcher_on_save = "autorun"
+
+[tool.uv.sources]
+gbnf-experiment = { path = "../packages/gbnf-experiment", editable = true }

@@ -1,0 +1,114 @@
+{
+  "test_it_parses_a_grammar": {
+    "test": "test_it_parses_a_grammar",
+    "argnames": [
+      "grammar"
+    ],
+    "argvalues": [
+      [
+        "root ::= \"foo\""
+      ],
+      [
+        "root ::= \"foo\" | \"bar\""
+      ],
+      [
+        "root ::= (\"foo\" | \"bar\")"
+      ],
+      [
+        "root ::= (\"foo\" | \"bar\")?"
+      ],
+      [
+        "root ::= (\"foo\" | \"bar\")*"
+      ],
+      [
+        "root ::= (\"foo\" | \"bar\")+"
+      ],
+      [
+        "root ::= [a-z]"
+      ],
+      [
+        "root ::= [a-zA-Z]"
+      ],
+      [
+        "root ::= [a-zA-Z0-9]"
+      ],
+      [
+        "root ::= [a-zA-Z0-9]*"
+      ],
+      [
+        "root ::= [a-zA-Z0-9]?"
+      ],
+      [
+        "root ::= [a-z]+"
+      ],
+      [
+        "root ::= [a-zA-Z0-9]+"
+      ],
+      [
+        "root ::= ([a-zA-Z0-9])*"
+      ],
+      [
+        "root ::= ([a-zA-Z0-9])?"
+      ],
+      [
+        "root ::= ([a-zA-Z0-9])+"
+      ],
+      [
+        "\n  root ::= foo\n  foo ::= \"foo\""
+      ],
+      [
+        "\n  root ::= foo\n  foo ::= \"foo\" | \"bar\" | ([a-z])?\n  "
+      ]
+    ]
+  },
+  "test_it_reports_an_error_for_an_invalid_grammar": {
+    "test": "test_it_reports_an_error_for_an_invalid_grammar",
+    "argnames": [
+      "grammar",
+      "error_pos",
+      "error_reason"
+    ],
+    "argvalues": [
+      [
+        "",
+        0,
+        "No rules were found"
+      ],
+      [
+        "root = \"foo\"",
+        5,
+        "Expecting ::= at 5"
+      ],
+      [
+        "root ::= foo\nfoo := \"foo\"\n  ",
+        17,
+        "Expecting ::= at 17"
+      ],
+      [
+        "root ::= foo",
+        9,
+        "Undefined rule identifier \"foo\""
+      ],
+      [
+        "root ::= foo\nbar ::= \"bar\"\n  ",
+        9,
+        "Undefined rule identifier \"foo\""
+      ],
+      [
+        "root ::= foo\nfoo ::= baz\nbar ::= \"bar\"\n  ",
+        21,
+        "Undefined rule identifier \"baz\""
+      ],
+      [
+        "root ::= foo ::= bar",
+        13,
+        "Expecting newline or end at 13"
+      ],
+      [
+        "root ::= ([a-z]\nfoo ::= \"foo\"\n  ",
+        20,
+        "Expecting ')' at 20"
+      ]
+    ]
+  }
+}

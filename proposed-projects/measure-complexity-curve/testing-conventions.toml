@@ -1,0 +1,14 @@
+[[python.exempt]]
+path = "measure_complexity_curve/__init__.py"
+rules = ["colocated-test"]
+reason = "re-export barrel; run_complexity_curve is tested in its own module"
+
+[[python.exempt]]
+path = "measure_complexity_curve/cli_test.py"
+rules = ["unmocked-collaborator"]
+reason = "click's CliRunner is the harness driving the unit"
+
+[[python.exempt]]
+path = "measure_complexity_curve/nested_literal_test.py"
+rules = ["unmocked-collaborator"]
+reason = "random.Random is a plain value type, constructed only to pass in as nested_literal's own injected rng argument; mocking it would defeat testing determinism against a real seeded generator"

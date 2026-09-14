@@ -1,0 +1,874 @@
+============================== graph_pointer_test.cpython-314-pytest-9.1.1.pyc
+
+--- def <module>(line 1) args=[]
+  L1:
+      LOAD_SMALL_INT             0
+      LOAD_CONST                 ('annotations',)
+      IMPORT_NAME                __future__
+      IMPORT_FROM                annotations
+      STORE_NAME                 annotations
+      POP_TOP                    
+  L3:
+      LOAD_SMALL_INT             0
+      LOAD_CONST                 None
+      IMPORT_NAME                builtins
+  L5:
+      LOAD_SMALL_INT             0
+      LOAD_CONST                 None
+      IMPORT_NAME                pytest
+      STORE_NAME                 pytest
+  L7:
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 ('RuleChar', 'RuleCharExclude', 'RuleEnd')
+      IMPORT_NAME                grammar_graph_types
+      IMPORT_FROM                RuleChar
+      STORE_NAME                 RuleChar
+      IMPORT_FROM                RuleCharExclude
+      STORE_NAME                 RuleCharExclude
+      IMPORT_FROM                RuleEnd
+      STORE_NAME                 RuleEnd
+      POP_TOP                    
+  L12:
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 ('GraphNode',)
+      IMPORT_NAME                graph_node
+      IMPORT_FROM                GraphNode
+      STORE_NAME                 GraphNode
+      POP_TOP                    
+  L13:
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 ('GraphPointer',)
+      IMPORT_NAME                graph_pointer
+      IMPORT_FROM                GraphPointer
+      STORE_NAME                 GraphPointer
+      POP_TOP                    
+  L14:
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 ('is_graph_pointer_rule_char', 'is_graph_pointer_rule_end')
+      IMPORT_NAME                type_guards
+      IMPORT_FROM                is_graph_pointer_rule_char
+      STORE_NAME                 is_graph_pointer_rule_char
+      IMPORT_FROM                is_graph_pointer_rule_end
+      STORE_NAME                 is_graph_pointer_rule_end
+      POP_TOP                    
+  L20:
+      LOAD_NAME                  pytest
+      LOAD_ATTR                  fixture
+      LOAD_CONST                 True
+      LOAD_CONST                 ('autouse',)
+      CALL_KW                    1
+  L21:
+      LOAD_CONST                 <code mock_is_graph_pointer_rule_ref>
+      MAKE_FUNCTION              
+  L20:
+      CALL                       0
+  L21:
+      STORE_NAME                 mock_is_graph_pointer_rule_ref
+  L28:
+      LOAD_NAME                  pytest
+      LOAD_ATTR                  fixture
+      LOAD_CONST                 True
+      LOAD_CONST                 ('autouse',)
+      CALL_KW                    1
+  L29:
+      LOAD_CONST                 <code mock_is_graph_pointer_rule_end>
+      MAKE_FUNCTION              
+  L28:
+      CALL                       0
+  L29:
+      STORE_NAME                 mock_is_graph_pointer_rule_end
+  L36:
+      LOAD_NAME                  pytest
+      LOAD_ATTR                  fixture
+      LOAD_CONST                 True
+      LOAD_CONST                 ('autouse',)
+      CALL_KW                    1
+  L37:
+      LOAD_CONST                 <code mock_is_graph_pointer_rule_char>
+      MAKE_FUNCTION              
+  L36:
+      CALL                       0
+  L37:
+      STORE_NAME                 mock_is_graph_pointer_rule_char
+  L45:
+      LOAD_NAME                  pytest
+      LOAD_ATTR                  fixture
+      LOAD_CONST                 True
+      LOAD_CONST                 ('autouse',)
+      CALL_KW                    1
+  L46:
+      LOAD_CONST                 <code mock_is_graph_pointer_rule_char_exclude>
+      MAKE_FUNCTION              
+  L45:
+      CALL                       0
+  L46:
+      STORE_NAME                 mock_is_graph_pointer_rule_char_exclude
+  L54:
+      LOAD_CONST                 <code describe_graph_pointer>
+      MAKE_FUNCTION              
+      STORE_NAME                 describe_graph_pointer
+      LOAD_CONST                 None
+      RETURN_VALUE               
+
+--- <module>.def mock_is_graph_pointer_rule_ref(line 20) args=[]
+  L20:
+      RETURN_GENERATOR           
+      POP_TOP                    
+  L22:
+      LOAD_GLOBAL                patch + NULL
+  L23:
+      LOAD_CONST                 'gbnf.grammar_graph.graph_pointer.is_graph_pointer_rule_ref'
+      LOAD_CONST                 False
+  L22:
+      LOAD_CONST                 ('return_value',)
+      CALL_KW                    2
+      COPY                       1
+      LOAD_SPECIAL               __exit__
+      SWAP                       2
+      SWAP                       3
+      LOAD_SPECIAL               __enter__
+      CALL                       0
+  L24:
+      STORE_FAST                 mock
+  L25:
+      LOAD_FAST_BORROW           mock
+      YIELD_VALUE                0
+      POP_TOP                    
+  L22:
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      CALL                       3
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      PUSH_EXC_INFO              
+      WITH_EXCEPT_START          
+      RERAISE                    2
+      POP_TOP                    
+      POP_EXCEPT                 
+      POP_TOP                    
+      POP_TOP                    
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      COPY                       3
+      POP_EXCEPT                 
+      RERAISE                    1
+      CALL_INTRINSIC_1           INTRINSIC_STOPITERATION_ERROR
+      RERAISE                    1
+
+--- <module>.def mock_is_graph_pointer_rule_end(line 28) args=[]
+  L28:
+      RETURN_GENERATOR           
+      POP_TOP                    
+  L30:
+      LOAD_GLOBAL                patch + NULL
+  L31:
+      LOAD_CONST                 'gbnf.grammar_graph.graph_pointer.is_graph_pointer_rule_end'
+      LOAD_CONST                 False
+  L30:
+      LOAD_CONST                 ('return_value',)
+      CALL_KW                    2
+      COPY                       1
+      LOAD_SPECIAL               __exit__
+      SWAP                       2
+      SWAP                       3
+      LOAD_SPECIAL               __enter__
+      CALL                       0
+  L32:
+      STORE_FAST                 mock
+  L33:
+      LOAD_FAST_BORROW           mock
+      YIELD_VALUE                0
+      POP_TOP                    
+  L30:
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      CALL                       3
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      PUSH_EXC_INFO              
+      WITH_EXCEPT_START          
+      RERAISE                    2
+      POP_TOP                    
+      POP_EXCEPT                 
+      POP_TOP                    
+      POP_TOP                    
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      COPY                       3
+      POP_EXCEPT                 
+      RERAISE                    1
+      CALL_INTRINSIC_1           INTRINSIC_STOPITERATION_ERROR
+      RERAISE                    1
+
+--- <module>.def mock_is_graph_pointer_rule_char(line 36) args=[]
+  L36:
+      RETURN_GENERATOR           
+      POP_TOP                    
+  L38:
+      LOAD_GLOBAL                patch + NULL
+  L39:
+      LOAD_CONST                 'gbnf.grammar_graph.graph_pointer.is_graph_pointer_rule_char'
+  L40:
+      LOAD_CONST                 False
+  L38:
+      LOAD_CONST                 ('return_value',)
+      CALL_KW                    2
+      COPY                       1
+      LOAD_SPECIAL               __exit__
+      SWAP                       2
+      SWAP                       3
+      LOAD_SPECIAL               __enter__
+      CALL                       0
+  L41:
+      STORE_FAST                 mock
+  L42:
+      LOAD_FAST_BORROW           mock
+      YIELD_VALUE                0
+      POP_TOP                    
+  L38:
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      CALL                       3
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      PUSH_EXC_INFO              
+      WITH_EXCEPT_START          
+      RERAISE                    2
+      POP_TOP                    
+      POP_EXCEPT                 
+      POP_TOP                    
+      POP_TOP                    
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      COPY                       3
+      POP_EXCEPT                 
+      RERAISE                    1
+      CALL_INTRINSIC_1           INTRINSIC_STOPITERATION_ERROR
+      RERAISE                    1
+
+--- <module>.def mock_is_graph_pointer_rule_char_exclude(line 45) args=[]
+  L45:
+      RETURN_GENERATOR           
+      POP_TOP                    
+  L47:
+      LOAD_GLOBAL                patch + NULL
+  L48:
+      LOAD_CONST                 'gbnf.grammar_graph.graph_pointer.is_graph_pointer_rule_char_exclude'
+  L49:
+      LOAD_CONST                 False
+  L47:
+      LOAD_CONST                 ('return_value',)
+      CALL_KW                    2
+      COPY                       1
+      LOAD_SPECIAL               __exit__
+      SWAP                       2
+      SWAP                       3
+      LOAD_SPECIAL               __enter__
+      CALL                       0
+  L50:
+      STORE_FAST                 mock
+  L51:
+      LOAD_FAST_BORROW           mock
+      YIELD_VALUE                0
+      POP_TOP                    
+  L47:
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      CALL                       3
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      PUSH_EXC_INFO              
+      WITH_EXCEPT_START          
+      RERAISE                    2
+      POP_TOP                    
+      POP_EXCEPT                 
+      POP_TOP                    
+      POP_TOP                    
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      COPY                       3
+      POP_EXCEPT                 
+      RERAISE                    1
+      CALL_INTRINSIC_1           INTRINSIC_STOPITERATION_ERROR
+      RERAISE                    1
+
+--- <module>.def describe_graph_pointer(line 54) args=[]
+  L55:
+      LOAD_CONST                 <code test_constructor>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_constructor
+  L62:
+      LOAD_CONST                 <code test_it_raises_error_if_node_is_undefined>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_it_raises_error_if_node_is_undefined
+  L66:
+      LOAD_CONST                 <code test_it_initializes_correctly_with_node_and_parent>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_it_initializes_correctly_with_node_and_parent
+  L78:
+      LOAD_CONST                 <code describe_resolve>
+      MAKE_FUNCTION              
+      STORE_FAST                 describe_resolve
+      LOAD_CONST                 None
+      RETURN_VALUE               
+
+--- describe_graph_pointer.def test_constructor(line 55) args=[]
+  L56:
+      LOAD_GLOBAL                GraphNode + NULL
+      LOAD_GLOBAL                RuleEnd + NULL
+      CALL                       0
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             2
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             3
+      BUILD_MAP                  3
+      CALL                       2
+      STORE_FAST                 node
+  L57:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW           node
+      CALL                       1
+      STORE_FAST                 pointer
+  L58:
+      LOAD_FAST_BORROW           pointer
+      LOAD_ATTR                  node
+      LOAD_FAST_BORROW           node
+      COMPARE_OP                 ==
+  L59:
+      LOAD_FAST_BORROW           pointer
+      LOAD_ATTR                  id
+      LOAD_CONST                 '1,2,3'
+      COMPARE_OP                 ==
+  L60:
+      LOAD_FAST_BORROW           pointer
+      LOAD_ATTR                  parent
+      LOAD_CONST                 None
+      IS_OP                      is
+
+--- describe_graph_pointer.def test_it_raises_error_if_node_is_undefined(line 62) args=[]
+  L63:
+      LOAD_GLOBAL                pytest
+      LOAD_ATTR                  raises
+      LOAD_GLOBAL                ValueError
+      LOAD_CONST                 'Node is undefined'
+      LOAD_CONST                 ('match',)
+      CALL_KW                    2
+      COPY                       1
+      LOAD_SPECIAL               __exit__
+      SWAP                       2
+      SWAP                       3
+      LOAD_SPECIAL               __enter__
+      CALL                       0
+      POP_TOP                    
+  L64:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_CONST                 None
+      CALL                       1
+      POP_TOP                    
+  L63:
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      CALL                       3
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      PUSH_EXC_INFO              
+      WITH_EXCEPT_START          
+      RERAISE                    2
+      POP_TOP                    
+      POP_EXCEPT                 
+      POP_TOP                    
+      POP_TOP                    
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      COPY                       3
+      POP_EXCEPT                 
+      RERAISE                    1
+
+--- describe_graph_pointer.def test_it_initializes_correctly_with_node_and_parent(line 66) args=[]
+  L67:
+      LOAD_GLOBAL                GraphNode + NULL
+  L68:
+      LOAD_GLOBAL                RuleChar + NULL
+      LOAD_SMALL_INT             97
+      BUILD_LIST                 1
+      LOAD_CONST                 ('value',)
+      CALL_KW                    1
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             2
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             3
+      BUILD_MAP                  3
+  L67:
+      CALL                       2
+      STORE_FAST                 parent_node
+  L70:
+      LOAD_GLOBAL                GraphNode + NULL
+  L71:
+      LOAD_GLOBAL                RuleChar + NULL
+      LOAD_SMALL_INT             98
+      BUILD_LIST                 1
+      LOAD_CONST                 ('value',)
+      CALL_KW                    1
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             4
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             5
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             6
+      BUILD_MAP                  3
+  L70:
+      CALL                       2
+      STORE_FAST                 child_node
+  L73:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW           parent_node
+      CALL                       1
+      STORE_FAST                 parent_pointer
+  L74:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW_LOAD_FAST_BORROW child_node, parent_pointer
+      CALL                       2
+      STORE_FAST                 child_pointer
+  L75:
+      LOAD_FAST_BORROW           child_pointer
+      LOAD_ATTR                  parent
+      LOAD_FAST_BORROW           parent_pointer
+      COMPARE_OP                 ==
+  L76:
+      LOAD_FAST_BORROW           child_pointer
+      LOAD_ATTR                  id
+      LOAD_CONST                 '1,2,3-4,5,6'
+      COMPARE_OP                 ==
+
+--- describe_graph_pointer.def describe_resolve(line 78) args=[]
+  L79:
+      LOAD_CONST                 <code test_it_raises_error_on_unknown_rule_types>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_it_raises_error_on_unknown_rule_types
+  L87:
+      LOAD_CONST                 <code test_it_yields_a_char_rule>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_it_yields_a_char_rule
+  L94:
+      LOAD_CONST                 <code test_it_yields_a_char_excluded_rule>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_it_yields_a_char_excluded_rule
+  L103:
+      LOAD_CONST                 <code test_it_yields_an_end_rule_without_a_parent>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_it_yields_an_end_rule_without_a_parent
+  L110:
+      LOAD_CONST                 <code test_it_yields_an_end_rule_with_a_parent>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_it_yields_an_end_rule_with_a_parent
+  L119:
+      LOAD_CONST                 <code test_it_yields_an_end_rule_with_a_grandparent>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_it_yields_an_end_rule_with_a_grandparent
+  L132:
+      LOAD_CONST                 <code test_it_yields_an_end_rule_with_a_parent_that_is_not_an_end_with_a_grandparent>
+      MAKE_FUNCTION              
+      STORE_FAST                 test_it_yields_an_end_rule_with_a_parent_that_is_not_an_end_with_a_grandparent
+      LOAD_CONST                 None
+      RETURN_VALUE               
+
+--- describe_resolve.def test_it_raises_error_on_unknown_rule_types(line 79) args=[]
+  L80:
+      LOAD_GLOBAL                GraphNode + NULL
+  L81:
+      LOAD_GLOBAL                type
+      LOAD_CONST                 'UNKNOWN_RULE_TYPE'
+      BUILD_MAP                  1
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             2
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             3
+      BUILD_MAP                  3
+  L80:
+      CALL                       2
+      STORE_FAST                 node
+  L83:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW           node
+      CALL                       1
+      STORE_FAST                 pointer
+  L84:
+      LOAD_GLOBAL                pytest
+      LOAD_ATTR                  raises
+      LOAD_GLOBAL                ValueError
+      LOAD_CONST                 'Unknown rule'
+      LOAD_CONST                 ('match',)
+      CALL_KW                    2
+      COPY                       1
+      LOAD_SPECIAL               __exit__
+      SWAP                       2
+      SWAP                       3
+      LOAD_SPECIAL               __enter__
+      CALL                       0
+      POP_TOP                    
+  L85:
+      LOAD_GLOBAL                list + NULL
+      LOAD_FAST_BORROW           pointer
+      LOAD_ATTR                  resolve + NULL|self
+      CALL                       0
+      CALL                       1
+      POP_TOP                    
+  L84:
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      LOAD_CONST                 None
+      CALL                       3
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      PUSH_EXC_INFO              
+      WITH_EXCEPT_START          
+      RERAISE                    2
+      POP_TOP                    
+      POP_EXCEPT                 
+      POP_TOP                    
+      POP_TOP                    
+      POP_TOP                    
+      LOAD_CONST                 None
+      RETURN_VALUE               
+      COPY                       3
+      POP_EXCEPT                 
+      RERAISE                    1
+
+--- describe_resolve.def test_it_yields_a_char_rule(line 87) args=['mock_is_graph_pointer_rule_char']
+  L88:
+      LOAD_CONST                 True
+      LOAD_FAST_BORROW           mock_is_graph_pointer_rule_char
+      STORE_ATTR                 return_value
+  L89:
+      LOAD_GLOBAL                RuleChar + NULL
+      LOAD_SMALL_INT             97
+      BUILD_LIST                 1
+      LOAD_CONST                 ('value',)
+      CALL_KW                    1
+      STORE_FAST                 rule
+  L90:
+      LOAD_GLOBAL                GraphNode + NULL
+      LOAD_FAST_BORROW           rule
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             2
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             3
+      BUILD_MAP                  3
+      CALL                       2
+      STORE_FAST                 node
+  L91:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW           node
+      CALL                       1
+      STORE_FAST                 pointer
+  L92:
+      LOAD_FAST_BORROW           pointer
+      LOAD_ATTR                  resolve
+      CALL                       0
+      LOAD_GLOBAL                list + NULL
+      CALL                       1
+      BUILD_LIST                 1
+      COMPARE_OP                 ==
+      EXTENDED_ARG               1
+
+--- describe_resolve.def test_it_yields_a_char_excluded_rule(line 94) args=['mock_is_graph_pointer_rule_char_exclude']
+  L97:
+      LOAD_CONST                 True
+      LOAD_FAST_BORROW           mock_is_graph_pointer_rule_char_exclude
+      STORE_ATTR                 return_value
+  L98:
+      LOAD_GLOBAL                RuleCharExclude + NULL
+      LOAD_SMALL_INT             97
+      BUILD_LIST                 1
+      LOAD_CONST                 ('value',)
+      CALL_KW                    1
+      STORE_FAST                 rule
+  L99:
+      LOAD_GLOBAL                GraphNode + NULL
+      LOAD_FAST_BORROW           rule
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             2
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             3
+      BUILD_MAP                  3
+      CALL                       2
+      STORE_FAST                 node
+  L100:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW           node
+      CALL                       1
+      STORE_FAST                 pointer
+  L101:
+      LOAD_FAST_BORROW           pointer
+      LOAD_ATTR                  resolve
+      CALL                       0
+      LOAD_GLOBAL                list + NULL
+      CALL                       1
+      BUILD_LIST                 1
+      COMPARE_OP                 ==
+      EXTENDED_ARG               1
+
+--- describe_resolve.def test_it_yields_an_end_rule_without_a_parent(line 103) args=['mock_is_graph_pointer_rule_end']
+  L104:
+      LOAD_CONST                 True
+      LOAD_FAST_BORROW           mock_is_graph_pointer_rule_end
+      STORE_ATTR                 return_value
+  L105:
+      LOAD_GLOBAL                RuleEnd + NULL
+      CALL                       0
+      STORE_FAST                 rule
+  L106:
+      LOAD_GLOBAL                GraphNode + NULL
+      LOAD_FAST_BORROW           rule
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             2
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             3
+      BUILD_MAP                  3
+      CALL                       2
+      STORE_FAST                 node
+  L107:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW           node
+      CALL                       1
+      STORE_FAST                 pointer
+  L108:
+      LOAD_FAST_BORROW           pointer
+      LOAD_ATTR                  resolve
+      CALL                       0
+      LOAD_GLOBAL                list + NULL
+      CALL                       1
+      BUILD_LIST                 1
+      COMPARE_OP                 ==
+      EXTENDED_ARG               1
+
+--- describe_resolve.def test_it_yields_an_end_rule_with_a_parent(line 110) args=['mock_is_graph_pointer_rule_end']
+  L111:
+      LOAD_CONST                 True
+      LOAD_FAST_BORROW           mock_is_graph_pointer_rule_end
+      STORE_ATTR                 return_value
+  L112:
+      LOAD_GLOBAL                RuleEnd + NULL
+      CALL                       0
+      STORE_FAST                 rule
+  L113:
+      LOAD_GLOBAL                GraphNode + NULL
+      LOAD_FAST_BORROW           rule
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             2
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             1
+      BUILD_MAP                  3
+      CALL                       2
+      STORE_FAST                 parent_node
+  L114:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW           parent_node
+      CALL                       1
+      STORE_FAST                 parent_pointer
+  L115:
+      LOAD_GLOBAL                GraphNode + NULL
+      LOAD_FAST_BORROW           rule
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             1
+      BUILD_MAP                  3
+      CALL                       2
+      STORE_FAST                 child_node
+  L116:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW_LOAD_FAST_BORROW child_node, parent_pointer
+      CALL                       2
+      STORE_FAST                 child_pointer
+  L117:
+      LOAD_FAST_BORROW           child_pointer
+      LOAD_ATTR                  resolve
+      CALL                       0
+      LOAD_GLOBAL                list + NULL
+      CALL                       1
+      BUILD_LIST                 1
+      COMPARE_OP                 ==
+      EXTENDED_ARG               1
+
+--- describe_resolve.def test_it_yields_an_end_rule_with_a_grandparent(line 119) args=['mock_is_graph_pointer_rule_end']
+  L122:
+      LOAD_CONST                 True
+      LOAD_FAST_BORROW           mock_is_graph_pointer_rule_end
+      STORE_ATTR                 return_value
+  L123:
+      LOAD_GLOBAL                RuleEnd + NULL
+      CALL                       0
+      STORE_FAST                 rule
+  L124:
+      LOAD_GLOBAL                GraphNode + NULL
+      LOAD_FAST_BORROW           rule
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             2
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             1
+      BUILD_MAP                  3
+      CALL                       2
+      STORE_FAST                 grandparent_node
+  L125:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW           grandparent_node
+      CALL                       1
+      STORE_FAST                 grandparent_pointer
+  L126:
+      LOAD_GLOBAL                GraphNode + NULL
+      LOAD_FAST_BORROW           rule
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             2
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             1
+      BUILD_MAP                  3
+      CALL                       2
+      STORE_FAST                 parent_node
+  L127:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW_LOAD_FAST_BORROW parent_node, grandparent_pointer
+      CALL                       2
+      STORE_FAST                 parent_pointer
+  L128:
+      LOAD_GLOBAL                GraphNode + NULL
+      LOAD_FAST_BORROW           rule
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             1
+      BUILD_MAP                  3
+      CALL                       2
+      STORE_FAST                 child_node
+  L129:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW_LOAD_FAST_BORROW child_node, parent_pointer
+      CALL                       2
+      STORE_FAST                 child_pointer
+  L130:
+      LOAD_FAST_BORROW           child_pointer
+      LOAD_ATTR                  resolve
+      CALL                       0
+      LOAD_GLOBAL                list + NULL
+      CALL                       1
+      BUILD_LIST                 1
+      COMPARE_OP                 ==
+      EXTENDED_ARG               1
+
+--- describe_resolve.def test_it_yields_an_end_rule_with_a_parent_that_is_not_an_end_with_a_grandparent(line 132) args=['mock_is_graph_pointer_rule_end', 'mock_is_graph_pointer_rule_char']
+  L136:
+      LOAD_GLOBAL                is_graph_pointer_rule_end
+      LOAD_FAST_BORROW           mock_is_graph_pointer_rule_end
+      STORE_ATTR                 side_effect
+  L137:
+      LOAD_GLOBAL                is_graph_pointer_rule_char
+      LOAD_FAST_BORROW           mock_is_graph_pointer_rule_char
+      STORE_ATTR                 side_effect
+  L138:
+      LOAD_GLOBAL                RuleEnd + NULL
+      CALL                       0
+      STORE_FAST                 rule
+  L139:
+      LOAD_GLOBAL                GraphNode + NULL
+      LOAD_FAST_BORROW           rule
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             2
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             1
+      BUILD_MAP                  3
+      CALL                       2
+      STORE_FAST                 grandparent_node
+  L140:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW           grandparent_node
+      CALL                       1
+      STORE_FAST                 grandparent_pointer
+  L141:
+      LOAD_GLOBAL                GraphNode + NULL
+  L142:
+      LOAD_GLOBAL                RuleChar + NULL
+      LOAD_SMALL_INT             97
+      BUILD_LIST                 1
+      LOAD_CONST                 ('value',)
+      CALL_KW                    1
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             2
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             1
+      BUILD_MAP                  3
+  L141:
+      CALL                       2
+      STORE_FAST                 parent_node
+  L144:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW_LOAD_FAST_BORROW parent_node, grandparent_pointer
+      CALL                       2
+      STORE_FAST                 parent_pointer
+  L145:
+      LOAD_GLOBAL                GraphNode + NULL
+      LOAD_FAST_BORROW           rule
+      LOAD_CONST                 'stackId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'pathId'
+      LOAD_SMALL_INT             1
+      LOAD_CONST                 'stepId'
+      LOAD_SMALL_INT             1
+      BUILD_MAP                  3
+      CALL                       2
+      STORE_FAST                 child_node
+  L146:
+      LOAD_GLOBAL                GraphPointer + NULL
+      LOAD_FAST_BORROW_LOAD_FAST_BORROW child_node, parent_pointer
+      CALL                       2
+      STORE_FAST                 child_pointer
+  L147:
+      LOAD_FAST_BORROW           child_pointer
+      LOAD_ATTR                  resolve
+      CALL                       0
+      LOAD_GLOBAL                list + NULL
+      CALL                       1
+      BUILD_LIST                 1
+      COMPARE_OP                 ==
+      EXTENDED_ARG               1

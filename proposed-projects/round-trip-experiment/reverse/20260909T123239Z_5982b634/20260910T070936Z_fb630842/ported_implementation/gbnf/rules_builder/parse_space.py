@@ -1,0 +1,16 @@
+from __future__ import annotations
+
+
+def parse_space(src: str, pos: int, newline_ok: bool) -> int:
+    while pos < len(src) and (
+        src[pos] == ' '
+        or src[pos] == '\t'
+        or src[pos] == '#'
+        or (newline_ok and (src[pos] == '\r' or src[pos] == '\n'))
+    ):
+        if src[pos] == '#':
+            while pos < len(src) and src[pos] != '\r' and src[pos] != '\n':
+                pos += 1
+        else:
+            pos += 1
+    return pos

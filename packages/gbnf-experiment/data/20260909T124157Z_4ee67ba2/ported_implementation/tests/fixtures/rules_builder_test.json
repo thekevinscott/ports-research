@@ -1,0 +1,4219 @@
+[
+  {
+    "key": "single-string",
+    "grammar": "root ::= \"foo\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            102
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            111
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            111
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "quote character",
+    "grammar": "root ::= \"\\\"\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "two-lines-referencing-expression",
+    "grammar": "root ::= foo\n            foo ::= \"bar\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "foo",
+        1
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            98
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            114
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "expression with dash",
+    "grammar": "root ::= foo-bar\n            foo-bar ::= \"bar\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "foo-bar",
+        1
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            98
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            114
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "simple-grammar",
+    "grammar": "\n            root  ::= (expr \"=\" term \"\n\")+\n            expr  ::= term ([-+*/] term)*\n            term  ::= [0-9]+\n            ",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ],
+      [
+        "expr",
+        2
+      ],
+      [
+        "term",
+        3
+      ],
+      [
+        "root_4",
+        4
+      ],
+      [
+        "expr_5",
+        5
+      ],
+      [
+        "expr_6",
+        6
+      ],
+      [
+        "term_7",
+        7
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            61
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            10
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 6
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            45
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 43
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 42
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 47
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 5
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 6
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "longer-grammar",
+    "grammar": "\n            root  ::= (expr \"=\" ws term \"\n\")+\n            expr  ::= term ([-+*/] term)*\n            term  ::= ident | num | \"(\" ws expr \")\" ws\n            ident ::= [a-z] [a-z0-9_]* ws\n            num   ::= [0-9]+ ws\n            ws    ::= [ \t\n]*\n            ",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ],
+      [
+        "expr",
+        2
+      ],
+      [
+        "ws",
+        3
+      ],
+      [
+        "term",
+        4
+      ],
+      [
+        "root_5",
+        5
+      ],
+      [
+        "expr_6",
+        6
+      ],
+      [
+        "expr_7",
+        7
+      ],
+      [
+        "ident",
+        8
+      ],
+      [
+        "num",
+        9
+      ],
+      [
+        "ident_10",
+        10
+      ],
+      [
+        "num_11",
+        11
+      ],
+      [
+        "ws_12",
+        12
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 5
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            61
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            10
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 12
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 8
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 9
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            40
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            41
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 5
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            45
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 43
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 42
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 47
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 6
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 122
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 10
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 11
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 122
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 48
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 95
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 10
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 11
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            32
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 9
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 10
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 12
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "character unicode grammar",
+    "grammar": "root  ::= [ぁ-ゟ]",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            12353
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 12447
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "character alts grammar",
+    "grammar": "root  ::= [az]",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 122
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "character range grammar",
+    "grammar": "root  ::= [a-zA-Z0-9]",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 122
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 65
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 90
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 48
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "character range grammar with dash at end",
+    "grammar": "root  ::= [a-z-]",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 122
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 45
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "grouping",
+    "grammar": "root  ::= \"f\" (\"b\" | \"a\")",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            102
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            98
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "optional",
+    "grammar": "root  ::= \"f\"?",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            102
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "repeating",
+    "grammar": "root  ::= \"f\"*",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            102
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "repeating-at-least-once",
+    "grammar": "root  ::= \"f\"+",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            102
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            102
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "character range with optional repeating",
+    "grammar": "root  ::= [a-zA-Z0-9]*",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 122
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 65
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 90
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 48
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "grouping-repeating",
+    "grammar": "root  ::= \"f\" (\"b\" | \"a\")*",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ],
+      [
+        "root_2",
+        2
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            102
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            98
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "negation",
+    "grammar": "root ::= [^\\n]",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefCharNot",
+          "value": [
+            10
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "negation of range",
+    "grammar": "root ::= [^0-9]",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefCharNot",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "negation with after",
+    "grammar": "root ::= [^\\n]+ \"\\n\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            10
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefCharNot",
+          "value": [
+            10
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefCharNot",
+          "value": [
+            10
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "longer negation",
+    "grammar": "root ::= \"\\\"\" ( [^\"abcdefgh])* ",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ],
+      [
+        "root_2",
+        2
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefCharNot",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 97
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 98
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 99
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 100
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 101
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 102
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 103
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 104
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "longer negation with a range",
+    "grammar": "root ::= \"\\\"\" ( [^\"abcdefghA-Z])* ",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ],
+      [
+        "root_2",
+        2
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefCharNot",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 97
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 98
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 99
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 100
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 101
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 102
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 103
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 104
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 65
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 90
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "escaped 8-bit unicode char",
+    "grammar": "root ::= \"\\x2A\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            42
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "escaped 16-bit unicode char",
+    "grammar": "root ::= \"\\u006F\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            111
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "escaped 32-bit unicode char",
+    "grammar": "root ::= \"\\U0001F4A9\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            128169
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "escaped tab char",
+    "grammar": "root ::= \"\\t\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            9
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "escaped new line char",
+    "grammar": "root ::= \"\\n\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            10
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "escaped \r char",
+    "grammar": "root ::= \"\\r\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            13
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "escaped quote char",
+    "grammar": "root ::= \"\\\"\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "escaped [ char",
+    "grammar": "root ::= \"\\[\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            91
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "escaped ] char",
+    "grammar": "root ::= \"\\]\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            93
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "escaped \\ char",
+    "grammar": "root ::= \"\\\\\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            92
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "simple arithmetic",
+    "grammar": "\n            root ::= (expr \"=\" term \"\\n\")+\n            expr ::= term ([-+*/] term)*\n            term ::= [0-9]+\n            ",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ],
+      [
+        "expr",
+        2
+      ],
+      [
+        "term",
+        3
+      ],
+      [
+        "root_4",
+        4
+      ],
+      [
+        "expr_5",
+        5
+      ],
+      [
+        "expr_6",
+        6
+      ],
+      [
+        "term_7",
+        7
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            61
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            10
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 6
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            45
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 43
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 42
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 47
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 5
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 6
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "ranges with chars",
+    "grammar": "\n            root ::= [a-z0-9_]*\n            ",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 122
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 48
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 95
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "nested ranges with chars",
+    "grammar": "\n            root ::= [a-z] [a-z0-9_]*\n            ",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 122
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 122
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 48
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 95
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "expression with nested range with chars",
+    "grammar": "\n            root ::= ident\n            ident ::= [a-z] [a-z0-9_]* ws\n            ws ::= [ \\t\\n]*\n            ",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "ident",
+        1
+      ],
+      [
+        "ident_2",
+        2
+      ],
+      [
+        "ws",
+        3
+      ],
+      [
+        "ws_4",
+        4
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 122
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 122
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 48
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 95
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            32
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 9
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 10
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "lots of escapes",
+    "grammar": "root ::= \"\\x2A\" \"\\u006F\" \"\\U0001F4A9\" \"\\t\" \"\\n\" \"\\r\" \"\\\"\" \"\\[\" \"\\]\" \"\\\\\"",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            42
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            111
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            128169
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            9
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            10
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            13
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            91
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            93
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            92
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "lots of escape and alternate escapes",
+    "grammar": "root ::= \"\\x2A\" \"\\u006F\" \"\\U0001F4A9\" \"\\t\" \"\\n\" \"\\r\" \"\\\"\" \"\\[\" \"\\]\" \"\\\\\" (\n                \"\\x2A\" | \"\\u006F\" | \"\\U0001F4A9\" | \"\\t\" | \"\\n\" | \"\\r\" | \"\\\"\" | \"\\[\" | \"\\]\"  | \"\\\\\" )",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            42
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            111
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            128169
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            9
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            10
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            13
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            91
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            93
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            92
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            42
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            111
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            128169
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            9
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            10
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            13
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            91
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            93
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            92
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "arithmetic",
+    "grammar": "\n            root  ::= (expr \"=\" ws term \"\\n\")+\n            expr  ::= term ([-+*/] term)*\n            term  ::= ident | num | \"(\" ws expr \")\" ws\n            ident ::= [a-z] [a-z0-9_]* ws\n            num   ::= [0-9]+ ws\n            ws    ::= [ \\t\\n]*\n            ",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ],
+      [
+        "expr",
+        2
+      ],
+      [
+        "ws",
+        3
+      ],
+      [
+        "term",
+        4
+      ],
+      [
+        "root_5",
+        5
+      ],
+      [
+        "expr_6",
+        6
+      ],
+      [
+        "expr_7",
+        7
+      ],
+      [
+        "ident",
+        8
+      ],
+      [
+        "num",
+        9
+      ],
+      [
+        "ident_10",
+        10
+      ],
+      [
+        "num_11",
+        11
+      ],
+      [
+        "ws_12",
+        12
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 5
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            61
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            10
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 12
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 8
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 9
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            40
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            41
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 5
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            45
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 43
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 42
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 47
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 6
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 122
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 10
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 11
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 122
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 48
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 95
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 10
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 11
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            32
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 9
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 10
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 12
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "json.gbnf (string)",
+    "grammar": "\n            root ::=\n            \"\\\"\" (\n                [^\"\\\\\\x7F\\x00-\\x1F] |\n                \"\\\\\" ([\"\\\\/bfnrt] | \"u\" [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F]) # escapes\n            )* \"\\\"\"\n            ",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "root_1",
+        1
+      ],
+      [
+        "root_2",
+        2
+      ],
+      [
+        "root_3",
+        3
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefCharNot",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 92
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 127
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 0
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 31
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            92
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 92
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 47
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 98
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 102
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 110
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 114
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 116
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            117
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 97
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 102
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 65
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 70
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 97
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 102
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 65
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 70
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 97
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 102
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 65
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 70
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 97
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 102
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 65
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 70
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "json.gbnf (full)",
+    "grammar": "\n            root   ::= object\n            value  ::= object | array | string | number | (\"true\" | \"false\" | \"null\") ws\n            object ::=\n              \"{\" ws (\n                        string \":\" ws value\n                (\",\" ws string \":\" ws value)*\n              )? \"}\" ws\n            array  ::=\n              \"[\" ws (\n                        value\n                (\",\" ws value)*\n              )? \"]\" ws\n                  string ::=\n              \"\\\"\" (\n                [^\"\\\\\\x7F\\x00-\\x1F] |\n                \"\\\\\" ([\"\\\\/bfnrt] | \"u\" [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F]) # escapes\n              )* \"\\\"\" ws\n            number ::= (\"-\"? ([0-9] | [1-9] [0-9]*)) (\".\" [0-9]+)? ([eE] [-+]? [0-9]+)? ws\n            # Optional space: by convention, applied in this grammar after literal chars when allowed\n            ws ::= ([ \\t\\n] ws)?\n            ",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "object",
+        1
+      ],
+      [
+        "value",
+        2
+      ],
+      [
+        "array",
+        3
+      ],
+      [
+        "string",
+        4
+      ],
+      [
+        "number",
+        5
+      ],
+      [
+        "value_6",
+        6
+      ],
+      [
+        "ws",
+        7
+      ],
+      [
+        "object_8",
+        8
+      ],
+      [
+        "object_9",
+        9
+      ],
+      [
+        "object_10",
+        10
+      ],
+      [
+        "object_11",
+        11
+      ],
+      [
+        "array_12",
+        12
+      ],
+      [
+        "array_13",
+        13
+      ],
+      [
+        "array_14",
+        14
+      ],
+      [
+        "array_15",
+        15
+      ],
+      [
+        "string_16",
+        16
+      ],
+      [
+        "string_17",
+        17
+      ],
+      [
+        "string_18",
+        18
+      ],
+      [
+        "number_19",
+        19
+      ],
+      [
+        "number_20",
+        20
+      ],
+      [
+        "number_21",
+        21
+      ],
+      [
+        "number_22",
+        22
+      ],
+      [
+        "number_23",
+        23
+      ],
+      [
+        "number_24",
+        24
+      ],
+      [
+        "number_25",
+        25
+      ],
+      [
+        "number_26",
+        26
+      ],
+      [
+        "number_27",
+        27
+      ],
+      [
+        "number_28",
+        28
+      ],
+      [
+        "number_29",
+        29
+      ],
+      [
+        "ws_30",
+        30
+      ],
+      [
+        "ws_31",
+        31
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            123
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 11
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            125
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 5
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 6
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            91
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 15
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            93
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 18
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 19
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 25
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 29
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            116
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            114
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            117
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            101
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            102
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            97
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            108
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            115
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            101
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            110
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            117
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            108
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            108
+          ]
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 31
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            58
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 10
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            44
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            58
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 9
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 10
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 8
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 14
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            44
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 13
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 14
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 12
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefCharNot",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 92
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 127
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 0
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 31
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            92
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 17
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            34
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 92
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 47
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 98
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 102
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 110
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 114
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 116
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            117
+          ]
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 97
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 102
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 65
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 70
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 97
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 102
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 65
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 70
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 97
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 102
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 65
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 70
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 97
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 102
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 65
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 70
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 16
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 18
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 20
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 21
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            45
+          ]
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            49
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 22
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 22
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            46
+          ]
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 24
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 24
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 23
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            101
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 69
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 27
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 28
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            45
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 43
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 28
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            48
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 57
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 26
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            32
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 9
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 10
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 30
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "key": "japanese",
+    "grammar": "\n            # A probably incorrect grammar for Japanese\n            root        ::= jp-char+ ([ \\t\\n] jp-char+)*\n            jp-char     ::= hiragana | katakana | punctuation | cjk\n            hiragana    ::= [ぁ-ゟ]\n            katakana    ::= [ァ-ヿ]\n            punctuation ::= [、-〾]\n            cjk         ::= [一-鿿]\n            ",
+    "symbolIds": [
+      [
+        "root",
+        0
+      ],
+      [
+        "jp-char",
+        1
+      ],
+      [
+        "root_2",
+        2
+      ],
+      [
+        "root_3",
+        3
+      ],
+      [
+        "root_4",
+        4
+      ],
+      [
+        "root_5",
+        5
+      ],
+      [
+        "hiragana",
+        6
+      ],
+      [
+        "katakana",
+        7
+      ],
+      [
+        "punctuation",
+        8
+      ],
+      [
+        "cjk",
+        9
+      ]
+    ],
+    "rules": [
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 5
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 6
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 7
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 8
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 9
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 2
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            32
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 9
+        },
+        {
+          "cls": "InternalRuleDefCharAlt",
+          "value": 10
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 4
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 1
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 3
+        },
+        {
+          "cls": "InternalRuleDefReference",
+          "value": 5
+        },
+        {
+          "cls": "InternalRuleDefAlt"
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            12353
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 12447
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            12449
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 12543
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            12289
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 12350
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ],
+      [
+        {
+          "cls": "InternalRuleDefChar",
+          "value": [
+            19968
+          ]
+        },
+        {
+          "cls": "InternalRuleDefCharRngUpper",
+          "value": 40959
+        },
+        {
+          "cls": "InternalRuleDefEnd"
+        }
+      ]
+    ]
+  }
+]

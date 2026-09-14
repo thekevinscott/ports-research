@@ -1,0 +1,20 @@
+{
+  "name": "gbnf",
+  "version": "0.0.30",
+  "description": "A library for parsing GBNF grammars",
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./src/*"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "test": "node --test \"tests/**/*.test.ts\" \"../tests/**/*.test.ts\"",
+    "test:fixtures": "python3 tests/parity/generate_fixtures.py"
+  }
+}

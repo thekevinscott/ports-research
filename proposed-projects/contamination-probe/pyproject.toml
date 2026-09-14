@@ -1,0 +1,30 @@
+[project]
+name = "contamination-probe"
+version = "0.1.0"
+description = "Perturb a reference implementation into a semantically identical but textually unfamiliar tree, so a port of it tests translation rather than recall"
+readme = "README.md"
+authors = [
+    { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "click>=8.5.0",
+    "rope>=1.14.0",
+]
+
+[project.scripts]
+perturb-reference-tree = "contamination_probe.cli:cli"
+
+[build-system]
+requires = ["uv_build>=0.9,<1.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+wheel-exclude = ["*_test.py"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-describe>=3.2.0",
+    "testing-conventions>=0.0.104",
+]

@@ -1,0 +1,16 @@
+{
+  "name": "gbnf",
+  "version": "0.1.0",
+  "description": "A library for parsing .gbnf grammar files in TypeScript.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --test 'tests/**/*.test.ts'"
+  },
+  "engines": {
+    "node": ">=22.6.0"
+  }
+}

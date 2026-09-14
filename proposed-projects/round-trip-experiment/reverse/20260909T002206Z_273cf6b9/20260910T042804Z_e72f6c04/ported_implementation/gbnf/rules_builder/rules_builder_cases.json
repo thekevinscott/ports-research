@@ -1,0 +1,4301 @@
+[
+  [
+    "single-string",
+    "root ::= \"foo\"",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              102
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              111
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              111
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "quote character",
+    "root ::= \"\\\"\"",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "two-lines-referencing-expression",
+    "root ::= foo\n            foo ::= \"bar\"",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "foo",
+          1
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              98
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              114
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "expression with dash",
+    "root ::= foo-bar\n            foo-bar ::= \"bar\"",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "foo-bar",
+          1
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              98
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              114
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "simple-grammar",
+    "\n            root  ::= (expr \"=\" term \"\n\")+\n            expr  ::= term ([-+*/] term)*\n            term  ::= [0-9]+\n            ",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ],
+        [
+          "expr",
+          2
+        ],
+        [
+          "term",
+          3
+        ],
+        [
+          "root_4",
+          4
+        ],
+        [
+          "expr_5",
+          5
+        ],
+        [
+          "expr_6",
+          6
+        ],
+        [
+          "term_7",
+          7
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "char",
+            "value": [
+              61
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "char",
+            "value": [
+              10
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "ref",
+            "value": 6
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              45
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 43
+          },
+          {
+            "kind": "char_alt",
+            "value": 42
+          },
+          {
+            "kind": "char_alt",
+            "value": 47
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 5
+          },
+          {
+            "kind": "ref",
+            "value": 6
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "longer-grammar",
+    "\n            root  ::= (expr \"=\" ws term \"\n\")+\n            expr  ::= term ([-+*/] term)*\n            term  ::= ident | num | \"(\" ws expr \")\" ws\n            ident ::= [a-z] [a-z0-9_]* ws\n            num   ::= [0-9]+ ws\n            ws    ::= [ \t\n]*\n            ",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ],
+        [
+          "expr",
+          2
+        ],
+        [
+          "ws",
+          3
+        ],
+        [
+          "term",
+          4
+        ],
+        [
+          "root_5",
+          5
+        ],
+        [
+          "expr_6",
+          6
+        ],
+        [
+          "expr_7",
+          7
+        ],
+        [
+          "ident",
+          8
+        ],
+        [
+          "num",
+          9
+        ],
+        [
+          "ident_10",
+          10
+        ],
+        [
+          "num_11",
+          11
+        ],
+        [
+          "ws_12",
+          12
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 5
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "char",
+            "value": [
+              61
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "char",
+            "value": [
+              10
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 12
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 8
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 9
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              40
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "char",
+            "value": [
+              41
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "ref",
+            "value": 5
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              45
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 43
+          },
+          {
+            "kind": "char_alt",
+            "value": 42
+          },
+          {
+            "kind": "char_alt",
+            "value": 47
+          },
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 6
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 122
+          },
+          {
+            "kind": "ref",
+            "value": 10
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 11
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 122
+          },
+          {
+            "kind": "char_alt",
+            "value": 48
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "char_alt",
+            "value": 95
+          },
+          {
+            "kind": "ref",
+            "value": 10
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "ref",
+            "value": 11
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              32
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 9
+          },
+          {
+            "kind": "char_alt",
+            "value": 10
+          },
+          {
+            "kind": "ref",
+            "value": 12
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "character unicode grammar",
+    "root  ::= [ぁ-ゟ]",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              12353
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 12447
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "character alts grammar",
+    "root  ::= [az]",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 122
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "character range grammar",
+    "root  ::= [a-zA-Z0-9]",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 122
+          },
+          {
+            "kind": "char_alt",
+            "value": 65
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 90
+          },
+          {
+            "kind": "char_alt",
+            "value": 48
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "character range grammar with dash at end",
+    "root  ::= [a-z-]",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 122
+          },
+          {
+            "kind": "char_alt",
+            "value": 45
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "grouping",
+    "root  ::= \"f\" (\"b\" | \"a\")",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              102
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              98
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "optional",
+    "root  ::= \"f\"?",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              102
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "repeating",
+    "root  ::= \"f\"*",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              102
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "repeating-at-least-once",
+    "root  ::= \"f\"+",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              102
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              102
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "character range with optional repeating",
+    "root  ::= [a-zA-Z0-9]*",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 122
+          },
+          {
+            "kind": "char_alt",
+            "value": 65
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 90
+          },
+          {
+            "kind": "char_alt",
+            "value": 48
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "grouping-repeating",
+    "root  ::= \"f\" (\"b\" | \"a\")*",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ],
+        [
+          "root_2",
+          2
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              102
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              98
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "negation",
+    "root ::= [^\\n]",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char_not",
+            "value": [
+              10
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "negation of range",
+    "root ::= [^0-9]",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char_not",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "negation with after",
+    "root ::= [^\\n]+ \"\\n\"",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "char",
+            "value": [
+              10
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char_not",
+            "value": [
+              10
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char_not",
+            "value": [
+              10
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "longer negation",
+    "root ::= \"\\\"\" ( [^\"abcdefgh])* ",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ],
+        [
+          "root_2",
+          2
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char_not",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 97
+          },
+          {
+            "kind": "char_alt",
+            "value": 98
+          },
+          {
+            "kind": "char_alt",
+            "value": 99
+          },
+          {
+            "kind": "char_alt",
+            "value": 100
+          },
+          {
+            "kind": "char_alt",
+            "value": 101
+          },
+          {
+            "kind": "char_alt",
+            "value": 102
+          },
+          {
+            "kind": "char_alt",
+            "value": 103
+          },
+          {
+            "kind": "char_alt",
+            "value": 104
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "longer negation with a range",
+    "root ::= \"\\\"\" ( [^\"abcdefghA-Z])* ",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ],
+        [
+          "root_2",
+          2
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char_not",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 97
+          },
+          {
+            "kind": "char_alt",
+            "value": 98
+          },
+          {
+            "kind": "char_alt",
+            "value": 99
+          },
+          {
+            "kind": "char_alt",
+            "value": 100
+          },
+          {
+            "kind": "char_alt",
+            "value": 101
+          },
+          {
+            "kind": "char_alt",
+            "value": 102
+          },
+          {
+            "kind": "char_alt",
+            "value": 103
+          },
+          {
+            "kind": "char_alt",
+            "value": 104
+          },
+          {
+            "kind": "char_alt",
+            "value": 65
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 90
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "escaped 8-bit unicode char",
+    "root ::= \"\\x2A\"",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              42
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "escaped 16-bit unicode char",
+    "root ::= \"\\u006F\"",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              111
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "escaped 32-bit unicode char",
+    "root ::= \"\\U0001F4A9\"",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              128169
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "escaped tab char",
+    "root ::= \"\\t\"",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              9
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "escaped new line char",
+    "root ::= \"\\n\"",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              10
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "escaped \r char",
+    "root ::= \"\\r\"",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              13
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "escaped quote char",
+    "root ::= \"\\\"\"",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "escaped [ char",
+    "root ::= \"\\[\"",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              91
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "escaped ] char",
+    "root ::= \"\\]\"",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              93
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "escaped \\ char",
+    "root ::= \"\\\\\"",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              92
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "simple arithmetic",
+    "\n            root ::= (expr \"=\" term \"\\n\")+\n            expr ::= term ([-+*/] term)*\n            term ::= [0-9]+\n            ",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ],
+        [
+          "expr",
+          2
+        ],
+        [
+          "term",
+          3
+        ],
+        [
+          "root_4",
+          4
+        ],
+        [
+          "expr_5",
+          5
+        ],
+        [
+          "expr_6",
+          6
+        ],
+        [
+          "term_7",
+          7
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "char",
+            "value": [
+              61
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "char",
+            "value": [
+              10
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "ref",
+            "value": 6
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              45
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 43
+          },
+          {
+            "kind": "char_alt",
+            "value": 42
+          },
+          {
+            "kind": "char_alt",
+            "value": 47
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 5
+          },
+          {
+            "kind": "ref",
+            "value": 6
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "ranges with chars",
+    "\n            root ::= [a-z0-9_]*\n            ",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 122
+          },
+          {
+            "kind": "char_alt",
+            "value": 48
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "char_alt",
+            "value": 95
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "nested ranges with chars",
+    "\n            root ::= [a-z] [a-z0-9_]*\n            ",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 122
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 122
+          },
+          {
+            "kind": "char_alt",
+            "value": 48
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "char_alt",
+            "value": 95
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "expression with nested range with chars",
+    "\n            root ::= ident\n            ident ::= [a-z] [a-z0-9_]* ws\n            ws ::= [ \\t\\n]*\n            ",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "ident",
+          1
+        ],
+        [
+          "ident_2",
+          2
+        ],
+        [
+          "ws",
+          3
+        ],
+        [
+          "ws_4",
+          4
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 122
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 122
+          },
+          {
+            "kind": "char_alt",
+            "value": 48
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "char_alt",
+            "value": 95
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              32
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 9
+          },
+          {
+            "kind": "char_alt",
+            "value": 10
+          },
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "lots of escapes",
+    "root ::= \"\\x2A\" \"\\u006F\" \"\\U0001F4A9\" \"\\t\" \"\\n\" \"\\r\" \"\\\"\" \"\\[\" \"\\]\" \"\\\\\"",
+    [
+      [
+        [
+          "root",
+          0
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              42
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              111
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              128169
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              9
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              10
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              13
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              91
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              93
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              92
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "lots of escape and alternate escapes",
+    "root ::= \"\\x2A\" \"\\u006F\" \"\\U0001F4A9\" \"\\t\" \"\\n\" \"\\r\" \"\\\"\" \"\\[\" \"\\]\" \"\\\\\" (\n                \"\\x2A\" | \"\\u006F\" | \"\\U0001F4A9\" | \"\\t\" | \"\\n\" | \"\\r\" | \"\\\"\" | \"\\[\" | \"\\]\"  | \"\\\\\" )",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              42
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              111
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              128169
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              9
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              10
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              13
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              91
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              93
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              92
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              42
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              111
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              128169
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              9
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              10
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              13
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              91
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              93
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              92
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "arithmetic",
+    "\n            root  ::= (expr \"=\" ws term \"\\n\")+\n            expr  ::= term ([-+*/] term)*\n            term  ::= ident | num | \"(\" ws expr \")\" ws\n            ident ::= [a-z] [a-z0-9_]* ws\n            num   ::= [0-9]+ ws\n            ws    ::= [ \\t\\n]*\n            ",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ],
+        [
+          "expr",
+          2
+        ],
+        [
+          "ws",
+          3
+        ],
+        [
+          "term",
+          4
+        ],
+        [
+          "root_5",
+          5
+        ],
+        [
+          "expr_6",
+          6
+        ],
+        [
+          "expr_7",
+          7
+        ],
+        [
+          "ident",
+          8
+        ],
+        [
+          "num",
+          9
+        ],
+        [
+          "ident_10",
+          10
+        ],
+        [
+          "num_11",
+          11
+        ],
+        [
+          "ws_12",
+          12
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 5
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "char",
+            "value": [
+              61
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "char",
+            "value": [
+              10
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 12
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 8
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 9
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              40
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "char",
+            "value": [
+              41
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "ref",
+            "value": 5
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              45
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 43
+          },
+          {
+            "kind": "char_alt",
+            "value": 42
+          },
+          {
+            "kind": "char_alt",
+            "value": 47
+          },
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 6
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 122
+          },
+          {
+            "kind": "ref",
+            "value": 10
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 11
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 122
+          },
+          {
+            "kind": "char_alt",
+            "value": 48
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "char_alt",
+            "value": 95
+          },
+          {
+            "kind": "ref",
+            "value": 10
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "ref",
+            "value": 11
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              32
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 9
+          },
+          {
+            "kind": "char_alt",
+            "value": 10
+          },
+          {
+            "kind": "ref",
+            "value": 12
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "json.gbnf (string)",
+    "\n            root ::=\n            \"\\\"\" (\n                [^\"\\\\\\x7F\\x00-\\x1F] |\n                \"\\\\\" ([\"\\\\/bfnrt] | \"u\" [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F]) # escapes\n            )* \"\\\"\"\n            ",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "root_1",
+          1
+        ],
+        [
+          "root_2",
+          2
+        ],
+        [
+          "root_3",
+          3
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "char",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "char",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char_not",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 92
+          },
+          {
+            "kind": "char_alt",
+            "value": 127
+          },
+          {
+            "kind": "char_alt",
+            "value": 0
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 31
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              92
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 92
+          },
+          {
+            "kind": "char_alt",
+            "value": 47
+          },
+          {
+            "kind": "char_alt",
+            "value": 98
+          },
+          {
+            "kind": "char_alt",
+            "value": 102
+          },
+          {
+            "kind": "char_alt",
+            "value": 110
+          },
+          {
+            "kind": "char_alt",
+            "value": 114
+          },
+          {
+            "kind": "char_alt",
+            "value": 116
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              117
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "char_alt",
+            "value": 97
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 102
+          },
+          {
+            "kind": "char_alt",
+            "value": 65
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 70
+          },
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "char_alt",
+            "value": 97
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 102
+          },
+          {
+            "kind": "char_alt",
+            "value": 65
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 70
+          },
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "char_alt",
+            "value": 97
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 102
+          },
+          {
+            "kind": "char_alt",
+            "value": 65
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 70
+          },
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "char_alt",
+            "value": 97
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 102
+          },
+          {
+            "kind": "char_alt",
+            "value": 65
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 70
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "json.gbnf (full)",
+    "\n            root   ::= object\n            value  ::= object | array | string | number | (\"true\" | \"false\" | \"null\") ws\n            object ::=\n              \"{\" ws (\n                        string \":\" ws value\n                (\",\" ws string \":\" ws value)*\n              )? \"}\" ws\n            array  ::=\n              \"[\" ws (\n                        value\n                (\",\" ws value)*\n              )? \"]\" ws\n                  string ::=\n              \"\\\"\" (\n                [^\"\\\\\\x7F\\x00-\\x1F] |\n                \"\\\\\" ([\"\\\\/bfnrt] | \"u\" [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F]) # escapes\n              )* \"\\\"\" ws\n            number ::= (\"-\"? ([0-9] | [1-9] [0-9]*)) (\".\" [0-9]+)? ([eE] [-+]? [0-9]+)? ws\n            # Optional space: by convention, applied in this grammar after literal chars when allowed\n            ws ::= ([ \\t\\n] ws)?\n            ",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "object",
+          1
+        ],
+        [
+          "value",
+          2
+        ],
+        [
+          "array",
+          3
+        ],
+        [
+          "string",
+          4
+        ],
+        [
+          "number",
+          5
+        ],
+        [
+          "value_6",
+          6
+        ],
+        [
+          "ws",
+          7
+        ],
+        [
+          "object_8",
+          8
+        ],
+        [
+          "object_9",
+          9
+        ],
+        [
+          "object_10",
+          10
+        ],
+        [
+          "object_11",
+          11
+        ],
+        [
+          "array_12",
+          12
+        ],
+        [
+          "array_13",
+          13
+        ],
+        [
+          "array_14",
+          14
+        ],
+        [
+          "array_15",
+          15
+        ],
+        [
+          "string_16",
+          16
+        ],
+        [
+          "string_17",
+          17
+        ],
+        [
+          "string_18",
+          18
+        ],
+        [
+          "number_19",
+          19
+        ],
+        [
+          "number_20",
+          20
+        ],
+        [
+          "number_21",
+          21
+        ],
+        [
+          "number_22",
+          22
+        ],
+        [
+          "number_23",
+          23
+        ],
+        [
+          "number_24",
+          24
+        ],
+        [
+          "number_25",
+          25
+        ],
+        [
+          "number_26",
+          26
+        ],
+        [
+          "number_27",
+          27
+        ],
+        [
+          "number_28",
+          28
+        ],
+        [
+          "number_29",
+          29
+        ],
+        [
+          "ws_30",
+          30
+        ],
+        [
+          "ws_31",
+          31
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              123
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "ref",
+            "value": 11
+          },
+          {
+            "kind": "char",
+            "value": [
+              125
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 5
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 6
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              91
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "ref",
+            "value": 15
+          },
+          {
+            "kind": "char",
+            "value": [
+              93
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 18
+          },
+          {
+            "kind": "char",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 19
+          },
+          {
+            "kind": "ref",
+            "value": 25
+          },
+          {
+            "kind": "ref",
+            "value": 29
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              116
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              114
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              117
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              101
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              102
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              97
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              108
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              115
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              101
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              110
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              117
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              108
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              108
+            ]
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 31
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "char",
+            "value": [
+              58
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "ref",
+            "value": 10
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              44
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "char",
+            "value": [
+              58
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 9
+          },
+          {
+            "kind": "ref",
+            "value": 10
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 8
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "ref",
+            "value": 14
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              44
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 13
+          },
+          {
+            "kind": "ref",
+            "value": 14
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 12
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char_not",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 92
+          },
+          {
+            "kind": "char_alt",
+            "value": 127
+          },
+          {
+            "kind": "char_alt",
+            "value": 0
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 31
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              92
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 17
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              34
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 92
+          },
+          {
+            "kind": "char_alt",
+            "value": 47
+          },
+          {
+            "kind": "char_alt",
+            "value": 98
+          },
+          {
+            "kind": "char_alt",
+            "value": 102
+          },
+          {
+            "kind": "char_alt",
+            "value": 110
+          },
+          {
+            "kind": "char_alt",
+            "value": 114
+          },
+          {
+            "kind": "char_alt",
+            "value": 116
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              117
+            ]
+          },
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "char_alt",
+            "value": 97
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 102
+          },
+          {
+            "kind": "char_alt",
+            "value": 65
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 70
+          },
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "char_alt",
+            "value": 97
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 102
+          },
+          {
+            "kind": "char_alt",
+            "value": 65
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 70
+          },
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "char_alt",
+            "value": 97
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 102
+          },
+          {
+            "kind": "char_alt",
+            "value": 65
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 70
+          },
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "char_alt",
+            "value": 97
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 102
+          },
+          {
+            "kind": "char_alt",
+            "value": 65
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 70
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 16
+          },
+          {
+            "kind": "ref",
+            "value": 18
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 20
+          },
+          {
+            "kind": "ref",
+            "value": 21
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              45
+            ]
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              49
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "ref",
+            "value": 22
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "ref",
+            "value": 22
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              46
+            ]
+          },
+          {
+            "kind": "ref",
+            "value": 24
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "ref",
+            "value": 24
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 23
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              101
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 69
+          },
+          {
+            "kind": "ref",
+            "value": 27
+          },
+          {
+            "kind": "ref",
+            "value": 28
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              45
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 43
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "ref",
+            "value": 28
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "char",
+            "value": [
+              48
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 57
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 26
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              32
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 9
+          },
+          {
+            "kind": "char_alt",
+            "value": 10
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 30
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ],
+  [
+    "japanese",
+    "\n            # A probably incorrect grammar for Japanese\n            root        ::= jp-char+ ([ \\t\\n] jp-char+)*\n            jp-char     ::= hiragana | katakana | punctuation | cjk\n            hiragana    ::= [ぁ-ゟ]\n            katakana    ::= [ァ-ヿ]\n            punctuation ::= [、-〾]\n            cjk         ::= [一-鿿]\n            ",
+    [
+      [
+        [
+          "root",
+          0
+        ],
+        [
+          "jp-char",
+          1
+        ],
+        [
+          "root_2",
+          2
+        ],
+        [
+          "root_3",
+          3
+        ],
+        [
+          "root_4",
+          4
+        ],
+        [
+          "root_5",
+          5
+        ],
+        [
+          "hiragana",
+          6
+        ],
+        [
+          "katakana",
+          7
+        ],
+        [
+          "punctuation",
+          8
+        ],
+        [
+          "cjk",
+          9
+        ]
+      ],
+      [
+        [
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "ref",
+            "value": 5
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 6
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 7
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 8
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 9
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "ref",
+            "value": 2
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              32
+            ]
+          },
+          {
+            "kind": "char_alt",
+            "value": 9
+          },
+          {
+            "kind": "char_alt",
+            "value": 10
+          },
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "ref",
+            "value": 4
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "ref",
+            "value": 1
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "ref",
+            "value": 3
+          },
+          {
+            "kind": "ref",
+            "value": 5
+          },
+          {
+            "kind": "alt"
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              12353
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 12447
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              12449
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 12543
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              12289
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 12350
+          },
+          {
+            "kind": "end"
+          }
+        ],
+        [
+          {
+            "kind": "char",
+            "value": [
+              19968
+            ]
+          },
+          {
+            "kind": "char_rng_upper",
+            "value": 40959
+          },
+          {
+            "kind": "end"
+          }
+        ]
+      ]
+    ]
+  ]
+]

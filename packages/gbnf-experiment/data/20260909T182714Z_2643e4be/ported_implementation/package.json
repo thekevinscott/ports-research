@@ -1,0 +1,22 @@
+{
+  "name": "gbnf",
+  "version": "0.0.30",
+  "description": "A library for parsing GBNF grammars",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./*"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "generate-fixtures": "python3 tests/fixtures/generate_fixtures.py"
+  },
+  "files": [
+    "src"
+  ],
+  "license": "MIT",
+  "author": "Ambient Labs <maintainers@gbnf.dev>",
+  "homepage": "https://github.com/ambient-labs/GBNF/packages/gbnf"
+}

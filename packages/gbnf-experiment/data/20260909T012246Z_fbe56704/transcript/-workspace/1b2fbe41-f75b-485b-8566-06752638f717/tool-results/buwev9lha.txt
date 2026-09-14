@@ -1,0 +1,2999 @@
+# Generated Python test suite
+
+Copy the suite into the ported implementation, then run it:
+
+```sh
+cd /workspace/ported_implementation
+cp -r /workspace/tests/python tests
+uv run --offline --no-project --with pytest==9.1.1 --with pytest-describe==3.2.0 python -m pytest tests
+```
+
+Run it as written. `python -m pytest` puts the working directory on `sys.path`, so `import
+gbnf` resolves from the port root. Set `PYTHONPATH` if your package lives somewhere else.
+
+A `pytest` is also on `PATH`, but running it directly leaves the working directory off
+`sys.path`, and `pytest tests` fails to import the package under test. The bare `python` has
+no pytest of its own — `uv run` is what supplies it.
+
+The versions are pinned to what the image's uv cache holds. `--offline` reads only that
+cache, so changing either pin makes the command fail to resolve.
+=== TEST FILES ===
+--- tests/python/validation/validate_grammar_test.py
+import pytest
+from gbnf import GBNF, GrammarParseError
+
+
+def describe_validate_grammar():
+    @pytest.mark.parametrize(
+        ("grammar"),
+        [
+            '''root ::= "foo"''',
+            '''root ::= "foo" | "bar"''',
+            """root ::= ("foo" | "bar")""",
+            """root ::= ("foo" | "bar")?""",
+            """root ::= ("foo" | "bar")*""",
+            """root ::= ("foo" | "bar")+""",
+            """root ::= [a-z]""",
+            """root ::= [a-zA-Z]""",
+            """root ::= [a-zA-Z0-9]""",
+            """root ::= [a-zA-Z0-9]*""",
+            """root ::= [a-zA-Z0-9]?""",
+            """root ::= [a-z]+""",
+            """root ::= [a-zA-Z0-9]+""",
+            """root ::= ([a-zA-Z0-9])*""",
+            """root ::= ([a-zA-Z0-9])?""",
+            """root ::= ([a-zA-Z0-9])+""",
+            '''
+  root ::= foo
+  foo ::= "foo"''',
+            """
+  root ::= foo
+  foo ::= "foo" | "bar" | ([a-z])?
+  """,
+        ],
+    )
+    def test_it_parses_a_grammar(grammar):
+        GBNF(grammar)
+
+    @pytest.mark.parametrize(
+        ("grammar", "error_pos", "error_reason"),
+        [
+            ("", 0, "No rules were found"),
+            ('root = "foo"', 5, "Expecting ::= at 5"),
+            (
+                """root ::= foo
+foo := "foo"
+  """,
+                17,
+                "Expecting ::= at 17",
+            ),
+            ("root ::= foo", 9, 'Undefined rule identifier "foo"'),
+            (
+                """root ::= foo
+bar ::= "bar"
+  """,
+                9,
+                'Undefined rule identifier "foo"',
+            ),
+            (
+                """root ::= foo
+foo ::= baz
+bar ::= "bar"
+  """,
+                21,
+                'Undefined rule identifier "baz"',
+            ),
+            ("root ::= foo ::= bar", 13, "Expecting newline or end at 13"),
+            (
+                """root ::= ([a-z]
+foo ::= "foo"
+  """,
+                20,
+                "Expecting ')' at 20",
+            ),
+        ],
+    )
+    def test_it_reports_an_error_for_an_invalid_grammar(
+        grammar, error_pos, error_reason
+    ):
+        expected = GrammarParseError(grammar, error_pos, error_reason)
+        with pytest.raises(GrammarParseError) as e:
+            graph = GBNF(grammar)
+        e = e.value
+        assert e == expected
+--- tests/python/validation/validate_input_test.py
+import pytest
+from gbnf import GBNF, InputParseError
+
+
+def describe_validate_input():
+    @pytest.mark.parametrize(
+        ("grammar", "input"),
+        [
+            ['root ::= "foo"', "f"],
+        ],
+    )
+    def test_it_parses_a_grammar(grammar, input):
+        graph = GBNF(grammar, input)
+        assert bool(graph) is True
+
+    @pytest.mark.parametrize(
+        ("grammar", "input_text", "error_pos"),
+        [
+            ['root ::= "foo"', "2", 0],
+            ['root ::= "foo"', "b", 0],
+            ['root ::= "foo"', "f1", 1],
+            ['root ::= "foo"', "fo1", 2],
+            ['root ::= "foo"', "fooo", 3],
+            ['root ::= "foo"', "fooooooo", 3],
+            ['root ::= "foo" | "bar"', "1", 0],
+            ['root ::= "foo" | "bar"', "z", 0],
+            ['root ::= "foo" | "bar"', "f1", 1],
+            ['root ::= "foo" | "bar"', "b1", 1],
+            ['root ::= "foo" | "bar"', "fo1", 2],
+            ['root ::= "foo" | "bar"', "ba1", 2],
+            ['root ::= "foo" | "bar"', "fooo", 3],
+            ['root ::= "foo" | "bar"', "barrr", 3],
+            ['root ::= "foo" | "bar" | "baz"', "1", 0],
+            ['root ::= "foo" | "bar" | "baz"', "z", 0],
+            ['root ::= "foo" | "bar" | "baz"', "f1", 1],
+            ['root ::= "foo" | "bar" | "baz"', "b1", 1],
+            ['root ::= "foo" | "bar" | "baz"', "fo1", 2],
+            ['root ::= "foo" | "bar" | "baz"', "bal", 2],
+            ['root ::= "foo" | "bar" | "baz"', "fooo", 3],
+            ['root ::= "foo" | "bar" | "baz"', "bazrr", 3],
+            ["root ::= [^a]", "a", 0],
+            ["root ::= [^abc]", "b", 0],
+            ["root ::= [^a-z]", "z", 0],
+            ["root ::= [^a-zA-Z]", "X", 0],
+            ["root ::= [^a-zA-Z0-9]", "8", 0],
+            [
+                '''
+  root ::= foo
+  foo ::= "foo"''',
+                "1",
+                0,
+            ],
+            [
+                '''
+  root ::= foo
+  foo ::= "foo"''',
+                "b",
+                0,
+            ],
+            [
+                '''
+  root ::= foo
+  foo ::= "foo"''',
+                "f1",
+                1,
+            ],
+            [
+                '''
+  root ::= foo
+  foo ::= "foo"''',
+                "fo1",
+                2,
+            ],
+            [
+                '''
+  root ::= foo
+  foo ::= "foo"''',
+                "fooo",
+                3,
+            ],
+            [
+                '''
+  root::=foo|"bar"
+  foo::="foo"''',
+                "1",
+                0,
+            ],
+            [
+                '''
+  root::=foo|"bar"
+  foo::="foo"''',
+                "z",
+                0,
+            ],
+            [
+                '''
+  root::=foo|"bar"
+  foo::="foo"''',
+                "f1",
+                1,
+            ],
+            [
+                '''
+  root::=foo|"bar"
+  foo::="foo"''',
+                "b1",
+                1,
+            ],
+            [
+                '''
+  root::=foo|"bar"
+  foo::="foo"''',
+                "fo1",
+                2,
+            ],
+            [
+                '''
+  root::=foo|"bar"
+  foo::="foo"''',
+                "fooo",
+                3,
+            ],
+            [
+                '''
+  root::=foo|"bar"
+  foo::="foo"''',
+                "barr",
+                3,
+            ],
+            [
+                '''
+  root::= foo | bar
+  foo::="foo"
+  bar::="bar"''',
+                "1",
+                0,
+            ],
+            [
+                '''
+  root::= foo | bar
+  foo::="foo"
+  bar::="bar"''',
+                "z",
+                0,
+            ],
+            [
+                '''
+  root::= foo | bar
+  foo::="foo"
+  bar::="bar"''',
+                "f1",
+                1,
+            ],
+            [
+                '''
+  root::= foo | bar
+  foo::="foo"
+  bar::="bar"''',
+                "b1",
+                1,
+            ],
+            [
+                '''
+  root::= foo | bar
+  foo::="foo"
+  bar::="bar"''',
+                "fo1",
+                2,
+            ],
+            [
+                '''
+  root::= foo | bar
+  foo::="foo"
+  bar::="bar"''',
+                "fooo",
+                3,
+            ],
+            [
+                '''
+  root::= foo | bar
+  foo::="foo"
+  bar::="bar"''',
+                "barr",
+                3,
+            ],
+            [
+                """
+  root ::= f | b
+  f ::= fo
+  b ::= ba
+  fo ::= foo
+  ba ::= bar | baz
+  foo ::= "foo"
+  bar ::= "bar"
+  baz ::= "baz"
+  """,
+                "1",
+                0,
+            ],
+            [
+                '''
+  root ::= f | b
+  f ::= fo
+  b ::= ba
+  fo ::= foo
+  ba ::= bar | baz
+  foo ::= "foo"
+  bar ::= "bar"
+  baz ::= "baz"''',
+                "z",
+                0,
+            ],
+            [
+                '''
+  root ::= f | b
+  f ::= fo
+  b ::= ba
+  fo ::= foo
+  ba ::= bar | baz
+  foo ::= "foo"
+  bar ::= "bar"
+  baz ::= "baz"''',
+                "f1",
+                1,
+            ],
+            [
+                '''
+  root ::= f | b
+  f ::= fo
+  b ::= ba
+  fo ::= foo
+  ba ::= bar | baz
+  foo ::= "foo"
+  bar ::= "bar"
+  baz ::= "baz"''',
+                "b1",
+                1,
+            ],
+            [
+                '''
+  root ::= f | b
+  f ::= fo
+  b ::= ba
+  fo ::= foo
+  ba ::= bar | baz
+  foo ::= "foo"
+  bar ::= "bar"
+  baz ::= "baz"''',
+                "fo1",
+                2,
+            ],
+            [
+                '''
+  root ::= f | b
+  f ::= fo
+  b ::= ba
+  fo ::= foo
+  ba ::= bar | baz
+  foo ::= "foo"
+  bar ::= "bar"
+  baz ::= "baz"''',
+                "fooo",
+                3,
+            ],
+            [
+                '''
+  root ::= f | b
+  f ::= fo
+  b ::= ba
+  fo ::= foo
+  ba ::= bar | baz
+  foo ::= "foo"
+  bar ::= "bar"
+  baz ::= "baz"''',
+                "barr",
+                3,
+            ],
+            [
+                '''
+  root ::= f | b
+  f ::= fo
+  b ::= ba
+  fo ::= foo
+  ba ::= bar | baz
+  foo ::= "foo"
+  bar ::= "bar"
+  baz ::= "baz"''',
+                "bazr",
+                3,
+            ],
+            ["root ::= [a-z]", "A", 0],
+            ["root ::= [a-z]", "0", 0],
+            ["root ::= [a-z]", "az", 1],
+            ["root ::= [a-z]?", "A", 0],
+            ["root ::= [a-z]?", "0", 0],
+            ["root ::= [a-z]?", "az", 1],
+            ["root ::= [a-z]+", "A", 0],
+            ["root ::= [a-z]+", "0", 0],
+            ["root ::= [a-z]+", "az0", 2],
+            ["root ::= [a-z]*", "A", 0],
+            ["root ::= [a-z]*", "0", 0],
+            ["root ::= [a-z]*", "az0", 2],
+            # sticking to llama.cpp's implementation, for a char_not rule _and_ a char rule
+            # side by side, _either_ is valid.
+            # that means that input explicitly forbidden by char_not can be allowed by the char
+            # rule.
+            # it seems weird. but it's the way it is.
+            # so below, anything in b-z is allowed, because of the second rule. Anything _not_ a-z is
+            # also allowed, because of the first rule. So really the only character disallowed is 'a'.
+            ["root ::= ( [^abcdefgh] | [b-z])*", "a", 0],
+        ],
+    )
+    def test_it_reports_an_error_for_an_invalid_input(grammar, input_text, error_pos):
+        graph = GBNF(grammar)
+        expected = InputParseError(input_text, error_pos)
+        with pytest.raises(InputParseError) as e:
+            graph.add(input_text)
+
+        e = e.value
+        assert e == expected
+--- tests/python/iteration/grammars_test.py
+import pytest
+from gbnf import GBNF
+
+
+def describe_grammars():
+    def _load_cases():
+        import json
+        from pathlib import Path
+
+        grammars_dir = Path(__file__).parent / "grammars"
+        cases = []
+        for grammar_path in sorted(grammars_dir.glob("*.gbnf")):
+            json_path = grammar_path.with_suffix(".json")
+            grammar = grammar_path.read_text()
+            for test_case in json.loads(json_path.read_text()):
+                cases.append((grammar_path.stem, test_case, grammar))
+        if not cases:
+            raise Exception("No grammar test cases found")
+        return cases
+
+    @pytest.mark.parametrize(("key", "test_case", "grammar"), _load_cases())
+    def test_it_parses_a_known_valid_grammar(key, test_case, grammar):
+        state = GBNF(grammar)
+        for char in test_case:
+            state = state.add(char)
+--- tests/python/iteration/iteration_test.py
+import pytest
+from gbnf import GBNF, RuleChar, RuleCharExclude, RuleEnd
+
+
+def describe_iteration():
+    @pytest.mark.parametrize(
+        ("grammar", "expected"),
+        [
+            # single char rule
+            (
+                'root ::= "foo"',
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                ],
+            ),
+            # two char rules
+            (
+                'root ::= "foo" | "bar" ',
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("b")],
+                    },
+                ],
+            ),
+            # three char rules
+            (
+                'root ::= "foo" | "bar" | "gaz"',
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("b")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("g")],
+                    },
+                ],
+            ),
+            (
+                'root ::= "foo" | "bar" | "baz"',
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("b")],
+                    },
+                ],
+            ),
+            # char not
+            (
+                "root ::= [^x]",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [ord("x")],
+                    },
+                ],
+            ),
+            (
+                'root ::= [^f] "o"',
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [ord("f")],
+                    },
+                ],
+            ),
+            (
+                "root ::= [^A-Z]",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [
+                            [
+                                ord("A"),
+                                ord("Z"),
+                            ],
+                        ],
+                    },
+                ],
+            ),
+            (
+                "root ::= [^A-Z0-9]",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [
+                            [
+                                ord("A"),
+                                ord("Z"),
+                            ],
+                            [
+                                ord("0"),
+                                ord("9"),
+                            ],
+                        ],
+                    },
+                ],
+            ),
+            (
+                "root ::= [^A-Z0-9_-]",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [
+                            [
+                                ord("A"),
+                                ord("Z"),
+                            ],
+                            [
+                                ord("0"),
+                                ord("9"),
+                            ],
+                            ord("_"),
+                            ord("-"),
+                        ],
+                    },
+                ],
+            ),
+            # expressions
+            (
+                """
+root ::= foo
+foo ::= "foo"
+  """,
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                ],
+            ),
+            (
+                """
+root ::= f
+f ::= foo
+foo ::= "foo"
+  """,
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                ],
+            ),
+            # expression and a char rule
+            (
+                '''
+root ::= foo | "bar"
+foo ::= "foo"''',
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("b")],
+                    },
+                ],
+            ),
+            # two expressions
+            (
+                """
+root ::= foo | bar
+foo ::= "foo"
+bar ::= "bar"
+  """,
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("b")],
+                    },
+                ],
+            ),
+            # nested expressions
+            (
+                """
+root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"
+  """,
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("b")],
+                    },
+                ],
+            ),
+            # ranges
+            (
+                "root ::= [a-z]",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")]],
+                    },
+                ],
+            ),
+            (
+                "root ::= [a-zA-Z]",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")], [ord("A"), ord("Z")]],
+                    },
+                ],
+            ),
+            # range with ? modifier
+            (
+                "root ::= [a-z]?",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            # range with + modifier
+            (
+                "root ::= [a-z]+",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")]],
+                    },
+                ],
+            ),
+            # range with * modifier
+            (
+                "root ::= [a-z]*",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            # rules that aren't used are silently ignored
+            (
+                '''
+  root ::= "foo"
+  foo ::= "foo"''',
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                ],
+            ),
+            # real world use cases
+            # arithmetic
+            (
+                """
+  root  ::= (expr "=" term "\
+")+
+  expr  ::= term ([-+*/] term)*
+  term  ::= [0-9]+
+  """,
+                [
+                    {"type": "char", "value": [[ord("0"), ord("9")]]},
+                ],
+            ),
+        ],
+    )
+    def test_it_returns_parse_state_for_grammar(grammar, expected):
+        def transformed_expected_dict(e: dict):
+            if e["type"] == "char":
+                return RuleChar(e["value"])
+            elif e["type"] == "char_exclude":
+                return RuleCharExclude(e["value"])
+            elif e["type"] == "end":
+                return RuleEnd()
+            else:
+                raise Exception(f"Unknown type found in expectation array: {type}")
+
+        state = [*GBNF(grammar)]
+        expected = [transformed_expected_dict(e) for e in expected]
+        assert state == expected
+--- tests/python/iteration/iteration_with_additional_strings_test.py
+import json
+import pytest
+from gbnf import GBNF, InputParseError, RuleChar, RuleCharExclude, RuleEnd
+
+
+def describe_iteration():
+    @pytest.mark.parametrize(
+        ("grammar", "starting", "additional"),
+        [
+            # single char rule
+            ['root ::= "foo"', "f", "1"],
+            ['root ::= "foo"', "f", "b"],
+            ['root ::= "foo"', "f", "o1"],
+            ['root ::= "foo"', "f", "ooo"],
+            ['root ::= "foo"', "f", "ooooooo"],
+            # two char rules
+            ['root ::= "foo" | "bar"', "f", "1"],
+            ['root ::= "foo" | "bar"', "b", "1"],
+            ['root ::= "foo" | "bar"', "f", "o1"],
+            ['root ::= "foo" | "bar"', "b", "a1"],
+            ['root ::= "foo" | "bar"', "f", "ooo"],
+            ['root ::= "foo" | "bar"', "b", "arrr"],
+            # three char rules
+            ['root ::= "foo" | "bar" | "baz"', "f", "1"],
+            ['root ::= "foo" | "bar" | "baz"', "f", "z"],
+            ['root ::= "foo" | "bar" | "baz"', "b", "b1"],
+            ['root ::= "foo" | "bar" | "baz"', "f", "o1"],
+            ['root ::= "foo" | "bar" | "baz"', "b", "al"],
+            ['root ::= "foo" | "bar" | "baz"', "f", "ooo"],
+            ['root ::= "foo" | "bar" | "baz"', "b", "azrr"],
+            # expressions
+            [
+                '''root ::= foo
+foo ::="foo"''',
+                "f",
+                "1",
+            ],
+            [
+                '''root ::= foo
+foo ::="foo"''',
+                "f",
+                "b",
+            ],
+            [
+                '''root ::= foo
+foo ::="foo"''',
+                "f",
+                "o1",
+            ],
+            [
+                '''root ::= foo
+foo ::="foo"''',
+                "f",
+                "ooo",
+            ],
+            # expression and a char rule
+            [
+                '''root::=foo|"bar"
+foo::="foo"''',
+                "f",
+                "1",
+            ],
+            [
+                '''root::=foo|"bar"
+foo::="foo"''',
+                "f",
+                "z",
+            ],
+            [
+                '''root::=foo|"bar"
+foo::="foo"''',
+                "b",
+                "b1",
+            ],
+            [
+                '''root::=foo|"bar"
+foo::="foo"''',
+                "f",
+                "o1",
+            ],
+            [
+                '''root::=foo|"bar"
+foo::="foo"''',
+                "f",
+                "ooo",
+            ],
+            [
+                '''root::=foo|"bar"
+foo::="foo"''',
+                "b",
+                "arr",
+            ],
+            # two expressions
+            [
+                '''root::= foo | bar
+ foo::="foo"
+ bar::="bar"''',
+                "f",
+                "1",
+            ],
+            [
+                '''root::= foo | bar
+ foo::="foo"
+ bar::="bar"''',
+                "f",
+                "z",
+            ],
+            [
+                '''root::= foo | bar
+ foo::="foo"
+ bar::="bar"''',
+                "b",
+                "1",
+            ],
+            [
+                '''root::= foo | bar
+ foo::="foo"
+ bar::="bar"''',
+                "f",
+                "o1",
+            ],
+            [
+                '''root::= foo | bar
+ foo::="foo"
+ bar::="bar"''',
+                "f",
+                "ooo",
+            ],
+            [
+                '''root::= foo | bar
+ foo::="foo"
+ bar::="bar"''',
+                "b",
+                "arr",
+            ],
+            # nested expressions
+            [
+                '''root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "f",
+                "1",
+            ],
+            [
+                '''root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "f",
+                "z",
+            ],
+            [
+                '''root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "b",
+                "1",
+            ],
+            [
+                '''root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "f",
+                "o1",
+            ],
+            [
+                '''root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "f",
+                "ooo",
+            ],
+            [
+                '''root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "b",
+                "arr",
+            ],
+            [
+                '''root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "b",
+                "azr",
+            ],
+            # ranges
+            ["root ::= [a-z]", "a", "A"],
+            ["root ::= [a-z]", "a", "0"],
+            ["root ::= [a-z]", "a", "az"],
+            # range with ? modifier
+            ["root ::= [a-z]?", "a", "A"],
+            ["root ::= [a-z]?", "a", "0"],
+            ["root ::= [a-z]?", "a", "az"],
+            # range with + modifier
+            ["root ::= [a-z]+", "a", "A"],
+            ["root ::= [a-z]+", "a", "0"],
+            ["root ::= [a-z]+", "a", "z0"],
+            # range with * modifier
+            ["root ::= [a-z]*", "a", "A"],
+            ["root ::= [a-z]*", "a", "0"],
+            ["root ::= [a-z]*", "a", "z0"],
+        ],
+    )
+    def test_it_raises_if_encountering_grammar_with_starting_s_and_additional_s(
+        grammar, starting, additional
+    ):
+        state = GBNF(grammar, starting)
+        with pytest.raises(InputParseError) as e:
+            state + additional
+
+    @pytest.mark.parametrize(
+        ("grammar", "starting", "additional", "expected"),  # single char rule
+        [
+            [
+                'root ::= "foo"',
+                "",
+                "f",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ],
+            [
+                'root ::= "foo"',
+                "f",
+                "o",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ],
+            [
+                'root ::= "foo"',
+                "fo",
+                "o",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            # two char rules
+            [
+                'root ::= "foo" | "bar" ',
+                "",
+                "f",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ],
+            [
+                'root ::= "foo" | "bar" ',
+                "f",
+                "o",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ],
+            [
+                'root ::= "foo" | "bar" ',
+                "fo",
+                "o",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                'root ::= "foo" | "bar" ',
+                "",
+                "b",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("a")],
+                    },
+                ],
+            ],
+            [
+                'root ::= "foo" | "bar" ',
+                "b",
+                "a",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("r")],
+                    },
+                ],
+            ],
+            [
+                'root ::= "foo" | "bar" ',
+                "ba",
+                "r",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            # three char rules
+            [
+                'root ::= "foo" | "bar" | "baz"',
+                "b",
+                "a",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("r")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("z")],
+                    },
+                ],
+            ],
+            # char not
+            [
+                'root ::= [^f] "o"',
+                "g",
+                "o",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                "root ::= [^A-Z]",
+                "",
+                "a",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                "root ::= [^A-Z0-9]",
+                "",
+                "a",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                "root ::= [^A-Z0-9_-]",
+                "",
+                "a",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            # expressions
+            [
+                '''root ::= foo
+foo ::= "foo"''',
+                "",
+                "f",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ],
+            [
+                '''root ::= foo
+foo ::= "foo"''',
+                "f",
+                "o",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ],
+            [
+                '''root ::= foo
+foo ::= "foo"''',
+                "fo",
+                "o",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            # expression and a char rule
+            [
+                '''root ::= foo | "bar"
+foo ::= "foo"''',
+                "",
+                "f",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ],
+            [
+                '''root ::= foo | "bar"
+foo ::= "foo"''',
+                "f",
+                "o",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ],
+            [
+                '''root ::= foo | "bar"
+foo ::= "foo"''',
+                "fo",
+                "o",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                '''root ::= foo | "bar"
+foo ::= "foo"''',
+                "",
+                "b",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("a")],
+                    },
+                ],
+            ],
+            [
+                '''root ::= foo | "bar"
+foo ::= "foo"''',
+                "b",
+                "a",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("r")],
+                    },
+                ],
+            ],
+            [
+                '''root ::= foo | "bar"
+foo ::= "foo"''',
+                "ba",
+                "r",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            # two expressions
+            [
+                '''root ::= foo | bar
+foo ::= "foo"
+bar ::= "bar"''',
+                "",
+                "f",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ],
+            [
+                '''
+root ::= foo | bar
+foo ::= "foo"
+bar ::= "bar"''',
+                "f",
+                "o",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ],
+            [
+                '''
+root ::= foo | bar
+foo ::= "foo"
+bar ::= "bar"''',
+                "fo",
+                "o",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                '''root ::= foo | bar
+foo ::= "foo"
+bar ::= "bar"''',
+                "",
+                "b",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("a")],
+                    },
+                ],
+            ],
+            [
+                '''root ::= foo | bar
+foo ::= "foo"
+bar ::= "bar"''',
+                "b",
+                "a",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("r")],
+                    },
+                ],
+            ],
+            [
+                '''root ::= foo | bar
+foo ::= "foo"
+bar ::= "bar"''',
+                "ba",
+                "r",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            # nested expressions
+            [
+                '''
+root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "",
+                "f",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ],
+            [
+                '''root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "f",
+                "o",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ],
+            [
+                '''root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "fo",
+                "o",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                '''root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "",
+                "b",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("a")],
+                    },
+                ],
+            ],
+            [
+                '''
+root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "b",
+                "a",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("r")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("z")],
+                    },
+                ],
+            ],
+            [
+                '''
+root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "ba",
+                "r",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                '''
+root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "ba",
+                "z",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            # ranges
+            [
+                "root ::= [a-z]",
+                "",
+                "a",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                "root ::= [a-z]",
+                "",
+                "m",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                "root ::= [a-z]",
+                "",
+                "z",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                "root ::= [a-zA-Z]",
+                "",
+                "a",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                "root ::= [a-zA-Z]",
+                "",
+                "Z",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                "root ::= [a-zA-Z0-9]",
+                "",
+                "Z",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                "root ::= [a-zA-Z0-9]",
+                "",
+                "0",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            [
+                "root ::= [a-zA-Z0-9]",
+                "",
+                "9",
+                [
+                    {"type": "end"},
+                ],
+            ],
+            # range with ? modifier
+            [
+                "root ::= [a-z]?",
+                "",
+                "a",
+                [
+                    {
+                        "type": "end",
+                    },
+                ],
+            ],
+            [
+                "root ::= [a-zA-Z]?",
+                "",
+                "Z",
+                [
+                    {
+                        "type": "end",
+                    },
+                ],
+            ],
+            [
+                "root ::= [a-zA-Z0-9]?",
+                "",
+                "0",
+                [
+                    {
+                        "type": "end",
+                    },
+                ],
+            ],
+            # range with + modifier
+            [
+                "root ::= [a-z]+",
+                "",
+                "a",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ],
+            [
+                "root ::= [a-zA-Z]+",
+                "",
+                "Z",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")], [ord("A"), ord("Z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ],
+            [
+                "root ::= [a-zA-Z]+",
+                "azA",
+                "Z",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")], [ord("A"), ord("Z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ],
+            # range with * modifier
+            [
+                "root ::= [a-z]*",
+                "",
+                "a",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ],
+            [
+                "root ::= [a-zA-Z]+",
+                "",
+                "Z",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")], [ord("A"), ord("Z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ],
+            [
+                "root ::= [a-zA-Z]+",
+                "acczABC",
+                "Z",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")], [ord("A"), ord("Z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ],
+            [
+                'root ::= "foo" | "bar" | "baz" | "bazaar" | "barrington" ',
+                "baza",
+                "a",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("r")],
+                    },
+                ],
+            ],
+            # char not with modifiers
+            [
+                'root ::= [^f]+ "o"',
+                "aaa",
+                "a",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [ord("f")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ],
+            [
+                "root ::= [^A-Z]+",
+                "abc",
+                "d",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [
+                            [
+                                ord("A"),
+                                ord("Z"),
+                            ],
+                        ],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ],
+            [
+                "root ::= [^A-Z0-9]*",
+                "abc",
+                "d",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [
+                            [
+                                ord("A"),
+                                ord("Z"),
+                            ],
+                            [
+                                ord("0"),
+                                ord("9"),
+                            ],
+                        ],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ],
+            [
+                "root ::= [^A-Z0-9_-]*",
+                "abc",
+                "d",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [
+                            [
+                                ord("A"),
+                                ord("Z"),
+                            ],
+                            [
+                                ord("0"),
+                                ord("9"),
+                            ],
+                            ord("_"),
+                            ord("-"),
+                        ],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ],
+        ],
+    )
+    def test_it_parses_a_grammar_with_starting_and_additional(
+        grammar, starting, additional, expected
+    ):
+        def transformed_expected_dict(e: dict):
+            if e["type"] == "char":
+                return RuleChar(e["value"])
+            elif e["type"] == "char_exclude":
+                return RuleCharExclude(e["value"])
+            elif e["type"] == "end":
+                return RuleEnd()
+            else:
+                raise Exception(f"Unknown type found in expectation array: {type}")
+
+        state = GBNF(grammar, starting)
+        state = state + additional
+        expected = [transformed_expected_dict(e) for e in expected]
+        state = sorted(state, key=lambda r: json.dumps(r.__dict__))
+        expected = sorted(expected, key=lambda r: json.dumps(r.__dict__))
+        assert state == expected
+
+    @pytest.mark.parametrize(("error_for_most_recent_input"), [False, True])
+    def test_it_raises_a_particular_error(error_for_most_recent_input):
+        grammar = 'root ::= "bar"'
+        state = GBNF(grammar)
+        state = state.add("b")
+        state = state.add("a")
+        with pytest.raises(InputParseError) as e:
+            state.add("z")
+        err = e.value
+        expected_error = InputParseError("z", 0, "ba")
+        if error_for_most_recent_input:
+            assert (
+                err.error_for_most_recent_input
+                == expected_error.error_for_most_recent_input
+            )
+        else:
+            assert str(err) == str(expected_error)
+--- tests/python/iteration/iteration_with_an_initial_string_test.py
+import json
+import pytest
+from gbnf import GBNF, RuleChar, RuleCharExclude, RuleEnd
+
+
+def describe_iteration():
+    @pytest.mark.parametrize(
+        ("grammar", "input_string", "expected"),
+        [
+            # single char rule
+            (
+                'root ::= "foo"',
+                "",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                ],
+            ),
+            (
+                'root ::= "foo"',
+                "f",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            (
+                'root ::= "foo"',
+                "fo",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            (
+                'root ::= "foo"',
+                "foo",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            # two char rules
+            (
+                'root ::= "foo" | "bar" ',
+                "",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("b")],
+                    },
+                ],
+            ),
+            (
+                'root ::= "foo" | "bar" ',
+                "f",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            (
+                'root ::= "foo" | "bar" ',
+                "fo",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            (
+                'root ::= "foo" | "bar" ',
+                "foo",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                'root ::= "foo" | "bar" ',
+                "b",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("a")],
+                    },
+                ],
+            ),
+            (
+                'root ::= "foo" | "bar" ',
+                "ba",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("r")],
+                    },
+                ],
+            ),
+            (
+                'root ::= "foo" | "bar" ',
+                "bar",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            # three char rules
+            (
+                'root ::= "foo" | "bar" | "baz"',
+                "ba",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("r")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("z")],
+                    },
+                ],
+            ),
+            # chars that shadow built-in characters
+            (
+                'root ::= "["',
+                "[",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                'root ::= "]"',
+                "]",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                'root ::= "[]"',
+                "[]",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                'root ::= "{"',
+                "{",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                'root ::= "}"',
+                "}",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                'root ::= "{}"',
+                "{}",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                'root ::= "[{}]"',
+                "[{}]",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            # ('root ::= "[{\"}]"', '[{"}]', [
+            #   { "type": 'end' },
+            # ]),
+            # char not
+            (
+                'root ::= [^f] "o"',
+                "",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [ord("f")],
+                    },
+                ],
+            ),
+            (
+                'root ::= [^f] "o"',
+                "a",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            (
+                "root ::= [^A-Z]",
+                "",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [
+                            [
+                                ord("A"),
+                                ord("Z"),
+                            ],
+                        ],
+                    },
+                ],
+            ),
+            (
+                "root ::= [^A-Z0-9]",
+                "",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [
+                            [
+                                ord("A"),
+                                ord("Z"),
+                            ],
+                            [
+                                ord("0"),
+                                ord("9"),
+                            ],
+                        ],
+                    },
+                ],
+            ),
+            (
+                "root ::= [^A-Z0-9_-]",
+                "",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [
+                            [
+                                ord("A"),
+                                ord("Z"),
+                            ],
+                            [
+                                ord("0"),
+                                ord("9"),
+                            ],
+                            ord("_"),
+                            ord("-"),
+                        ],
+                    },
+                ],
+            ),
+            # expressions
+            (
+                '''
+root ::= foo
+foo ::= "foo"''',
+                "",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                ],
+            ),
+            (
+                """root ::= foo
+foo ::= "foo"
+""",
+                "f",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            (
+                """
+root ::= foo
+foo ::= "foo"
+""",
+                "fo",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            (
+                '''root ::= foo
+foo ::= "foo"''',
+                "foo",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                '''root ::= f
+f ::= foo
+foo ::= "foo"''',
+                "",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                ],
+            ),
+            # expression and a char rule
+            (
+                """
+root ::= foo | "bar"
+foo ::= "foo"
+""",
+                "",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("b")],
+                    },
+                ],
+            ),
+            (
+                '''
+root ::= foo | "bar"
+foo ::= "foo"''',
+                "f",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            (
+                '''root ::= foo | "bar"
+foo ::= "foo"''',
+                "fo",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            (
+                '''root ::= foo | "bar"
+foo ::= "foo"''',
+                "foo",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                '''root ::= foo | "bar"
+foo ::= "foo"''',
+                "b",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("a")],
+                    },
+                ],
+            ),
+            (
+                '''root ::= foo | "bar"
+foo ::= "foo"''',
+                "ba",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("r")],
+                    },
+                ],
+            ),
+            (
+                '''root ::= foo | "bar"
+foo ::= "foo"''',
+                "bar",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            # two expressions
+            (
+                '''
+root ::= foo | bar
+foo ::= "foo"
+bar ::= "bar"''',
+                "",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("b")],
+                    },
+                ],
+            ),
+            (
+                '''
+root ::= foo | bar
+foo ::= "foo"
+bar ::= "bar"''',
+                "f",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            (
+                '''
+root ::= foo | bar
+foo ::= "foo"
+bar ::= "bar"''',
+                "fo",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            (
+                '''
+root ::= foo | bar
+foo ::= "foo"
+bar ::= "bar"''',
+                "foo",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                '''
+root ::= foo | bar
+foo ::= "foo"
+bar ::= "bar"''',
+                "b",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("a")],
+                    },
+                ],
+            ),
+            (
+                '''
+root ::= foo | bar
+foo ::= "foo"
+bar ::= "bar"''',
+                "ba",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("r")],
+                    },
+                ],
+            ),
+            (
+                '''
+root ::= foo | bar
+foo ::= "foo"
+bar ::= "bar"''',
+                "bar",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            # nested expressions
+            (
+                '''
+root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("b")],
+                    },
+                ],
+            ),
+            (
+                '''
+root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "f",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            (
+                '''
+root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "fo",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            (
+                '''
+root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "foo",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                '''
+root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "b",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("a")],
+                    },
+                ],
+            ),
+            (
+                '''
+root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "ba",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("r")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("z")],
+                    },
+                ],
+            ),
+            (
+                '''
+root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "bar",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                '''
+root ::= f | b
+f ::= fo
+b ::= ba
+fo ::= foo
+ba ::= bar | baz
+foo ::= "foo"
+bar ::= "bar"
+baz ::= "baz"''',
+                "baz",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            # ranges
+            (
+                "root ::= [a-z]",
+                "",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")]],
+                    },
+                ],
+            ),
+            (
+                "root ::= [a-zA-Z]",
+                "",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")], [ord("A"), ord("Z")]],
+                    },
+                ],
+            ),
+            (
+                "root ::= [a-z]",
+                "a",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                "root ::= [a-z]",
+                "m",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                "root ::= [a-z]",
+                "z",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                "root ::= [a-zA-Z]",
+                "a",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                "root ::= [a-zA-Z]",
+                "Z",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                "root ::= [a-zA-Z0-9]",
+                "Z",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                "root ::= [a-zA-Z0-9]",
+                "0",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            (
+                "root ::= [a-zA-Z0-9]",
+                "9",
+                [
+                    {"type": "end"},
+                ],
+            ),
+            # range with ? modifier
+            (
+                "root ::= [a-z]?",
+                "",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            (
+                "root ::= [a-z]?",
+                "a",
+                [
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            (
+                "root ::= [a-zA-Z]?",
+                "Z",
+                [
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            (
+                "root ::= [a-zA-Z0-9]?",
+                "0",
+                [
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            # range with + modifier
+            (
+                "root ::= [a-z]+",
+                "",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")]],
+                    },
+                ],
+            ),
+            (
+                "root ::= [a-z]+",
+                "l",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            (
+                "root ::= [a-zA-Z]+",
+                "Z",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")], [ord("A"), ord("Z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            (
+                "root ::= [a-zA-Z]+",
+                "aZ",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")], [ord("A"), ord("Z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            (
+                "root ::= [a-zA-Z]+",
+                "azAZ",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")], [ord("A"), ord("Z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            # range with * modifier
+            (
+                "root ::= [a-z]*",
+                "",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            (
+                "root ::= [a-z]*",
+                "a",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            (
+                "root ::= [a-zA-Z]+",
+                "Z",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")], [ord("A"), ord("Z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            (
+                "root ::= [a-zA-Z]+",
+                "abczABCZ",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("a"), ord("z")], [ord("A"), ord("Z")]],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            # char not with modifiers
+            (
+                'root ::= [^f]+ "o"',
+                "aaa",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [ord("f")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            (
+                "root ::= [^A-Z]+",
+                "abc",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [
+                            [
+                                ord("A"),
+                                ord("Z"),
+                            ],
+                        ],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            (
+                "root ::= [^A-Z0-9]*",
+                "abc",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [
+                            [
+                                ord("A"),
+                                ord("Z"),
+                            ],
+                            [
+                                ord("0"),
+                                ord("9"),
+                            ],
+                        ],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            (
+                "root ::= [^A-Z0-9_-]*",
+                "abc",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [
+                            [
+                                ord("A"),
+                                ord("Z"),
+                            ],
+                            [
+                                ord("0"),
+                                ord("9"),
+                            ],
+                            ord("_"),
+                            ord("-"),
+                        ],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            # real world bugs
+            (
+                '''
+root ::= [a-z] | xyx
+xyx ::= "foo"''',
+                "f",
+                [
+                    {"type": "end"},
+                    {
+                        "type": "char",
+                        "value": [ord("o")],
+                    },
+                ],
+            ),
+            # "baz" and "bazaar" are ambiguous, and a string "bazaa" should not result in an 'a' CHAR rule
+            (
+                'root ::= "foo" | "bar" | "baz" | "bazaar" | "barrington" ',
+                "bazaa",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("r")],
+                    },
+                ],
+            ),
+            # should be able to step _into_ a rule, and then continue with the previous rule
+            (
+                'root ::= ("bar" | "foo") "zyx"',
+                "bar",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("z")],
+                    },
+                ],
+            ),
+            # should be able to process a rule, then step _into_ a rule, with a pointer to previous rule
+            (
+                'root ::= "z" ("bar" | "foo") "zzzz"',
+                "z",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("b")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("f")],
+                    },
+                ],
+            ),
+            # should be able to process a rule, then step _into_ a rule, and then continue with the previous rule
+            (
+                'root ::= "z" ("bar" | "foo") "zzz"',
+                "zbar",
+                [
+                    {
+                        "type": "char",
+                        "value": [ord("z")],
+                    },
+                ],
+            ),
+            (
+                """
+root  ::= termz ([-+*/] termz)* 
+termz  ::= [0-9]+""",
+                "1",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("0"), ord("9")]],
+                    },
+                    {
+                        "type": "char",
+                        "value": [
+                            ord("-"),
+                            ord("+"),
+                            ord("*"),
+                            ord("/"),
+                        ],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            (
+                """
+root  ::= expr "=" termy  
+expr  ::= termy ([-+*/] termy)*
+termy  ::= [0-9]+""",
+                "1",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("0"), ord("9")]],
+                    },
+                    {
+                        "type": "char",
+                        "value": [
+                            ord("-"),
+                            ord("+"),
+                            ord("*"),
+                            ord("/"),
+                        ],
+                    },
+                    {
+                        "type": "char",
+                        "value": [
+                            ord("="),
+                        ],
+                    },
+                ],
+            ),
+            (
+                """
+root  ::= (expr "=" terma "\n")+
+expr  ::= terma ([-+*/] terma)*
+terma  ::= [0-9]+""",
+                "1",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("0"), ord("9")]],
+                    },
+                    {
+                        "type": "char",
+                        "value": [
+                            ord("-"),
+                            ord("+"),
+                            ord("*"),
+                            ord("/"),
+                        ],
+                    },
+                    {
+                        "type": "char",
+                        "value": [
+                            ord("="),
+                        ],
+                    },
+                ],
+            ),
+            (
+                """root  ::= (expr "=" termb "\n")+
+expr  ::= termb ([-+*/] termb)*
+termb  ::= [0-9]+""",
+                "1+",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("0"), ord("9")]],
+                    },
+                ],
+            ),
+            (
+                """
+root  ::= (expr "=" termc "\n")+
+expr  ::= termc ([-+*/] termc)*
+termc  ::= [0-9]+""",
+                "1=",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("0"), ord("9")]],
+                    },
+                ],
+            ),
+            (
+                """root  ::= (expr "=" termd "\n")+
+expr  ::= termd ([-+*/] termd)*
+termd  ::= [0-9]+""",
+                "1+1",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("0"), ord("9")]],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("-"), ord("+"), ord("*"), ord("/")],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("=")],
+                    },
+                ],
+            ),
+            (
+                """root  ::= (expr "=" term "\n")+
+expr  ::= term ([-+*/] term)*
+term  ::= [0-9]+""",
+                "1=1",
+                [
+                    {
+                        "type": "char",
+                        "value": [[ord("0"), ord("9")]],
+                    },
+                    {
+                        "type": "char",
+                        "value": [ord("\n")],
+                    },
+                ],
+            ),
+            (
+                """root ::= "\\"" ( [^\\"abcdefghA-Z])* """,
+                """"is not only in its lyrism, its vow to sustin it in its poo-sion, its r,v:l'y, it's tory,""",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [
+                            ord('"'),
+                            ord("a"),
+                            ord("b"),
+                            ord("c"),
+                            ord("d"),
+                            ord("e"),
+                            ord("f"),
+                            ord("g"),
+                            ord("h"),
+                            [ord("A"), ord("Z")],
+                        ],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+            # sticking to llama.cpp's implementation, for a char_not rule _and_ a char rule
+            # side by side, _either_ is valid.
+            # that means that input explicitly forbidden by char_not can be allowed by the char
+            # rule.
+            # it seems weird. but it's the way it is.
+            # so below, anything in b-z is allowed, because of the second rule. Anything _not_ a-z is
+            # also allowed, because of the first rule. So really the only character disallowed is 'a'.
+            (
+                "root ::= ( [^abcdefgh] | [b-z])* ",
+                "bcdefghzyxw0123ABCZ",
+                [
+                    {
+                        "type": "char_exclude",
+                        "value": [
+                            ord("a"),
+                            ord("b"),
+                            ord("c"),
+                            ord("d"),
+                            ord("e"),
+                            ord("f"),
+                            ord("g"),
+                            ord("h"),
+                        ],
+                    },
+                    {
+                        "type": "char",
+                        "value": [
+                            [ord("b"), ord("z")],
+                        ],
+                    },
+                    {
+                        "type": "end",
+                    },
+                ],
+            ),
+        ],
+    )
+    def test_it_returns_parse_state_for_grammar_and_initial_string(
+        grammar, input_string, expected
+    ):
+        def transformed_expected_dict(e: dict):
+            if e["type"] == "char":
+                return RuleChar(e["value"])
+            elif e["type"] == "char_exclude":
+                return RuleCharExclude(e["value"])
+            elif e["type"] == "end":
+                return RuleEnd()
+            else:
+                raise Exception(f"Unknown type found in expectation array: {type}")
+
+        state = GBNF(grammar)
+        state = state + input_string
+        state = [*state]
+        expected = [transformed_expected_dict(e) for e in expected]
+        state = sorted(state, key=lambda r: json.dumps(r.__dict__))
+        expected = sorted(expected, key=lambda r: json.dumps(r.__dict__))
+        assert state == expected

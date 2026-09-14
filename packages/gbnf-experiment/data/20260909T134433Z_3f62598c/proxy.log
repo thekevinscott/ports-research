@@ -1,0 +1,77 @@
+NOTICE    Sep 09 13:44:35.164 [1]: Initializing tinyproxy ...
+NOTICE    Sep 09 13:44:35.164 [1]: Reloading config file (/etc/tinyproxy/tinyproxy.conf)
+INFO      Sep 09 13:44:35.164 [1]: Added address [0.0.0.0] to listen addresses.
+INFO      Sep 09 13:44:35.164 [1]: Adding Port [443] to the list allowed by CONNECT
+NOTICE    Sep 09 13:44:35.164 [1]: Reloading config file finished
+INFO      Sep 09 13:44:35.164 [1]: listen_sock called with addr = '0.0.0.0'
+INFO      Sep 09 13:44:35.164 [1]: trying to listen on host[0.0.0.0], family[2], socktype[1], proto[6]
+INFO      Sep 09 13:44:35.164 [1]: listening on fd [3]
+INFO      Sep 09 13:44:35.164 [1]: Not running as root, so not changing UID/GID.
+INFO      Sep 09 13:44:35.164 [1]: Setting the various signals.
+INFO      Sep 09 13:44:35.164 [1]: Starting main loop. Accepting connections.
+CONNECT   Sep 09 13:44:35.433 [1]: Connect (file descriptor 4): 172.20.0.3
+CONNECT   Sep 09 13:44:35.433 [1]: Request (file descriptor 4): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Sep 09 13:44:35.433 [1]: No upstream proxy for api.anthropic.com
+INFO      Sep 09 13:44:35.433 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Sep 09 13:44:35.434 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Sep 09 13:44:35.440 [1]: Established connection to host "api.anthropic.com" using file descriptor 5.
+INFO      Sep 09 13:44:35.440 [1]: Not sending client headers to remote machine
+CONNECT   Sep 09 13:44:35.473 [1]: Connect (file descriptor 6): 172.20.0.3
+CONNECT   Sep 09 13:44:35.476 [1]: Request (file descriptor 6): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Sep 09 13:44:35.476 [1]: No upstream proxy for api.anthropic.com
+INFO      Sep 09 13:44:35.476 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Sep 09 13:44:35.476 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Sep 09 13:44:35.483 [1]: Established connection to host "api.anthropic.com" using file descriptor 7.
+INFO      Sep 09 13:44:35.483 [1]: Not sending client headers to remote machine
+CONNECT   Sep 09 13:44:35.534 [1]: Connect (file descriptor 8): 172.20.0.3
+CONNECT   Sep 09 13:44:35.534 [1]: Request (file descriptor 8): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Sep 09 13:44:35.534 [1]: No upstream proxy for api.anthropic.com
+INFO      Sep 09 13:44:35.534 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Sep 09 13:44:35.535 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Sep 09 13:44:35.541 [1]: Established connection to host "api.anthropic.com" using file descriptor 9.
+INFO      Sep 09 13:44:35.541 [1]: Not sending client headers to remote machine
+INFO      Sep 09 13:44:35.706 [1]: Closed connection between local client (fd:6) and remote client (fd:7)
+CONNECT   Sep 09 13:44:35.721 [1]: Connect (file descriptor 6): 172.20.0.3
+CONNECT   Sep 09 13:44:35.721 [1]: Request (file descriptor 6): CONNECT mcp-proxy.anthropic.com:443 HTTP/1.1
+NOTICE    Sep 09 13:44:35.721 [1]: Proxying refused on filtered domain "mcp-proxy.anthropic.com"
+CONNECT   Sep 09 13:44:35.721 [1]: Connect (file descriptor 7): 172.20.0.3
+CONNECT   Sep 09 13:44:35.721 [1]: Request (file descriptor 7): CONNECT mcp-proxy.anthropic.com:443 HTTP/1.1
+NOTICE    Sep 09 13:44:35.721 [1]: Proxying refused on filtered domain "mcp-proxy.anthropic.com"
+CONNECT   Sep 09 13:44:35.721 [1]: Connect (file descriptor 10): 172.20.0.3
+CONNECT   Sep 09 13:44:35.721 [1]: Request (file descriptor 10): CONNECT mcp-proxy.anthropic.com:443 HTTP/1.1
+NOTICE    Sep 09 13:44:35.721 [1]: Proxying refused on filtered domain "mcp-proxy.anthropic.com"
+INFO      Sep 09 13:44:35.734 [1]: Closed connection between local client (fd:4) and remote client (fd:5)
+CONNECT   Sep 09 13:45:27.315 [1]: Connect (file descriptor 4): 172.20.0.3
+CONNECT   Sep 09 13:45:27.315 [1]: Request (file descriptor 4): CONNECT pypi.org:443 HTTP/1.1
+NOTICE    Sep 09 13:45:27.315 [1]: Proxying refused on filtered domain "pypi.org"
+CONNECT   Sep 09 13:45:27.316 [1]: Connect (file descriptor 4): 172.20.0.3
+CONNECT   Sep 09 13:45:27.316 [1]: Request (file descriptor 4): CONNECT pypi.org:443 HTTP/1.1
+NOTICE    Sep 09 13:45:27.316 [1]: Proxying refused on filtered domain "pypi.org"
+CONNECT   Sep 09 13:45:27.818 [1]: Connect (file descriptor 4): 172.20.0.3
+CONNECT   Sep 09 13:45:27.818 [1]: Request (file descriptor 4): CONNECT pypi.org:443 HTTP/1.1
+NOTICE    Sep 09 13:45:27.818 [1]: Proxying refused on filtered domain "pypi.org"
+CONNECT   Sep 09 13:45:28.819 [1]: Connect (file descriptor 4): 172.20.0.3
+CONNECT   Sep 09 13:45:28.819 [1]: Request (file descriptor 4): CONNECT pypi.org:443 HTTP/1.1
+NOTICE    Sep 09 13:45:28.819 [1]: Proxying refused on filtered domain "pypi.org"
+CONNECT   Sep 09 13:45:30.820 [1]: Connect (file descriptor 4): 172.20.0.3
+CONNECT   Sep 09 13:45:30.820 [1]: Request (file descriptor 4): CONNECT pypi.org:443 HTTP/1.1
+NOTICE    Sep 09 13:45:30.820 [1]: Proxying refused on filtered domain "pypi.org"
+CONNECT   Sep 09 13:45:34.822 [1]: Connect (file descriptor 4): 172.20.0.3
+CONNECT   Sep 09 13:45:34.822 [1]: Request (file descriptor 4): CONNECT pypi.org:443 HTTP/1.1
+NOTICE    Sep 09 13:45:34.822 [1]: Proxying refused on filtered domain "pypi.org"
+ERROR     Sep 09 13:53:01.128 [1]: read_buffer: read() failed on fd 8: Connection reset by peer
+INFO      Sep 09 13:53:01.128 [1]: Closed connection between local client (fd:8) and remote client (fd:9)
+CONNECT   Sep 09 13:53:01.156 [1]: Connect (file descriptor 4): 172.20.0.3
+CONNECT   Sep 09 13:53:01.156 [1]: Request (file descriptor 4): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Sep 09 13:53:01.156 [1]: No upstream proxy for api.anthropic.com
+INFO      Sep 09 13:53:01.156 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Sep 09 13:53:01.157 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Sep 09 13:53:01.195 [1]: Established connection to host "api.anthropic.com" using file descriptor 5.
+INFO      Sep 09 13:53:01.195 [1]: Not sending client headers to remote machine
+CONNECT   Sep 09 13:57:24.000 [1]: Connect (file descriptor 7): 172.20.0.3
+CONNECT   Sep 09 13:57:24.000 [1]: Connect (file descriptor 6): 172.20.0.3
+CONNECT   Sep 09 13:57:24.000 [1]: Request (file descriptor 7): CONNECT registry.npmjs.org:443 HTTP/1.1
+CONNECT   Sep 09 13:57:24.000 [1]: Request (file descriptor 6): CONNECT registry.npmjs.org:443 HTTP/1.1
+NOTICE    Sep 09 13:57:24.000 [1]: Proxying refused on filtered domain "registry.npmjs.org"
+NOTICE    Sep 09 13:57:24.000 [1]: Proxying refused on filtered domain "registry.npmjs.org"
+INFO      Sep 09 14:05:16.712 [1]: Closed connection between local client (fd:4) and remote client (fd:5)

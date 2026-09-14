@@ -1,0 +1,267 @@
+[
+  [
+    "root ::= \"foo\"",
+    "f",
+    "1"
+  ],
+  [
+    "root ::= \"foo\"",
+    "f",
+    "b"
+  ],
+  [
+    "root ::= \"foo\"",
+    "f",
+    "o1"
+  ],
+  [
+    "root ::= \"foo\"",
+    "f",
+    "ooo"
+  ],
+  [
+    "root ::= \"foo\"",
+    "f",
+    "ooooooo"
+  ],
+  [
+    "root ::= \"foo\" | \"bar\"",
+    "f",
+    "1"
+  ],
+  [
+    "root ::= \"foo\" | \"bar\"",
+    "b",
+    "1"
+  ],
+  [
+    "root ::= \"foo\" | \"bar\"",
+    "f",
+    "o1"
+  ],
+  [
+    "root ::= \"foo\" | \"bar\"",
+    "b",
+    "a1"
+  ],
+  [
+    "root ::= \"foo\" | \"bar\"",
+    "f",
+    "ooo"
+  ],
+  [
+    "root ::= \"foo\" | \"bar\"",
+    "b",
+    "arrr"
+  ],
+  [
+    "root ::= \"foo\" | \"bar\" | \"baz\"",
+    "f",
+    "1"
+  ],
+  [
+    "root ::= \"foo\" | \"bar\" | \"baz\"",
+    "f",
+    "z"
+  ],
+  [
+    "root ::= \"foo\" | \"bar\" | \"baz\"",
+    "b",
+    "b1"
+  ],
+  [
+    "root ::= \"foo\" | \"bar\" | \"baz\"",
+    "f",
+    "o1"
+  ],
+  [
+    "root ::= \"foo\" | \"bar\" | \"baz\"",
+    "b",
+    "al"
+  ],
+  [
+    "root ::= \"foo\" | \"bar\" | \"baz\"",
+    "f",
+    "ooo"
+  ],
+  [
+    "root ::= \"foo\" | \"bar\" | \"baz\"",
+    "b",
+    "azrr"
+  ],
+  [
+    "root ::= foo\nfoo ::=\"foo\"",
+    "f",
+    "1"
+  ],
+  [
+    "root ::= foo\nfoo ::=\"foo\"",
+    "f",
+    "b"
+  ],
+  [
+    "root ::= foo\nfoo ::=\"foo\"",
+    "f",
+    "o1"
+  ],
+  [
+    "root ::= foo\nfoo ::=\"foo\"",
+    "f",
+    "ooo"
+  ],
+  [
+    "root::=foo|\"bar\"\nfoo::=\"foo\"",
+    "f",
+    "1"
+  ],
+  [
+    "root::=foo|\"bar\"\nfoo::=\"foo\"",
+    "f",
+    "z"
+  ],
+  [
+    "root::=foo|\"bar\"\nfoo::=\"foo\"",
+    "b",
+    "b1"
+  ],
+  [
+    "root::=foo|\"bar\"\nfoo::=\"foo\"",
+    "f",
+    "o1"
+  ],
+  [
+    "root::=foo|\"bar\"\nfoo::=\"foo\"",
+    "f",
+    "ooo"
+  ],
+  [
+    "root::=foo|\"bar\"\nfoo::=\"foo\"",
+    "b",
+    "arr"
+  ],
+  [
+    "root::= foo | bar\n foo::=\"foo\"\n bar::=\"bar\"",
+    "f",
+    "1"
+  ],
+  [
+    "root::= foo | bar\n foo::=\"foo\"\n bar::=\"bar\"",
+    "f",
+    "z"
+  ],
+  [
+    "root::= foo | bar\n foo::=\"foo\"\n bar::=\"bar\"",
+    "b",
+    "1"
+  ],
+  [
+    "root::= foo | bar\n foo::=\"foo\"\n bar::=\"bar\"",
+    "f",
+    "o1"
+  ],
+  [
+    "root::= foo | bar\n foo::=\"foo\"\n bar::=\"bar\"",
+    "f",
+    "ooo"
+  ],
+  [
+    "root::= foo | bar\n foo::=\"foo\"\n bar::=\"bar\"",
+    "b",
+    "arr"
+  ],
+  [
+    "root ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= \"foo\"\nbar ::= \"bar\"\nbaz ::= \"baz\"",
+    "f",
+    "1"
+  ],
+  [
+    "root ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= \"foo\"\nbar ::= \"bar\"\nbaz ::= \"baz\"",
+    "f",
+    "z"
+  ],
+  [
+    "root ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= \"foo\"\nbar ::= \"bar\"\nbaz ::= \"baz\"",
+    "b",
+    "1"
+  ],
+  [
+    "root ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= \"foo\"\nbar ::= \"bar\"\nbaz ::= \"baz\"",
+    "f",
+    "o1"
+  ],
+  [
+    "root ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= \"foo\"\nbar ::= \"bar\"\nbaz ::= \"baz\"",
+    "f",
+    "ooo"
+  ],
+  [
+    "root ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= \"foo\"\nbar ::= \"bar\"\nbaz ::= \"baz\"",
+    "b",
+    "arr"
+  ],
+  [
+    "root ::= f | b\nf ::= fo\nb ::= ba\nfo ::= foo\nba ::= bar | baz\nfoo ::= \"foo\"\nbar ::= \"bar\"\nbaz ::= \"baz\"",
+    "b",
+    "azr"
+  ],
+  [
+    "root ::= [a-z]",
+    "a",
+    "A"
+  ],
+  [
+    "root ::= [a-z]",
+    "a",
+    "0"
+  ],
+  [
+    "root ::= [a-z]",
+    "a",
+    "az"
+  ],
+  [
+    "root ::= [a-z]?",
+    "a",
+    "A"
+  ],
+  [
+    "root ::= [a-z]?",
+    "a",
+    "0"
+  ],
+  [
+    "root ::= [a-z]?",
+    "a",
+    "az"
+  ],
+  [
+    "root ::= [a-z]+",
+    "a",
+    "A"
+  ],
+  [
+    "root ::= [a-z]+",
+    "a",
+    "0"
+  ],
+  [
+    "root ::= [a-z]+",
+    "a",
+    "z0"
+  ],
+  [
+    "root ::= [a-z]*",
+    "a",
+    "A"
+  ],
+  [
+    "root ::= [a-z]*",
+    "a",
+    "0"
+  ],
+  [
+    "root ::= [a-z]*",
+    "a",
+    "z0"
+  ]
+]

@@ -1,0 +1,975 @@
+===== src/grammar_parser/build_rule_stack.ts =====
+import {
+  RuleChar,
+  RuleCharExclude,
+  RuleEnd,
+  type Range,
+  type UnresolvedRule,
+} from "../grammar_graph/grammar_graph_types.ts";
+import { RuleRef } from "../grammar_graph/rule_ref.ts";
+import { is_range, is_rule_end } from "../grammar_graph/type_guards.ts";
+import { json_dumps } from "../utils/python_compat.ts";
+import {
+  is_rule_def_alt,
+  is_rule_def_char,
+  is_rule_def_char_alt,
+  is_rule_def_char_not,
+  is_rule_def_char_rng_upper,
+  is_rule_def_end,
+  is_rule_def_ref,
+  type InternalRuleDef,
+  type InternalRuleDefChar,
+  type InternalRuleDefCharNot,
+} from "../rules_builder/rules_builder_types.ts";
+
+export const make_char_rule = (
+  rule_def: InternalRuleDefChar | InternalRuleDefCharNot,
+): RuleChar | RuleCharExclude => {
+  const value = rule_def.value as Array<number | Range>;
+  if (is_rule_def_char_not(rule_def)) {
+    return new RuleCharExclude(value);
+  }
+  if (is_rule_def_char(rule_def)) {
+    return new RuleChar(value);
+  }
+
+  throw new Error(`Unsupported rule type for make_char_rule: ${rule_def}`);
+};
+
+export const build_rule_stack = (linear_rules: InternalRuleDef[]): UnresolvedRule[][] => {
+  let paths: UnresolvedRule[] = [];
+  const stack: UnresolvedRule[][] = [];
+  let idx = 0;
+
+  while (idx < linear_rules.length) {
+    const rule_def = linear_rules[idx];
+    if (is_rule_def_char(rule_def) || is_rule_def_char_not(rule_def)) {
+      // this could be a single char, or a range, or a sequence of alts; we don't know until we step through it.
+      const char_rule = make_char_rule(rule_def);
+      idx += 1;
+      let rule: InternalRuleDef | null = idx < linear_rules.length ? linear_rules[idx] : null;
+      while (
+        idx < linear_rules.length &&
+        (is_rule_def_char_rng_upper(rule) || is_rule_def_char_alt(rule))
+      ) {
+        if (is_rule_def_char_rng_upper(rule)) {
+          // previous rule value should be a number
+          const prev_value = char_rule.value.pop();
+          if (is_range(prev_value)) {
+            throw new Error(
+              `Unexpected range, expected a number but got an array: ${json_dumps(prev_value)}`,
+            );
+          }
+          if (prev_value === undefined) {
+            throw new Error("Unexpected undefined value");
+          }
+
+          char_rule.value.push([prev_value as number, rule.value]);
+        }
+        if (is_rule_def_char_alt(rule)) {
+          char_rule.value.push(rule.value);
+        }
+        idx += 1;
+        rule = idx < linear_rules.length ? linear_rules[idx] : null;
+      }
+      paths.push(char_rule);
+    } else {
+      if (is_rule_def_alt(rule_def)) {
+        if (paths.length === 0) {
+          throw new Error("Encountered alt without anything before it");
+        }
+        paths.push(new RuleEnd());
+        stack.push(paths);
+        paths = [];
+      } else if (is_rule_def_end(rule_def)) {
+        paths.push(new RuleEnd());
+      } else if (is_rule_def_ref(rule_def)) {
+        paths.push(new RuleRef(rule_def.value));
+      } else if (is_rule_def_char_alt(rule_def)) {
+        throw new Error(`Encountered char alt, should be handled by above block: ${rule_def}`);
+      } else {
+        throw new Error(`Unsupported rule type: ${rule_def}`);
+      }
+      idx += 1;
+    }
+  }
+
+  if (!is_rule_end(paths[paths.length - 1])) {
+    paths.push(new RuleEnd());
+  }
+
+  stack.push(paths);
+  return stack;
+};
+===== src/grammar_graph/colorize.ts =====
+export const Color = {
+  BLUE: "\x1b[34m",
+  CYAN: "\x1b[36m",
+  GREEN: "\x1b[32m",
+  RED: "\x1b[31m",
+  GRAY: "\x1b[90m",
+  YELLOW: "\x1b[33m",
+} as const;
+
+export const colorize = (text: string | number, color: string): string => `${color}${text}`;
+===== src/grammar_graph/get_input_as_code_points.ts =====
+import type { ValidInput } from "./grammar_graph_types.ts";
+
+export const get_code_point = (char: string): number => {
+  const code_point = char.codePointAt(0);
+  if (code_point === undefined) {
+    throw new Error(`Could not get code point for character: ${char}`);
+  }
+  if (!Number.isInteger(code_point)) {
+    throw new Error("code_point must be an integer!");
+  }
+  return code_point;
+};
+
+export const get_input_as_code_points = (src: ValidInput): number[] => {
+  if (typeof src === "number") {
+    return [src];
+  }
+
+  if (Array.isArray(src)) {
+    for (const c of src) {
+      if (!Number.isInteger(c)) {
+        throw new Error(`code_point must be an integer for ${c} if src is a list`);
+      }
+    }
+    return src;
+  }
+
+  if (typeof src === "string") {
+    return [...src].map((s) => get_code_point(s));
+  }
+
+  throw new Error(`Invalid input type: ${typeof src}`);
+};
+===== src/grammar_graph/get_parent_stack_id.ts =====
+import { Color } from "./colorize.ts";
+import type { GraphPointer } from "./graph_pointer.ts";
+
+export const get_parent_stack_id = (
+  pointer: GraphPointer,
+  col: (text: string | number, color: string) => string,
+): string => {
+  const stack_ids: string[] = [];
+  let parent: GraphPointer | null = pointer.parent;
+  while (parent) {
+    stack_ids.push(
+      `${parent.node.meta.stackId},${parent.node.meta.pathId},${parent.node.meta.stepId}`,
+    );
+    parent = parent.parent;
+  }
+  const arrow = col("<-", Color.GRAY);
+  return stack_ids.map((stack_id) => col(stack_id, Color.RED)).join(arrow);
+};
+===== src/grammar_graph/get_serialized_rule_key.ts =====
+import { json_dumps } from "../utils/python_compat.ts";
+import {
+  RuleChar,
+  RuleCharExclude,
+  RuleEnd,
+  type UnresolvedRule,
+} from "./grammar_graph_types.ts";
+import { RuleRef } from "./rule_ref.ts";
+import { is_rule_char, is_rule_char_exclude, is_rule_end, is_rule_ref } from "./type_guards.ts";
+
+export const KEY_TRANSLATION = new Map<unknown, number>([
+  [RuleEnd, 0],
+  [RuleChar, 1],
+  [RuleCharExclude, 2],
+]);
+
+export const get_serialized_rule_key = (rule: UnresolvedRule): string => {
+  if (is_rule_end(rule)) {
+    return `${KEY_TRANSLATION.get(RuleEnd)}`;
+  }
+
+  if (is_rule_char(rule)) {
+    return `${KEY_TRANSLATION.get(RuleChar)}-${json_dumps(rule.value)}`;
+  }
+
+  if (is_rule_char_exclude(rule)) {
+    return `${KEY_TRANSLATION.get(RuleCharExclude)}-${json_dumps(rule.value)}`;
+  }
+
+  if (is_rule_ref(rule)) {
+    return `3-${(rule as RuleRef).value}`;
+  }
+
+  throw new Error(`Unknown rule type: ${rule}`);
+};
+===== src/grammar_graph/grammar_graph_types.ts =====
+import { RuleRef } from "./rule_ref.ts";
+import type { GraphPointer } from "./graph_pointer.ts";
+import type { Pointers } from "./pointers.ts";
+
+export { RuleRef };
+
+export interface PrintOpts {
+  pointers?: Pointers | Iterable<PrintablePointer>;
+  colorize: (text: string | number, color: string) => string;
+  show_position?: boolean;
+}
+
+/** The shape `print.ts` needs; `GraphNode` satisfies it, and so do test doubles. */
+export interface PrintableNode {
+  id: string;
+  rule: UnresolvedRule;
+  next: PrintableNode | null;
+  print(opts: PrintOpts): string;
+}
+
+export interface PrintablePointer {
+  node: PrintableNode;
+  print(opts: PrintOpts): string;
+}
+
+export type Range = [number, number];
+
+export class Rule {
+  equals(other: unknown): boolean {
+    return other instanceof (this.constructor as new (...args: never[]) => Rule);
+  }
+
+  toString(): string {
+    return `${this.constructor.name}()`;
+  }
+
+  /** Mirrors the reference's `__dict__` property, used to build JSON keys. */
+  toDict(): Record<string, unknown> {
+    return {
+      type: this.constructor.name,
+    };
+  }
+}
+
+export class RuleWithValue<T = unknown> extends Rule {
+  value: T;
+
+  constructor(value: T) {
+    super();
+    this.value = value;
+  }
+
+  override equals(other: unknown): boolean {
+    return (
+      other instanceof (this.constructor as new (...args: never[]) => RuleWithValue<T>) &&
+      deep_equals(this.value, (other as RuleWithValue<T>).value)
+    );
+  }
+
+  override toString(): string {
+    return `${this.constructor.name}(value=${JSON.stringify(this.value)})`;
+  }
+
+  override toDict(): Record<string, unknown> {
+    return {
+      ...super.toDict(),
+      value: this.value,
+    };
+  }
+}
+
+export class RuleWithListOfIntsOrRanges extends RuleWithValue<Array<number | Range>> {
+  constructor(value: Array<number | Range> = []) {
+    // The reference copies the incoming list in `__post_init__`; `build_rule_stack`
+    // relies on being able to mutate `value` without touching the caller's array.
+    super([...value]);
+  }
+}
+
+export class RuleChar extends RuleWithListOfIntsOrRanges {}
+
+export class RuleCharExclude extends RuleWithListOfIntsOrRanges {}
+
+export class RuleEnd extends Rule {}
+
+export type UnresolvedRule = RuleChar | RuleCharExclude | RuleRef | RuleEnd;
+
+/**
+ * ValidInput can either be a string, or a number indicating a code point.
+ * It CANNOT be a number representing a number; a number intended as input (like "8")
+ * should be passed in as a string.
+ */
+export type ValidInput = string | number | number[];
+
+/** RuleRefs should never be exposed to the end user. */
+export type ResolvedRule = RuleCharExclude | RuleChar | RuleEnd;
+
+export type ResolvedGraphPointer = GraphPointer<ResolvedRule>;
+
+const deep_equals = (a: unknown, b: unknown): boolean => {
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return a.length === b.length && a.every((item, idx) => deep_equals(item, b[idx]));
+  }
+  return a === b;
+};
+===== src/grammar_graph/graph.ts =====
+import { InputParseError } from "../utils/errors/index.ts";
+import { is_point_in_range } from "../utils/is_point_in_range.ts";
+import { colorize } from "./colorize.ts";
+import { get_input_as_code_points } from "./get_input_as_code_points.ts";
+import { get_serialized_rule_key } from "./get_serialized_rule_key.ts";
+import type {
+  ResolvedGraphPointer,
+  UnresolvedRule,
+  ValidInput,
+} from "./grammar_graph_types.ts";
+import { GraphNode } from "./graph_node.ts";
+import { GraphPointer } from "./graph_pointer.ts";
+import { Pointers } from "./pointers.ts";
+import type { RuleRef } from "./rule_ref.ts";
+import {
+  is_range,
+  is_rule_char,
+  is_rule_char_exclude,
+  is_rule_end,
+  is_rule_ref,
+} from "./type_guards.ts";
+
+export type RootNode = Map<number, GraphNode>;
+
+export class Graph {
+  __roots__: Map<number, RootNode>;
+  grammar: string;
+  __rootNode__: RootNode | null;
+  previous_code_points: number[];
+
+  constructor(grammar: string, stacked_rules: UnresolvedRule[][][], root_id: number) {
+    this.__roots__ = new Map();
+    this.grammar = grammar;
+    this.previous_code_points = [];
+    const rule_refs: RuleRef[] = [];
+    const unique_rules = new Map<string, UnresolvedRule>();
+
+    for (let stack_id = 0; stack_id < stacked_rules.length; stack_id++) {
+      const stack = stacked_rules[stack_id];
+      const nodes: RootNode = new Map();
+      for (let path_id = 0; path_id < stack.length; path_id++) {
+        const path = stack[path_id];
+        let node: GraphNode | null = null;
+        for (let step_id = path.length - 1; step_id >= 0; step_id--) {
+          const next_node: GraphNode | null = node;
+          const rule = stack[path_id][step_id];
+          unique_rules.set(get_serialized_rule_key(rule), rule);
+          if (is_rule_ref(rule)) {
+            rule_refs.push(rule);
+          }
+          // rules coming in may be identical but have different references.
+          // here, we ensure we always use the same reference for an identical rule.
+          // this makes future comparisons easier.
+          const unique_rule = unique_rules.get(get_serialized_rule_key(rule));
+          if (unique_rule === undefined) {
+            throw new Error("Could not get unique rule");
+          }
+          node = new GraphNode(
+            unique_rule,
+            {
+              stackId: stack_id,
+              pathId: path_id,
+              stepId: step_id,
+            },
+            next_node,
+          );
+        }
+
+        if (node === null) {
+          throw new Error("Could not get node");
+        }
+        nodes.set(path_id, node);
+      }
+      this.__roots__.set(stack_id, nodes);
+    }
+
+    const root_node = this.__roots__.get(root_id);
+    if (root_node === undefined) {
+      throw new Error(`Root node not found for value: ${root_id}`);
+    }
+    this.__rootNode__ = root_node;
+
+    for (const rule_ref of rule_refs) {
+      const referenced_nodes = new Set<GraphNode>();
+      for (const node of this.__get_root_node__(rule_ref.value).values()) {
+        referenced_nodes.add(node);
+      }
+      rule_ref.nodes = referenced_nodes;
+    }
+  }
+
+  __get_root_node__(value: number): RootNode {
+    const root_node = this.__roots__.get(value);
+    if (root_node === undefined) {
+      throw new Error(`Root node not found for value: ${value}`);
+    }
+    return root_node;
+  }
+
+  __get_initial_pointers__(): Pointers {
+    const pointers = new Pointers();
+
+    const root_node = this.__rootNode__;
+    if (root_node === null) {
+      throw new Error("Root node is not defined");
+    }
+
+    for (const [node, parent] of this.__fetch_nodes_for_root_node__(root_node)) {
+      const pointer = new GraphPointer(node, parent);
+      for (const resolvedPointer of this.__resolve_pointer__(pointer)) {
+        pointers.add(resolvedPointer);
+      }
+    }
+    return pointers;
+  }
+
+  __set_valid__(pointers: GraphPointer[], valid: boolean): void {
+    for (const pointer of pointers) {
+      pointer.valid = valid;
+    }
+  }
+
+  __parse__(current_pointers: Pointers, code_point: number): Pointers {
+    for (const [rule, graph_pointers] of this.__iterate_over_pointers__(current_pointers)) {
+      if (is_rule_char(rule)) {
+        let valid = false;
+        for (const possible_code_point of rule.value) {
+          if (valid === true) {
+            // already matched
+          } else if (is_range(possible_code_point)) {
+            if (is_point_in_range(code_point, possible_code_point)) {
+              valid = true;
+            }
+          } else if (code_point === possible_code_point) {
+            valid = true;
+          }
+        }
+        this.__set_valid__(graph_pointers, valid);
+      } else if (is_rule_char_exclude(rule)) {
+        let valid = true;
+        for (const possible_code_point of rule.value) {
+          if (valid === false) {
+            // already excluded
+          } else if (is_range(possible_code_point)) {
+            if (is_point_in_range(code_point, possible_code_point)) {
+              valid = false;
+            }
+          } else {
+            if (code_point === possible_code_point) {
+              valid = false;
+            }
+          }
+        }
+        this.__set_valid__(graph_pointers, valid);
+      } else if (!is_rule_end(rule)) {
+        throw new Error(`Unsupported rule: ${rule}`);
+      }
+    }
+
+    // a pointer's id is the sum of its node's id and its parent's id chain.
+    // if two pointers share the same id, it means they point to the same node and have identical parent chains.
+    // for the purposes of walking the graph, we only need to keep one of them.
+    const next_pointers = new Pointers();
+    for (const current_pointer of current_pointers) {
+      for (const unresolved_next_pointer of current_pointer.fetch_next()) {
+        for (const resolved_next_pointer of this.__resolve_pointer__(unresolved_next_pointer)) {
+          next_pointers.add(resolved_next_pointer);
+        }
+      }
+    }
+    return next_pointers;
+  }
+
+  *__resolve_pointer__(unresolved_pointer: GraphPointer): Generator<ResolvedGraphPointer> {
+    for (const resolved_pointer of unresolved_pointer.resolve()) {
+      if (is_rule_ref(resolved_pointer.node.rule)) {
+        throw new Error("Encountered a reference rule when building pointers to the graph");
+      }
+      if (is_rule_end(resolved_pointer.node.rule) && resolved_pointer.parent !== null) {
+        throw new Error(
+          "Encountered an ending rule with a parent when building pointers to the graph",
+        );
+      }
+      yield resolved_pointer as ResolvedGraphPointer;
+    }
+  }
+
+  add(src: ValidInput, pointers: Pointers | null = null): Pointers {
+    if (typeof src !== "string") {
+      throw new Error("src must be a string in graph.add");
+    }
+    // The reference uses `pointers or self.__get_initial_pointers__()`, so an
+    // empty `Pointers` also falls back to the initial pointers.
+    let current: Pointers =
+      pointers !== null && pointers !== undefined && pointers.length > 0
+        ? pointers
+        : this.__get_initial_pointers__();
+
+    const code_points = get_input_as_code_points(src);
+    for (const code_point of code_points) {
+      if (!Number.isInteger(code_point)) {
+        throw new Error("code_point must be an integer!");
+      }
+    }
+
+    for (let code_point_pos = 0; code_point_pos < code_points.length; code_point_pos++) {
+      const code_point = code_points[code_point_pos];
+      current = this.__parse__(current, code_point);
+      if (current.length === 0) {
+        throw new InputParseError(code_points, code_point_pos, this.previous_code_points);
+      }
+    }
+    this.previous_code_points.push(...code_points);
+    return current;
+  }
+
+  // generator that yields either the node, or if a reference rule, the referenced node
+  // we need these function, as distinct from leveraging the logic in GraphPointer,
+  // because that needs a rule ref with already defined nodes; this function is used to _set_ those nodes
+  *__fetch_nodes_for_root_node__(
+    root_nodes: RootNode,
+    parent: GraphPointer | null = null,
+  ): Generator<[GraphNode, GraphPointer | null]> {
+    for (const node of root_nodes.values()) {
+      if (is_rule_ref(node.rule)) {
+        yield* this.__fetch_nodes_for_root_node__(
+          this.__get_root_node__(node.rule.value),
+          new GraphPointer(node, parent),
+        );
+      } else {
+        yield [node, parent];
+      }
+    }
+  }
+
+  print(pointers: Pointers | null = null, colors: boolean = false): string {
+    const nodes: GraphNode[][] = [...this.__roots__.values()].map((root_node) => [
+      ...root_node.values(),
+    ]);
+    const resolved_pointers = pointers ?? new Pointers();
+    const graph_view: string[] = [];
+    for (const root_node of nodes) {
+      for (const node of root_node) {
+        graph_view.push(
+          node.print({
+            pointers: resolved_pointers,
+            show_position: true,
+            colorize: colors ? colorize : (s) => String(s),
+          }),
+        );
+      }
+    }
+
+    return graph_view.join("\n");
+  }
+
+  *__iterate_over_pointers__(
+    pointers: Iterable<GraphPointer>,
+  ): Generator<[UnresolvedRule, GraphPointer[]]> {
+    // Keyed by rule identity: the reference's `Rule.__hash__` is `id(self)`, so
+    // equal-but-distinct rule objects are distinct keys.
+    const seen_rules = new Map<UnresolvedRule, GraphPointer[]>();
+    for (const pointer of pointers) {
+      const rule = pointer.rule;
+      if (is_rule_ref(rule)) {
+        throw new Error("Encountered a reference rule in the graph");
+      }
+
+      let seen_rule = seen_rules.get(rule);
+      if (seen_rule === undefined) {
+        seen_rule = [pointer];
+        seen_rules.set(rule, seen_rule);
+      }
+      seen_rule.push(pointer);
+    }
+
+    yield* seen_rules.entries();
+  }
+}
+===== src/grammar_graph/graph_node.ts =====
+import type { PrintOpts, UnresolvedRule } from "./grammar_graph_types.ts";
+import { print_graph_node } from "./print.ts";
+import type { RuleRef } from "./rule_ref.ts";
+
+export interface GraphNodeMeta {
+  stackId: number;
+  pathId: number;
+  stepId: number;
+}
+
+export class GraphNode<T extends UnresolvedRule = UnresolvedRule> {
+  rule: T;
+  next: GraphNode | null;
+  meta: GraphNodeMeta;
+  private __id__: string | null = null;
+
+  constructor(rule: T, meta: GraphNodeMeta | null | undefined, next_node: GraphNode | null = null) {
+    this.rule = rule;
+    if (meta === null || meta === undefined) {
+      throw new Error("Meta is undefined");
+    }
+    this.meta = meta;
+    this.next = next_node;
+  }
+
+  get id(): string {
+    if (this.__id__ === null) {
+      this.__id__ = `${this.meta.stackId},${this.meta.pathId},${this.meta.stepId}`;
+    }
+    return this.__id__;
+  }
+
+  print(opts: PrintOpts): string {
+    return print_graph_node(this)(opts);
+  }
+
+  toString(): string {
+    return `<GraphNode ${this.id} ${this.rule}>`;
+  }
+}
+
+export type GraphNodeRuleRef = GraphNode<RuleRef>;
+===== src/grammar_graph/graph_pointer.ts =====
+import type { PrintOpts, UnresolvedRule } from "./grammar_graph_types.ts";
+import type { GraphNode } from "./graph_node.ts";
+import { print_graph_pointer } from "./print.ts";
+import {
+  is_graph_pointer_rule_char,
+  is_graph_pointer_rule_char_exclude,
+  is_graph_pointer_rule_end,
+  is_graph_pointer_rule_ref,
+  is_rule_end,
+} from "./type_guards.ts";
+
+export type GraphPointerKey = string;
+
+export class GraphPointer<T extends UnresolvedRule = UnresolvedRule> {
+  node: GraphNode<T>;
+  parent: GraphPointer | null;
+  id: string;
+  private __valid__: boolean | null = null;
+
+  constructor(node: GraphNode<T>, parent: GraphPointer | null = null) {
+    if (node === null || node === undefined) {
+      throw new Error("Node is undefined");
+    }
+    this.node = node;
+    this.parent = parent;
+    this.id = parent ? `${parent.id}-${node.id}` : node.id;
+  }
+
+  get rule(): T {
+    return this.node.rule;
+  }
+
+  get valid(): boolean | null {
+    return this.__valid__;
+  }
+
+  set valid(valid: boolean | null) {
+    this.__valid__ = valid;
+  }
+
+  print(opts: PrintOpts): string {
+    return print_graph_pointer(this as GraphPointer)(opts);
+  }
+
+  /**
+   * Resolve the graph pointer.
+   *
+   * @param resolved Whether the pointer has already been resolved.
+   * @yields the resolved graph pointers.
+   */
+  *resolve(resolved: boolean = false): Generator<GraphPointer> {
+    const self = this as GraphPointer;
+    if (is_graph_pointer_rule_ref(self)) {
+      if (resolved) {
+        if (!this.node.next) {
+          throw new Error(`No next node: ${this.node}`);
+        }
+        yield* new GraphPointer(this.node.next, this.parent).resolve();
+      } else {
+        for (const node of self.rule.nodes) {
+          yield* new GraphPointer(node, self).resolve();
+        }
+      }
+    } else if (is_graph_pointer_rule_end(self)) {
+      if (!this.parent) {
+        yield self;
+      } else {
+        yield* this.parent.resolve(true);
+      }
+    } else if (is_graph_pointer_rule_char(self) || is_graph_pointer_rule_char_exclude(self)) {
+      yield self;
+    } else {
+      throw new Error(`Unknown rule: ${this.node.rule}`);
+    }
+  }
+
+  /**
+   * Fetch the next resolved graph pointers.
+   */
+  *fetch_next(): Generator<GraphPointer> {
+    // If this pointer is invalid, then we don't return any new pointers
+    if (!this.valid) {
+      return;
+    }
+
+    // If this pointer is an end node, we return the parent's next node.
+    // If no parent exists, we return nothing, since it's the end of the line.
+    if (is_rule_end(this.node.rule)) {
+      if (this.parent) {
+        yield* this.parent.fetch_next();
+      }
+    } else {
+      if (!this.node.next) {
+        throw new Error(`No next node: ${this.node}`);
+      }
+      const pointer = new GraphPointer(this.node.next, this.parent);
+      yield* pointer.resolve();
+    }
+  }
+
+  toString(): string {
+    return `<GraphPointer ${this.id} ${this.node}>`;
+  }
+}
+===== src/grammar_graph/parse_state.ts =====
+import { json_dumps } from "../utils/python_compat.ts";
+import type { ResolvedRule } from "./grammar_graph_types.ts";
+import type { Graph } from "./graph.ts";
+import type { Pointers } from "./pointers.ts";
+
+export class ParseState {
+  private __graph__: Graph;
+  private __pointers__: Pointers;
+
+  constructor(graph: Graph, pointers: Pointers) {
+    this.__graph__ = graph;
+    this.__pointers__ = pointers;
+  }
+
+  *[Symbol.iterator](): Generator<ResolvedRule> {
+    yield* this.rules();
+  }
+
+  *rules(): Generator<ResolvedRule> {
+    const rules = new Set<string>();
+    for (const pointer of this.__pointers__) {
+      const rule = pointer.rule as ResolvedRule;
+      const key = json_dumps(rule.toDict());
+      if (!rules.has(key)) {
+        rules.add(key);
+        yield rule;
+      }
+    }
+  }
+
+  add(text: string): ParseState {
+    if (typeof text !== "string") {
+      throw new Error("input text must be of type string");
+    }
+    const pointers = this.__graph__.add(text, this.__pointers__);
+    return new ParseState(this.__graph__, pointers);
+  }
+
+  get size(): number {
+    return [...this.rules()].length;
+  }
+
+  get grammar(): string {
+    return this.__graph__.grammar;
+  }
+}
+===== src/grammar_graph/pointers.ts =====
+import type { GraphPointer } from "./graph_pointer.ts";
+
+export class Pointers {
+  private __pointers__: Map<string, GraphPointer>;
+
+  constructor(...pointers: GraphPointer[]) {
+    this.__pointers__ = new Map();
+    for (const pointer of pointers) {
+      this.add(pointer);
+    }
+  }
+
+  toString(): string {
+    return `<Pointers ${[...this].map((p) => String(p.node.rule)).join(", ")}>`;
+  }
+
+  add(pointer: GraphPointer): void {
+    this.__pointers__.set(pointer.id, pointer);
+  }
+
+  *[Symbol.iterator](): Generator<GraphPointer> {
+    yield* this.__pointers__.values();
+  }
+
+  get length(): number {
+    return this.__pointers__.size;
+  }
+}
+===== src/grammar_graph/print.ts =====
+import { AttributeError } from "../utils/python_compat.ts";
+import { Color } from "./colorize.ts";
+import { get_parent_stack_id } from "./get_parent_stack_id.ts";
+import type { PrintableNode, PrintablePointer, PrintOpts, Range } from "./grammar_graph_types.ts";
+import type { GraphPointer } from "./graph_pointer.ts";
+import { is_range, is_rule_char, is_rule_ref } from "./type_guards.ts";
+
+export const print_graph_pointer =
+  (pointer: GraphPointer) =>
+  (opts: PrintOpts): string => {
+    const col = opts.colorize;
+    return col(`*${get_parent_stack_id(pointer, col)}`, Color.RED);
+  };
+
+export const print_graph_node =
+  (node: PrintableNode) =>
+  (opts: PrintOpts): string => {
+    const pointers = [...(opts.pointers ?? [])] as PrintablePointer[];
+    const col = opts.colorize;
+    const show_position = opts.show_position ?? false;
+    const rule = node.rule;
+    const parts: string[] = [];
+    if (show_position) {
+      parts.push(col("{", Color.BLUE), col(node.id, Color.GRAY), col("}", Color.BLUE));
+    }
+
+    if (is_rule_char(rule)) {
+      parts.push(
+        col("[", Color.GRAY),
+        col(
+          rule.value
+            .map((v) =>
+              is_range(v)
+                ? (v as Range).map((val) => col(get_char(val), Color.YELLOW)).join("")
+                : get_char(v as number),
+            )
+            .join(""),
+          Color.YELLOW,
+        ),
+        col("]", Color.GRAY),
+      );
+    } else if (is_rule_ref(rule)) {
+      parts.push(col("Ref(", Color.GRAY), col(rule.value, Color.GREEN), col(")", Color.GRAY));
+    } else {
+      // Faithful to the reference: `Rule` exposes `type` only through its
+      // `__dict__` property, so this lookup raises for RuleEnd/RuleCharExclude.
+      const type = (rule as { type?: unknown }).type;
+      if (type === undefined) {
+        throw new AttributeError(
+          `'${rule.constructor.name}' object has no attribute 'type'`,
+        );
+      }
+      parts.push(col(String(type), Color.YELLOW));
+    }
+
+    if (pointers.length > 0) {
+      for (const pointer of pointers) {
+        const pointer_parts: string[] = [];
+        if (pointer.node === node) {
+          pointer_parts.push(pointer.print(opts));
+        }
+
+        if (pointer_parts.length > 0) {
+          parts.push(
+            col("[", Color.GRAY),
+            col(pointer_parts.join(""), Color.YELLOW),
+            col("]", Color.GRAY),
+          );
+        }
+      }
+    }
+
+    const parts_to_return = [parts.join("")];
+    if (node.next) {
+      parts_to_return.push(node.next.print(opts));
+    }
+
+    return parts_to_return.join(col("-> ", Color.GRAY));
+  };
+
+export const get_char = (char_code: number): string => {
+  const char = String.fromCodePoint(char_code);
+  if (char === "\n") {
+    return "\\n";
+  }
+  return char;
+};
+===== src/grammar_graph/rule_ref.ts =====
+import type { GraphNode } from "./graph_node.ts";
+
+export class RuleRef {
+  private __nodes__: Set<GraphNode> | null = null;
+  value: number;
+
+  constructor(value: number) {
+    this.value = value;
+  }
+
+  get nodes(): Set<GraphNode> {
+    if (this.__nodes__ === null) {
+      throw new Error("Nodes are not set");
+    }
+    return this.__nodes__;
+  }
+
+  set nodes(nodes: Set<GraphNode>) {
+    this.__nodes__ = nodes;
+  }
+
+  equals(other: unknown): boolean {
+    return other instanceof RuleRef && this.value === other.value;
+  }
+}
+===== src/grammar_graph/type_guards.ts =====
+import {
+  RuleChar,
+  RuleCharExclude,
+  RuleEnd,
+  type Range,
+  type UnresolvedRule,
+} from "./grammar_graph_types.ts";
+import { RuleRef } from "./rule_ref.ts";
+import type { GraphPointer } from "./graph_pointer.ts";
+
+export const is_rule = (rule: unknown): rule is UnresolvedRule =>
+  rule !== null &&
+  rule !== undefined &&
+  (rule instanceof RuleChar ||
+    rule instanceof RuleCharExclude ||
+    rule instanceof RuleEnd ||
+    rule instanceof RuleRef);
+
+export const is_rule_ref = (rule: unknown): rule is RuleRef => rule instanceof RuleRef;
+
+export const is_rule_end = (rule: unknown): rule is RuleEnd =>
+  rule !== null && rule !== undefined && rule instanceof RuleEnd;
+
+export const is_rule_char = (rule: unknown): rule is RuleChar =>
+  rule !== null && rule !== undefined && rule instanceof RuleChar;
+
+export const is_rule_char_exclude = (rule: unknown): rule is RuleCharExclude =>
+  rule !== null && rule !== undefined && rule instanceof RuleCharExclude;
+
+export const is_range = (inpt: unknown): inpt is Range =>
+  Array.isArray(inpt) && inpt.length === 2 && inpt.every((n) => Number.isInteger(n));
+
+export const is_graph_pointer_rule_ref = (
+  pointer: GraphPointer,
+): pointer is GraphPointer<RuleRef> => is_rule_ref(pointer.rule);
+
+export const is_graph_pointer_rule_end = (
+  pointer: GraphPointer,
+): pointer is GraphPointer<RuleEnd> => is_rule_end(pointer.rule);
+
+export const is_graph_pointer_rule_char = (
+  pointer: GraphPointer,
+): pointer is GraphPointer<RuleChar> => is_rule_char(pointer.rule);
+
+export const is_graph_pointer_rule_char_exclude = (
+  pointer: GraphPointer,
+): pointer is GraphPointer<RuleCharExclude> => is_rule_char_exclude(pointer.rule);

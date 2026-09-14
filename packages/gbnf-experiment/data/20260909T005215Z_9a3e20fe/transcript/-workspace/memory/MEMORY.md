@@ -1,0 +1,2 @@
+- [GBNF reference tests live in __pycache__](gbnf-reference-tests-in-pycache.md) — the deleted `*_test.py` sources are recoverable from the .pyc files with marshal + stubbed pytest.
+- [/workspace/tests is read-only](gbnf-workspace-tests-dir-readonly.md) — ported tests go in `ported_implementation/test/` instead.

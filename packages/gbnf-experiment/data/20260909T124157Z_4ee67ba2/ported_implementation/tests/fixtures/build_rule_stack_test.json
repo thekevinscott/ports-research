@@ -1,0 +1,1152 @@
+[
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          120
+        ]
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            120
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          120
+        ]
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          121
+        ]
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            120
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            121
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          120
+        ]
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          121
+        ]
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          122
+        ]
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            120
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            121
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            122
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefCharNot",
+        "value": [
+          120
+        ]
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefCharNot",
+        "value": [
+          121
+        ]
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefCharNot",
+        "value": [
+          122
+        ]
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleCharExclude",
+          "value": [
+            120
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleCharExclude",
+          "value": [
+            121
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleCharExclude",
+          "value": [
+            122
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefCharNot",
+        "value": [
+          120
+        ]
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          121
+        ]
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefCharNot",
+        "value": [
+          122
+        ]
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleCharExclude",
+          "value": [
+            120
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            121
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleCharExclude",
+          "value": [
+            122
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefCharNot",
+        "value": [
+          120
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 121
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 130
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleCharExclude",
+          "value": [
+            120,
+            121,
+            [
+              122,
+              130
+            ]
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefEnd"
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 65
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 90
+      },
+      {
+        "cls": "InternalRuleDefEnd"
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ],
+            [
+              65,
+              90
+            ]
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 65
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 90
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 48
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 57
+      },
+      {
+        "cls": "InternalRuleDefEnd"
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ],
+            [
+              65,
+              90
+            ],
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefEnd"
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 65
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 90
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefEnd"
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ],
+            [
+              65,
+              90
+            ]
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 65
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 90
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 48
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 57
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefEnd"
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ],
+            [
+              65,
+              90
+            ],
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefReference",
+        "value": 1
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefEnd"
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        },
+        {
+          "cls": "RuleRef",
+          "value": 1
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 65
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 90
+      },
+      {
+        "cls": "InternalRuleDefReference",
+        "value": 1
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 65
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 90
+      },
+      {
+        "cls": "InternalRuleDefEnd"
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ],
+            [
+              65,
+              90
+            ]
+          ]
+        },
+        {
+          "cls": "RuleRef",
+          "value": 1
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ],
+            [
+              65,
+              90
+            ]
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 65
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 90
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 48
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 57
+      },
+      {
+        "cls": "InternalRuleDefReference",
+        "value": 1
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 65
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 90
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 48
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 57
+      },
+      {
+        "cls": "InternalRuleDefEnd"
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ],
+            [
+              65,
+              90
+            ],
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "cls": "RuleRef",
+          "value": 1
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ],
+            [
+              65,
+              90
+            ],
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefReference",
+        "value": 1
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefEnd"
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ]
+          ]
+        },
+        {
+          "cls": "RuleRef",
+          "value": 1
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 65
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 90
+      },
+      {
+        "cls": "InternalRuleDefReference",
+        "value": 1
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefEnd"
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ],
+            [
+              65,
+              90
+            ]
+          ]
+        },
+        {
+          "cls": "RuleRef",
+          "value": 1
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 65
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 90
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 48
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 57
+      },
+      {
+        "cls": "InternalRuleDefReference",
+        "value": 1
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefEnd"
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ],
+            [
+              65,
+              90
+            ],
+            [
+              48,
+              57
+            ]
+          ]
+        },
+        {
+          "cls": "RuleRef",
+          "value": 1
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          97
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 122
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 65
+      },
+      {
+        "cls": "InternalRuleDefCharRngUpper",
+        "value": 90
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 95
+      },
+      {
+        "cls": "InternalRuleDefEnd"
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            [
+              97,
+              122
+            ],
+            [
+              65,
+              90
+            ],
+            95
+          ]
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  },
+  {
+    "input": [
+      {
+        "cls": "InternalRuleDefChar",
+        "value": [
+          32
+        ]
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 92
+      },
+      {
+        "cls": "InternalRuleDefCharAlt",
+        "value": 110
+      },
+      {
+        "cls": "InternalRuleDefReference",
+        "value": 4
+      },
+      {
+        "cls": "InternalRuleDefAlt"
+      },
+      {
+        "cls": "InternalRuleDefEnd"
+      }
+    ],
+    "expected": [
+      [
+        {
+          "cls": "RuleChar",
+          "value": [
+            32,
+            92,
+            110
+          ]
+        },
+        {
+          "cls": "RuleRef",
+          "value": 4
+        },
+        {
+          "cls": "RuleEnd"
+        }
+      ],
+      [
+        {
+          "cls": "RuleEnd"
+        }
+      ]
+    ]
+  }
+]

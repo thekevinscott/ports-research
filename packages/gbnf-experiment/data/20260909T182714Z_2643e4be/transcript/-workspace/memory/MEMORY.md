@@ -1,0 +1,1 @@
+- [Workspace layout](workspace-layout.md) — only ported_implementation/ is writable; tests/ is an empty read-only mount; no npm network, vitest is global

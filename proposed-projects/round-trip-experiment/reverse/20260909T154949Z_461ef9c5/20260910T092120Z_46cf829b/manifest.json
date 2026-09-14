@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-09-10T09:21:20Z",
+  "completed_at": "2026-09-10T09:31:56Z",
+  "condition": {
+    "name": "source-python_typescript-tests_python-tests_effort-high_model-claude-opus-5",
+    "source_language": "python",
+    "target_language": "typescript",
+    "include_python_tests": true,
+    "include_typescript_tests": true,
+    "effort": "high",
+    "model": "claude-opus-5"
+  },
+  "derivation": {
+    "gbnf_commit": "13f1aca495d11e160fffd68c4ba299a2415909d8"
+  },
+  "sandbox": {
+    "image_id": "sha256:abbae24d1e97ad3726e6d27207584e01153cca914f0c3b8a4155d59ef44ae3e2"
+  },
+  "harness": {
+    "commit": "7ae15c19a3b8a2d9c6c8cfcebd41d858080521b1",
+    "dirty": false
+  },
+  "forward": {
+    "run_id": "20260909T154949Z_461ef9c5",
+    "condition": {
+      "name": "source-typescript_typescript-tests_effort-high_model-claude-opus-5",
+      "source_language": "typescript",
+      "target_language": "python",
+      "include_python_tests": false,
+      "include_typescript_tests": true,
+      "effort": "high",
+      "model": "claude-opus-5"
+    }
+  }
+}

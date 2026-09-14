@@ -1,0 +1,24 @@
+[[python.exempt]]
+path = "measure_ast/__init__.py"
+rules = ["colocated-test"]
+reason = "re-export barrel; measure_ast is tested in its own module"
+
+[[python.exempt]]
+path = "measure_ast/cli_test.py"
+rules = ["unmocked-collaborator"]
+reason = "click's CliRunner is the harness driving the unit"
+
+[[python.exempt]]
+path = "measure_ast/languages_test.py"
+rules = ["unmocked-collaborator"]
+reason = "is_branch is a predicate over real tree-sitter nodes; a mocked node would only restate the type lists"
+
+[[python.exempt]]
+path = "measure_ast/measure_tree_test.py"
+rules = ["unmocked-collaborator"]
+reason = "measure_tree walks real tree-sitter trees; the expected counts are only meaningful against the grammar's actual shape"
+
+[[python.exempt]]
+path = "measure_ast/measure_ast_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the aggregate over real parses of tmp files is the unit; mocking collect_files and measure_tree would leave only arithmetic"

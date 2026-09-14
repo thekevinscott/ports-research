@@ -1,0 +1,13 @@
+[project]
+name = "gbnf"
+version = "0.1.0"
+description = "Python port of the GBNF grammar parser"
+requires-python = ">=3.9"
+dependencies = []
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["gbnf*"]

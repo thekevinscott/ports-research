@@ -1,0 +1,86 @@
+"""Ported from tests/javascript/validation/validate-grammar.test.ts.
+
+Generated from the JavaScript suite in /workspace/tests/javascript; the case
+tables are the originals, translated verbatim.
+"""
+
+import pytest
+
+from gbnf import GBNF, GrammarParseError
+
+VALID_GRAMMARS = [
+    'root ::= "foo"',
+    'root ::= "foo" | "bar"',
+    'root ::= ("foo" | "bar")',
+    'root ::= ("foo" | "bar")?',
+    'root ::= ("foo" | "bar")*',
+    'root ::= ("foo" | "bar")+',
+    'root ::= [a-z]',
+    'root ::= [a-zA-Z]',
+    'root ::= [a-zA-Z0-9]',
+    'root ::= [a-zA-Z0-9]*',
+    'root ::= [a-zA-Z0-9]?',
+    'root ::= [a-z]+',
+    'root ::= [a-zA-Z0-9]+',
+    'root ::= ([a-zA-Z0-9])*',
+    'root ::= ([a-zA-Z0-9])?',
+    'root ::= ([a-zA-Z0-9])+',
+    '\n  root ::= foo\n  foo ::= "foo"',
+    '\n  root ::= foo\n  foo ::= "foo" | "bar" | ([a-z])?\n  ',
+]
+
+INVALID_GRAMMARS = [
+    [
+        '',
+        0,
+        'No rules were found',
+    ],
+    [
+        'root = "foo"',
+        5,
+        'Expecting ::= at 5',
+    ],
+    [
+        'root ::= foo\nfoo := "foo"\n  ',
+        17,
+        'Expecting ::= at 17',
+    ],
+    [
+        'root ::= foo',
+        9,
+        'Undefined rule identifier "foo"',
+    ],
+    [
+        'root ::= foo\nbar ::= "bar"\n  ',
+        9,
+        'Undefined rule identifier "foo"',
+    ],
+    [
+        'root ::= foo\nfoo ::= baz\nbar ::= "bar"\n  ',
+        21,
+        'Undefined rule identifier "baz"',
+    ],
+    [
+        'root ::= foo ::= bar',
+        13,
+        'Expecting newline or end at 13',
+    ],
+    [
+        'root ::= ([a-z]\nfoo ::= "foo"\n  ',
+        20,
+        "Expecting ')' at 20",
+    ],
+]
+
+@pytest.mark.parametrize('grammar', VALID_GRAMMARS, ids=[str(i) for i in range(len(VALID_GRAMMARS))])
+def test_it_parses_a_grammar(grammar):
+    assert GBNF(grammar) is not None
+
+
+@pytest.mark.parametrize(
+    'grammar,error_pos,error_reason', INVALID_GRAMMARS, ids=[str(i) for i in range(len(INVALID_GRAMMARS))]
+)
+def test_it_reports_an_error_for_an_invalid_grammar(grammar, error_pos, error_reason):
+    with pytest.raises(GrammarParseError) as exc_info:
+        GBNF(grammar)
+    assert str(exc_info.value) == str(GrammarParseError(grammar, error_pos, error_reason))

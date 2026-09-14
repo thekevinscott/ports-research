@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gbnf"
+version = "0.1.41"
+description = "A library for parsing GBNF grammars"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = ["gbnf", "grammar", "grammar-parser"]
+
+[tool.setuptools.packages.find]
+include = ["gbnf*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

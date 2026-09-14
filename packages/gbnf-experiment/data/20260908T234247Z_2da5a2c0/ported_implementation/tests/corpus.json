@@ -1,0 +1,676 @@
+[
+  {
+    "name": "single-literal",
+    "grammar": "root ::= \"a\"",
+    "inputs": [
+      "",
+      "a"
+    ]
+  },
+  {
+    "name": "multi-char-literal",
+    "grammar": "root ::= \"abc\"",
+    "inputs": [
+      "",
+      "a",
+      "ab",
+      "abc"
+    ]
+  },
+  {
+    "name": "incremental-literal",
+    "grammar": "root ::= \"I like green eggs and ham\"",
+    "steps": [
+      "I li",
+      "ke gree",
+      "n eggs and ham"
+    ]
+  },
+  {
+    "name": "alternates",
+    "grammar": "root ::= \"yes\" | \"no\"",
+    "inputs": [
+      "",
+      "y",
+      "n",
+      "ye",
+      "yes",
+      "no"
+    ]
+  },
+  {
+    "name": "three-alternates",
+    "grammar": "root ::= \"a\" | \"b\" | \"c\"",
+    "inputs": [
+      "",
+      "a",
+      "b",
+      "c"
+    ]
+  },
+  {
+    "name": "range",
+    "grammar": "root ::= [a-z]",
+    "inputs": [
+      "",
+      "a",
+      "q",
+      "z"
+    ]
+  },
+  {
+    "name": "multi-range",
+    "grammar": "root ::= [a-zA-Z0-9]",
+    "inputs": [
+      "",
+      "a",
+      "Z",
+      "5"
+    ]
+  },
+  {
+    "name": "range-plus-alt",
+    "grammar": "root ::= [a-z_]",
+    "inputs": [
+      "",
+      "_",
+      "a"
+    ]
+  },
+  {
+    "name": "char-alts",
+    "grammar": "root ::= [abc]",
+    "inputs": [
+      "",
+      "a",
+      "b",
+      "c"
+    ]
+  },
+  {
+    "name": "negated-range",
+    "grammar": "root ::= [^a-z]",
+    "inputs": [
+      "",
+      "A",
+      "0",
+      " "
+    ]
+  },
+  {
+    "name": "negated-chars",
+    "grammar": "root ::= [^ab]",
+    "inputs": [
+      "",
+      "c",
+      "z"
+    ]
+  },
+  {
+    "name": "negated-mixed",
+    "grammar": "root ::= [^a-z0-9]",
+    "inputs": [
+      "",
+      "A",
+      "!"
+    ]
+  },
+  {
+    "name": "star",
+    "grammar": "root ::= \"a\"* \"b\"",
+    "inputs": [
+      "",
+      "b",
+      "a",
+      "ab",
+      "aaab"
+    ]
+  },
+  {
+    "name": "plus",
+    "grammar": "root ::= \"a\"+",
+    "inputs": [
+      "",
+      "a",
+      "aa",
+      "aaa"
+    ]
+  },
+  {
+    "name": "optional",
+    "grammar": "root ::= \"a\"? \"b\"",
+    "inputs": [
+      "",
+      "b",
+      "a",
+      "ab"
+    ]
+  },
+  {
+    "name": "star-range",
+    "grammar": "root ::= [0-9]*",
+    "inputs": [
+      "",
+      "1",
+      "12",
+      "123"
+    ]
+  },
+  {
+    "name": "plus-range",
+    "grammar": "root ::= [0-9]+",
+    "inputs": [
+      "",
+      "1",
+      "42"
+    ]
+  },
+  {
+    "name": "group",
+    "grammar": "root ::= (\"a\" | \"b\") \"c\"",
+    "inputs": [
+      "",
+      "a",
+      "b",
+      "ac",
+      "bc"
+    ]
+  },
+  {
+    "name": "group-star",
+    "grammar": "root ::= (\"ab\")* \"c\"",
+    "inputs": [
+      "",
+      "a",
+      "ab",
+      "abab",
+      "abc",
+      "c"
+    ]
+  },
+  {
+    "name": "group-plus",
+    "grammar": "root ::= (\"a\" \"b\")+",
+    "inputs": [
+      "",
+      "a",
+      "ab",
+      "aba",
+      "abab"
+    ]
+  },
+  {
+    "name": "nested-groups",
+    "grammar": "root ::= ((\"a\" | \"b\") \"c\")+ \"d\"",
+    "inputs": [
+      "",
+      "a",
+      "ac",
+      "acbc",
+      "acd"
+    ]
+  },
+  {
+    "name": "rule-ref",
+    "grammar": "root ::= a b\na ::= \"1\"\nb ::= \"2\"",
+    "inputs": [
+      "",
+      "1",
+      "12"
+    ]
+  },
+  {
+    "name": "rule-ref-alt",
+    "grammar": "root ::= inner \"!\"\ninner ::= \"x\" | \"y\"",
+    "inputs": [
+      "",
+      "x",
+      "y",
+      "x!"
+    ]
+  },
+  {
+    "name": "hyphenated-names",
+    "grammar": "root ::= my-rule\nmy-rule ::= \"z\"",
+    "inputs": [
+      "",
+      "z"
+    ]
+  },
+  {
+    "name": "recursive",
+    "grammar": "root ::= \"(\" root \")\" | \"x\"",
+    "inputs": [
+      "",
+      "x",
+      "(",
+      "(x",
+      "(x)",
+      "((x))"
+    ]
+  },
+  {
+    "name": "repeated-group",
+    "grammar": "root ::= item (\",\" item)*\nitem ::= [a-z]",
+    "inputs": [
+      "",
+      "a",
+      "a,",
+      "a,b",
+      "a,b,c"
+    ]
+  },
+  {
+    "name": "comments",
+    "grammar": "# leading comment\nroot ::= \"a\" # trailing comment\n",
+    "inputs": [
+      "",
+      "a"
+    ]
+  },
+  {
+    "name": "extra-whitespace",
+    "grammar": "\n\n   root   ::=   \"a\"   \n\n",
+    "inputs": [
+      "",
+      "a"
+    ]
+  },
+  {
+    "name": "crlf",
+    "grammar": "root ::= \"a\"\r\nsecond ::= \"b\"\r\n",
+    "inputs": [
+      "",
+      "a"
+    ]
+  },
+  {
+    "name": "escape-newline",
+    "grammar": "root ::= \"a\\n\"",
+    "inputs": [
+      "",
+      "a",
+      "a\n"
+    ]
+  },
+  {
+    "name": "escape-tab-cr",
+    "grammar": "root ::= \"\\t\" \"\\r\"",
+    "inputs": [
+      "",
+      "\t",
+      "\t\r"
+    ]
+  },
+  {
+    "name": "escape-hex",
+    "grammar": "root ::= \"\\x41\"",
+    "inputs": [
+      "",
+      "A"
+    ]
+  },
+  {
+    "name": "escape-unicode",
+    "grammar": "root ::= \"\\u00e9\"",
+    "inputs": [
+      "",
+      "é"
+    ]
+  },
+  {
+    "name": "escape-quote",
+    "grammar": "root ::= \"\\\"\"",
+    "inputs": [
+      "",
+      "\""
+    ]
+  },
+  {
+    "name": "escape-brackets",
+    "grammar": "root ::= [\\[\\]]",
+    "inputs": [
+      "",
+      "[",
+      "]"
+    ]
+  },
+  {
+    "name": "escape-backslash",
+    "grammar": "root ::= \"\\\\\"",
+    "inputs": [
+      "",
+      "\\"
+    ]
+  },
+  {
+    "name": "dash-at-end-of-class",
+    "grammar": "root ::= [a-]",
+    "inputs": [
+      "",
+      "a",
+      "-"
+    ]
+  },
+  {
+    "name": "empty-rule-body",
+    "grammar": "root ::= ",
+    "inputs": [
+      ""
+    ]
+  },
+  {
+    "name": "unused-rule",
+    "grammar": "root ::= \"a\"\nunused ::= \"b\"",
+    "inputs": [
+      "",
+      "a"
+    ]
+  },
+  {
+    "name": "whitespace-rule",
+    "grammar": "root ::= \"a\" ws \"b\"\nws ::= [ \\t\\n]*",
+    "inputs": [
+      "",
+      "a",
+      "ab",
+      "a b",
+      "a  \tb"
+    ]
+  },
+  {
+    "name": "json-ish",
+    "grammar": "root ::= object\nobject ::= \"{\" ws ( string \":\" ws value ( \",\" ws string \":\" ws value )* )? \"}\" ws\nvalue ::= object | array | string | number | (\"true\" | \"false\" | \"null\") ws\narray ::= \"[\" ws ( value ( \",\" ws value )* )? \"]\" ws\nstring ::= \"\\\"\" ( [^\"\\\\] )* \"\\\"\" ws\nnumber ::= (\"-\"? ([0-9] | [1-9] [0-9]*)) (\".\" [0-9]+)? ws\nws ::= ([ \\t\\n] ws)?",
+    "inputs": [
+      "",
+      "{",
+      "{}",
+      "{\"a\": 1}",
+      "{\"a\": [1, 2], \"b\": {\"c\": null}}"
+    ]
+  },
+  {
+    "name": "list-grammar",
+    "grammar": "root ::= item+\nitem ::= \"- \" [a-z]+ \"\\n\"",
+    "inputs": [
+      "",
+      "- ",
+      "- a",
+      "- ab\n",
+      "- ab\n- c"
+    ]
+  },
+  {
+    "name": "err-empty-grammar",
+    "grammar": "",
+    "inputs": [
+      ""
+    ]
+  },
+  {
+    "name": "err-whitespace-grammar",
+    "grammar": "   \n  ",
+    "inputs": [
+      ""
+    ]
+  },
+  {
+    "name": "err-no-root",
+    "grammar": "foo ::= \"a\"",
+    "inputs": [
+      ""
+    ]
+  },
+  {
+    "name": "err-undefined-ref",
+    "grammar": "root ::= foo",
+    "inputs": [
+      ""
+    ]
+  },
+  {
+    "name": "err-undefined-ref-multiline",
+    "grammar": "root ::= \"a\" bar\nbaz ::= \"b\"",
+    "inputs": [
+      ""
+    ]
+  },
+  {
+    "name": "err-missing-assign",
+    "grammar": "root \"a\"",
+    "inputs": [
+      ""
+    ]
+  },
+  {
+    "name": "err-underscore-name",
+    "grammar": "root_ ::= \"a\"",
+    "inputs": [
+      ""
+    ]
+  },
+  {
+    "name": "err-digit-name",
+    "grammar": "root1 ::= \"a\"",
+    "inputs": [
+      ""
+    ]
+  },
+  {
+    "name": "err-unclosed-paren",
+    "grammar": "root ::= (\"a\"",
+    "inputs": [
+      ""
+    ]
+  },
+  {
+    "name": "err-unclosed-quote",
+    "grammar": "root ::= \"a",
+    "inputs": [
+      ""
+    ]
+  },
+  {
+    "name": "err-unclosed-bracket",
+    "grammar": "root ::= [a",
+    "inputs": [
+      ""
+    ]
+  },
+  {
+    "name": "err-leading-star",
+    "grammar": "root ::= *",
+    "inputs": [
+      ""
+    ]
+  },
+  {
+    "name": "err-unknown-escape",
+    "grammar": "root ::= \"\\q\"",
+    "inputs": [
+      ""
+    ]
+  },
+  {
+    "name": "err-input-mismatch",
+    "grammar": "root ::= \"abc\"",
+    "inputs": [
+      "axc",
+      "b",
+      "abcd"
+    ]
+  },
+  {
+    "name": "err-input-mismatch-multiline",
+    "grammar": "root ::= \"ab\\ncd\"",
+    "inputs": [
+      "ab\ncX"
+    ]
+  },
+  {
+    "name": "err-input-after-end",
+    "grammar": "root ::= \"a\"",
+    "inputs": [
+      "aa"
+    ]
+  },
+  {
+    "name": "err-input-range",
+    "grammar": "root ::= [a-z]",
+    "inputs": [
+      "A",
+      "0"
+    ]
+  },
+  {
+    "name": "err-input-negated",
+    "grammar": "root ::= [^a-z]",
+    "inputs": [
+      "a"
+    ]
+  },
+  {
+    "name": "err-step-mismatch",
+    "grammar": "root ::= \"abc\"",
+    "steps": [
+      "ab",
+      "X"
+    ]
+  },
+  {
+    "name": "codepoint-int-input",
+    "grammar": "root ::= \"abc\"",
+    "code_point_inputs": [
+      97
+    ]
+  },
+  {
+    "name": "codepoint-list-input",
+    "grammar": "root ::= \"abc\"",
+    "code_point_inputs": [
+      [
+        97
+      ],
+      [
+        97,
+        98
+      ],
+      [
+        97,
+        98,
+        99
+      ]
+    ]
+  },
+  {
+    "name": "codepoint-empty-list",
+    "grammar": "root ::= \"abc\"",
+    "code_point_inputs": [
+      []
+    ]
+  },
+  {
+    "name": "err-codepoint-mismatch",
+    "grammar": "root ::= \"abc\"",
+    "code_point_inputs": [
+      [
+        97,
+        120
+      ],
+      120
+    ]
+  },
+  {
+    "name": "optional-group",
+    "grammar": "root ::= (\"a\" \"b\")? \"c\"",
+    "inputs": [
+      "",
+      "a",
+      "ab",
+      "abc",
+      "c"
+    ]
+  },
+  {
+    "name": "alt-of-refs",
+    "grammar": "root ::= a | b\na ::= \"1\" a | \"1\"\nb ::= \"2\"",
+    "inputs": [
+      "",
+      "1",
+      "11",
+      "2"
+    ]
+  },
+  {
+    "name": "deep-recursion",
+    "grammar": "root ::= \"a\" root | \"b\"",
+    "inputs": [
+      "",
+      "aaaaaaaaaab",
+      "aaaaa"
+    ]
+  },
+  {
+    "name": "escaped-in-negated-class",
+    "grammar": "root ::= [^\\n\\t]+",
+    "inputs": [
+      "",
+      "x",
+      "xy"
+    ]
+  },
+  {
+    "name": "nested-alternates-in-group",
+    "grammar": "root ::= (\"a\" | \"b\" | \"c\")+ \"!\"",
+    "inputs": [
+      "",
+      "a",
+      "ab",
+      "abc!"
+    ]
+  },
+  {
+    "name": "multiple-root-alts-with-refs",
+    "grammar": "root ::= greeting \" \" name\ngreeting ::= \"hi\" | \"hello\"\nname ::= [a-z]+",
+    "inputs": [
+      "",
+      "hi",
+      "hi ",
+      "hi bob",
+      "hello x"
+    ]
+  },
+  {
+    "name": "quantified-ref",
+    "grammar": "root ::= digit+\ndigit ::= [0-9]",
+    "inputs": [
+      "",
+      "1",
+      "123"
+    ]
+  },
+  {
+    "name": "empty-alternate",
+    "grammar": "root ::= \"a\" | ",
+    "inputs": [
+      "",
+      "a"
+    ]
+  },
+  {
+    "name": "unicode-range",
+    "grammar": "root ::= [\\u00e0-\\u00ff]",
+    "inputs": [
+      "",
+      "é",
+      "à"
+    ]
+  },
+  {
+    "name": "err-input-unicode",
+    "grammar": "root ::= \"é\"",
+    "inputs": [
+      "e"
+    ]
+  }
+]

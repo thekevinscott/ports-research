@@ -1,0 +1,11 @@
+"""Port of ``src/utils/errors/get-input-as-string.ts``."""
+from __future__ import annotations
+
+from ...valid_input import ValidInput
+
+
+def get_input_as_string(src: ValidInput) -> str:
+    if isinstance(src, str):
+        return src
+    code_points = src if isinstance(src, (list, tuple)) else [src]
+    return ''.join(chr(cp) for cp in code_points)
