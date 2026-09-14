@@ -21,6 +21,10 @@ generate-embedding = "generate_embedding.cli:cli"
 requires = ["uv_build>=0.10.11,<0.11.0"]
 build-backend = "uv_build"
 
+[tool.uv.build-backend]
+# Colocated tests are development code; keep them out of the wheel and sdist.
+source-exclude = ["*_test.py", "**/*_test.py"]
+
 [dependency-groups]
 dev = [
     "coverage>=7.16.0",
