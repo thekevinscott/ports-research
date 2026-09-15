@@ -6,12 +6,9 @@ app = marimo.App(width="medium")
 
 @app.cell(hide_code=True)
 def _():
-    from pathlib import Path
-
     import altair as alt
     import marimo as mo
     import polars as pl
-    from dirsql._dirsql import DirSQL
 
     from src.Codebase import Codebase
     from src.pair_layout import (
@@ -25,43 +22,12 @@ def _():
     )
     from src.port_pairs import within_cell, within_direction_similarity
     from src.rebuilt_layout import LAYOUT_LABELS, LAYOUT_RULE, layout_flag
-    from src.run_table import completed_runs, reverse_runs_table, runs_table
+    from src.run_table import reverse_runs_table, runs_table
 
 
-    ROOT = Path(__file__).resolve().parents[1]
-    DATA = ROOT / "packages" / "gbnf-experiment" / "data"
-    REVERSE = ROOT / "proposed-projects" / "round-trip-experiment" / "reverse"
-    DERIVATION = "af673dbe41be73ce"
-    REFERENCE = Path.home() / ".cache" / "ports" / "gbnf-experiment" / "derivations" / DERIVATION / "source"
-    EXCLUDE = [
-        "node_modules",
-        "__pycache__",
-        ".venv",
-        ".pytest_cache",
-        "dist",
-        "dev-deps",
-        "tests",
-        "test",
-        "integration-tests",
-        "conftest.py",
-        "*_test.py",
-        "test_*.py",
-        "*.test.ts",
-        "*.spec.ts",
-    ]
-    EXCLUDE_BY_LANGUAGE = {"python": EXCLUDE, "typescript": [*EXCLUDE, "builder", "dev"]}
-
-    def codebases_under(root, table):
-        # A fresh DirSQL scan every run, so a run banked since the last refresh is picked up.
-        db = DirSQL(str(root), tables=[table])
-        return [
-            Codebase.from_run(
-                row,
-                exclude=EXCLUDE_BY_LANGUAGE[row["target_language"]],
-                reference=REFERENCE / row["target_language"],
-            )
-            for row in completed_runs(db, table.name)
-        ]
+    from src.corpus import (
+        DATA, REVERSE, REFERENCE, EXCLUDE_BY_LANGUAGE, codebases_under,
+    )
 
     codebases = codebases_under(DATA, runs_table())
     reverse_codebases = codebases_under(REVERSE, reverse_runs_table())
@@ -261,7 +227,6 @@ def _(
     SIZE_COLUMNS = [
         "file_count",
         "loc",
-        "mean_cyclomatic",
     ]
     TEST_COLUMNS = [
         "adapted_unit_pass_pct",
@@ -282,7 +247,7 @@ def _(
         "api_calls": "API calls",
         "duration_min": "Duration (minutes)",
         "file_count": "Files",
-        "loc": "Lines of code",
+        "loc": "LOC",
         "mean_cyclomatic": "Mean cyclomatic complexity",
         "adapted_unit_pass_pct": "Unit tests passing (%)",
         "adapted_integration_pass_pct": "Integration tests passing (%)",
@@ -382,8 +347,8 @@ def _(
     DOT_STEP = 6
     BAND_FILL = 0.8
 
-    def panel_title(text):
-        return alt.TitleParams(text, fontSize=11, anchor="start", color=INK)
+    def panel_title(text, font_size=11):
+        return alt.TitleParams(text, fontSize=font_size, anchor="start", color=INK)
 
     def metric_title(metric):
         return METRIC_TITLES.get(metric, metric.replace("_", " "))
@@ -418,7 +383,13 @@ def _(
         )
 
     def chart(
-        frame, target_language, source_language, metrics, flags=CONDITION_FLAGS, anchors=None
+        frame,
+        target_language,
+        source_language,
+        metrics,
+        flags=CONDITION_FLAGS,
+        anchors=None,
+        font_scale=1.0,
     ):
         metrics = ["duration_min" if metric == "duration" else metric for metric in metrics]
         labelled = with_conditions(frame, source_language, flags)
@@ -440,6 +411,7 @@ def _(
             sort=[label for label, *_ in conditions(source_language)],
             title=None,
             scale=alt.Scale(paddingInner=BAND_PADDING, paddingOuter=BAND_PADDING / 2),
+            axis=alt.Axis(labelFontSize=10 * font_scale),
         )
         # A continuous offset scale is measured from the band's left edge, not its middle,
         # so half a band puts the fan back under the label and on the median tick.
@@ -462,7 +434,15 @@ def _(
             base = alt.Chart(rows)
             median = median_tick(base, x=x, y=alt.Y("median(value):Q", title=None, scale=scale))
             points = base.mark_point(filled=True, size=96).encode(
-                x=x, xOffset=dot_offset(rows, centre), y=alt.Y("value:Q", scale=scale)
+                x=x,
+                xOffset=dot_offset(rows, centre),
+                y=alt.Y(
+                    "value:Q",
+                    scale=scale,
+                    axis=alt.Axis(
+                        labelFontSize=10 * font_scale, titleFontSize=11 * font_scale
+                    ),
+                ),
             )
             if metric == DIFF_LEAD:
                 points = points.encode(shape=layout_shape())
@@ -487,7 +467,9 @@ def _(
                     .encode(y=level, x=alt.value(158), text="label:N")
                 )
             return alt.layer(*layers).properties(
-                width=PANEL_WIDTH, height=height, title=panel_title(metric_title(metric))
+                width=PANEL_WIDTH,
+                height=height,
+                title=panel_title(metric_title(metric), 11 * font_scale),
             )
 
         return alt.concat(*(panel(metric) for metric in metrics), columns=4)
@@ -498,11 +480,22 @@ def _(
     LEAD_COLUMNS = {DIFF_LEAD: "Other diff columns", UNIT_LEAD: "Other test columns"}
 
     def section_chart(metrics, frame, target_language, source_language, flags=CONDITION_FLAGS):
-        def build(columns):
-            return chart(frame, target_language, source_language, columns, flags, CALIBRATION)
+        def build(columns, font_scale=1.0):
+            return chart(
+                frame, target_language, source_language, columns, flags, CALIBRATION, font_scale
+            )
 
         lead = next((metric for metric in metrics if metric in LEAD_COLUMNS), None)
         if lead is None:
+            if metrics == SIZE_COLUMNS:
+                result = build(metrics, font_scale=1.5)
+                return result.properties(
+                    title=alt.TitleParams(
+                        f"{source_language} -> {target_language}",
+                        fontSize=21,
+                        anchor="start",
+                    )
+                )
             return build(metrics)
         # shim_chart draws SHIM_COLUMNS before and after, so the section leaves them to it.
         others = [metric for metric in metrics if metric not in (lead, *SHIM_COLUMNS)]
@@ -597,7 +590,7 @@ def _(
     # separation under deuteranopia, protanopia and tritanopia alike.
     CONDITION_COLOURS = ["#2a78d6", "#eb6834", "#1baf7a", "#4a3aa7"]
     CONDITION_SHAPES = ["circle", "square", "triangle-up", "cross"]
-    REFERENCE_LABEL = "hand-written reference"
+    REFERENCE_LABEL = "reference"
     REFERENCE_SHAPE = "diamond"
     RING_LEVELS = [25, 50, 75]
     SCALE_BAR = 20
@@ -859,15 +852,16 @@ def _(
             ),
         )
 
-    MATRIX_CELL_PX = 34
-    MATRIX_LABEL_PX = 8
-    MATRIX_VALUE_PX = 9
+    # Compact cells leave room for readable run labels around the matrix.
+    MATRIX_CELL_PX = 30
+    MATRIX_LABEL_PX = 11
+    MATRIX_VALUE_PX = 8
     MATRIX_STRIP_PX = 9
     MATRIX_STRIP_GAP = 4
     MUTED_INK = "#898781"
     SURFACE = "#fcfcfb"
     SEQUENTIAL_BLUE = ["#cde2fb", "#86b6ef", "#3987e5", "#256abf", "#0d366b"]
-    REFERENCE_TICK = "reference"
+    REFERENCE_TICK = ""
 
     def matrix_ports(source_language):
         """The direction's 21 items in axis order: condition, then run id, reference last.
@@ -921,7 +915,7 @@ def _(
         )
 
     def matrix_blocks(ordered):
-        """The first item of every block: the four conditions, then the reference alone."""
+        """The first item of every condition block."""
         return (
             ordered.group_by("condition", maintain_order=True).first().select("port", "condition")
         )
@@ -942,6 +936,9 @@ def _(
 
     def pair_matrix_chart(source_language):
         """The 21-item square: values in one triangle, colour in the other, no diagonal."""
+        target_language = runs.filter(pl.col("source_language") == source_language)[
+            "target_language"
+        ][0]
         ordered = matrix_ports(source_language)
         items = ordered["port"].to_list()
         cells = matrix_cells(source_language, ordered)
@@ -950,7 +947,7 @@ def _(
         side = MATRIX_CELL_PX * len(items)
         scale = alt.Scale(domain=items)
         x = alt.X("port_a:N", scale=scale, title=None, axis=matrix_axis(labelAngle=-90))
-        y = alt.Y("port_b:N", scale=scale, title=None, axis=matrix_axis(labelAngle=0)
+        y = alt.Y("port_b:N", scale=scale, title=None, axis=matrix_axis(labelAngle=0))
         filled = (
             alt.Chart(cells.filter(pl.col("half") == "colour"))
             .mark_rect(stroke=SURFACE, strokeWidth=1)
@@ -997,7 +994,7 @@ def _(
             alt.Chart(strip)
             .mark_rect()
             .encode(
-                y=alt.Y("port:N", scale=scale, title=None, axis=matrix_axis(labelAngle=0),
+                y=alt.Y("port:N", scale=scale, title=None, axis=matrix_axis(labelAngle=0)),
                 x=alt.value(-far),
                 x2=alt.value(-near),
                 color=strip_colour(False),
@@ -1021,19 +1018,9 @@ def _(
                 width=side,
                 height=side,
                 title=alt.TitleParams(
-                    f"{direction(source_language)}: port against port",
-                    subtitle=[
-                        "Each cell is one pair: the port on its row read against the port on"
-                        " its column. Lower triangle prints the value, upper fills it as"
-                        " colour.",
-                        "The diagonal is left out, a port against itself being 100. Colour"
-                        f" runs over the measured range, {low:.0f}% to {high:.0f}%.",
-                        "Strips on both headers carry the condition; the hand-written"
-                        " reference takes the last row and column.",
-                    ],
-                    fontSize=11,
+                    f"{source_language} -> {target_language}",
+                    fontSize=14,
                     subtitleFontSize=10,
-                    subtitleColor="#52514e",
                     anchor="start",
                     color=INK,
                     offset=MATRIX_STRIP_PX + MATRIX_STRIP_GAP * 2 + 6,
@@ -1077,7 +1064,7 @@ def _(
         )
 
     RATIO_TOLERANCE = 0.01
-    RATIO_WIDTH = 440
+    RATIO_WIDTH = 290
 
     def nudges(values, tolerance=RATIO_TOLERANCE):
         """Dots within `tolerance` of each other spread sideways; a dot on its own stays centred."""
@@ -1118,10 +1105,18 @@ def _(
         scale = (
             alt.Scale(zero=False) if domain is None else alt.Scale(domain=list(domain), nice=False)
         )
-        y = alt.Y("value:Q", title=metric_title("ladder_ref_ratio"), scale=scale)
+        y = alt.Y(
+            "value:Q",
+            title=metric_title("ladder_ref_ratio"),
+            scale=scale,
+            axis=alt.Axis(labelFontSize=20, titleFontSize=22),
+        )
         parity = pl.DataFrame({"value": [1.0], "label": ["reference"]})
         x = alt.X(
-            "condition:N", sort=[label for label, *_ in conditions(source_language)], title=None
+            "condition:N",
+            sort=[label for label, *_ in conditions(source_language)],
+            title=None,
+            axis=alt.Axis(labelFontSize=20),
         )
         # A continuous offset scale is measured from the band's left edge, so half a band
         # (the panel's width over the four conditions) re-centres the dots under their label.
@@ -1133,7 +1128,7 @@ def _(
         )
         dots = (
             alt.Chart(rows)
-            .mark_point(filled=True, size=70, opacity=0.75)
+            .mark_point(filled=True, size=136, opacity=0.5)
             .encode(
                 x=x,
                 xOffset=offset,
@@ -1714,7 +1709,7 @@ def _(mo):
 
                     A consistent rename costs as much as deleting a quarter of the files, so this embedder is largely measuring vocabulary, and the number cannot tell "every file slightly different" from "most files exact and a few unrelated". Read it as a relative distance between ports, not a fidelity grade.
 
-                    Ports are compared only against the hand-written reference in the same language, port on `a`, reference on `b`. Model `qwen3-embedding-0.6b-q8_0`, 8192-token context; the largest source file is 10,356 bytes, so nothing is truncated.
+                    The per-port panels compare against the hand-written reference in the same language, port on `a`, reference on `b`. The all-pairs panel compares every unordered pair of forward ports within each direction, including across test conditions. Model `qwen3-embedding-0.6b-q8_0`, 8192-token context; the largest source file is 10,356 bytes, so nothing is truncated.
                     """)
                 }
             ),
@@ -1728,6 +1723,19 @@ def _(report):
     report("embeddings")
     return
 
+
+@app.cell(hide_code=True)
+def _(codebases, mo):
+    from export_embedding_pairs import pair_chart as embedding_pair_chart
+    from src.embedding_pairs import compare_corpus
+
+    embedding_pair_report = compare_corpus(codebases)
+    mo.vstack([
+        mo.md("### Every port to every port\nAll pairs within each direction, across test conditions. Lower distance means closer. Pairs share ports and are not independent observations."),
+        *[embedding_pair_chart(embedding_pair_report["comparisons"], source, target)
+          for source, target in (("python", "typescript"), ("typescript", "python"))],
+    ])
+    return embedding_pair_chart, embedding_pair_report
 
 @app.cell(hide_code=True)
 def _(mo):

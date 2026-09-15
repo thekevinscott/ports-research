@@ -36,6 +36,13 @@ def slug(name):
 
 def charts(notebook):
     """Every chart runs.py renders, as (path stem, chart)."""
+    for source, target in (("python", "typescript"), ("typescript", "python")):
+        yield (
+            f"embeddings/port-pairs-{source}-to-{target}",
+            notebook["embedding_pair_chart"](
+                notebook["embedding_pair_report"]["comparisons"], source, target
+            ),
+        )
     chart = notebook["chart"]
     calibration = notebook["CALIBRATION"]
     lead = notebook["DIFF_LEAD"]
@@ -46,12 +53,19 @@ def charts(notebook):
     shim = notebook["SHIM_COLUMNS"]
 
     def section_charts(section, metrics, frame, target_language, source_language, flags):
-        def build(columns):
-            return chart(frame, target_language, source_language, columns, flags, calibration)
+        def build(columns, font_scale=1.0):
+            return chart(
+                frame, target_language, source_language, columns, flags, calibration, font_scale
+            )
 
         section_lead = next((metric for metric in metrics if metric in leads), None)
         if section_lead is None:
-            yield slug(section), build(metrics)
+            if section == "size":
+                built = build(metrics, font_scale=1.5)
+                built = built.properties(title=f"{source_language} -> {target_language}")
+            else:
+                built = build(metrics)
+            yield slug(section), built
             return
         # section_chart splits a led section: the lead on its own, the rest in an accordion.
         yield slug(section_lead), build([section_lead])
