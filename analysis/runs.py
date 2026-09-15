@@ -950,7 +950,7 @@ def _(
         side = MATRIX_CELL_PX * len(items)
         scale = alt.Scale(domain=items)
         x = alt.X("port_a:N", scale=scale, title=None, axis=matrix_axis(labelAngle=-90))
-        y = alt.Y("port_b:N", scale=scale, title=None, axis=matrix_axis())
+        y = alt.Y("port_b:N", scale=scale, title=None, axis=matrix_axis(labelAngle=0)
         filled = (
             alt.Chart(cells.filter(pl.col("half") == "colour"))
             .mark_rect(stroke=SURFACE, strokeWidth=1)
@@ -997,7 +997,7 @@ def _(
             alt.Chart(strip)
             .mark_rect()
             .encode(
-                y=alt.Y("port:N", scale=scale, title=None, axis=matrix_axis()),
+                y=alt.Y("port:N", scale=scale, title=None, axis=matrix_axis(labelAngle=0),
                 x=alt.value(-far),
                 x2=alt.value(-near),
                 color=strip_colour(False),
