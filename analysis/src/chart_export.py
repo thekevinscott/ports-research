@@ -19,7 +19,7 @@ TEXT = "#d8d3ca"
 TITLE = "#f3f1ec"
 GRID = "#2e2b26"
 TICK = "#4c4840"
-DARK_BLUE_RAMP = ["#161513", "#14233a", "#123152", "#10345f", "#0d366b"]
+DARK_BLUE_RAMP = ["#161513", "#17375c", "#1f5b8f", "#256abf", "#0d366b"]
 
 
 def dark_spec(spec, name):
@@ -30,7 +30,7 @@ def dark_spec(spec, name):
     spec = deepcopy(spec)
     colors = {"#000": TEXT, "#000000": TEXT, "black": TEXT,
               "#0b0b0b": TITLE, "#ddd": GRID, "#dddddd": GRID,
-              "#888": TICK, "#888888": TICK, "#898781": TEXT, "#fcfcfb": GRID}
+              "#888": TICK, "#888888": TICK, "#898781": TEXT, "#fcfcfb": TICK}
 
     def recolor(value, stroke=False):
         mapping = colors | ({"#000": TITLE, "#000000": TITLE, "black": TITLE} if stroke else {})
