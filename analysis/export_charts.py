@@ -13,9 +13,21 @@ from pathlib import Path
 import polars as pl
 
 from runs import app
-from src.chart_export import write_chart
+from src.chart_export import fit_pair, write_chart
 
 CHARTS = Path(__file__).resolve().parent / "charts"
+# Blog slots: a 757px body; side-by-side pairs split it with a 1rem (16px) gap. Charts in
+# a slot render 1:1 at these widths, so fonts hold one pixel size across the blog.
+BODY_WIDTH = 757
+HALF_WIDTH = (BODY_WIDTH - 16) / 2
+SLOT_WIDTHS = {
+    "performance/ladder-ref-ratio-": HALF_WIDTH,
+    "statistical-analysis/size-": HALF_WIDTH,
+    "statistical-analysis/port-to-port-matrix-": BODY_WIDTH,
+}
+# Builder widths that land each slot chart just under its slot; fit_pair pads the rest.
+SIZE_PANEL_WIDTH = 131.25
+MATRIX_SIDE = 598
 LANGUAGES = ("python", "typescript")
 # The notebook renders reverse_report for these two sections only: there is no reverse ladder.
 REVERSE_SECTIONS = ("diff", "embeddings")
@@ -54,8 +66,9 @@ def charts(notebook):
 
     def section_charts(section, metrics, frame, target_language, source_language, flags):
         def build(columns, font_scale=1.0):
+            size = {"panel_width": SIZE_PANEL_WIDTH} if section == "size" else {}
             return chart(
-                frame, target_language, source_language, columns, flags, calibration, font_scale
+                frame, target_language, source_language, columns, flags, calibration, font_scale, **size
             )
 
         section_lead = next((metric for metric in metrics if metric in leads), None)
@@ -116,7 +129,7 @@ def charts(notebook):
         )
         yield (
             f"{FORWARD_GROUP}/port-to-port-matrix-{direction}",
-            notebook["pair_matrix_chart"](source_language),
+            notebook["pair_matrix_chart"](source_language, side=MATRIX_SIDE),
         )
 
     yield f"{FORWARD_GROUP}/port-to-port-similarity-pct", notebook["pair_chart"]()
@@ -164,9 +177,22 @@ def write(chart, stem):
 
 def main():
     _outputs, notebook = app.run()
+    pending = {}
     for stem, chart in charts(notebook):
-        for path in write(chart, stem):
-            print(path.relative_to(CHARTS.parent))
+        slot = next(
+            ((prefix, width) for prefix, width in SLOT_WIDTHS.items() if stem.startswith(prefix)),
+            None,
+        )
+        if slot is None:
+            for path in write(chart, stem):
+                print(path.relative_to(CHARTS.parent))
+        else:
+            pending.setdefault(slot, []).append((stem, chart))
+    for (_prefix, width), group in pending.items():
+        fitted = fit_pair([chart.to_dict() for _, chart in group], width)
+        for (stem, _), spec in zip(group, fitted):
+            for path in write(spec, stem):
+                print(path.relative_to(CHARTS.parent))
 
 
 if __name__ == "__main__":

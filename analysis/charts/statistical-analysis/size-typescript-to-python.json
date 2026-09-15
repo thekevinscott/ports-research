@@ -35,7 +35,8 @@
               "title": null,
               "type": "nominal",
               "axis": {
-                "labelFontSize": 15
+                "labelFontSize": 15,
+                "labelPadding": 4
               }
             },
             "y": {
@@ -52,7 +53,8 @@
               "type": "quantitative",
               "axis": {
                 "labelFontSize": 15,
-                "titleFontSize": 16.5
+                "titleFontSize": 16.5,
+                "labelPadding": 8
               }
             }
           }
@@ -79,7 +81,8 @@
               "title": null,
               "type": "nominal",
               "axis": {
-                "labelFontSize": 15
+                "labelFontSize": 15,
+                "labelPadding": 4
               }
             },
             "xOffset": {
@@ -90,8 +93,8 @@
                   1.0
                 ],
                 "range": [
-                  9.0,
-                  21.0
+                  6.3046875,
+                  18.3046875
                 ]
               },
               "title": null,
@@ -109,7 +112,8 @@
               "type": "quantitative",
               "axis": {
                 "labelFontSize": 15,
-                "titleFontSize": 16.5
+                "titleFontSize": 16.5,
+                "labelPadding": 8
               }
             }
           }
@@ -132,7 +136,8 @@
               "type": "quantitative",
               "axis": {
                 "labelFontSize": 15,
-                "titleFontSize": 16.5
+                "titleFontSize": 16.5,
+                "labelPadding": 8
               }
             }
           },
@@ -156,7 +161,7 @@
         "color": "#0b0b0b",
         "fontSize": 16.5
       },
-      "width": 160
+      "width": 131.25
     },
     {
       "layer": [
@@ -184,7 +189,8 @@
               "title": null,
               "type": "nominal",
               "axis": {
-                "labelFontSize": 15
+                "labelFontSize": 15,
+                "labelPadding": 4
               }
             },
             "y": {
@@ -228,7 +234,8 @@
               "title": null,
               "type": "nominal",
               "axis": {
-                "labelFontSize": 15
+                "labelFontSize": 15,
+                "labelPadding": 4
               }
             },
             "xOffset": {
@@ -239,8 +246,8 @@
                   1.0
                 ],
                 "range": [
-                  9.0,
-                  21.0
+                  6.3046875,
+                  18.3046875
                 ]
               },
               "title": null,
@@ -305,7 +312,7 @@
         "color": "#0b0b0b",
         "fontSize": 16.5
       },
-      "width": 160
+      "width": 131.25
     }
   ],
   "columns": 4,
@@ -640,5 +647,11 @@
         "nudge": 0.0
       }
     ]
+  },
+  "padding": {
+    "left": 5,
+    "top": 5,
+    "right": 6.5,
+    "bottom": 5
   }
 }

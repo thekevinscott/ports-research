@@ -5,7 +5,9 @@ import xml.etree.ElementTree as ET
 import altair as alt
 import pytest
 
-from src.chart_export import dark_spec, write_chart
+from copy import deepcopy
+
+from src.chart_export import dark_spec, fit_pair, write_chart
 
 CHARTS = Path(__file__).resolve().parents[1] / "charts"
 
@@ -61,3 +63,66 @@ def test_future_grid_charts_export_both_variants(tmp_path):
         "port-to-port-grid-python-to-typescript.svg",
         "port-to-port-grid-python-to-typescript-dark.svg",
     }
+
+
+def fake_geometry(spec):
+    """Deterministic stand-in for rendered_geometry: totals from widths and paddings."""
+
+    def pad(unit, channel):
+        extra = 0
+        for layer in unit.get("layer", [unit]):
+            enc = layer.get("encoding", {}).get(channel, {})
+            extra = max(extra, enc.get("axis", {}).get("labelPadding", 2) - 2)
+        return extra
+
+    units = spec.get("concat", [spec])
+    padding = spec.get("padding", 5)
+    right = padding.get("right", 5) if isinstance(padding, dict) else padding
+    left = 30 + pad(units[0], "y")
+    width = left + sum(unit.get("width", 100) for unit in units) + (right - 5) + 7
+    height = 50 + 200 + pad(units[0], "x")
+    return (width, height, left, 50)
+
+
+def layered(width, left_pad=2, bottom_pad=2):
+    """A two-panel concat in the size chart's shape."""
+    return {
+        "data": {"values": []},
+        "concat": [
+            {
+                "width": width,
+                "layer": [
+                    {
+                        "encoding": {
+                            "x": {"field": "c", "axis": {"labelPadding": bottom_pad}},
+                            "y": {"field": "v", "axis": {"labelPadding": left_pad}},
+                        }
+                    }
+                ],
+            }
+            for _ in range(2)
+        ],
+    }
+
+
+def test_fit_pair_aligns_slot_geometry():
+    """A blog slot pair shares one width, one left margin and one height."""
+    short_left = layered(131.25, bottom_pad=4)  # 30px left margin, 252px tall
+    wide_left = layered(131.25, left_pad=8)  # 36px left margin, 250px tall
+    originals = [deepcopy(short_left), deepcopy(wide_left)]
+    fitted = fit_pair([short_left, wide_left], 370.5, measure=fake_geometry)
+    assert [fake_geometry(spec) for spec in fitted] == [(370.5, 252, 36, 50)] * 2
+    assert [short_left, wide_left] == originals  # inputs are never mutated
+
+
+def test_fit_pair_grows_single_view_plots_and_keeps_matrices_square():
+    single = {"data": {"values": []}, "width": 290, "height": 300,
+              "layer": [{"encoding": {"x": {"field": "c"}, "y": {"field": "v"}}}]}
+    matrix = {"data": {"values": []}, "width": 630, "height": 630,
+              "layer": [{"encoding": {"x": {"field": "a"}, "y": {"field": "b"}}}]}
+    (fitted,) = fit_pair([single], 370.5, measure=fake_geometry)
+    assert fake_geometry(fitted) == (370.5, 250, 30, 50)
+    assert fitted["width"] > 290  # the plot itself grew; padding only closes the rest
+    (fitted_matrix,) = fit_pair([matrix], 757, measure=fake_geometry)
+    assert fake_geometry(fitted_matrix)[0] == 757
+    assert fitted_matrix["width"] == fitted_matrix["height"]

@@ -390,6 +390,7 @@ def _(
         flags=CONDITION_FLAGS,
         anchors=None,
         font_scale=1.0,
+        panel_width=PANEL_WIDTH,
     ):
         metrics = ["duration_min" if metric == "duration" else metric for metric in metrics]
         labelled = with_conditions(frame, source_language, flags)
@@ -415,7 +416,7 @@ def _(
         )
         # A continuous offset scale is measured from the band's left edge, not its middle,
         # so half a band puts the fan back under the label and on the median tick.
-        centre = PANEL_WIDTH / len(conditions(source_language)) * (1 - BAND_PADDING) / 2
+        centre = panel_width / len(conditions(source_language)) * (1 - BAND_PADDING) / 2
 
         def panel(metric):
             rows = fan_out(long.filter(pl.col("metric") == metric))
@@ -467,7 +468,7 @@ def _(
                     .encode(y=level, x=alt.value(158), text="label:N")
                 )
             return alt.layer(*layers).properties(
-                width=PANEL_WIDTH,
+                width=panel_width,
                 height=height,
                 title=panel_title(metric_title(metric), 11 * font_scale),
             )
@@ -934,7 +935,7 @@ def _(
             **extra,
         )
 
-    def pair_matrix_chart(source_language):
+    def pair_matrix_chart(source_language, side=None):
         """The 21-item square: values in one triangle, colour in the other, no diagonal."""
         target_language = runs.filter(pl.col("source_language") == source_language)[
             "target_language"
@@ -944,7 +945,8 @@ def _(
         cells = matrix_cells(source_language, ordered)
         low = cells["similarity_pct"].min()
         high = cells["similarity_pct"].max()
-        side = MATRIX_CELL_PX * len(items)
+        # 598px of cells fills the blog's 757px body once axes and the legend join in.
+        side = side or MATRIX_CELL_PX * len(items)
         scale = alt.Scale(domain=items)
         x = alt.X("port_a:N", scale=scale, title=None, axis=matrix_axis(labelAngle=-90))
         y = alt.Y("port_b:N", scale=scale, title=None, axis=matrix_axis(labelAngle=0))
@@ -1064,7 +1066,9 @@ def _(
         )
 
     RATIO_TOLERANCE = 0.01
-    RATIO_WIDTH = 290
+    # Plot width that fills half the blog's 757px body (minus the 1rem gap) once the
+    # y-axis and margins join in: the exported ladder renders exactly 370.5px wide.
+    RATIO_WIDTH = 297.5
 
     def nudges(values, tolerance=RATIO_TOLERANCE):
         """Dots within `tolerance` of each other spread sideways; a dot on its own stays centred."""
@@ -1119,8 +1123,9 @@ def _(
             axis=alt.Axis(labelFontSize=20),
         )
         # A continuous offset scale is measured from the band's left edge, so half a band
-        # (the panel's width over the four conditions) re-centres the dots under their label.
-        centre = RATIO_WIDTH / len(conditions(source_language)) / 2
+        # re-centres the dots under their label. The band scale keeps Vega-Lite's padding
+        # defaults (0.2 inner, 0.2 outer), so a band spans width / (n + 0.2) * 0.8 pixels.
+        centre = RATIO_WIDTH * 0.8 / (2 * (len(conditions(source_language)) + 0.2))
         offset = alt.XOffset(
             "nudge:Q",
             scale=alt.Scale(domain=[-2, 2], range=[centre - 24, centre + 24]),

@@ -1,1 +1,4068 @@
-{"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}, "axis": {"labelAngle": -45}}, "layer": [{"data": {"name": "data-2a5d5e9fbb94c6cd2932f00e9a888e53"}, "mark": {"type": "rect", "stroke": "#fcfcfb", "strokeWidth": 1}, "encoding": {"color": {"field": "similarity_pct", "legend": {"gradientLength": 210.0, "labelFontSize": 9, "titleFontSize": 10}, "scale": {"domain": [1.193238316208154, 86.63366336633663], "range": ["#cde2fb", "#86b6ef", "#3987e5", "#256abf", "#0d366b"]}, "title": "Similarity (%)", "type": "quantitative"}, "x": {"axis": {"domain": false, "labelAngle": -90, "labelColor": {"expr": "datum.label === '' ? '#0b0b0b' : '#898781'"}, "labelFontSize": 11, "labelFontWeight": {"expr": "datum.label === '' ? 'bold' : 'normal'"}, "labelPadding": 17, "ticks": false}, "field": "port_a", "scale": {"domain": ["9a3e20fe", "b96078c6", "31ac2789", "170b737d", "2643e4be", "273cf6b9", "19e0fe30", "4ee67ba2", "5b46f630", "280f3890", "a47a3057", "e94dca40", "09b2c811", "a7cd2ee9", "00b43b48", "1c28aa33", "ffb57550", "5982b634", "4ff7cdec", "62b61540", ""]}, "title": null, "type": "nominal"}, "y": {"axis": {"domain": false, "labelColor": {"expr": "datum.label === '' ? '#0b0b0b' : '#898781'"}, "labelFontSize": 11, "labelFontWeight": {"expr": "datum.label === '' ? 'bold' : 'normal'"}, "labelPadding": 17, "ticks": false, "labelAngle": 0}, "field": "port_b", "scale": {"domain": ["9a3e20fe", "b96078c6", "31ac2789", "170b737d", "2643e4be", "273cf6b9", "19e0fe30", "4ee67ba2", "5b46f630", "280f3890", "a47a3057", "e94dca40", "09b2c811", "a7cd2ee9", "00b43b48", "1c28aa33", "ffb57550", "5982b634", "4ff7cdec", "62b61540", ""]}, "title": null, "type": "nominal"}}}, {"data": {"name": "data-110ffbd7a494e521a6229a077032d508"}, "mark": {"type": "text", "color": "#0b0b0b", "fontSize": 8}, "encoding": {"text": {"field": "similarity_pct", "format": ".0f", "type": "quantitative"}, "x": {"axis": {"domain": false, "labelAngle": -90, "labelColor": {"expr": "datum.label === '' ? '#0b0b0b' : '#898781'"}, "labelFontSize": 11, "labelFontWeight": {"expr": "datum.label === '' ? 'bold' : 'normal'"}, "labelPadding": 17, "ticks": false}, "field": "port_a", "scale": {"domain": ["9a3e20fe", "b96078c6", "31ac2789", "170b737d", "2643e4be", "273cf6b9", "19e0fe30", "4ee67ba2", "5b46f630", "280f3890", "a47a3057", "e94dca40", "09b2c811", "a7cd2ee9", "00b43b48", "1c28aa33", "ffb57550", "5982b634", "4ff7cdec", "62b61540", ""]}, "title": null, "type": "nominal"}, "y": {"axis": {"domain": false, "labelColor": {"expr": "datum.label === '' ? '#0b0b0b' : '#898781'"}, "labelFontSize": 11, "labelFontWeight": {"expr": "datum.label === '' ? 'bold' : 'normal'"}, "labelPadding": 17, "ticks": false, "labelAngle": 0}, "field": "port_b", "scale": {"domain": ["9a3e20fe", "b96078c6", "31ac2789", "170b737d", "2643e4be", "273cf6b9", "19e0fe30", "4ee67ba2", "5b46f630", "280f3890", "a47a3057", "e94dca40", "09b2c811", "a7cd2ee9", "00b43b48", "1c28aa33", "ffb57550", "5982b634", "4ff7cdec", "62b61540", ""]}, "title": null, "type": "nominal"}}}, {"data": {"name": "data-415d0101714bba784b2bc3c29e0b19a4"}, "mark": {"type": "rect"}, "encoding": {"color": {"field": "condition", "legend": {"labelFontSize": 9, "symbolType": "square", "title": null}, "scale": {"domain": ["no tests", "source tests", "target tests", "both tests", "reference"], "range": ["#2a78d6", "#eb6834", "#1baf7a", "#4a3aa7", "#0b0b0b"]}, "type": "nominal"}, "x": {"axis": {"domain": false, "labelAngle": -90, "labelColor": {"expr": "datum.label === '' ? '#0b0b0b' : '#898781'"}, "labelFontSize": 11, "labelFontWeight": {"expr": "datum.label === '' ? 'bold' : 'normal'"}, "labelPadding": 17, "ticks": false}, "field": "port", "scale": {"domain": ["9a3e20fe", "b96078c6", "31ac2789", "170b737d", "2643e4be", "273cf6b9", "19e0fe30", "4ee67ba2", "5b46f630", "280f3890", "a47a3057", "e94dca40", "09b2c811", "a7cd2ee9", "00b43b48", "1c28aa33", "ffb57550", "5982b634", "4ff7cdec", "62b61540", ""]}, "title": null, "type": "nominal"}, "y": {"value": -13}, "y2": {"value": -4}}}, {"data": {"name": "data-415d0101714bba784b2bc3c29e0b19a4"}, "mark": {"type": "rect"}, "encoding": {"color": {"field": "condition", "legend": null, "scale": {"domain": ["no tests", "source tests", "target tests", "both tests", "reference"], "range": ["#2a78d6", "#eb6834", "#1baf7a", "#4a3aa7", "#0b0b0b"]}, "type": "nominal"}, "x": {"value": -13}, "x2": {"value": -4}, "y": {"axis": {"domain": false, "labelColor": {"expr": "datum.label === '' ? '#0b0b0b' : '#898781'"}, "labelFontSize": 11, "labelFontWeight": {"expr": "datum.label === '' ? 'bold' : 'normal'"}, "labelPadding": 17, "ticks": false, "labelAngle": 0}, "field": "port", "scale": {"domain": ["9a3e20fe", "b96078c6", "31ac2789", "170b737d", "2643e4be", "273cf6b9", "19e0fe30", "4ee67ba2", "5b46f630", "280f3890", "a47a3057", "e94dca40", "09b2c811", "a7cd2ee9", "00b43b48", "1c28aa33", "ffb57550", "5982b634", "4ff7cdec", "62b61540", ""]}, "title": null, "type": "nominal"}}}, {"data": {"name": "data-1b34f20180a30c8fe486905b8213b327"}, "mark": {"type": "rule", "color": "#0b0b0b", "opacity": 0.75, "strokeWidth": 2}, "encoding": {"x": {"bandPosition": 0, "field": "port", "scale": {"domain": ["9a3e20fe", "b96078c6", "31ac2789", "170b737d", "2643e4be", "273cf6b9", "19e0fe30", "4ee67ba2", "5b46f630", "280f3890", "a47a3057", "e94dca40", "09b2c811", "a7cd2ee9", "00b43b48", "1c28aa33", "ffb57550", "5982b634", "4ff7cdec", "62b61540", ""]}, "type": "nominal"}}}, {"data": {"name": "data-1b34f20180a30c8fe486905b8213b327"}, "mark": {"type": "rule", "color": "#0b0b0b", "opacity": 0.75, "strokeWidth": 2}, "encoding": {"y": {"bandPosition": 0, "field": "port", "scale": {"domain": ["9a3e20fe", "b96078c6", "31ac2789", "170b737d", "2643e4be", "273cf6b9", "19e0fe30", "4ee67ba2", "5b46f630", "280f3890", "a47a3057", "e94dca40", "09b2c811", "a7cd2ee9", "00b43b48", "1c28aa33", "ffb57550", "5982b634", "4ff7cdec", "62b61540", ""]}, "type": "nominal"}}}, {"data": {"name": "data-dae1687b7766f38b94517020e43783ee"}, "mark": {"type": "rule", "color": "#0b0b0b", "opacity": 0.75, "strokeWidth": 2}, "encoding": {"x": {"bandPosition": 1, "field": "port", "scale": {"domain": ["9a3e20fe", "b96078c6", "31ac2789", "170b737d", "2643e4be", "273cf6b9", "19e0fe30", "4ee67ba2", "5b46f630", "280f3890", "a47a3057", "e94dca40", "09b2c811", "a7cd2ee9", "00b43b48", "1c28aa33", "ffb57550", "5982b634", "4ff7cdec", "62b61540", ""]}, "type": "nominal"}}}, {"data": {"name": "data-dae1687b7766f38b94517020e43783ee"}, "mark": {"type": "rule", "color": "#0b0b0b", "opacity": 0.75, "strokeWidth": 2}, "encoding": {"y": {"bandPosition": 1, "field": "port", "scale": {"domain": ["9a3e20fe", "b96078c6", "31ac2789", "170b737d", "2643e4be", "273cf6b9", "19e0fe30", "4ee67ba2", "5b46f630", "280f3890", "a47a3057", "e94dca40", "09b2c811", "a7cd2ee9", "00b43b48", "1c28aa33", "ffb57550", "5982b634", "4ff7cdec", "62b61540", ""]}, "type": "nominal"}}}], "height": 630, "resolve": {"scale": {"color": "independent"}}, "title": {"text": "python -> typescript", "anchor": "start", "color": "#0b0b0b", "fontSize": 14, "offset": 23, "subtitleFontSize": 10}, "width": 630, "$schema": "https://vega.github.io/schema/vega-lite/v6.4.1.json", "datasets": {"data-2a5d5e9fbb94c6cd2932f00e9a888e53": [{"port_a": "b96078c6", "port_b": "9a3e20fe", "condition_a": "no tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 62.13965406790519}, {"port_a": "31ac2789", "port_b": "9a3e20fe", "condition_a": "no tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 52.14970615527374}, {"port_a": "170b737d", "port_b": "9a3e20fe", "condition_a": "no tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 13.183915622940013}, {"port_a": "2643e4be", "port_b": "9a3e20fe", "condition_a": "no tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 66.95478723404256}, {"port_a": "273cf6b9", "port_b": "9a3e20fe", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 71.4334124025754}, {"port_a": "19e0fe30", "port_b": "9a3e20fe", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 61.04472516217139}, {"port_a": "4ee67ba2", "port_b": "9a3e20fe", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 72.80191583989053}, {"port_a": "5b46f630", "port_b": "9a3e20fe", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 76.107964011996}, {"port_a": "280f3890", "port_b": "9a3e20fe", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 56.02493074792244}, {"port_a": "a47a3057", "port_b": "9a3e20fe", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 68.8593421973408}, {"port_a": "e94dca40", "port_b": "9a3e20fe", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 61.17483489746264}, {"port_a": "09b2c811", "port_b": "9a3e20fe", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 58.56697819314642}, {"port_a": "a7cd2ee9", "port_b": "9a3e20fe", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 56.796956070563816}, {"port_a": "00b43b48", "port_b": "9a3e20fe", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 60.16655100624566}, {"port_a": "1c28aa33", "port_b": "9a3e20fe", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 68.05266805266805}, {"port_a": "ffb57550", "port_b": "9a3e20fe", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 62.02878684030158}, {"port_a": "5982b634", "port_b": "9a3e20fe", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 54.055968827488485}, {"port_a": "4ff7cdec", "port_b": "9a3e20fe", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 63.829787234042556}, {"port_a": "62b61540", "port_b": "9a3e20fe", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 57.57575757575758}, {"port_a": "", "port_b": "9a3e20fe", "condition_a": "reference", "condition_b": "no tests", "half": "colour", "similarity_pct": 7.120849024306744}, {"port_a": "31ac2789", "port_b": "b96078c6", "condition_a": "no tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 42.02516827626573}, {"port_a": "170b737d", "port_b": "b96078c6", "condition_a": "no tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 12.181479179614668}, {"port_a": "2643e4be", "port_b": "b96078c6", "condition_a": "no tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 63.095238095238095}, {"port_a": "273cf6b9", "port_b": "b96078c6", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 70.1116427432217}, {"port_a": "19e0fe30", "port_b": "b96078c6", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 57.822036620623194}, {"port_a": "4ee67ba2", "port_b": "b96078c6", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 69.4560669456067}, {"port_a": "5b46f630", "port_b": "b96078c6", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 55.44740973312402}, {"port_a": "280f3890", "port_b": "b96078c6", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 56.4453125}, {"port_a": "a47a3057", "port_b": "b96078c6", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 63.971071663379355}, {"port_a": "e94dca40", "port_b": "b96078c6", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 60.24175106174453}, {"port_a": "09b2c811", "port_b": "b96078c6", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 60.52717214448422}, {"port_a": "a7cd2ee9", "port_b": "b96078c6", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 57.951219512195124}, {"port_a": "00b43b48", "port_b": "b96078c6", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 59.29549902152642}, {"port_a": "1c28aa33", "port_b": "b96078c6", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 61.17263843648208}, {"port_a": "ffb57550", "port_b": "b96078c6", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 57.25338491295938}, {"port_a": "5982b634", "port_b": "b96078c6", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 52.743598270701696}, {"port_a": "4ff7cdec", "port_b": "b96078c6", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 61.881350376925596}, {"port_a": "62b61540", "port_b": "b96078c6", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 56.51886168100596}, {"port_a": "", "port_b": "b96078c6", "condition_a": "reference", "condition_b": "no tests", "half": "colour", "similarity_pct": 35.169082125603865}, {"port_a": "170b737d", "port_b": "31ac2789", "condition_a": "no tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 49.20396515470111}, {"port_a": "2643e4be", "port_b": "31ac2789", "condition_a": "no tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 45.716015743263696}, {"port_a": "273cf6b9", "port_b": "31ac2789", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 57.301293900184845}, {"port_a": "19e0fe30", "port_b": "31ac2789", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 45.78163771712159}, {"port_a": "4ee67ba2", "port_b": "31ac2789", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 55.18955873213176}, {"port_a": "5b46f630", "port_b": "31ac2789", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 54.429611650485434}, {"port_a": "280f3890", "port_b": "31ac2789", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 47.75369148601948}, {"port_a": "a47a3057", "port_b": "31ac2789", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 53.98033618775769}, {"port_a": "e94dca40", "port_b": "31ac2789", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 49.243379571248425}, {"port_a": "09b2c811", "port_b": "31ac2789", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 51.57035175879397}, {"port_a": "a7cd2ee9", "port_b": "31ac2789", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 53.483992467043315}, {"port_a": "00b43b48", "port_b": "31ac2789", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 48.8511174063582}, {"port_a": "1c28aa33", "port_b": "31ac2789", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 53.81955359949701}, {"port_a": "ffb57550", "port_b": "31ac2789", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 51.9140989729225}, {"port_a": "5982b634", "port_b": "31ac2789", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 41.18024374599102}, {"port_a": "4ff7cdec", "port_b": "31ac2789", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 49.39911448450348}, {"port_a": "62b61540", "port_b": "31ac2789", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 48.96265560165975}, {"port_a": "", "port_b": "31ac2789", "condition_a": "reference", "condition_b": "no tests", "half": "colour", "similarity_pct": 5.161691542288557}, {"port_a": "2643e4be", "port_b": "170b737d", "condition_a": "no tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 12.95103092783505}, {"port_a": "273cf6b9", "port_b": "170b737d", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 16.212668198227764}, {"port_a": "19e0fe30", "port_b": "170b737d", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 7.537190082644628}, {"port_a": "4ee67ba2", "port_b": "170b737d", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 14.508115269956939}, {"port_a": "5b46f630", "port_b": "170b737d", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 13.561511139812723}, {"port_a": "280f3890", "port_b": "170b737d", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 4.959785522788204}, {"port_a": "a47a3057", "port_b": "170b737d", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 6.702775897088693}, {"port_a": "e94dca40", "port_b": "170b737d", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 6.390850992263707}, {"port_a": "09b2c811", "port_b": "170b737d", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 8.576214405360133}, {"port_a": "a7cd2ee9", "port_b": "170b737d", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 8.436558419819217}, {"port_a": "00b43b48", "port_b": "170b737d", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 5.372733378106111}, {"port_a": "1c28aa33", "port_b": "170b737d", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 6.3715627095908784}, {"port_a": "ffb57550", "port_b": "170b737d", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 5.175846051758461}, {"port_a": "5982b634", "port_b": "170b737d", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 5.686879068174032}, {"port_a": "4ff7cdec", "port_b": "170b737d", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 3.8474519068511643}, {"port_a": "62b61540", "port_b": "170b737d", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 4.158145875937287}, {"port_a": "", "port_b": "170b737d", "condition_a": "reference", "condition_b": "no tests", "half": "colour", "similarity_pct": 1.193238316208154}, {"port_a": "273cf6b9", "port_b": "2643e4be", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 77.06057596822244}, {"port_a": "19e0fe30", "port_b": "2643e4be", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 70.89029676558853}, {"port_a": "4ee67ba2", "port_b": "2643e4be", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 72.23521550283996}, {"port_a": "5b46f630", "port_b": "2643e4be", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 63.75773363725171}, {"port_a": "280f3890", "port_b": "2643e4be", "condition_a": "source tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 67.4104124408384}, {"port_a": "a47a3057", "port_b": "2643e4be", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 77.18579234972678}, {"port_a": "e94dca40", "port_b": "2643e4be", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 71.25890736342043}, {"port_a": "09b2c811", "port_b": "2643e4be", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 71.1726934775262}, {"port_a": "a7cd2ee9", "port_b": "2643e4be", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 65.51840594393786}, {"port_a": "00b43b48", "port_b": "2643e4be", "condition_a": "target tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 70.79945799457994}, {"port_a": "1c28aa33", "port_b": "2643e4be", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 69.75642760487145}, {"port_a": "ffb57550", "port_b": "2643e4be", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 67.9384203480589}, {"port_a": "5982b634", "port_b": "2643e4be", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 62.77220877981334}, {"port_a": "4ff7cdec", "port_b": "2643e4be", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 63.193735103847466}, {"port_a": "62b61540", "port_b": "2643e4be", "condition_a": "both tests", "condition_b": "no tests", "half": "colour", "similarity_pct": 63.34250343878955}, {"port_a": "", "port_b": "2643e4be", "condition_a": "reference", "condition_b": "no tests", "half": "colour", "similarity_pct": 38.58241390839184}, {"port_a": "19e0fe30", "port_b": "273cf6b9", "condition_a": "source tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 69.61250849762067}, {"port_a": "4ee67ba2", "port_b": "273cf6b9", "condition_a": "source tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 82.76566757493188}, {"port_a": "5b46f630", "port_b": "273cf6b9", "condition_a": "source tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 67.41871267418712}, {"port_a": "280f3890", "port_b": "273cf6b9", "condition_a": "source tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 66.80455015511892}, {"port_a": "a47a3057", "port_b": "273cf6b9", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 77.1856495994427}, {"port_a": "e94dca40", "port_b": "273cf6b9", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 73.63321799307958}, {"port_a": "09b2c811", "port_b": "273cf6b9", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 73.94900068917988}, {"port_a": "a7cd2ee9", "port_b": "273cf6b9", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 72.24517906336088}, {"port_a": "00b43b48", "port_b": "273cf6b9", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 70.94991364421416}, {"port_a": "1c28aa33", "port_b": "273cf6b9", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 72.36978268368402}, {"port_a": "ffb57550", "port_b": "273cf6b9", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 68.91845786421017}, {"port_a": "5982b634", "port_b": "273cf6b9", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 62.55289139633286}, {"port_a": "4ff7cdec", "port_b": "273cf6b9", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 73.54166666666667}, {"port_a": "62b61540", "port_b": "273cf6b9", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 68.95826025955805}, {"port_a": "", "port_b": "273cf6b9", "condition_a": "reference", "condition_b": "source tests", "half": "colour", "similarity_pct": 40.558963871847304}, {"port_a": "4ee67ba2", "port_b": "19e0fe30", "condition_a": "source tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 70.28140013726836}, {"port_a": "5b46f630", "port_b": "19e0fe30", "condition_a": "source tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 60.82887700534759}, {"port_a": "280f3890", "port_b": "19e0fe30", "condition_a": "source tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 78.56894755123307}, {"port_a": "a47a3057", "port_b": "19e0fe30", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 79.95787995787995}, {"port_a": "e94dca40", "port_b": "19e0fe30", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 75.94142259414225}, {"port_a": "09b2c811", "port_b": "19e0fe30", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 73.33333333333333}, {"port_a": "a7cd2ee9", "port_b": "19e0fe30", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 76.05829285218599}, {"port_a": "00b43b48", "port_b": "19e0fe30", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 81.58719108945353}, {"port_a": "1c28aa33", "port_b": "19e0fe30", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 76.81612791101843}, {"port_a": "ffb57550", "port_b": "19e0fe30", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 84.1526297696803}, {"port_a": "5982b634", "port_b": "19e0fe30", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 75.47974413646055}, {"port_a": "4ff7cdec", "port_b": "19e0fe30", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 74.10776766969909}, {"port_a": "62b61540", "port_b": "19e0fe30", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 77.34181689642983}, {"port_a": "", "port_b": "19e0fe30", "condition_a": "reference", "condition_b": "source tests", "half": "colour", "similarity_pct": 40.72802197802198}, {"port_a": "5b46f630", "port_b": "4ee67ba2", "condition_a": "source tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 71.0649698593436}, {"port_a": "280f3890", "port_b": "4ee67ba2", "condition_a": "source tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 68.15175774451792}, {"port_a": "a47a3057", "port_b": "4ee67ba2", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 73.58424199788955}, {"port_a": "e94dca40", "port_b": "4ee67ba2", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 71.97763801537387}, {"port_a": "09b2c811", "port_b": "4ee67ba2", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 71.60751565762004}, {"port_a": "a7cd2ee9", "port_b": "4ee67ba2", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 69.47148817802504}, {"port_a": "00b43b48", "port_b": "4ee67ba2", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 69.9686083013603}, {"port_a": "1c28aa33", "port_b": "4ee67ba2", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 75.86206896551724}, {"port_a": "ffb57550", "port_b": "4ee67ba2", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 69.23871856699965}, {"port_a": "5982b634", "port_b": "4ee67ba2", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 62.32193732193732}, {"port_a": "4ff7cdec", "port_b": "4ee67ba2", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 72.44039270687237}, {"port_a": "62b61540", "port_b": "4ee67ba2", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 67.58767268862911}, {"port_a": "", "port_b": "4ee67ba2", "condition_a": "reference", "condition_b": "source tests", "half": "colour", "similarity_pct": 40.53682037164487}, {"port_a": "280f3890", "port_b": "5b46f630", "condition_a": "source tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 60.18298881735005}, {"port_a": "a47a3057", "port_b": "5b46f630", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 67.1687778158165}, {"port_a": "e94dca40", "port_b": "5b46f630", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 58.63945578231292}, {"port_a": "09b2c811", "port_b": "5b46f630", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 60.84010840108401}, {"port_a": "a7cd2ee9", "port_b": "5b46f630", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 48.13811780636425}, {"port_a": "00b43b48", "port_b": "5b46f630", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 57.249575551782684}, {"port_a": "1c28aa33", "port_b": "5b46f630", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 62.66531027466938}, {"port_a": "ffb57550", "port_b": "5b46f630", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 59.71150620597115}, {"port_a": "5982b634", "port_b": "5b46f630", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 53.36105336105336}, {"port_a": "4ff7cdec", "port_b": "5b46f630", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 61.70648464163823}, {"port_a": "62b61540", "port_b": "5b46f630", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 56.7390554981041}, {"port_a": "", "port_b": "5b46f630", "condition_a": "reference", "condition_b": "source tests", "half": "colour", "similarity_pct": 8.981233243967829}, {"port_a": "a47a3057", "port_b": "280f3890", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 77.27920227920228}, {"port_a": "e94dca40", "port_b": "280f3890", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 75.34488857446055}, {"port_a": "09b2c811", "port_b": "280f3890", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 73.68791828108489}, {"port_a": "a7cd2ee9", "port_b": "280f3890", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 69.48257655755016}, {"port_a": "00b43b48", "port_b": "280f3890", "condition_a": "target tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 80.22598870056497}, {"port_a": "1c28aa33", "port_b": "280f3890", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 73.27221438645981}, {"port_a": "ffb57550", "port_b": "280f3890", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 77.68479776847978}, {"port_a": "5982b634", "port_b": "280f3890", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 72.91741795888929}, {"port_a": "4ff7cdec", "port_b": "280f3890", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 76.53532126375576}, {"port_a": "62b61540", "port_b": "280f3890", "condition_a": "both tests", "condition_b": "source tests", "half": "colour", "similarity_pct": 73.60114777618364}, {"port_a": "", "port_b": "280f3890", "condition_a": "reference", "condition_b": "source tests", "half": "colour", "similarity_pct": 40.82201323580634}, {"port_a": "e94dca40", "port_b": "a47a3057", "condition_a": "target tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 82.2309617447265}, {"port_a": "09b2c811", "port_b": "a47a3057", "condition_a": "target tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 79.03168387326451}, {"port_a": "a7cd2ee9", "port_b": "a47a3057", "condition_a": "target tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 73.78157239416578}, {"port_a": "00b43b48", "port_b": "a47a3057", "condition_a": "target tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 82.01284796573876}, {"port_a": "1c28aa33", "port_b": "a47a3057", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 79.54383464005701}, {"port_a": "ffb57550", "port_b": "a47a3057", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 79.06976744186046}, {"port_a": "5982b634", "port_b": "a47a3057", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 72.62121764491432}, {"port_a": "4ff7cdec", "port_b": "a47a3057", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 76.35450304987442}, {"port_a": "62b61540", "port_b": "a47a3057", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 75.56200145032632}, {"port_a": "", "port_b": "a47a3057", "condition_a": "reference", "condition_b": "target tests", "half": "colour", "similarity_pct": 43.43541006687786}, {"port_a": "09b2c811", "port_b": "e94dca40", "condition_a": "target tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 86.63366336633663}, {"port_a": "a7cd2ee9", "port_b": "e94dca40", "condition_a": "target tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 78.65724381625442}, {"port_a": "00b43b48", "port_b": "e94dca40", "condition_a": "target tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 80.96419709322934}, {"port_a": "1c28aa33", "port_b": "e94dca40", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 77.30973451327434}, {"port_a": "ffb57550", "port_b": "e94dca40", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 76.51382569128457}, {"port_a": "5982b634", "port_b": "e94dca40", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 69.94931209268645}, {"port_a": "4ff7cdec", "port_b": "e94dca40", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 74.26942266571632}, {"port_a": "62b61540", "port_b": "e94dca40", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 74.18077061577242}, {"port_a": "", "port_b": "e94dca40", "condition_a": "reference", "condition_b": "target tests", "half": "colour", "similarity_pct": 44.61538461538461}, {"port_a": "a7cd2ee9", "port_b": "09b2c811", "condition_a": "target tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 77.26952850105559}, {"port_a": "00b43b48", "port_b": "09b2c811", "condition_a": "target tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 78.22096717260854}, {"port_a": "1c28aa33", "port_b": "09b2c811", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 75.50229115262601}, {"port_a": "ffb57550", "port_b": "09b2c811", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 73.40536772394563}, {"port_a": "5982b634", "port_b": "09b2c811", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 68.70944484498918}, {"port_a": "4ff7cdec", "port_b": "09b2c811", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 72.46273953158268}, {"port_a": "62b61540", "port_b": "09b2c811", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 69.7024022947293}, {"port_a": "", "port_b": "09b2c811", "condition_a": "reference", "condition_b": "target tests", "half": "colour", "similarity_pct": 43.31476323119777}, {"port_a": "00b43b48", "port_b": "a7cd2ee9", "condition_a": "target tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 74.70899470899471}, {"port_a": "1c28aa33", "port_b": "a7cd2ee9", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 81.08488904543853}, {"port_a": "ffb57550", "port_b": "a7cd2ee9", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 77.60362243120863}, {"port_a": "5982b634", "port_b": "a7cd2ee9", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 70.10086455331412}, {"port_a": "4ff7cdec", "port_b": "a7cd2ee9", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 71.63120567375887}, {"port_a": "62b61540", "port_b": "a7cd2ee9", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 78.96811178788964}, {"port_a": "", "port_b": "a7cd2ee9", "condition_a": "reference", "condition_b": "target tests", "half": "colour", "similarity_pct": 42.72790535838553}, {"port_a": "1c28aa33", "port_b": "00b43b48", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 80.56537102473499}, {"port_a": "ffb57550", "port_b": "00b43b48", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 82.7393431167016}, {"port_a": "5982b634", "port_b": "00b43b48", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 73.36465486086014}, {"port_a": "4ff7cdec", "port_b": "00b43b48", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 79.04660263251512}, {"port_a": "62b61540", "port_b": "00b43b48", "condition_a": "both tests", "condition_b": "target tests", "half": "colour", "similarity_pct": 77.13874910136592}, {"port_a": "", "port_b": "00b43b48", "condition_a": "reference", "condition_b": "target tests", "half": "colour", "similarity_pct": 43.42059336823735}, {"port_a": "ffb57550", "port_b": "1c28aa33", "condition_a": "both tests", "condition_b": "both tests", "half": "colour", "similarity_pct": 76.69225401256107}, {"port_a": "5982b634", "port_b": "1c28aa33", "condition_a": "both tests", "condition_b": "both tests", "half": "colour", "similarity_pct": 67.84554312522555}, {"port_a": "4ff7cdec", "port_b": "1c28aa33", "condition_a": "both tests", "condition_b": "both tests", "half": "colour", "similarity_pct": 76.6607460035524}, {"port_a": "62b61540", "port_b": "1c28aa33", "condition_a": "both tests", "condition_b": "both tests", "half": "colour", "similarity_pct": 81.0480976310122}, {"port_a": "", "port_b": "1c28aa33", "condition_a": "reference", "condition_b": "both tests", "half": "colour", "similarity_pct": 41.129313349599165}, {"port_a": "5982b634", "port_b": "ffb57550", "condition_a": "both tests", "condition_b": "both tests", "half": "colour", "similarity_pct": 78.41598287549054}, {"port_a": "4ff7cdec", "port_b": "ffb57550", "condition_a": "both tests", "condition_b": "both tests", "half": "colour", "similarity_pct": 75.30734106076572}, {"port_a": "62b61540", "port_b": "ffb57550", "condition_a": "both tests", "condition_b": "both tests", "half": "colour", "similarity_pct": 78.7792760823279}, {"port_a": "", "port_b": "ffb57550", "condition_a": "reference", "condition_b": "both tests", "half": "colour", "similarity_pct": 41.50293002412961}, {"port_a": "4ff7cdec", "port_b": "5982b634", "condition_a": "both tests", "condition_b": "both tests", "half": "colour", "similarity_pct": 70.05813953488372}, {"port_a": "62b61540", "port_b": "5982b634", "condition_a": "both tests", "condition_b": "both tests", "half": "colour", "similarity_pct": 77.19427102460521}, {"port_a": "", "port_b": "5982b634", "condition_a": "reference", "condition_b": "both tests", "half": "colour", "similarity_pct": 49.82181040627227}, {"port_a": "62b61540", "port_b": "4ff7cdec", "condition_a": "both tests", "condition_b": "both tests", "half": "colour", "similarity_pct": 79.58077340079508}, {"port_a": "", "port_b": "4ff7cdec", "condition_a": "reference", "condition_b": "both tests", "half": "colour", "similarity_pct": 41.6140350877193}, {"port_a": "", "port_b": "62b61540", "condition_a": "reference", "condition_b": "both tests", "half": "colour", "similarity_pct": 41.54555122297058}], "data-110ffbd7a494e521a6229a077032d508": [{"port_a": "9a3e20fe", "port_b": "b96078c6", "condition_a": "no tests", "condition_b": "no tests", "half": "number", "similarity_pct": 62.13965406790519}, {"port_a": "9a3e20fe", "port_b": "31ac2789", "condition_a": "no tests", "condition_b": "no tests", "half": "number", "similarity_pct": 52.14970615527374}, {"port_a": "b96078c6", "port_b": "31ac2789", "condition_a": "no tests", "condition_b": "no tests", "half": "number", "similarity_pct": 42.02516827626573}, {"port_a": "9a3e20fe", "port_b": "170b737d", "condition_a": "no tests", "condition_b": "no tests", "half": "number", "similarity_pct": 13.183915622940013}, {"port_a": "b96078c6", "port_b": "170b737d", "condition_a": "no tests", "condition_b": "no tests", "half": "number", "similarity_pct": 12.181479179614668}, {"port_a": "31ac2789", "port_b": "170b737d", "condition_a": "no tests", "condition_b": "no tests", "half": "number", "similarity_pct": 49.20396515470111}, {"port_a": "9a3e20fe", "port_b": "2643e4be", "condition_a": "no tests", "condition_b": "no tests", "half": "number", "similarity_pct": 66.95478723404256}, {"port_a": "b96078c6", "port_b": "2643e4be", "condition_a": "no tests", "condition_b": "no tests", "half": "number", "similarity_pct": 63.095238095238095}, {"port_a": "31ac2789", "port_b": "2643e4be", "condition_a": "no tests", "condition_b": "no tests", "half": "number", "similarity_pct": 45.716015743263696}, {"port_a": "170b737d", "port_b": "2643e4be", "condition_a": "no tests", "condition_b": "no tests", "half": "number", "similarity_pct": 12.95103092783505}, {"port_a": "9a3e20fe", "port_b": "273cf6b9", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 71.4334124025754}, {"port_a": "b96078c6", "port_b": "273cf6b9", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 70.1116427432217}, {"port_a": "31ac2789", "port_b": "273cf6b9", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 57.301293900184845}, {"port_a": "170b737d", "port_b": "273cf6b9", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 16.212668198227764}, {"port_a": "2643e4be", "port_b": "273cf6b9", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 77.06057596822244}, {"port_a": "9a3e20fe", "port_b": "19e0fe30", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 61.04472516217139}, {"port_a": "b96078c6", "port_b": "19e0fe30", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 57.822036620623194}, {"port_a": "31ac2789", "port_b": "19e0fe30", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 45.78163771712159}, {"port_a": "170b737d", "port_b": "19e0fe30", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 7.537190082644628}, {"port_a": "2643e4be", "port_b": "19e0fe30", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 70.89029676558853}, {"port_a": "273cf6b9", "port_b": "19e0fe30", "condition_a": "source tests", "condition_b": "source tests", "half": "number", "similarity_pct": 69.61250849762067}, {"port_a": "9a3e20fe", "port_b": "4ee67ba2", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 72.80191583989053}, {"port_a": "b96078c6", "port_b": "4ee67ba2", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 69.4560669456067}, {"port_a": "31ac2789", "port_b": "4ee67ba2", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 55.18955873213176}, {"port_a": "170b737d", "port_b": "4ee67ba2", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 14.508115269956939}, {"port_a": "2643e4be", "port_b": "4ee67ba2", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 72.23521550283996}, {"port_a": "273cf6b9", "port_b": "4ee67ba2", "condition_a": "source tests", "condition_b": "source tests", "half": "number", "similarity_pct": 82.76566757493188}, {"port_a": "19e0fe30", "port_b": "4ee67ba2", "condition_a": "source tests", "condition_b": "source tests", "half": "number", "similarity_pct": 70.28140013726836}, {"port_a": "9a3e20fe", "port_b": "5b46f630", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 76.107964011996}, {"port_a": "b96078c6", "port_b": "5b46f630", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 55.44740973312402}, {"port_a": "31ac2789", "port_b": "5b46f630", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 54.429611650485434}, {"port_a": "170b737d", "port_b": "5b46f630", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 13.561511139812723}, {"port_a": "2643e4be", "port_b": "5b46f630", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 63.75773363725171}, {"port_a": "273cf6b9", "port_b": "5b46f630", "condition_a": "source tests", "condition_b": "source tests", "half": "number", "similarity_pct": 67.41871267418712}, {"port_a": "19e0fe30", "port_b": "5b46f630", "condition_a": "source tests", "condition_b": "source tests", "half": "number", "similarity_pct": 60.82887700534759}, {"port_a": "4ee67ba2", "port_b": "5b46f630", "condition_a": "source tests", "condition_b": "source tests", "half": "number", "similarity_pct": 71.0649698593436}, {"port_a": "9a3e20fe", "port_b": "280f3890", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 56.02493074792244}, {"port_a": "b96078c6", "port_b": "280f3890", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 56.4453125}, {"port_a": "31ac2789", "port_b": "280f3890", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 47.75369148601948}, {"port_a": "170b737d", "port_b": "280f3890", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 4.959785522788204}, {"port_a": "2643e4be", "port_b": "280f3890", "condition_a": "no tests", "condition_b": "source tests", "half": "number", "similarity_pct": 67.4104124408384}, {"port_a": "273cf6b9", "port_b": "280f3890", "condition_a": "source tests", "condition_b": "source tests", "half": "number", "similarity_pct": 66.80455015511892}, {"port_a": "19e0fe30", "port_b": "280f3890", "condition_a": "source tests", "condition_b": "source tests", "half": "number", "similarity_pct": 78.56894755123307}, {"port_a": "4ee67ba2", "port_b": "280f3890", "condition_a": "source tests", "condition_b": "source tests", "half": "number", "similarity_pct": 68.15175774451792}, {"port_a": "5b46f630", "port_b": "280f3890", "condition_a": "source tests", "condition_b": "source tests", "half": "number", "similarity_pct": 60.18298881735005}, {"port_a": "9a3e20fe", "port_b": "a47a3057", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 68.8593421973408}, {"port_a": "b96078c6", "port_b": "a47a3057", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 63.971071663379355}, {"port_a": "31ac2789", "port_b": "a47a3057", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 53.98033618775769}, {"port_a": "170b737d", "port_b": "a47a3057", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 6.702775897088693}, {"port_a": "2643e4be", "port_b": "a47a3057", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 77.18579234972678}, {"port_a": "273cf6b9", "port_b": "a47a3057", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 77.1856495994427}, {"port_a": "19e0fe30", "port_b": "a47a3057", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 79.95787995787995}, {"port_a": "4ee67ba2", "port_b": "a47a3057", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 73.58424199788955}, {"port_a": "5b46f630", "port_b": "a47a3057", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 67.1687778158165}, {"port_a": "280f3890", "port_b": "a47a3057", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 77.27920227920228}, {"port_a": "9a3e20fe", "port_b": "e94dca40", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 61.17483489746264}, {"port_a": "b96078c6", "port_b": "e94dca40", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 60.24175106174453}, {"port_a": "31ac2789", "port_b": "e94dca40", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 49.243379571248425}, {"port_a": "170b737d", "port_b": "e94dca40", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 6.390850992263707}, {"port_a": "2643e4be", "port_b": "e94dca40", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 71.25890736342043}, {"port_a": "273cf6b9", "port_b": "e94dca40", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 73.63321799307958}, {"port_a": "19e0fe30", "port_b": "e94dca40", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 75.94142259414225}, {"port_a": "4ee67ba2", "port_b": "e94dca40", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 71.97763801537387}, {"port_a": "5b46f630", "port_b": "e94dca40", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 58.63945578231292}, {"port_a": "280f3890", "port_b": "e94dca40", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 75.34488857446055}, {"port_a": "a47a3057", "port_b": "e94dca40", "condition_a": "target tests", "condition_b": "target tests", "half": "number", "similarity_pct": 82.2309617447265}, {"port_a": "9a3e20fe", "port_b": "09b2c811", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 58.56697819314642}, {"port_a": "b96078c6", "port_b": "09b2c811", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 60.52717214448422}, {"port_a": "31ac2789", "port_b": "09b2c811", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 51.57035175879397}, {"port_a": "170b737d", "port_b": "09b2c811", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 8.576214405360133}, {"port_a": "2643e4be", "port_b": "09b2c811", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 71.1726934775262}, {"port_a": "273cf6b9", "port_b": "09b2c811", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 73.94900068917988}, {"port_a": "19e0fe30", "port_b": "09b2c811", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 73.33333333333333}, {"port_a": "4ee67ba2", "port_b": "09b2c811", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 71.60751565762004}, {"port_a": "5b46f630", "port_b": "09b2c811", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 60.84010840108401}, {"port_a": "280f3890", "port_b": "09b2c811", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 73.68791828108489}, {"port_a": "a47a3057", "port_b": "09b2c811", "condition_a": "target tests", "condition_b": "target tests", "half": "number", "similarity_pct": 79.03168387326451}, {"port_a": "e94dca40", "port_b": "09b2c811", "condition_a": "target tests", "condition_b": "target tests", "half": "number", "similarity_pct": 86.63366336633663}, {"port_a": "9a3e20fe", "port_b": "a7cd2ee9", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 56.796956070563816}, {"port_a": "b96078c6", "port_b": "a7cd2ee9", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 57.951219512195124}, {"port_a": "31ac2789", "port_b": "a7cd2ee9", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 53.483992467043315}, {"port_a": "170b737d", "port_b": "a7cd2ee9", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 8.436558419819217}, {"port_a": "2643e4be", "port_b": "a7cd2ee9", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 65.51840594393786}, {"port_a": "273cf6b9", "port_b": "a7cd2ee9", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 72.24517906336088}, {"port_a": "19e0fe30", "port_b": "a7cd2ee9", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 76.05829285218599}, {"port_a": "4ee67ba2", "port_b": "a7cd2ee9", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 69.47148817802504}, {"port_a": "5b46f630", "port_b": "a7cd2ee9", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 48.13811780636425}, {"port_a": "280f3890", "port_b": "a7cd2ee9", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 69.48257655755016}, {"port_a": "a47a3057", "port_b": "a7cd2ee9", "condition_a": "target tests", "condition_b": "target tests", "half": "number", "similarity_pct": 73.78157239416578}, {"port_a": "e94dca40", "port_b": "a7cd2ee9", "condition_a": "target tests", "condition_b": "target tests", "half": "number", "similarity_pct": 78.65724381625442}, {"port_a": "09b2c811", "port_b": "a7cd2ee9", "condition_a": "target tests", "condition_b": "target tests", "half": "number", "similarity_pct": 77.26952850105559}, {"port_a": "9a3e20fe", "port_b": "00b43b48", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 60.16655100624566}, {"port_a": "b96078c6", "port_b": "00b43b48", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 59.29549902152642}, {"port_a": "31ac2789", "port_b": "00b43b48", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 48.8511174063582}, {"port_a": "170b737d", "port_b": "00b43b48", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 5.372733378106111}, {"port_a": "2643e4be", "port_b": "00b43b48", "condition_a": "no tests", "condition_b": "target tests", "half": "number", "similarity_pct": 70.79945799457994}, {"port_a": "273cf6b9", "port_b": "00b43b48", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 70.94991364421416}, {"port_a": "19e0fe30", "port_b": "00b43b48", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 81.58719108945353}, {"port_a": "4ee67ba2", "port_b": "00b43b48", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 69.9686083013603}, {"port_a": "5b46f630", "port_b": "00b43b48", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 57.249575551782684}, {"port_a": "280f3890", "port_b": "00b43b48", "condition_a": "source tests", "condition_b": "target tests", "half": "number", "similarity_pct": 80.22598870056497}, {"port_a": "a47a3057", "port_b": "00b43b48", "condition_a": "target tests", "condition_b": "target tests", "half": "number", "similarity_pct": 82.01284796573876}, {"port_a": "e94dca40", "port_b": "00b43b48", "condition_a": "target tests", "condition_b": "target tests", "half": "number", "similarity_pct": 80.96419709322934}, {"port_a": "09b2c811", "port_b": "00b43b48", "condition_a": "target tests", "condition_b": "target tests", "half": "number", "similarity_pct": 78.22096717260854}, {"port_a": "a7cd2ee9", "port_b": "00b43b48", "condition_a": "target tests", "condition_b": "target tests", "half": "number", "similarity_pct": 74.70899470899471}, {"port_a": "9a3e20fe", "port_b": "1c28aa33", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 68.05266805266805}, {"port_a": "b96078c6", "port_b": "1c28aa33", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 61.17263843648208}, {"port_a": "31ac2789", "port_b": "1c28aa33", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 53.81955359949701}, {"port_a": "170b737d", "port_b": "1c28aa33", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 6.3715627095908784}, {"port_a": "2643e4be", "port_b": "1c28aa33", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 69.75642760487145}, {"port_a": "273cf6b9", "port_b": "1c28aa33", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 72.36978268368402}, {"port_a": "19e0fe30", "port_b": "1c28aa33", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 76.81612791101843}, {"port_a": "4ee67ba2", "port_b": "1c28aa33", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 75.86206896551724}, {"port_a": "5b46f630", "port_b": "1c28aa33", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 62.66531027466938}, {"port_a": "280f3890", "port_b": "1c28aa33", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 73.27221438645981}, {"port_a": "a47a3057", "port_b": "1c28aa33", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 79.54383464005701}, {"port_a": "e94dca40", "port_b": "1c28aa33", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 77.30973451327434}, {"port_a": "09b2c811", "port_b": "1c28aa33", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 75.50229115262601}, {"port_a": "a7cd2ee9", "port_b": "1c28aa33", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 81.08488904543853}, {"port_a": "00b43b48", "port_b": "1c28aa33", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 80.56537102473499}, {"port_a": "9a3e20fe", "port_b": "ffb57550", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 62.02878684030158}, {"port_a": "b96078c6", "port_b": "ffb57550", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 57.25338491295938}, {"port_a": "31ac2789", "port_b": "ffb57550", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 51.9140989729225}, {"port_a": "170b737d", "port_b": "ffb57550", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 5.175846051758461}, {"port_a": "2643e4be", "port_b": "ffb57550", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 67.9384203480589}, {"port_a": "273cf6b9", "port_b": "ffb57550", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 68.91845786421017}, {"port_a": "19e0fe30", "port_b": "ffb57550", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 84.1526297696803}, {"port_a": "4ee67ba2", "port_b": "ffb57550", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 69.23871856699965}, {"port_a": "5b46f630", "port_b": "ffb57550", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 59.71150620597115}, {"port_a": "280f3890", "port_b": "ffb57550", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 77.68479776847978}, {"port_a": "a47a3057", "port_b": "ffb57550", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 79.06976744186046}, {"port_a": "e94dca40", "port_b": "ffb57550", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 76.51382569128457}, {"port_a": "09b2c811", "port_b": "ffb57550", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 73.40536772394563}, {"port_a": "a7cd2ee9", "port_b": "ffb57550", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 77.60362243120863}, {"port_a": "00b43b48", "port_b": "ffb57550", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 82.7393431167016}, {"port_a": "1c28aa33", "port_b": "ffb57550", "condition_a": "both tests", "condition_b": "both tests", "half": "number", "similarity_pct": 76.69225401256107}, {"port_a": "9a3e20fe", "port_b": "5982b634", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 54.055968827488485}, {"port_a": "b96078c6", "port_b": "5982b634", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 52.743598270701696}, {"port_a": "31ac2789", "port_b": "5982b634", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 41.18024374599102}, {"port_a": "170b737d", "port_b": "5982b634", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 5.686879068174032}, {"port_a": "2643e4be", "port_b": "5982b634", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 62.77220877981334}, {"port_a": "273cf6b9", "port_b": "5982b634", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 62.55289139633286}, {"port_a": "19e0fe30", "port_b": "5982b634", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 75.47974413646055}, {"port_a": "4ee67ba2", "port_b": "5982b634", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 62.32193732193732}, {"port_a": "5b46f630", "port_b": "5982b634", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 53.36105336105336}, {"port_a": "280f3890", "port_b": "5982b634", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 72.91741795888929}, {"port_a": "a47a3057", "port_b": "5982b634", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 72.62121764491432}, {"port_a": "e94dca40", "port_b": "5982b634", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 69.94931209268645}, {"port_a": "09b2c811", "port_b": "5982b634", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 68.70944484498918}, {"port_a": "a7cd2ee9", "port_b": "5982b634", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 70.10086455331412}, {"port_a": "00b43b48", "port_b": "5982b634", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 73.36465486086014}, {"port_a": "1c28aa33", "port_b": "5982b634", "condition_a": "both tests", "condition_b": "both tests", "half": "number", "similarity_pct": 67.84554312522555}, {"port_a": "ffb57550", "port_b": "5982b634", "condition_a": "both tests", "condition_b": "both tests", "half": "number", "similarity_pct": 78.41598287549054}, {"port_a": "9a3e20fe", "port_b": "4ff7cdec", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 63.829787234042556}, {"port_a": "b96078c6", "port_b": "4ff7cdec", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 61.881350376925596}, {"port_a": "31ac2789", "port_b": "4ff7cdec", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 49.39911448450348}, {"port_a": "170b737d", "port_b": "4ff7cdec", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 3.8474519068511643}, {"port_a": "2643e4be", "port_b": "4ff7cdec", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 63.193735103847466}, {"port_a": "273cf6b9", "port_b": "4ff7cdec", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 73.54166666666667}, {"port_a": "19e0fe30", "port_b": "4ff7cdec", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 74.10776766969909}, {"port_a": "4ee67ba2", "port_b": "4ff7cdec", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 72.44039270687237}, {"port_a": "5b46f630", "port_b": "4ff7cdec", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 61.70648464163823}, {"port_a": "280f3890", "port_b": "4ff7cdec", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 76.53532126375576}, {"port_a": "a47a3057", "port_b": "4ff7cdec", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 76.35450304987442}, {"port_a": "e94dca40", "port_b": "4ff7cdec", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 74.26942266571632}, {"port_a": "09b2c811", "port_b": "4ff7cdec", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 72.46273953158268}, {"port_a": "a7cd2ee9", "port_b": "4ff7cdec", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 71.63120567375887}, {"port_a": "00b43b48", "port_b": "4ff7cdec", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 79.04660263251512}, {"port_a": "1c28aa33", "port_b": "4ff7cdec", "condition_a": "both tests", "condition_b": "both tests", "half": "number", "similarity_pct": 76.6607460035524}, {"port_a": "ffb57550", "port_b": "4ff7cdec", "condition_a": "both tests", "condition_b": "both tests", "half": "number", "similarity_pct": 75.30734106076572}, {"port_a": "5982b634", "port_b": "4ff7cdec", "condition_a": "both tests", "condition_b": "both tests", "half": "number", "similarity_pct": 70.05813953488372}, {"port_a": "9a3e20fe", "port_b": "62b61540", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 57.57575757575758}, {"port_a": "b96078c6", "port_b": "62b61540", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 56.51886168100596}, {"port_a": "31ac2789", "port_b": "62b61540", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 48.96265560165975}, {"port_a": "170b737d", "port_b": "62b61540", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 4.158145875937287}, {"port_a": "2643e4be", "port_b": "62b61540", "condition_a": "no tests", "condition_b": "both tests", "half": "number", "similarity_pct": 63.34250343878955}, {"port_a": "273cf6b9", "port_b": "62b61540", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 68.95826025955805}, {"port_a": "19e0fe30", "port_b": "62b61540", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 77.34181689642983}, {"port_a": "4ee67ba2", "port_b": "62b61540", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 67.58767268862911}, {"port_a": "5b46f630", "port_b": "62b61540", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 56.7390554981041}, {"port_a": "280f3890", "port_b": "62b61540", "condition_a": "source tests", "condition_b": "both tests", "half": "number", "similarity_pct": 73.60114777618364}, {"port_a": "a47a3057", "port_b": "62b61540", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 75.56200145032632}, {"port_a": "e94dca40", "port_b": "62b61540", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 74.18077061577242}, {"port_a": "09b2c811", "port_b": "62b61540", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 69.7024022947293}, {"port_a": "a7cd2ee9", "port_b": "62b61540", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 78.96811178788964}, {"port_a": "00b43b48", "port_b": "62b61540", "condition_a": "target tests", "condition_b": "both tests", "half": "number", "similarity_pct": 77.13874910136592}, {"port_a": "1c28aa33", "port_b": "62b61540", "condition_a": "both tests", "condition_b": "both tests", "half": "number", "similarity_pct": 81.0480976310122}, {"port_a": "ffb57550", "port_b": "62b61540", "condition_a": "both tests", "condition_b": "both tests", "half": "number", "similarity_pct": 78.7792760823279}, {"port_a": "5982b634", "port_b": "62b61540", "condition_a": "both tests", "condition_b": "both tests", "half": "number", "similarity_pct": 77.19427102460521}, {"port_a": "4ff7cdec", "port_b": "62b61540", "condition_a": "both tests", "condition_b": "both tests", "half": "number", "similarity_pct": 79.58077340079508}, {"port_a": "9a3e20fe", "port_b": "", "condition_a": "no tests", "condition_b": "reference", "half": "number", "similarity_pct": 7.120849024306744}, {"port_a": "b96078c6", "port_b": "", "condition_a": "no tests", "condition_b": "reference", "half": "number", "similarity_pct": 35.169082125603865}, {"port_a": "31ac2789", "port_b": "", "condition_a": "no tests", "condition_b": "reference", "half": "number", "similarity_pct": 5.161691542288557}, {"port_a": "170b737d", "port_b": "", "condition_a": "no tests", "condition_b": "reference", "half": "number", "similarity_pct": 1.193238316208154}, {"port_a": "2643e4be", "port_b": "", "condition_a": "no tests", "condition_b": "reference", "half": "number", "similarity_pct": 38.58241390839184}, {"port_a": "273cf6b9", "port_b": "", "condition_a": "source tests", "condition_b": "reference", "half": "number", "similarity_pct": 40.558963871847304}, {"port_a": "19e0fe30", "port_b": "", "condition_a": "source tests", "condition_b": "reference", "half": "number", "similarity_pct": 40.72802197802198}, {"port_a": "4ee67ba2", "port_b": "", "condition_a": "source tests", "condition_b": "reference", "half": "number", "similarity_pct": 40.53682037164487}, {"port_a": "5b46f630", "port_b": "", "condition_a": "source tests", "condition_b": "reference", "half": "number", "similarity_pct": 8.981233243967829}, {"port_a": "280f3890", "port_b": "", "condition_a": "source tests", "condition_b": "reference", "half": "number", "similarity_pct": 40.82201323580634}, {"port_a": "a47a3057", "port_b": "", "condition_a": "target tests", "condition_b": "reference", "half": "number", "similarity_pct": 43.43541006687786}, {"port_a": "e94dca40", "port_b": "", "condition_a": "target tests", "condition_b": "reference", "half": "number", "similarity_pct": 44.61538461538461}, {"port_a": "09b2c811", "port_b": "", "condition_a": "target tests", "condition_b": "reference", "half": "number", "similarity_pct": 43.31476323119777}, {"port_a": "a7cd2ee9", "port_b": "", "condition_a": "target tests", "condition_b": "reference", "half": "number", "similarity_pct": 42.72790535838553}, {"port_a": "00b43b48", "port_b": "", "condition_a": "target tests", "condition_b": "reference", "half": "number", "similarity_pct": 43.42059336823735}, {"port_a": "1c28aa33", "port_b": "", "condition_a": "both tests", "condition_b": "reference", "half": "number", "similarity_pct": 41.129313349599165}, {"port_a": "ffb57550", "port_b": "", "condition_a": "both tests", "condition_b": "reference", "half": "number", "similarity_pct": 41.50293002412961}, {"port_a": "5982b634", "port_b": "", "condition_a": "both tests", "condition_b": "reference", "half": "number", "similarity_pct": 49.82181040627227}, {"port_a": "4ff7cdec", "port_b": "", "condition_a": "both tests", "condition_b": "reference", "half": "number", "similarity_pct": 41.6140350877193}, {"port_a": "62b61540", "port_b": "", "condition_a": "both tests", "condition_b": "reference", "half": "number", "similarity_pct": 41.54555122297058}], "data-415d0101714bba784b2bc3c29e0b19a4": [{"port": "9a3e20fe", "condition": "no tests"}, {"port": "b96078c6", "condition": "no tests"}, {"port": "31ac2789", "condition": "no tests"}, {"port": "170b737d", "condition": "no tests"}, {"port": "2643e4be", "condition": "no tests"}, {"port": "273cf6b9", "condition": "source tests"}, {"port": "19e0fe30", "condition": "source tests"}, {"port": "4ee67ba2", "condition": "source tests"}, {"port": "5b46f630", "condition": "source tests"}, {"port": "280f3890", "condition": "source tests"}, {"port": "a47a3057", "condition": "target tests"}, {"port": "e94dca40", "condition": "target tests"}, {"port": "09b2c811", "condition": "target tests"}, {"port": "a7cd2ee9", "condition": "target tests"}, {"port": "00b43b48", "condition": "target tests"}, {"port": "1c28aa33", "condition": "both tests"}, {"port": "ffb57550", "condition": "both tests"}, {"port": "5982b634", "condition": "both tests"}, {"port": "4ff7cdec", "condition": "both tests"}, {"port": "62b61540", "condition": "both tests"}, {"port": "", "condition": "reference"}], "data-1b34f20180a30c8fe486905b8213b327": [{"port": "9a3e20fe", "condition": "no tests"}, {"port": "273cf6b9", "condition": "source tests"}, {"port": "a47a3057", "condition": "target tests"}, {"port": "1c28aa33", "condition": "both tests"}, {"port": "", "condition": "reference"}], "data-dae1687b7766f38b94517020e43783ee": [{"port": ""}]}}
+{
+  "config": {
+    "view": {
+      "continuousWidth": 300,
+      "continuousHeight": 300
+    },
+    "axis": {
+      "labelAngle": -45
+    }
+  },
+  "layer": [
+    {
+      "data": {
+        "name": "data-2a5d5e9fbb94c6cd2932f00e9a888e53"
+      },
+      "mark": {
+        "type": "rect",
+        "stroke": "#fcfcfb",
+        "strokeWidth": 1
+      },
+      "encoding": {
+        "color": {
+          "field": "similarity_pct",
+          "legend": {
+            "gradientLength": 199.33333333333334,
+            "labelFontSize": 9,
+            "titleFontSize": 10
+          },
+          "scale": {
+            "domain": [
+              1.193238316208154,
+              86.63366336633663
+            ],
+            "range": [
+              "#cde2fb",
+              "#86b6ef",
+              "#3987e5",
+              "#256abf",
+              "#0d366b"
+            ]
+          },
+          "title": "Similarity (%)",
+          "type": "quantitative"
+        },
+        "x": {
+          "axis": {
+            "domain": false,
+            "labelAngle": -90,
+            "labelColor": {
+              "expr": "datum.label === '' ? '#0b0b0b' : '#898781'"
+            },
+            "labelFontSize": 11,
+            "labelFontWeight": {
+              "expr": "datum.label === '' ? 'bold' : 'normal'"
+            },
+            "labelPadding": 17,
+            "ticks": false
+          },
+          "field": "port_a",
+          "scale": {
+            "domain": [
+              "9a3e20fe",
+              "b96078c6",
+              "31ac2789",
+              "170b737d",
+              "2643e4be",
+              "273cf6b9",
+              "19e0fe30",
+              "4ee67ba2",
+              "5b46f630",
+              "280f3890",
+              "a47a3057",
+              "e94dca40",
+              "09b2c811",
+              "a7cd2ee9",
+              "00b43b48",
+              "1c28aa33",
+              "ffb57550",
+              "5982b634",
+              "4ff7cdec",
+              "62b61540",
+              ""
+            ]
+          },
+          "title": null,
+          "type": "nominal"
+        },
+        "y": {
+          "axis": {
+            "domain": false,
+            "labelColor": {
+              "expr": "datum.label === '' ? '#0b0b0b' : '#898781'"
+            },
+            "labelFontSize": 11,
+            "labelFontWeight": {
+              "expr": "datum.label === '' ? 'bold' : 'normal'"
+            },
+            "labelPadding": 17,
+            "ticks": false,
+            "labelAngle": 0
+          },
+          "field": "port_b",
+          "scale": {
+            "domain": [
+              "9a3e20fe",
+              "b96078c6",
+              "31ac2789",
+              "170b737d",
+              "2643e4be",
+              "273cf6b9",
+              "19e0fe30",
+              "4ee67ba2",
+              "5b46f630",
+              "280f3890",
+              "a47a3057",
+              "e94dca40",
+              "09b2c811",
+              "a7cd2ee9",
+              "00b43b48",
+              "1c28aa33",
+              "ffb57550",
+              "5982b634",
+              "4ff7cdec",
+              "62b61540",
+              ""
+            ]
+          },
+          "title": null,
+          "type": "nominal"
+        }
+      }
+    },
+    {
+      "data": {
+        "name": "data-110ffbd7a494e521a6229a077032d508"
+      },
+      "mark": {
+        "type": "text",
+        "color": "#0b0b0b",
+        "fontSize": 8
+      },
+      "encoding": {
+        "text": {
+          "field": "similarity_pct",
+          "format": ".0f",
+          "type": "quantitative"
+        },
+        "x": {
+          "axis": {
+            "domain": false,
+            "labelAngle": -90,
+            "labelColor": {
+              "expr": "datum.label === '' ? '#0b0b0b' : '#898781'"
+            },
+            "labelFontSize": 11,
+            "labelFontWeight": {
+              "expr": "datum.label === '' ? 'bold' : 'normal'"
+            },
+            "labelPadding": 17,
+            "ticks": false
+          },
+          "field": "port_a",
+          "scale": {
+            "domain": [
+              "9a3e20fe",
+              "b96078c6",
+              "31ac2789",
+              "170b737d",
+              "2643e4be",
+              "273cf6b9",
+              "19e0fe30",
+              "4ee67ba2",
+              "5b46f630",
+              "280f3890",
+              "a47a3057",
+              "e94dca40",
+              "09b2c811",
+              "a7cd2ee9",
+              "00b43b48",
+              "1c28aa33",
+              "ffb57550",
+              "5982b634",
+              "4ff7cdec",
+              "62b61540",
+              ""
+            ]
+          },
+          "title": null,
+          "type": "nominal"
+        },
+        "y": {
+          "axis": {
+            "domain": false,
+            "labelColor": {
+              "expr": "datum.label === '' ? '#0b0b0b' : '#898781'"
+            },
+            "labelFontSize": 11,
+            "labelFontWeight": {
+              "expr": "datum.label === '' ? 'bold' : 'normal'"
+            },
+            "labelPadding": 17,
+            "ticks": false,
+            "labelAngle": 0
+          },
+          "field": "port_b",
+          "scale": {
+            "domain": [
+              "9a3e20fe",
+              "b96078c6",
+              "31ac2789",
+              "170b737d",
+              "2643e4be",
+              "273cf6b9",
+              "19e0fe30",
+              "4ee67ba2",
+              "5b46f630",
+              "280f3890",
+              "a47a3057",
+              "e94dca40",
+              "09b2c811",
+              "a7cd2ee9",
+              "00b43b48",
+              "1c28aa33",
+              "ffb57550",
+              "5982b634",
+              "4ff7cdec",
+              "62b61540",
+              ""
+            ]
+          },
+          "title": null,
+          "type": "nominal"
+        }
+      }
+    },
+    {
+      "data": {
+        "name": "data-415d0101714bba784b2bc3c29e0b19a4"
+      },
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "color": {
+          "field": "condition",
+          "legend": {
+            "labelFontSize": 9,
+            "symbolType": "square",
+            "title": null
+          },
+          "scale": {
+            "domain": [
+              "no tests",
+              "source tests",
+              "target tests",
+              "both tests",
+              "reference"
+            ],
+            "range": [
+              "#2a78d6",
+              "#eb6834",
+              "#1baf7a",
+              "#4a3aa7",
+              "#0b0b0b"
+            ]
+          },
+          "type": "nominal"
+        },
+        "x": {
+          "axis": {
+            "domain": false,
+            "labelAngle": -90,
+            "labelColor": {
+              "expr": "datum.label === '' ? '#0b0b0b' : '#898781'"
+            },
+            "labelFontSize": 11,
+            "labelFontWeight": {
+              "expr": "datum.label === '' ? 'bold' : 'normal'"
+            },
+            "labelPadding": 17,
+            "ticks": false
+          },
+          "field": "port",
+          "scale": {
+            "domain": [
+              "9a3e20fe",
+              "b96078c6",
+              "31ac2789",
+              "170b737d",
+              "2643e4be",
+              "273cf6b9",
+              "19e0fe30",
+              "4ee67ba2",
+              "5b46f630",
+              "280f3890",
+              "a47a3057",
+              "e94dca40",
+              "09b2c811",
+              "a7cd2ee9",
+              "00b43b48",
+              "1c28aa33",
+              "ffb57550",
+              "5982b634",
+              "4ff7cdec",
+              "62b61540",
+              ""
+            ]
+          },
+          "title": null,
+          "type": "nominal"
+        },
+        "y": {
+          "value": -13
+        },
+        "y2": {
+          "value": -4
+        }
+      }
+    },
+    {
+      "data": {
+        "name": "data-415d0101714bba784b2bc3c29e0b19a4"
+      },
+      "mark": {
+        "type": "rect"
+      },
+      "encoding": {
+        "color": {
+          "field": "condition",
+          "legend": null,
+          "scale": {
+            "domain": [
+              "no tests",
+              "source tests",
+              "target tests",
+              "both tests",
+              "reference"
+            ],
+            "range": [
+              "#2a78d6",
+              "#eb6834",
+              "#1baf7a",
+              "#4a3aa7",
+              "#0b0b0b"
+            ]
+          },
+          "type": "nominal"
+        },
+        "x": {
+          "value": -13
+        },
+        "x2": {
+          "value": -4
+        },
+        "y": {
+          "axis": {
+            "domain": false,
+            "labelColor": {
+              "expr": "datum.label === '' ? '#0b0b0b' : '#898781'"
+            },
+            "labelFontSize": 11,
+            "labelFontWeight": {
+              "expr": "datum.label === '' ? 'bold' : 'normal'"
+            },
+            "labelPadding": 17,
+            "ticks": false,
+            "labelAngle": 0
+          },
+          "field": "port",
+          "scale": {
+            "domain": [
+              "9a3e20fe",
+              "b96078c6",
+              "31ac2789",
+              "170b737d",
+              "2643e4be",
+              "273cf6b9",
+              "19e0fe30",
+              "4ee67ba2",
+              "5b46f630",
+              "280f3890",
+              "a47a3057",
+              "e94dca40",
+              "09b2c811",
+              "a7cd2ee9",
+              "00b43b48",
+              "1c28aa33",
+              "ffb57550",
+              "5982b634",
+              "4ff7cdec",
+              "62b61540",
+              ""
+            ]
+          },
+          "title": null,
+          "type": "nominal"
+        }
+      }
+    },
+    {
+      "data": {
+        "name": "data-1b34f20180a30c8fe486905b8213b327"
+      },
+      "mark": {
+        "type": "rule",
+        "color": "#0b0b0b",
+        "opacity": 0.75,
+        "strokeWidth": 2
+      },
+      "encoding": {
+        "x": {
+          "bandPosition": 0,
+          "field": "port",
+          "scale": {
+            "domain": [
+              "9a3e20fe",
+              "b96078c6",
+              "31ac2789",
+              "170b737d",
+              "2643e4be",
+              "273cf6b9",
+              "19e0fe30",
+              "4ee67ba2",
+              "5b46f630",
+              "280f3890",
+              "a47a3057",
+              "e94dca40",
+              "09b2c811",
+              "a7cd2ee9",
+              "00b43b48",
+              "1c28aa33",
+              "ffb57550",
+              "5982b634",
+              "4ff7cdec",
+              "62b61540",
+              ""
+            ]
+          },
+          "type": "nominal"
+        }
+      }
+    },
+    {
+      "data": {
+        "name": "data-1b34f20180a30c8fe486905b8213b327"
+      },
+      "mark": {
+        "type": "rule",
+        "color": "#0b0b0b",
+        "opacity": 0.75,
+        "strokeWidth": 2
+      },
+      "encoding": {
+        "y": {
+          "bandPosition": 0,
+          "field": "port",
+          "scale": {
+            "domain": [
+              "9a3e20fe",
+              "b96078c6",
+              "31ac2789",
+              "170b737d",
+              "2643e4be",
+              "273cf6b9",
+              "19e0fe30",
+              "4ee67ba2",
+              "5b46f630",
+              "280f3890",
+              "a47a3057",
+              "e94dca40",
+              "09b2c811",
+              "a7cd2ee9",
+              "00b43b48",
+              "1c28aa33",
+              "ffb57550",
+              "5982b634",
+              "4ff7cdec",
+              "62b61540",
+              ""
+            ]
+          },
+          "type": "nominal"
+        }
+      }
+    },
+    {
+      "data": {
+        "name": "data-dae1687b7766f38b94517020e43783ee"
+      },
+      "mark": {
+        "type": "rule",
+        "color": "#0b0b0b",
+        "opacity": 0.75,
+        "strokeWidth": 2
+      },
+      "encoding": {
+        "x": {
+          "bandPosition": 1,
+          "field": "port",
+          "scale": {
+            "domain": [
+              "9a3e20fe",
+              "b96078c6",
+              "31ac2789",
+              "170b737d",
+              "2643e4be",
+              "273cf6b9",
+              "19e0fe30",
+              "4ee67ba2",
+              "5b46f630",
+              "280f3890",
+              "a47a3057",
+              "e94dca40",
+              "09b2c811",
+              "a7cd2ee9",
+              "00b43b48",
+              "1c28aa33",
+              "ffb57550",
+              "5982b634",
+              "4ff7cdec",
+              "62b61540",
+              ""
+            ]
+          },
+          "type": "nominal"
+        }
+      }
+    },
+    {
+      "data": {
+        "name": "data-dae1687b7766f38b94517020e43783ee"
+      },
+      "mark": {
+        "type": "rule",
+        "color": "#0b0b0b",
+        "opacity": 0.75,
+        "strokeWidth": 2
+      },
+      "encoding": {
+        "y": {
+          "bandPosition": 1,
+          "field": "port",
+          "scale": {
+            "domain": [
+              "9a3e20fe",
+              "b96078c6",
+              "31ac2789",
+              "170b737d",
+              "2643e4be",
+              "273cf6b9",
+              "19e0fe30",
+              "4ee67ba2",
+              "5b46f630",
+              "280f3890",
+              "a47a3057",
+              "e94dca40",
+              "09b2c811",
+              "a7cd2ee9",
+              "00b43b48",
+              "1c28aa33",
+              "ffb57550",
+              "5982b634",
+              "4ff7cdec",
+              "62b61540",
+              ""
+            ]
+          },
+          "type": "nominal"
+        }
+      }
+    }
+  ],
+  "height": 598,
+  "resolve": {
+    "scale": {
+      "color": "independent"
+    }
+  },
+  "title": {
+    "text": "python -> typescript",
+    "anchor": "start",
+    "color": "#0b0b0b",
+    "fontSize": 14,
+    "offset": 23,
+    "subtitleFontSize": 10
+  },
+  "width": 598,
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.4.1.json",
+  "datasets": {
+    "data-2a5d5e9fbb94c6cd2932f00e9a888e53": [
+      {
+        "port_a": "b96078c6",
+        "port_b": "9a3e20fe",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 62.13965406790519
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "9a3e20fe",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 52.14970615527374
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "9a3e20fe",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 13.183915622940013
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "9a3e20fe",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 66.95478723404256
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "9a3e20fe",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 71.4334124025754
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "9a3e20fe",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 61.04472516217139
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "9a3e20fe",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 72.80191583989053
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "9a3e20fe",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 76.107964011996
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "9a3e20fe",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 56.02493074792244
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "9a3e20fe",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 68.8593421973408
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "9a3e20fe",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 61.17483489746264
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "9a3e20fe",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 58.56697819314642
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "9a3e20fe",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 56.796956070563816
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "9a3e20fe",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 60.16655100624566
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "9a3e20fe",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 68.05266805266805
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "9a3e20fe",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 62.02878684030158
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "9a3e20fe",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 54.055968827488485
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "9a3e20fe",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 63.829787234042556
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "9a3e20fe",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 57.57575757575758
+      },
+      {
+        "port_a": "",
+        "port_b": "9a3e20fe",
+        "condition_a": "reference",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 7.120849024306744
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "b96078c6",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 42.02516827626573
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "b96078c6",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 12.181479179614668
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "b96078c6",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 63.095238095238095
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "b96078c6",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 70.1116427432217
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "b96078c6",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 57.822036620623194
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "b96078c6",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 69.4560669456067
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "b96078c6",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 55.44740973312402
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "b96078c6",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 56.4453125
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "b96078c6",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 63.971071663379355
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "b96078c6",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 60.24175106174453
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "b96078c6",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 60.52717214448422
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "b96078c6",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 57.951219512195124
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "b96078c6",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 59.29549902152642
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "b96078c6",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 61.17263843648208
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "b96078c6",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 57.25338491295938
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "b96078c6",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 52.743598270701696
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "b96078c6",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 61.881350376925596
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "b96078c6",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 56.51886168100596
+      },
+      {
+        "port_a": "",
+        "port_b": "b96078c6",
+        "condition_a": "reference",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 35.169082125603865
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "31ac2789",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 49.20396515470111
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "31ac2789",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 45.716015743263696
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "31ac2789",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 57.301293900184845
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "31ac2789",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 45.78163771712159
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "31ac2789",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 55.18955873213176
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "31ac2789",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 54.429611650485434
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "31ac2789",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 47.75369148601948
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "31ac2789",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 53.98033618775769
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "31ac2789",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 49.243379571248425
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "31ac2789",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 51.57035175879397
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "31ac2789",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 53.483992467043315
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "31ac2789",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 48.8511174063582
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "31ac2789",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 53.81955359949701
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "31ac2789",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 51.9140989729225
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "31ac2789",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 41.18024374599102
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "31ac2789",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 49.39911448450348
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "31ac2789",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 48.96265560165975
+      },
+      {
+        "port_a": "",
+        "port_b": "31ac2789",
+        "condition_a": "reference",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 5.161691542288557
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "170b737d",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 12.95103092783505
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "170b737d",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 16.212668198227764
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "170b737d",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 7.537190082644628
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "170b737d",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 14.508115269956939
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "170b737d",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 13.561511139812723
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "170b737d",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 4.959785522788204
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "170b737d",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 6.702775897088693
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "170b737d",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 6.390850992263707
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "170b737d",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 8.576214405360133
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "170b737d",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 8.436558419819217
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "170b737d",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 5.372733378106111
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "170b737d",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 6.3715627095908784
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "170b737d",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 5.175846051758461
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "170b737d",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 5.686879068174032
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "170b737d",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 3.8474519068511643
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "170b737d",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 4.158145875937287
+      },
+      {
+        "port_a": "",
+        "port_b": "170b737d",
+        "condition_a": "reference",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 1.193238316208154
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "2643e4be",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 77.06057596822244
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "2643e4be",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 70.89029676558853
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "2643e4be",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 72.23521550283996
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "2643e4be",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 63.75773363725171
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "2643e4be",
+        "condition_a": "source tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 67.4104124408384
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "2643e4be",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 77.18579234972678
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "2643e4be",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 71.25890736342043
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "2643e4be",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 71.1726934775262
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "2643e4be",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 65.51840594393786
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "2643e4be",
+        "condition_a": "target tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 70.79945799457994
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "2643e4be",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 69.75642760487145
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "2643e4be",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 67.9384203480589
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "2643e4be",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 62.77220877981334
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "2643e4be",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 63.193735103847466
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "2643e4be",
+        "condition_a": "both tests",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 63.34250343878955
+      },
+      {
+        "port_a": "",
+        "port_b": "2643e4be",
+        "condition_a": "reference",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 38.58241390839184
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "273cf6b9",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 69.61250849762067
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "273cf6b9",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 82.76566757493188
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "273cf6b9",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 67.41871267418712
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "273cf6b9",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 66.80455015511892
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "273cf6b9",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 77.1856495994427
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "273cf6b9",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 73.63321799307958
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "273cf6b9",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 73.94900068917988
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "273cf6b9",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 72.24517906336088
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "273cf6b9",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 70.94991364421416
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "273cf6b9",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 72.36978268368402
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "273cf6b9",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 68.91845786421017
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "273cf6b9",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 62.55289139633286
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "273cf6b9",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 73.54166666666667
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "273cf6b9",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 68.95826025955805
+      },
+      {
+        "port_a": "",
+        "port_b": "273cf6b9",
+        "condition_a": "reference",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 40.558963871847304
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "19e0fe30",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 70.28140013726836
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "19e0fe30",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 60.82887700534759
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "19e0fe30",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 78.56894755123307
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "19e0fe30",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 79.95787995787995
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "19e0fe30",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 75.94142259414225
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "19e0fe30",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 73.33333333333333
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "19e0fe30",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 76.05829285218599
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "19e0fe30",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 81.58719108945353
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "19e0fe30",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 76.81612791101843
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "19e0fe30",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 84.1526297696803
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "19e0fe30",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 75.47974413646055
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "19e0fe30",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 74.10776766969909
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "19e0fe30",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 77.34181689642983
+      },
+      {
+        "port_a": "",
+        "port_b": "19e0fe30",
+        "condition_a": "reference",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 40.72802197802198
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "4ee67ba2",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 71.0649698593436
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "4ee67ba2",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 68.15175774451792
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "4ee67ba2",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 73.58424199788955
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "4ee67ba2",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 71.97763801537387
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "4ee67ba2",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 71.60751565762004
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "4ee67ba2",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 69.47148817802504
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "4ee67ba2",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 69.9686083013603
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "4ee67ba2",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 75.86206896551724
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "4ee67ba2",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 69.23871856699965
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "4ee67ba2",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 62.32193732193732
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "4ee67ba2",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 72.44039270687237
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "4ee67ba2",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 67.58767268862911
+      },
+      {
+        "port_a": "",
+        "port_b": "4ee67ba2",
+        "condition_a": "reference",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 40.53682037164487
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "5b46f630",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 60.18298881735005
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "5b46f630",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 67.1687778158165
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "5b46f630",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 58.63945578231292
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "5b46f630",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 60.84010840108401
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "5b46f630",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 48.13811780636425
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "5b46f630",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 57.249575551782684
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "5b46f630",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 62.66531027466938
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "5b46f630",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 59.71150620597115
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "5b46f630",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 53.36105336105336
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "5b46f630",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 61.70648464163823
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "5b46f630",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 56.7390554981041
+      },
+      {
+        "port_a": "",
+        "port_b": "5b46f630",
+        "condition_a": "reference",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 8.981233243967829
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "280f3890",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 77.27920227920228
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "280f3890",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 75.34488857446055
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "280f3890",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 73.68791828108489
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "280f3890",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 69.48257655755016
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "280f3890",
+        "condition_a": "target tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 80.22598870056497
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "280f3890",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 73.27221438645981
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "280f3890",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 77.68479776847978
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "280f3890",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 72.91741795888929
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "280f3890",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 76.53532126375576
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "280f3890",
+        "condition_a": "both tests",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 73.60114777618364
+      },
+      {
+        "port_a": "",
+        "port_b": "280f3890",
+        "condition_a": "reference",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 40.82201323580634
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "a47a3057",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 82.2309617447265
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "a47a3057",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 79.03168387326451
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "a47a3057",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 73.78157239416578
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "a47a3057",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 82.01284796573876
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "a47a3057",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 79.54383464005701
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "a47a3057",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 79.06976744186046
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "a47a3057",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 72.62121764491432
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "a47a3057",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 76.35450304987442
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "a47a3057",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 75.56200145032632
+      },
+      {
+        "port_a": "",
+        "port_b": "a47a3057",
+        "condition_a": "reference",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 43.43541006687786
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "e94dca40",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 86.63366336633663
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "e94dca40",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 78.65724381625442
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "e94dca40",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 80.96419709322934
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "e94dca40",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 77.30973451327434
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "e94dca40",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 76.51382569128457
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "e94dca40",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 69.94931209268645
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "e94dca40",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 74.26942266571632
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "e94dca40",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 74.18077061577242
+      },
+      {
+        "port_a": "",
+        "port_b": "e94dca40",
+        "condition_a": "reference",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 44.61538461538461
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "09b2c811",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 77.26952850105559
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "09b2c811",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 78.22096717260854
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "09b2c811",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 75.50229115262601
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "09b2c811",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 73.40536772394563
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "09b2c811",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 68.70944484498918
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "09b2c811",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 72.46273953158268
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "09b2c811",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 69.7024022947293
+      },
+      {
+        "port_a": "",
+        "port_b": "09b2c811",
+        "condition_a": "reference",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 43.31476323119777
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "a7cd2ee9",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 74.70899470899471
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "a7cd2ee9",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 81.08488904543853
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "a7cd2ee9",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 77.60362243120863
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "a7cd2ee9",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 70.10086455331412
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "a7cd2ee9",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 71.63120567375887
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "a7cd2ee9",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 78.96811178788964
+      },
+      {
+        "port_a": "",
+        "port_b": "a7cd2ee9",
+        "condition_a": "reference",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 42.72790535838553
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "00b43b48",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 80.56537102473499
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "00b43b48",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 82.7393431167016
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "00b43b48",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 73.36465486086014
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "00b43b48",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 79.04660263251512
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "00b43b48",
+        "condition_a": "both tests",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 77.13874910136592
+      },
+      {
+        "port_a": "",
+        "port_b": "00b43b48",
+        "condition_a": "reference",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 43.42059336823735
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "1c28aa33",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 76.69225401256107
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "1c28aa33",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 67.84554312522555
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "1c28aa33",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 76.6607460035524
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "1c28aa33",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 81.0480976310122
+      },
+      {
+        "port_a": "",
+        "port_b": "1c28aa33",
+        "condition_a": "reference",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 41.129313349599165
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "ffb57550",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 78.41598287549054
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "ffb57550",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 75.30734106076572
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "ffb57550",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 78.7792760823279
+      },
+      {
+        "port_a": "",
+        "port_b": "ffb57550",
+        "condition_a": "reference",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 41.50293002412961
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "5982b634",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 70.05813953488372
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "5982b634",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 77.19427102460521
+      },
+      {
+        "port_a": "",
+        "port_b": "5982b634",
+        "condition_a": "reference",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 49.82181040627227
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "4ff7cdec",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 79.58077340079508
+      },
+      {
+        "port_a": "",
+        "port_b": "4ff7cdec",
+        "condition_a": "reference",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 41.6140350877193
+      },
+      {
+        "port_a": "",
+        "port_b": "62b61540",
+        "condition_a": "reference",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 41.54555122297058
+      }
+    ],
+    "data-110ffbd7a494e521a6229a077032d508": [
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "b96078c6",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "number",
+        "similarity_pct": 62.13965406790519
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "31ac2789",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "number",
+        "similarity_pct": 52.14970615527374
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "31ac2789",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "number",
+        "similarity_pct": 42.02516827626573
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "170b737d",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "number",
+        "similarity_pct": 13.183915622940013
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "170b737d",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "number",
+        "similarity_pct": 12.181479179614668
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "170b737d",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "number",
+        "similarity_pct": 49.20396515470111
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "2643e4be",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "number",
+        "similarity_pct": 66.95478723404256
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "2643e4be",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "number",
+        "similarity_pct": 63.095238095238095
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "2643e4be",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "number",
+        "similarity_pct": 45.716015743263696
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "2643e4be",
+        "condition_a": "no tests",
+        "condition_b": "no tests",
+        "half": "number",
+        "similarity_pct": 12.95103092783505
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "273cf6b9",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 71.4334124025754
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "273cf6b9",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 70.1116427432217
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "273cf6b9",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 57.301293900184845
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "273cf6b9",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 16.212668198227764
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "273cf6b9",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 77.06057596822244
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "19e0fe30",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 61.04472516217139
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "19e0fe30",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 57.822036620623194
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "19e0fe30",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 45.78163771712159
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "19e0fe30",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 7.537190082644628
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "19e0fe30",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 70.89029676558853
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "19e0fe30",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 69.61250849762067
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "4ee67ba2",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 72.80191583989053
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "4ee67ba2",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 69.4560669456067
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "4ee67ba2",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 55.18955873213176
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "4ee67ba2",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 14.508115269956939
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "4ee67ba2",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 72.23521550283996
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "4ee67ba2",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 82.76566757493188
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "4ee67ba2",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 70.28140013726836
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "5b46f630",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 76.107964011996
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "5b46f630",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 55.44740973312402
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "5b46f630",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 54.429611650485434
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "5b46f630",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 13.561511139812723
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "5b46f630",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 63.75773363725171
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "5b46f630",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 67.41871267418712
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "5b46f630",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 60.82887700534759
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "5b46f630",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 71.0649698593436
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "280f3890",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 56.02493074792244
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "280f3890",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 56.4453125
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "280f3890",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 47.75369148601948
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "280f3890",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 4.959785522788204
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "280f3890",
+        "condition_a": "no tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 67.4104124408384
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "280f3890",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 66.80455015511892
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "280f3890",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 78.56894755123307
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "280f3890",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 68.15175774451792
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "280f3890",
+        "condition_a": "source tests",
+        "condition_b": "source tests",
+        "half": "number",
+        "similarity_pct": 60.18298881735005
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "a47a3057",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 68.8593421973408
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "a47a3057",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 63.971071663379355
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "a47a3057",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 53.98033618775769
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "a47a3057",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 6.702775897088693
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "a47a3057",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 77.18579234972678
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "a47a3057",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 77.1856495994427
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "a47a3057",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 79.95787995787995
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "a47a3057",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 73.58424199788955
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "a47a3057",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 67.1687778158165
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "a47a3057",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 77.27920227920228
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "e94dca40",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 61.17483489746264
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "e94dca40",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 60.24175106174453
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "e94dca40",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 49.243379571248425
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "e94dca40",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 6.390850992263707
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "e94dca40",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 71.25890736342043
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "e94dca40",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 73.63321799307958
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "e94dca40",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 75.94142259414225
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "e94dca40",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 71.97763801537387
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "e94dca40",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 58.63945578231292
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "e94dca40",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 75.34488857446055
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "e94dca40",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 82.2309617447265
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "09b2c811",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 58.56697819314642
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "09b2c811",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 60.52717214448422
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "09b2c811",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 51.57035175879397
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "09b2c811",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 8.576214405360133
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "09b2c811",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 71.1726934775262
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "09b2c811",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 73.94900068917988
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "09b2c811",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 73.33333333333333
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "09b2c811",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 71.60751565762004
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "09b2c811",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 60.84010840108401
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "09b2c811",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 73.68791828108489
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "09b2c811",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 79.03168387326451
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "09b2c811",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 86.63366336633663
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "a7cd2ee9",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 56.796956070563816
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "a7cd2ee9",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 57.951219512195124
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "a7cd2ee9",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 53.483992467043315
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "a7cd2ee9",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 8.436558419819217
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "a7cd2ee9",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 65.51840594393786
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "a7cd2ee9",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 72.24517906336088
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "a7cd2ee9",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 76.05829285218599
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "a7cd2ee9",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 69.47148817802504
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "a7cd2ee9",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 48.13811780636425
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "a7cd2ee9",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 69.48257655755016
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "a7cd2ee9",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 73.78157239416578
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "a7cd2ee9",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 78.65724381625442
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "a7cd2ee9",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 77.26952850105559
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "00b43b48",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 60.16655100624566
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "00b43b48",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 59.29549902152642
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "00b43b48",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 48.8511174063582
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "00b43b48",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 5.372733378106111
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "00b43b48",
+        "condition_a": "no tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 70.79945799457994
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "00b43b48",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 70.94991364421416
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "00b43b48",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 81.58719108945353
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "00b43b48",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 69.9686083013603
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "00b43b48",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 57.249575551782684
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "00b43b48",
+        "condition_a": "source tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 80.22598870056497
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "00b43b48",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 82.01284796573876
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "00b43b48",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 80.96419709322934
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "00b43b48",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 78.22096717260854
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "00b43b48",
+        "condition_a": "target tests",
+        "condition_b": "target tests",
+        "half": "number",
+        "similarity_pct": 74.70899470899471
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "1c28aa33",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 68.05266805266805
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "1c28aa33",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 61.17263843648208
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "1c28aa33",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 53.81955359949701
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "1c28aa33",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 6.3715627095908784
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "1c28aa33",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 69.75642760487145
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "1c28aa33",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 72.36978268368402
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "1c28aa33",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 76.81612791101843
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "1c28aa33",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 75.86206896551724
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "1c28aa33",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 62.66531027466938
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "1c28aa33",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 73.27221438645981
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "1c28aa33",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 79.54383464005701
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "1c28aa33",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 77.30973451327434
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "1c28aa33",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 75.50229115262601
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "1c28aa33",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 81.08488904543853
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "1c28aa33",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 80.56537102473499
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "ffb57550",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 62.02878684030158
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "ffb57550",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 57.25338491295938
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "ffb57550",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 51.9140989729225
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "ffb57550",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 5.175846051758461
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "ffb57550",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 67.9384203480589
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "ffb57550",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 68.91845786421017
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "ffb57550",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 84.1526297696803
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "ffb57550",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 69.23871856699965
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "ffb57550",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 59.71150620597115
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "ffb57550",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 77.68479776847978
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "ffb57550",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 79.06976744186046
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "ffb57550",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 76.51382569128457
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "ffb57550",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 73.40536772394563
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "ffb57550",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 77.60362243120863
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "ffb57550",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 82.7393431167016
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "ffb57550",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 76.69225401256107
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "5982b634",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 54.055968827488485
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "5982b634",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 52.743598270701696
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "5982b634",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 41.18024374599102
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "5982b634",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 5.686879068174032
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "5982b634",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 62.77220877981334
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "5982b634",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 62.55289139633286
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "5982b634",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 75.47974413646055
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "5982b634",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 62.32193732193732
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "5982b634",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 53.36105336105336
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "5982b634",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 72.91741795888929
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "5982b634",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 72.62121764491432
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "5982b634",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 69.94931209268645
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "5982b634",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 68.70944484498918
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "5982b634",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 70.10086455331412
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "5982b634",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 73.36465486086014
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "5982b634",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 67.84554312522555
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "5982b634",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 78.41598287549054
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "4ff7cdec",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 63.829787234042556
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "4ff7cdec",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 61.881350376925596
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "4ff7cdec",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 49.39911448450348
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "4ff7cdec",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 3.8474519068511643
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "4ff7cdec",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 63.193735103847466
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "4ff7cdec",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 73.54166666666667
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "4ff7cdec",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 74.10776766969909
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "4ff7cdec",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 72.44039270687237
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "4ff7cdec",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 61.70648464163823
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "4ff7cdec",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 76.53532126375576
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "4ff7cdec",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 76.35450304987442
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "4ff7cdec",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 74.26942266571632
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "4ff7cdec",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 72.46273953158268
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "4ff7cdec",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 71.63120567375887
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "4ff7cdec",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 79.04660263251512
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "4ff7cdec",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 76.6607460035524
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "4ff7cdec",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 75.30734106076572
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "4ff7cdec",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 70.05813953488372
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "62b61540",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 57.57575757575758
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "62b61540",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 56.51886168100596
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "62b61540",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 48.96265560165975
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "62b61540",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 4.158145875937287
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "62b61540",
+        "condition_a": "no tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 63.34250343878955
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "62b61540",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 68.95826025955805
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "62b61540",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 77.34181689642983
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "62b61540",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 67.58767268862911
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "62b61540",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 56.7390554981041
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "62b61540",
+        "condition_a": "source tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 73.60114777618364
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "62b61540",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 75.56200145032632
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "62b61540",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 74.18077061577242
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "62b61540",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 69.7024022947293
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "62b61540",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 78.96811178788964
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "62b61540",
+        "condition_a": "target tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 77.13874910136592
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "62b61540",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 81.0480976310122
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "62b61540",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 78.7792760823279
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "62b61540",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 77.19427102460521
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "62b61540",
+        "condition_a": "both tests",
+        "condition_b": "both tests",
+        "half": "number",
+        "similarity_pct": 79.58077340079508
+      },
+      {
+        "port_a": "9a3e20fe",
+        "port_b": "",
+        "condition_a": "no tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 7.120849024306744
+      },
+      {
+        "port_a": "b96078c6",
+        "port_b": "",
+        "condition_a": "no tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 35.169082125603865
+      },
+      {
+        "port_a": "31ac2789",
+        "port_b": "",
+        "condition_a": "no tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 5.161691542288557
+      },
+      {
+        "port_a": "170b737d",
+        "port_b": "",
+        "condition_a": "no tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 1.193238316208154
+      },
+      {
+        "port_a": "2643e4be",
+        "port_b": "",
+        "condition_a": "no tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 38.58241390839184
+      },
+      {
+        "port_a": "273cf6b9",
+        "port_b": "",
+        "condition_a": "source tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 40.558963871847304
+      },
+      {
+        "port_a": "19e0fe30",
+        "port_b": "",
+        "condition_a": "source tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 40.72802197802198
+      },
+      {
+        "port_a": "4ee67ba2",
+        "port_b": "",
+        "condition_a": "source tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 40.53682037164487
+      },
+      {
+        "port_a": "5b46f630",
+        "port_b": "",
+        "condition_a": "source tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 8.981233243967829
+      },
+      {
+        "port_a": "280f3890",
+        "port_b": "",
+        "condition_a": "source tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 40.82201323580634
+      },
+      {
+        "port_a": "a47a3057",
+        "port_b": "",
+        "condition_a": "target tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 43.43541006687786
+      },
+      {
+        "port_a": "e94dca40",
+        "port_b": "",
+        "condition_a": "target tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 44.61538461538461
+      },
+      {
+        "port_a": "09b2c811",
+        "port_b": "",
+        "condition_a": "target tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 43.31476323119777
+      },
+      {
+        "port_a": "a7cd2ee9",
+        "port_b": "",
+        "condition_a": "target tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 42.72790535838553
+      },
+      {
+        "port_a": "00b43b48",
+        "port_b": "",
+        "condition_a": "target tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 43.42059336823735
+      },
+      {
+        "port_a": "1c28aa33",
+        "port_b": "",
+        "condition_a": "both tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 41.129313349599165
+      },
+      {
+        "port_a": "ffb57550",
+        "port_b": "",
+        "condition_a": "both tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 41.50293002412961
+      },
+      {
+        "port_a": "5982b634",
+        "port_b": "",
+        "condition_a": "both tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 49.82181040627227
+      },
+      {
+        "port_a": "4ff7cdec",
+        "port_b": "",
+        "condition_a": "both tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 41.6140350877193
+      },
+      {
+        "port_a": "62b61540",
+        "port_b": "",
+        "condition_a": "both tests",
+        "condition_b": "reference",
+        "half": "number",
+        "similarity_pct": 41.54555122297058
+      }
+    ],
+    "data-415d0101714bba784b2bc3c29e0b19a4": [
+      {
+        "port": "9a3e20fe",
+        "condition": "no tests"
+      },
+      {
+        "port": "b96078c6",
+        "condition": "no tests"
+      },
+      {
+        "port": "31ac2789",
+        "condition": "no tests"
+      },
+      {
+        "port": "170b737d",
+        "condition": "no tests"
+      },
+      {
+        "port": "2643e4be",
+        "condition": "no tests"
+      },
+      {
+        "port": "273cf6b9",
+        "condition": "source tests"
+      },
+      {
+        "port": "19e0fe30",
+        "condition": "source tests"
+      },
+      {
+        "port": "4ee67ba2",
+        "condition": "source tests"
+      },
+      {
+        "port": "5b46f630",
+        "condition": "source tests"
+      },
+      {
+        "port": "280f3890",
+        "condition": "source tests"
+      },
+      {
+        "port": "a47a3057",
+        "condition": "target tests"
+      },
+      {
+        "port": "e94dca40",
+        "condition": "target tests"
+      },
+      {
+        "port": "09b2c811",
+        "condition": "target tests"
+      },
+      {
+        "port": "a7cd2ee9",
+        "condition": "target tests"
+      },
+      {
+        "port": "00b43b48",
+        "condition": "target tests"
+      },
+      {
+        "port": "1c28aa33",
+        "condition": "both tests"
+      },
+      {
+        "port": "ffb57550",
+        "condition": "both tests"
+      },
+      {
+        "port": "5982b634",
+        "condition": "both tests"
+      },
+      {
+        "port": "4ff7cdec",
+        "condition": "both tests"
+      },
+      {
+        "port": "62b61540",
+        "condition": "both tests"
+      },
+      {
+        "port": "",
+        "condition": "reference"
+      }
+    ],
+    "data-1b34f20180a30c8fe486905b8213b327": [
+      {
+        "port": "9a3e20fe",
+        "condition": "no tests"
+      },
+      {
+        "port": "273cf6b9",
+        "condition": "source tests"
+      },
+      {
+        "port": "a47a3057",
+        "condition": "target tests"
+      },
+      {
+        "port": "1c28aa33",
+        "condition": "both tests"
+      },
+      {
+        "port": "",
+        "condition": "reference"
+      }
+    ],
+    "data-dae1687b7766f38b94517020e43783ee": [
+      {
+        "port": ""
+      }
+    ]
+  }
+}

@@ -1,18 +1,123 @@
 """Export light charts and transparent dark SVG siblings."""
 
-FORMATS = {".svg": {}, ".png": {"scale_factor": 2}, ".json": {}}
+import json
+import re
+from copy import deepcopy
+
+FORMATS = (".svg", ".png", ".json")
 
 
 def write_chart(chart, base):
-    chart = chart.configure_axis(labelAngle=-45)
+    """Light SVG, PNG and JSON, plus the transparent dark SVG sibling."""
+    spec = _light_spec(chart)
     base.parent.mkdir(parents=True, exist_ok=True)
+    import vl_convert as vlc
+
     written = []
-    for suffix, options in FORMATS.items():
+    for suffix in FORMATS:
         path = base.with_name(base.name + suffix)
-        chart.save(str(path), **options)
+        if suffix == ".json":
+            path.write_text(json.dumps(spec, indent=2) + "\n")
+        elif suffix == ".svg":
+            path.write_text(vlc.vegalite_to_svg(spec))
+        else:
+            path.write_bytes(vlc.vegalite_to_png(spec, scale=2))
         written.append(path)
-    written.append(write_dark_svg(chart.to_dict(), base))
+    written.append(write_dark_svg(spec, base))
     return written
+
+
+def _light_spec(chart):
+    """A spec dict from a chart object or a spec, with the blog's label rotation."""
+    if hasattr(chart, "to_dict"):
+        return chart.configure_axis(labelAngle=-45).to_dict()
+    spec = deepcopy(chart)
+    spec.setdefault("config", {}).setdefault("axis", {})["labelAngle"] = -45
+    return spec
+
+
+# --- Blog slot fitting -----------------------------------------------------
+
+# Band scales snap plot geometry to a couple of pixels; padding is continuous, so
+# plots shrink to just under the slot and padding closes the rest.
+QUANTUM = 2.5
+DEFAULT_LABEL_PADDING = 2
+DEFAULT_VIEW_PADDING = 5
+
+
+def rendered_geometry(spec):
+    """The rendered (width, height, left margin, top margin) of a spec, in pixels."""
+    import vl_convert as vlc
+
+    svg = vlc.vegalite_to_svg(spec)
+    (width, height), = re.findall(r'<svg[^>]*width="([\d.]+)" height="([\d.]+)"', svg)
+    (left, top), = re.findall(
+        r'stroke-miterlimit="10" transform="translate\(([\d.]+),([\d.]+)\)"', svg
+    )
+    return float(width), float(height), float(left), float(top)
+
+
+def fit_pair(specs, width, measure=rendered_geometry):
+    """Fit charts sharing a blog slot to identical geometry: equal left margins, the
+    slot's exact width, equal heights. Every chart in the slot then renders at 1:1,
+    so fonts hold one pixel size, and paired plots line up side by side."""
+    fitted = [deepcopy(spec) for spec in specs]
+    left = max(measure(spec)[2] for spec in fitted)
+    for spec in fitted:
+        _pad_axis(_units(spec)[0], "y", left - measure(spec)[2])
+    for spec in fitted:
+        _fit_width(spec, width, measure)
+    top = max(measure(spec)[1] for spec in fitted)
+    for spec in fitted:
+        delta = top - measure(spec)[1]
+        for unit in _units(spec):
+            _pad_axis(unit, "x", delta)
+    return fitted
+
+
+def _units(spec):
+    """Concat panels when there are any; the chart itself otherwise."""
+    return spec.get("concat", [spec])
+
+
+def _fit_width(spec, width, measure, iterations=12):
+    for _ in range(iterations):
+        delta = width - measure(spec)[0]
+        if 0 <= delta < QUANTUM:
+            _pad_right(spec, delta)
+            return
+        units = _units(spec)
+        share = (delta - QUANTUM / 2) / len(units) if delta > 0 else delta / len(units)
+        for unit in units:
+            if "width" not in unit:
+                raise RuntimeError(f"no plot width to fit the {width}px slot")
+            grown = unit["width"] + share
+            if grown < 10:
+                raise RuntimeError(f"plot cannot shrink to the {width}px slot")
+            if unit.get("height") == unit["width"]:
+                unit["height"] = grown  # the port-to-port matrix stays square
+            unit["width"] = grown
+    raise RuntimeError(f"plot did not converge to the {width}px slot")
+
+
+def _pad_right(spec, delta):
+    if delta < 0.05:
+        return
+    padding = spec.get("padding", DEFAULT_VIEW_PADDING)
+    if not isinstance(padding, dict):
+        padding = dict.fromkeys(("left", "top", "right", "bottom"), padding)
+    spec["padding"] = padding | {"right": padding.get("right", DEFAULT_VIEW_PADDING) + delta}
+
+
+def _pad_axis(unit, channel, delta):
+    if abs(delta) < 0.05:
+        return
+    for layer in unit.get("layer", [unit]):
+        enc = layer.get("encoding", {}).get(channel)
+        if enc is None or "value" in enc or "datum" in enc:
+            continue
+        axis = enc.setdefault("axis", {})
+        axis["labelPadding"] = axis.get("labelPadding", DEFAULT_LABEL_PADDING) + delta
 
 
 TEXT = "#d8d3ca"
