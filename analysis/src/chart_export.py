@@ -19,7 +19,7 @@ TEXT = "#d8d3ca"
 TITLE = "#f3f1ec"
 GRID = "#2e2b26"
 TICK = "#4c4840"
-DARK_BLUE_RAMP = ["#161513", "#17375c", "#1f5b8f", "#256abf", "#0d366b"]
+DARK_BLUE_RAMP = ["#161513", "#23466b", "#2f6fa3", "#3987e5", "#256abf"]
 
 
 def dark_spec(spec, name):

@@ -49,7 +49,7 @@ def test_matrix_dark_scale_preserves_domain_data_and_categorical_palette():
         if light_color.get("type") == "quantitative":
             assert dark_color["scale"]["domain"] == light_color["scale"]["domain"]
             assert dark_color["scale"]["range"][0] == "#161513"
-            assert dark_color["scale"]["range"][-1] == light_color["scale"]["range"][-1]
+            assert dark_color["scale"]["range"][-1] == "#256abf"
         elif light_color.get("type") == "nominal":
             assert dark_color == light_color
 
