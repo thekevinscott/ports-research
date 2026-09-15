@@ -482,7 +482,7 @@ def _(
             if metric == DIFF_LEAD:
                 points = points.encode(shape=layout_shape())
             rule = (
-                base.mark_rule()
+                base.mark_rule(color=REFERENCE)
                 .transform_filter(alt.FieldValidPredicate(field="reference", valid=True))
                 .encode(y=alt.Y("median(reference):Q", scale=scale))
             )
@@ -893,6 +893,9 @@ def _(
     MATRIX_STRIP_PX = 9
     MATRIX_STRIP_GAP = 4
     MUTED_INK = "#898781"
+    # The reference rule reads on both the light page and the dark variant; a mid-grey
+    # sits between the two themes, so dark_spec leaves it alone.
+    REFERENCE = "#6e6e6e"
     SURFACE = "#fcfcfb"
     SEQUENTIAL_BLUE = ["#cde2fb", "#86b6ef", "#3987e5", "#256abf", "#0d366b"]
     REFERENCE_TICK = ""
@@ -1195,10 +1198,10 @@ def _(
             xOffset=offset,
             y=y,
         )
-        rule = alt.Chart(parity).mark_rule(color="black", strokeWidth=2).encode(y=y)
+        rule = alt.Chart(parity).mark_rule(color=REFERENCE, strokeWidth=2).encode(y=y)
         rule_label = (
             alt.Chart(parity)
-            .mark_text(align="left", baseline="bottom", dy=-2, fontSize=9)
+            .mark_text(align="left", baseline="bottom", dy=-2, fontSize=9, color=REFERENCE)
             .encode(y=y, x=alt.value(2), text="label:N")
         )
         return alt.layer(medians, dots, rule, rule_label).properties(

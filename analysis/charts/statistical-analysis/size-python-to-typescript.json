@@ -133,7 +133,8 @@
         },
         {
           "mark": {
-            "type": "rule"
+            "type": "rule",
+            "color": "#6e6e6e"
           },
           "encoding": {
             "y": {
@@ -298,7 +299,8 @@
         },
         {
           "mark": {
-            "type": "rule"
+            "type": "rule",
+            "color": "#6e6e6e"
           },
           "encoding": {
             "y": {

@@ -168,7 +168,7 @@
       },
       "mark": {
         "type": "rule",
-        "color": "black",
+        "color": "#6e6e6e",
         "strokeWidth": 2
       },
       "encoding": {
@@ -199,7 +199,8 @@
         "align": "left",
         "baseline": "bottom",
         "dy": -2,
-        "fontSize": 9
+        "fontSize": 9,
+        "color": "#6e6e6e"
       },
       "encoding": {
         "text": {
