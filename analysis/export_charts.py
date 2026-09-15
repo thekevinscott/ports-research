@@ -13,10 +13,10 @@ from pathlib import Path
 import polars as pl
 
 from runs import app
+from src.chart_export import write_chart
 
 CHARTS = Path(__file__).resolve().parent / "charts"
 LANGUAGES = ("python", "typescript")
-FORMATS = {".svg": {}, ".png": {"scale_factor": 2}, ".json": {}}
 # The notebook renders reverse_report for these two sections only: there is no reverse ladder.
 REVERSE_SECTIONS = ("diff", "embeddings")
 GROUPS = {"embeddings": "embeddings", "performance": "performance"}
@@ -145,14 +145,7 @@ def charts(notebook):
 
 
 def write(chart, stem):
-    base = CHARTS / stem
-    base.parent.mkdir(parents=True, exist_ok=True)
-    written = []
-    for suffix, options in FORMATS.items():
-        path = base.with_name(base.name + suffix)
-        chart.save(str(path), **options)
-        written.append(path)
-    return written
+    return write_chart(chart, CHARTS / stem)
 
 
 def main():
