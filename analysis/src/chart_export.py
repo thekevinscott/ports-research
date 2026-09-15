@@ -213,7 +213,9 @@ TEXT = "#d8d3ca"
 TITLE = "#f3f1ec"
 GRID = "#2e2b26"
 TICK = "#4c4840"
-DARK_BLUE_RAMP = ["#161513", "#23466b", "#2f6fa3", "#3987e5", "#256abf"]
+# The floor stays visibly blue: against the dark page a near-black cell would read
+# as the empty triangle, not as data.
+DARK_BLUE_RAMP = ["#1e3452", "#23466b", "#2f6fa3", "#3987e5", "#256abf"]
 
 
 def dark_spec(spec, name):
@@ -248,7 +250,10 @@ def dark_spec(spec, name):
             for key, value in node.items():
                 if key in {"data", "datasets"}:
                     continue
-                if key in {"color", "fill", "stroke"} or key.endswith("Color"):
+                if key == "range" and isinstance(value, list):
+                    # Categorical ranges carry ink too — the matrix's reference swatch.
+                    node[key] = [recolor(item) for item in value]
+                elif key in {"color", "fill", "stroke"} or key.endswith("Color"):
                     node[key] = recolor(value, key == "stroke")
                 visit(node[key])
             if name.startswith("port-to-port-matrix-"):

@@ -7,7 +7,15 @@ import pytest
 
 from copy import deepcopy
 
-from src.chart_export import align_panel_titles, dark_spec, fit_pair, share_y_domains, write_chart
+from src.chart_export import (
+    DARK_BLUE_RAMP,
+    TITLE,
+    align_panel_titles,
+    dark_spec,
+    fit_pair,
+    share_y_domains,
+    write_chart,
+)
 
 CHARTS = Path(__file__).resolve().parents[1] / "charts"
 
@@ -51,10 +59,13 @@ def test_matrix_dark_scale_preserves_domain_data_and_categorical_palette():
         dark_color = dark_layer.get("encoding", {}).get("color", {})
         if light_color.get("type") == "quantitative":
             assert dark_color["scale"]["domain"] == light_color["scale"]["domain"]
-            assert dark_color["scale"]["range"][0] == "#161513"
-            assert dark_color["scale"]["range"][-1] == "#256abf"
+            assert dark_color["scale"]["range"] == DARK_BLUE_RAMP
         elif light_color.get("type") == "nominal":
-            assert dark_color == light_color
+            # Category colours survive; only the ink (the reference swatch) lifts.
+            assert dark_color["scale"]["range"] == [
+                TITLE if colour == "#0b0b0b" else colour
+                for colour in light_color["scale"]["range"]
+            ]
 
 
 def test_future_grid_charts_export_both_variants(tmp_path):
@@ -114,6 +125,27 @@ def test_fit_pair_aligns_slot_geometry():
     fitted = fit_pair([short_left, wide_left], 370.5, measure=fake_geometry)
     assert [fake_geometry(spec) for spec in fitted] == [(370.5, 252, 36, 50)] * 2
     assert [short_left, wide_left] == originals  # inputs are never mutated
+
+
+def test_dark_spec_recolors_ink_in_categorical_scale_ranges():
+    """The matrix's reference swatch is ink; on a dark page it must not stay dark."""
+    spec = {
+        "data": {"values": []},
+        "mark": "rect",
+        "encoding": {
+            "color": {"field": "c", "scale": {"domain": ["a", "b"], "range": ["#2a78d6", "#0b0b0b"]}}
+        },
+        "config": {"axis": {}},
+    }
+    dark = dark_spec(spec, "size-python-to-typescript")
+    assert dark["encoding"]["color"]["scale"]["range"] == ["#2a78d6", TITLE]
+
+
+def test_dark_ramp_floors_above_the_page_background():
+    """The lowest stop must read as data, not as the empty triangle, on a near-black page."""
+    floor = DARK_BLUE_RAMP[0].lstrip("#")
+    brightness = sum(int(floor[i : i + 2], 16) for i in (0, 2, 4))
+    assert brightness > 120  # the old floor #161513 scored 61 and vanished
 
 
 def test_align_panel_titles_moves_panel_titles_onto_their_plots():
