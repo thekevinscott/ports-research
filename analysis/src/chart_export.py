@@ -27,12 +27,19 @@ def write_chart(chart, base):
     return written
 
 
+# X labels sit 7.5 degrees more horizontal than the shared -45; the axisX entry
+# overrides the axis one for x axes only, so y tick labels keep the steeper angle.
+X_LABEL_ANGLE = -37.5
+
+
 def _light_spec(chart):
     """A spec dict from a chart object or a spec, with the blog's label rotation."""
     if hasattr(chart, "to_dict"):
-        return chart.configure_axis(labelAngle=-45).to_dict()
-    spec = deepcopy(chart)
-    spec.setdefault("config", {}).setdefault("axis", {})["labelAngle"] = -45
+        spec = chart.configure_axis(labelAngle=-45).to_dict()
+    else:
+        spec = deepcopy(chart)
+        spec.setdefault("config", {}).setdefault("axis", {})["labelAngle"] = -45
+    spec["config"]["axisX"] = {**spec["config"].get("axisX", {}), "labelAngle": X_LABEL_ANGLE}
     return spec
 
 

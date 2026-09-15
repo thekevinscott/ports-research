@@ -1172,9 +1172,8 @@ def _(
         return alt.layer(medians, dots, rule, rule_label).properties(
             width=RATIO_WIDTH,
             height=300,
-            title=panel_title(
-                f"{direction(source_language)}: ladder time relative to the reference"
-            ),
+            # The blog frames every chart pair as the one python -> typescript story.
+            title=panel_title("python → typescript"),
         )
 
     def performance_panel(source_language):

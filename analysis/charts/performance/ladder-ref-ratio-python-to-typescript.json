@@ -6,6 +6,9 @@
     },
     "axis": {
       "labelAngle": -45
+    },
+    "axisX": {
+      "labelAngle": -37.5
     }
   },
   "layer": [
@@ -218,7 +221,7 @@
   ],
   "height": 300,
   "title": {
-    "text": "python \u2192 typescript: ladder time relative to the reference",
+    "text": "python \u2192 typescript",
     "anchor": "start",
     "color": "#0b0b0b",
     "fontSize": 11

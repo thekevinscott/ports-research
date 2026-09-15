@@ -6,6 +6,9 @@
     },
     "axis": {
       "labelAngle": -45
+    },
+    "axisX": {
+      "labelAngle": -37.5
     }
   },
   "concat": [
@@ -317,7 +320,7 @@
   ],
   "columns": 4,
   "title": {
-    "text": "python -> typescript",
+    "text": "python \u2192 typescript",
     "fontSize": 19.5,
     "anchor": "start"
   },

@@ -82,7 +82,7 @@ def charts(notebook):
             if section == "size":
                 built = build(metrics, font_scale=1.5)
                 # The blog frames the pair as one comparison, so both carry the same title.
-                built = built.properties(title="python -> typescript")
+                built = built.properties(title="python → typescript")
             else:
                 built = build(metrics)
             yield slug(section), built
