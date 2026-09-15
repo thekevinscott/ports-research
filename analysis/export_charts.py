@@ -27,8 +27,12 @@ SLOT_WIDTHS = {
     "statistical-analysis/port-to-port-matrix-": BODY_WIDTH,
 }
 # Builder widths that land each slot chart just under its slot; fit_pair pads the rest.
-SIZE_PANEL_WIDTH = 126.0
+SIZE_PANEL_WIDTH = 128.875
 SIZE_LABEL_ANGLE = -32.5  # 5 degrees closer to horizontal than the blog's default
+# One py->ts run exploded to 146 files (every other run lands at 33-51) and one
+# ts->py run to 2,075 LOC; both squash their panels' ranges. The size charts drop
+# those runs and carry an asterisk.
+SIZE_OUTLIER = (pl.col("file_count") > 100) | (pl.col("loc") > 2000)
 MATRIX_SIDE = 598
 LANGUAGES = ("python", "typescript")
 # The notebook renders reverse_report for these two sections only: there is no reverse ladder.
@@ -93,7 +97,7 @@ def charts(notebook):
                 # The blog frames the pair as one comparison, so both carry the same title.
                 built = built.properties(
                     title=alt.TitleParams(
-                        "python → typescript", fontSize=main_title_px, anchor="start"
+                        "python → typescript*", fontSize=main_title_px, anchor="start"
                     )
                 )
             else:
@@ -125,7 +129,7 @@ def charts(notebook):
             for name, built in section_charts(
                 section,
                 metrics,
-                by_source,
+                by_source.filter(~SIZE_OUTLIER) if section == "size" else by_source,
                 target_language,
                 source_language,
                 notebook["CONDITION_FLAGS"],

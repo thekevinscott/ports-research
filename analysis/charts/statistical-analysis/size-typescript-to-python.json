@@ -50,8 +50,8 @@
               "field": "value",
               "scale": {
                 "domain": [
-                  23.96,
-                  155.04
+                  31.56,
+                  52.44
                 ],
                 "nice": false
               },
@@ -106,8 +106,8 @@
                   1.0
                 ],
                 "range": [
-                  5.82421875,
-                  17.82421875
+                  6.17578125,
+                  18.17578125
                 ]
               },
               "title": null,
@@ -117,8 +117,8 @@
               "field": "value",
               "scale": {
                 "domain": [
-                  23.96,
-                  155.04
+                  31.56,
+                  52.44
                 ],
                 "nice": false
               },
@@ -141,8 +141,8 @@
               "field": "reference",
               "scale": {
                 "domain": [
-                  23.96,
-                  155.04
+                  31.56,
+                  52.44
                 ],
                 "nice": false
               },
@@ -173,9 +173,9 @@
         "anchor": "start",
         "color": "#0b0b0b",
         "fontSize": 12.375,
-        "dx": 40.79770267296361
+        "dx": 33.9864563580015
       },
-      "width": 126.125
+      "width": 129.875
     },
     {
       "layer": [
@@ -215,8 +215,8 @@
               "field": "value",
               "scale": {
                 "domain": [
-                  856.76,
-                  2165.24
+                  906.44,
+                  1494.56
                 ],
                 "nice": false
               },
@@ -271,8 +271,8 @@
                   1.0
                 ],
                 "range": [
-                  5.82421875,
-                  17.82421875
+                  6.17578125,
+                  18.17578125
                 ]
               },
               "title": null,
@@ -282,8 +282,8 @@
               "field": "value",
               "scale": {
                 "domain": [
-                  856.76,
-                  2165.24
+                  906.44,
+                  1494.56
                 ],
                 "nice": false
               },
@@ -306,8 +306,8 @@
               "field": "reference",
               "scale": {
                 "domain": [
-                  856.76,
-                  2165.24
+                  906.44,
+                  1494.56
                 ],
                 "nice": false
               },
@@ -340,12 +340,12 @@
         "fontSize": 12.375,
         "dx": 36.5126340666414
       },
-      "width": 126.125
+      "width": 129.875
     }
   ],
   "columns": 4,
   "title": {
-    "text": "python \u2192 typescript",
+    "text": "python \u2192 typescript*",
     "fontSize": 19.5,
     "anchor": "start"
   },
@@ -587,14 +587,6 @@
         "nudge": 0.0
       },
       {
-        "condition": "source tests",
-        "layout": "kept the file layout",
-        "metric": "loc",
-        "value": 2075.0,
-        "reference": 1305.0,
-        "nudge": 0.0
-      },
-      {
         "condition": "target tests",
         "layout": "kept the file layout",
         "metric": "loc",
@@ -679,7 +671,7 @@
   "padding": {
     "left": 5,
     "top": 5,
-    "right": 7.5,
+    "right": 8.5,
     "bottom": 5
   }
 }
