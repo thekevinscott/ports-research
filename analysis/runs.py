@@ -461,7 +461,7 @@ def _(
             )
             base = alt.Chart(rows)
             median = median_tick(base, x=x, y=alt.Y("median(value):Q", title=None, scale=scale))
-            points = base.mark_point(filled=True).encode(
+            points = base.mark_point(filled=True, size=96).encode(
                 x=x, xOffset=dot_offset(rows, centre), y=alt.Y("value:Q", scale=scale)
             )
             if metric == DIFF_LEAD:
