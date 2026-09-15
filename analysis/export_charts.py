@@ -10,10 +10,11 @@ the first chart is built.
 
 from pathlib import Path
 
+import altair as alt
 import polars as pl
 
 from runs import app
-from src.chart_export import fit_pair, write_chart
+from src.chart_export import align_panel_titles, fit_pair, write_chart
 
 CHARTS = Path(__file__).resolve().parent / "charts"
 # Blog slots: a 757px body; side-by-side pairs split it with a 1rem (16px) gap. Charts in
@@ -65,11 +66,17 @@ def charts(notebook):
     shim = notebook["SHIM_COLUMNS"]
 
     axis_label_px = notebook["AXIS_LABEL_PX"]
+    main_title_px = notebook["MAIN_TITLE_PX"]
 
     def section_charts(section, metrics, frame, target_language, source_language, flags):
         def build(columns, font_scale=1.0):
             size = (
-                {"panel_width": SIZE_PANEL_WIDTH, "axis_label_size": axis_label_px}
+                {
+                    "panel_width": SIZE_PANEL_WIDTH,
+                    "axis_label_size": axis_label_px,
+                    "panel_title_scale": 0.75,
+                    "test_axis": True,
+                }
                 if section == "size"
                 else {}
             )
@@ -82,7 +89,11 @@ def charts(notebook):
             if section == "size":
                 built = build(metrics, font_scale=1.5)
                 # The blog frames the pair as one comparison, so both carry the same title.
-                built = built.properties(title="python → typescript")
+                built = built.properties(
+                    title=alt.TitleParams(
+                        "python → typescript", fontSize=main_title_px, anchor="start"
+                    )
+                )
             else:
                 built = build(metrics)
             yield slug(section), built
@@ -195,8 +206,10 @@ def main():
                 print(path.relative_to(CHARTS.parent))
         else:
             pending.setdefault(slot, []).append((stem, chart))
-    for (_prefix, width), group in pending.items():
+    for (prefix, width), group in pending.items():
         fitted = fit_pair([chart.to_dict() for _, chart in group], width)
+        if prefix == "statistical-analysis/size-":
+            fitted = [align_panel_titles(spec) for spec in fitted]
         for (stem, _), spec in zip(group, fitted):
             for path in write(spec, stem):
                 print(path.relative_to(CHARTS.parent))

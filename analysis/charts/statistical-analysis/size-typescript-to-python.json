@@ -35,11 +35,13 @@
                 "target tests",
                 "both tests"
               ],
-              "title": null,
+              "title": "test inclusion",
               "type": "nominal",
               "axis": {
                 "labelFontSize": 17.32,
-                "labelPadding": 6.0
+                "labelPadding": 6.0,
+                "titleFontSize": 12.375,
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
               }
             },
             "y": {
@@ -81,11 +83,13 @@
                 "target tests",
                 "both tests"
               ],
-              "title": null,
+              "title": "test inclusion",
               "type": "nominal",
               "axis": {
                 "labelFontSize": 17.32,
-                "labelPadding": 6.0
+                "labelPadding": 6.0,
+                "titleFontSize": 12.375,
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
               }
             },
             "xOffset": {
@@ -162,7 +166,8 @@
         "text": "Files",
         "anchor": "start",
         "color": "#0b0b0b",
-        "fontSize": 16.5
+        "fontSize": 12.375,
+        "dx": 33.986456358001504
       },
       "width": 126.125
     },
@@ -189,11 +194,13 @@
                 "target tests",
                 "both tests"
               ],
-              "title": null,
+              "title": "test inclusion",
               "type": "nominal",
               "axis": {
                 "labelFontSize": 17.32,
-                "labelPadding": 6.0
+                "labelPadding": 6.0,
+                "titleFontSize": 12.375,
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
               }
             },
             "y": {
@@ -234,11 +241,13 @@
                 "target tests",
                 "both tests"
               ],
-              "title": null,
+              "title": "test inclusion",
               "type": "nominal",
               "axis": {
                 "labelFontSize": 17.32,
-                "labelPadding": 6.0
+                "labelPadding": 6.0,
+                "titleFontSize": 12.375,
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
               }
             },
             "xOffset": {
@@ -313,7 +322,8 @@
         "text": "LOC",
         "anchor": "start",
         "color": "#0b0b0b",
-        "fontSize": 16.5
+        "fontSize": 12.375,
+        "dx": 44.01158477678436
       },
       "width": 126.125
     }

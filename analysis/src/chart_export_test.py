@@ -7,7 +7,7 @@ import pytest
 
 from copy import deepcopy
 
-from src.chart_export import dark_spec, fit_pair, write_chart
+from src.chart_export import align_panel_titles, dark_spec, fit_pair, write_chart
 
 CHARTS = Path(__file__).resolve().parents[1] / "charts"
 
@@ -114,6 +114,30 @@ def test_fit_pair_aligns_slot_geometry():
     fitted = fit_pair([short_left, wide_left], 370.5, measure=fake_geometry)
     assert [fake_geometry(spec) for spec in fitted] == [(370.5, 252, 36, 50)] * 2
     assert [short_left, wide_left] == originals  # inputs are never mutated
+
+
+def test_align_panel_titles_moves_panel_titles_onto_their_plots():
+    """Panel titles anchor to the panel's left edge; they belong over the plot area."""
+    spec = {
+        "title": {"text": "chart"},
+        "concat": [
+            {"title": {"text": "a"}, "width": 100},
+            {"title": {"text": "b"}, "width": 100},
+        ],
+    }
+
+    def fake_positions(s):
+        plots = [40.0, 205.0]
+        titles = [base + unit["title"].get("dx", 0)
+                  for base, unit in zip((6.2, 190.0), s["concat"])]
+        if s.get("title"):
+            titles.append(5.2)  # the chart title renders after the panel titles
+        return plots, titles
+
+    aligned = align_panel_titles(spec, measure=fake_positions)
+    assert [unit["title"]["dx"] for unit in aligned["concat"]] == [33.8, 15.0]
+    assert "dx" not in spec["concat"][0]["title"]  # the input is never mutated
+    assert align_panel_titles(aligned, measure=fake_positions) == aligned  # idempotent
 
 
 def test_fit_pair_grows_single_view_plots_and_keeps_matrices_square():

@@ -346,6 +346,19 @@ def _(
     BAND_PADDING = 0.25
     DOT_STEP = 6
     BAND_FILL = 0.8
+    # One title tier across the blog's charts: the main title at 19.5, panel and axis
+    # titles 25% under the size section's old 16.5.
+    MAIN_TITLE_PX = 19.5
+    AXIS_TITLE_PX = 11 * 1.5 * 0.75
+    # X-axis labels match across the blog's charts: the size charts' 15px and the
+    # ladder's 20px met at sqrt(15 * 20), so both moved by the same 15.5%.
+    AXIS_LABEL_PX = 17.32
+    # The x axis is test inclusion; once the axis says so, the labels can stay short.
+    TEST_AXIS_TITLE = "test inclusion"
+    CONDITION_LABEL_EXPR = (
+        "{'no tests': 'none', 'source tests': 'source', "
+        "'target tests': 'target', 'both tests': 'both'}[datum.label]"
+    )
 
     def panel_title(text, font_size=11):
         return alt.TitleParams(text, fontSize=font_size, anchor="start", color=INK)
@@ -392,6 +405,8 @@ def _(
         font_scale=1.0,
         panel_width=PANEL_WIDTH,
         axis_label_size=None,
+        panel_title_scale=1.0,
+        test_axis=False,
     ):
         metrics = ["duration_min" if metric == "duration" else metric for metric in metrics]
         labelled = with_conditions(frame, source_language, flags)
@@ -413,7 +428,15 @@ def _(
             sort=[label for label, *_ in conditions(source_language)],
             title=None,
             scale=alt.Scale(paddingInner=BAND_PADDING, paddingOuter=BAND_PADDING / 2),
-            axis=alt.Axis(labelFontSize=axis_label_size or 10 * font_scale),
+            title=TEST_AXIS_TITLE if test_axis else None,
+            axis=alt.Axis(
+                labelFontSize=axis_label_size or 10 * font_scale,
+                **(
+                    {"labelExpr": CONDITION_LABEL_EXPR, "titleFontSize": AXIS_TITLE_PX}
+                    if test_axis
+                    else {}
+                ),
+            ),
         )
         # A continuous offset scale is measured from the band's left edge, not its middle,
         # so half a band puts the fan back under the label and on the median tick.
@@ -472,7 +495,7 @@ def _(
             return alt.layer(*layers).properties(
                 width=panel_width,
                 height=height,
-                title=panel_title(metric_title(metric), 11 * font_scale),
+                title=panel_title(metric_title(metric), 11 * font_scale * panel_title_scale),
             )
 
         return alt.concat(*(panel(metric) for metric in metrics), columns=4)
@@ -1071,9 +1094,7 @@ def _(
     # Plot width that fills half the blog's 757px body (minus the 1rem gap) once the
     # y-axis and margins join in: the exported ladder renders exactly 370.5px wide.
     RATIO_WIDTH = 326.25
-    # X-axis labels match across the blog's charts: the size charts' 15px and the
-    # ladder's 20px met at sqrt(15 * 20), so both moved by the same 15.5%.
-    AXIS_LABEL_PX = 17.32
+
 
     def nudges(values, tolerance=RATIO_TOLERANCE):
         """Dots within `tolerance` of each other spread sideways; a dot on its own stays centred."""
@@ -1124,8 +1145,12 @@ def _(
         x = alt.X(
             "condition:N",
             sort=[label for label, *_ in conditions(source_language)],
-            title=None,
-            axis=alt.Axis(labelFontSize=AXIS_LABEL_PX),
+            title=TEST_AXIS_TITLE,
+            axis=alt.Axis(
+                labelFontSize=AXIS_LABEL_PX,
+                labelExpr=CONDITION_LABEL_EXPR,
+                titleFontSize=AXIS_TITLE_PX,
+            ),
         )
         # A continuous offset scale is measured from the band's left edge, so half a band
         # re-centres the dots under their label. The band scale keeps Vega-Lite's padding
@@ -1173,7 +1198,7 @@ def _(
             width=RATIO_WIDTH,
             height=300,
             # The blog frames every chart pair as the one python -> typescript story.
-            title=panel_title("python → typescript"),
+            title=panel_title("python → typescript", MAIN_TITLE_PX),
         )
 
     def performance_panel(source_language):

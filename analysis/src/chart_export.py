@@ -87,6 +87,58 @@ def _units(spec):
     return spec.get("concat", [spec])
 
 
+def align_panel_titles(spec, measure=None):
+    """Anchor each concat panel's title to its plot area, not its y-axis."""
+    measure = measure or _title_and_plot_xs
+    spec = deepcopy(spec)
+    units = spec.get("concat")
+    if not units:
+        return spec
+    plots, titles = measure(spec)
+    if spec.get("title") and len(titles) == len(units) + 1:
+        titles = titles[:-1]  # the chart title renders after the panel titles
+    for unit, plot_x, title_x in zip(units, plots, titles):
+        title = unit.get("title")
+        if isinstance(title, dict) and abs(plot_x - title_x) > 0.75:
+            title["dx"] = title.get("dx", 0) + plot_x - title_x
+    _, titles = measure(spec)
+    if spec.get("title") and len(titles) == len(units) + 1:
+        titles = titles[:-1]
+    for plot_x, title_x in zip(plots, titles):
+        if abs(plot_x - title_x) > 0.75:
+            raise RuntimeError("panel titles did not align to their plots")
+    return spec
+
+
+def _title_and_plot_xs(spec):
+    """(per-panel plot x's, title text x's) in document order, from the rendered SVG."""
+    import xml.etree.ElementTree as ET
+    import vl_convert as vlc
+
+    root = ET.fromstring(vlc.vegalite_to_svg(spec))
+    plots, titles = {}, []
+
+    def walk(el, x, titled):
+        match = re.match(r"translate\(([-\d.e]+)[, ]", el.get("transform", ""))
+        if match:
+            x += float(match.group(1))
+        cls = el.get("class") or ""
+        # A concat panel's first marks group sits at the panel's plot origin.
+        panel = re.search(r"\bconcat_(\d+)_(?:layer_0_)?marks\b", cls)
+        if panel and "role-mark" in cls:
+            plots.setdefault(int(panel.group(1)), x)
+        if "role-title" in cls:
+            titled = True
+        if titled and el.tag.endswith("}text"):
+            titles.append(x)
+            return  # exactly one text per title group
+        for child in el:
+            walk(child, x, titled)
+
+    walk(root, 0.0, False)
+    return [plots[i] for i in sorted(plots)], titles
+
+
 def _fit_width(spec, width, measure, iterations=12):
     for _ in range(iterations):
         delta = width - measure(spec)[0]

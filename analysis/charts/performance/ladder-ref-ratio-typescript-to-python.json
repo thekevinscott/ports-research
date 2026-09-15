@@ -32,10 +32,12 @@
             "target tests",
             "both tests"
           ],
-          "title": null,
+          "title": "test inclusion",
           "type": "nominal",
           "axis": {
-            "labelFontSize": 17.32
+            "labelFontSize": 17.32,
+            "titleFontSize": 12.375,
+            "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
           }
         },
         "xOffset": {
@@ -114,10 +116,12 @@
             "target tests",
             "both tests"
           ],
-          "title": null,
+          "title": "test inclusion",
           "type": "nominal",
           "axis": {
-            "labelFontSize": 17.32
+            "labelFontSize": 17.32,
+            "titleFontSize": 12.375,
+            "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
           }
         },
         "xOffset": {
@@ -224,7 +228,7 @@
     "text": "python \u2192 typescript",
     "anchor": "start",
     "color": "#0b0b0b",
-    "fontSize": 11
+    "fontSize": 19.5
   },
   "width": 326.25,
   "$schema": "https://vega.github.io/schema/vega-lite/v6.4.1.json",
