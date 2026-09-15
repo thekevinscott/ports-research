@@ -59,14 +59,40 @@ product is cosine similarity. Per port/reference pair
 
 - `chamfer_a_to_b`: for each port file, cosine distance to its nearest
   reference file, averaged with weights equal to the **stripped** file
-  lengths in bytes.
+  lengths in decoded characters (the cached `lengths` values).
 - `chamfer_b_to_a`: the same walk from the reference's side.
 - `chamfer_distance`: the mean of the two. This is the headline number.
 - Also reported: `mean_cosine_distance` (distance between the mean
   vectors) and `mean_nearest_file_distance` (unweighted).
 
-Ports are compared only against the hand-written reference in the same
-language — port on `a`, reference on `b`.
+Each forward port is compared against the hand-written reference in the same
+language — port on `a`, reference on `b` — and every other forward port in its
+source/target direction, including across test conditions. Each unordered port
+pair is computed once, ordered by run ID. The two directional Chamfer columns
+retain that order; the headline Chamfer distance is symmetric.
+
+Run `uv run --directory analysis python export_embedding_pairs.py` to reproduce
+the comparisons and charts using existing caches only. The exporter verifies
+file selection, stripped source contents, character-count weights, model label,
+dimensions and finite nonzero vectors before comparing. Its JSON report records
+SHA-256 fingerprints of each index and its consumed sidecars/vectors. This checks
+cache consistency, not independent proof of which model generated the vectors.
+
+Results for the 40 completed forward ports on 2026-09-14:
+
+| direction | all port pairs: median | within-condition pairs: median | port/reference: median |
+| --- | --- | --- | --- |
+| python → typescript | 0.01712 | 0.01234 | 0.04157 |
+| typescript → python | 0.04467 | 0.02980 | 0.06562 |
+
+Each direction has 190 unordered port pairs (40 within condition) and 20
+port/reference comparisons. Lower is closer. In 189/190 Python → TypeScript
+pairs and 169/190 TypeScript → Python pairs, the pair distance is smaller than
+both ports' distances to the reference. Thus embeddings agree with the diff's
+aggregate finding that ports are closer to each other than to the reference.
+Pairs share ports, so these are descriptive summaries, not independent samples
+for a significance test. Raw metrics and cache fingerprints are saved in
+`charts/embeddings/port-pair-distances.json`.
 
 ## Calibration
 

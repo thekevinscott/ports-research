@@ -2,6 +2,10 @@ version = 1
 revision = 3
 requires-python = ">=3.14"
 
+[options]
+exclude-newer = "2026-09-12T00:20:56.552482692Z"
+exclude-newer-span = "P3D"
+
 [[package]]
 name = "annotated-types"
 version = "0.8.0"
