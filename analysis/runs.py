@@ -949,7 +949,7 @@ def _(
         high = cells["similarity_pct"].max()
         side = MATRIX_CELL_PX * len(items)
         scale = alt.Scale(domain=items)
-        x = alt.X("port_a:N", scale=scale, title=None, axis=matrix_axis(labelAngle=-90))
+        x = alt.X("port_a:N", scale=scale, title=None, axis=matrix_axis(labelAngle=45))
         y = alt.Y("port_b:N", scale=scale, title=None, axis=matrix_axis())
         filled = (
             alt.Chart(cells.filter(pl.col("half") == "colour"))
@@ -987,7 +987,7 @@ def _(
             alt.Chart(strip)
             .mark_rect()
             .encode(
-                x=alt.X("port:N", scale=scale, title=None, axis=matrix_axis(labelAngle=-90)),
+                x=alt.X("port:N", scale=scale, title=None, axis=matrix_axis(labelAngle=45)),
                 y=alt.value(-far),
                 y2=alt.value(-near),
                 color=strip_colour(True),

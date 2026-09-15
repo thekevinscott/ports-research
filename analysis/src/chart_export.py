@@ -4,6 +4,7 @@ FORMATS = {".svg": {}, ".png": {"scale_factor": 2}, ".json": {}}
 
 
 def write_chart(chart, base):
+    chart = chart.configure_axis(labelAngle=45)
     base.parent.mkdir(parents=True, exist_ok=True)
     written = []
     for suffix, options in FORMATS.items():
