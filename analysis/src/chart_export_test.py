@@ -21,7 +21,7 @@ def test_exports_transparent_dark_sibling_with_same_geometry_and_data(tmp_path, 
     dark_path = tmp_path / (source.stem + "-dark.svg")
     assert dark_path in paths
     exported_spec = json.loads((tmp_path / (source.stem + ".json")).read_text())
-    assert exported_spec["config"]["axis"]["labelAngle"] == 45
+    assert exported_spec["config"]["axis"]["labelAngle"] == -45
     light = ET.parse(tmp_path / (source.stem + ".svg")).getroot()
     dark = ET.parse(dark_path).getroot()
     assert light.attrib == dark.attrib
