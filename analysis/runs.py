@@ -526,7 +526,7 @@ def _(
                 result = build(metrics, font_scale=1.5)
                 return result.properties(
                     title=alt.TitleParams(
-                        f"{source_language} -> {target_language}",
+                        f"{source_language} → {target_language}",
                         fontSize=21,
                         anchor="start",
                     )
@@ -890,7 +890,6 @@ def _(
     # Compact cells leave room for readable run labels around the matrix.
     MATRIX_CELL_PX = 30
     MATRIX_LABEL_PX = 11
-    MATRIX_VALUE_PX = 8
     MATRIX_STRIP_PX = 9
     MATRIX_STRIP_GAP = 4
     MUTED_INK = "#898781"
@@ -922,11 +921,11 @@ def _(
         return pl.concat([ordered, reference_row])
 
     def matrix_cells(source_language, ordered):
-        """Every off-diagonal cell of the square, each half of a pair marked for its role.
+        """Every cell of the upper triangle, coloured.
 
         The diagonal is left out: a port against itself is 100 by definition and would own
-        the top of any scale fitted to the data. The measure is symmetric, so a pair is
-        printed once, in the lower triangle, and filled once, in the upper.
+        the top of any scale fitted to the data. The measure is symmetric, so the colour
+        carries the whole story and nothing below the diagonal is drawn at all.
         """
         _ports, ids, matrix = pair_similarity(source_language)
         place = {run_id: position for position, run_id in enumerate(ids)}
@@ -938,14 +937,13 @@ def _(
                     "port_b": items[row][1],
                     "condition_a": items[column][2],
                     "condition_b": items[row][2],
-                    "half": "colour" if column > row else "number",
                     "similarity_pct": float(
                         matrix[place[items[row][0]], place[items[column][0]]]
                     ),
                 }
                 for row in range(len(items))
                 for column in range(len(items))
-                if row != column
+                if column > row
             ]
         )
 
@@ -985,7 +983,7 @@ def _(
         x = alt.X("port_a:N", scale=scale, title=None, axis=matrix_axis(labelAngle=-90))
         y = alt.Y("port_b:N", scale=scale, title=None, axis=matrix_axis(labelAngle=0))
         filled = (
-            alt.Chart(cells.filter(pl.col("half") == "colour"))
+            alt.Chart(cells)
             .mark_rect(stroke=SURFACE, strokeWidth=1)
             .encode(
                 x=x,
@@ -997,11 +995,6 @@ def _(
                     legend=alt.Legend(titleFontSize=10, labelFontSize=9, gradientLength=side / 3),
                 ),
             )
-        )
-        printed = (
-            alt.Chart(cells.filter(pl.col("half") == "number"))
-            .mark_text(fontSize=MATRIX_VALUE_PX, color=INK)
-            .encode(x=x, y=y, text=alt.Text("similarity_pct:Q", format=".0f"))
         )
         strip = ordered.select("port", "condition")
         # Both strips share one scale, so only the header draws the key.
@@ -1048,13 +1041,13 @@ def _(
             for channel, builder in (("x", alt.X), ("y", alt.Y))
         ]
         return (
-            alt.layer(filled, printed, header, sidebar, *rules)
+            alt.layer(filled, header, sidebar, *rules)
             .resolve_scale(color="independent")
             .properties(
                 width=side,
                 height=side,
                 title=alt.TitleParams(
-                    f"{source_language} -> {target_language}",
+                    f"{source_language} → {target_language}",
                     fontSize=14,
                     subtitleFontSize=10,
                     anchor="start",
