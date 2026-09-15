@@ -94,10 +94,11 @@ def charts(notebook):
         if section_lead is None:
             if section == "size":
                 built = build(metrics, font_scale=1.5)
-                # The blog frames the pair as one comparison, so both carry the same title.
                 built = built.properties(
                     title=alt.TitleParams(
-                        "python → typescript*", fontSize=main_title_px, anchor="start"
+                        f"{source_language} → {target_language}*",
+                        fontSize=main_title_px,
+                        anchor="start",
                     )
                 )
             else:

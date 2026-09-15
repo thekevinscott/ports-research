@@ -345,7 +345,7 @@
   ],
   "columns": 4,
   "title": {
-    "text": "python \u2192 typescript*",
+    "text": "typescript \u2192 python*",
     "fontSize": 19.5,
     "anchor": "start"
   },
