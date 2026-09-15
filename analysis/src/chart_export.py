@@ -87,6 +87,36 @@ def _units(spec):
     return spec.get("concat", [spec])
 
 
+def share_y_domains(specs, margin=0.08):
+    """One y domain per panel across a pair of concat charts, so the two compare by eye."""
+    import math
+
+    specs = [deepcopy(spec) for spec in specs]
+    if not all(spec.get("concat") for spec in specs):
+        return specs
+    for panel in range(len(specs[0]["concat"])):
+        values = [
+            float(row[key])
+            for spec in specs
+            for row in spec.get("datasets", {}).get(
+                spec["concat"][panel].get("data", {}).get("name", ""), []
+            )
+            for key in ("value", "reference")
+            if isinstance(row.get(key), (int, float)) and math.isfinite(row[key])
+        ]
+        if not values:
+            continue
+        low, high = min(values), max(values)
+        span = high - low
+        pad = span * margin if span else max(abs(high), 1.0) * 0.02
+        for spec in specs:
+            for layer in spec["concat"][panel].get("layer", []):
+                y = layer.get("encoding", {}).get("y")
+                if y is not None and "scale" in y:
+                    y["scale"] = {"domain": [low - pad, high + pad], "nice": False}
+    return specs
+
+
 def align_panel_titles(spec, measure=None):
     """Anchor each concat panel's title to its plot area, not its y-axis."""
     measure = measure or _title_and_plot_xs

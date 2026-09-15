@@ -41,7 +41,8 @@
                 "labelFontSize": 17.32,
                 "labelPadding": 6.0,
                 "titleFontSize": 12.375,
-                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]",
+                "labelAngle": -32.5
               }
             },
             "y": {
@@ -49,8 +50,8 @@
               "field": "value",
               "scale": {
                 "domain": [
-                  31.56,
-                  52.44
+                  23.96,
+                  155.04
                 ],
                 "nice": false
               },
@@ -68,7 +69,11 @@
           "mark": {
             "type": "point",
             "filled": true,
-            "size": 96
+            "size": 96,
+            "fillOpacity": 0.5,
+            "stroke": "#4c78a8",
+            "strokeWidth": 2,
+            "strokeOpacity": 1
           },
           "encoding": {
             "x": {
@@ -89,7 +94,8 @@
                 "labelFontSize": 17.32,
                 "labelPadding": 6.0,
                 "titleFontSize": 12.375,
-                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]",
+                "labelAngle": -32.5
               }
             },
             "xOffset": {
@@ -111,8 +117,8 @@
               "field": "value",
               "scale": {
                 "domain": [
-                  31.56,
-                  52.44
+                  23.96,
+                  155.04
                 ],
                 "nice": false
               },
@@ -135,8 +141,8 @@
               "field": "reference",
               "scale": {
                 "domain": [
-                  31.56,
-                  52.44
+                  23.96,
+                  155.04
                 ],
                 "nice": false
               },
@@ -167,7 +173,7 @@
         "anchor": "start",
         "color": "#0b0b0b",
         "fontSize": 12.375,
-        "dx": 33.986456358001504
+        "dx": 40.79770267296361
       },
       "width": 126.125
     },
@@ -200,7 +206,8 @@
                 "labelFontSize": 17.32,
                 "labelPadding": 6.0,
                 "titleFontSize": 12.375,
-                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]",
+                "labelAngle": -32.5
               }
             },
             "y": {
@@ -217,7 +224,8 @@
               "type": "quantitative",
               "axis": {
                 "labelFontSize": 17.32,
-                "titleFontSize": 16.5
+                "titleFontSize": 16.5,
+                "format": "~s"
               }
             }
           }
@@ -226,7 +234,11 @@
           "mark": {
             "type": "point",
             "filled": true,
-            "size": 96
+            "size": 96,
+            "fillOpacity": 0.5,
+            "stroke": "#4c78a8",
+            "strokeWidth": 2,
+            "strokeOpacity": 1
           },
           "encoding": {
             "x": {
@@ -247,7 +259,8 @@
                 "labelFontSize": 17.32,
                 "labelPadding": 6.0,
                 "titleFontSize": 12.375,
-                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]",
+                "labelAngle": -32.5
               }
             },
             "xOffset": {
@@ -277,7 +290,8 @@
               "type": "quantitative",
               "axis": {
                 "labelFontSize": 17.32,
-                "titleFontSize": 16.5
+                "titleFontSize": 16.5,
+                "format": "~s"
               }
             }
           }
@@ -300,7 +314,8 @@
               "type": "quantitative",
               "axis": {
                 "labelFontSize": 17.32,
-                "titleFontSize": 16.5
+                "titleFontSize": 16.5,
+                "format": "~s"
               }
             }
           },
@@ -323,7 +338,7 @@
         "anchor": "start",
         "color": "#0b0b0b",
         "fontSize": 12.375,
-        "dx": 44.01158477678436
+        "dx": 36.5126340666414
       },
       "width": 126.125
     }
@@ -664,7 +679,7 @@
   "padding": {
     "left": 5,
     "top": 5,
-    "right": 6.5,
+    "right": 7.5,
     "bottom": 5
   }
 }

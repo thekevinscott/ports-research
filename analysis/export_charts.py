@@ -14,7 +14,7 @@ import altair as alt
 import polars as pl
 
 from runs import app
-from src.chart_export import align_panel_titles, fit_pair, write_chart
+from src.chart_export import align_panel_titles, fit_pair, share_y_domains, write_chart
 
 CHARTS = Path(__file__).resolve().parent / "charts"
 # Blog slots: a 757px body; side-by-side pairs split it with a 1rem (16px) gap. Charts in
@@ -27,7 +27,8 @@ SLOT_WIDTHS = {
     "statistical-analysis/port-to-port-matrix-": BODY_WIDTH,
 }
 # Builder widths that land each slot chart just under its slot; fit_pair pads the rest.
-SIZE_PANEL_WIDTH = 125.625
+SIZE_PANEL_WIDTH = 126.0
+SIZE_LABEL_ANGLE = -32.5  # 5 degrees closer to horizontal than the blog's default
 MATRIX_SIDE = 598
 LANGUAGES = ("python", "typescript")
 # The notebook renders reverse_report for these two sections only: there is no reverse ladder.
@@ -74,6 +75,7 @@ def charts(notebook):
                 {
                     "panel_width": SIZE_PANEL_WIDTH,
                     "axis_label_size": axis_label_px,
+                    "x_label_angle": SIZE_LABEL_ANGLE,
                     "panel_title_scale": 0.75,
                     "test_axis": True,
                 }
@@ -207,8 +209,13 @@ def main():
         else:
             pending.setdefault(slot, []).append((stem, chart))
     for (prefix, width), group in pending.items():
-        fitted = fit_pair([chart.to_dict() for _, chart in group], width)
+        specs = [chart.to_dict() for _, chart in group]
         if prefix == "statistical-analysis/size-":
+            # The two directions share each panel's y domain so the pair compares by eye.
+            specs = share_y_domains(specs)
+        fitted = fit_pair(specs, width)
+        if prefix == "statistical-analysis/size-":
+            # Panel-title dx goes on last, after fit_pair has settled the margins.
             fitted = [align_panel_titles(spec) for spec in fitted]
         for (stem, _), spec in zip(group, fitted):
             for path in write(spec, stem):

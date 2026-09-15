@@ -37,7 +37,8 @@
           "axis": {
             "labelFontSize": 17.32,
             "titleFontSize": 12.375,
-            "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
+            "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]",
+            "labelAngle": -27.5
           }
         },
         "xOffset": {
@@ -80,8 +81,11 @@
       "mark": {
         "type": "point",
         "filled": true,
-        "opacity": 0.5,
-        "size": 136
+        "size": 136,
+        "fillOpacity": 0.5,
+        "stroke": "#4c78a8",
+        "strokeWidth": 2,
+        "strokeOpacity": 1
       },
       "encoding": {
         "tooltip": [
@@ -121,7 +125,8 @@
           "axis": {
             "labelFontSize": 17.32,
             "titleFontSize": 12.375,
-            "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
+            "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]",
+            "labelAngle": -27.5
           }
         },
         "xOffset": {

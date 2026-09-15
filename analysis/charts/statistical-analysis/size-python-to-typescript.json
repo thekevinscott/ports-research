@@ -40,7 +40,9 @@
               "axis": {
                 "labelFontSize": 17.32,
                 "titleFontSize": 12.375,
-                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]",
+                "labelAngle": -32.5,
+                "labelPadding": 6.0
               }
             },
             "y": {
@@ -57,7 +59,8 @@
               "type": "quantitative",
               "axis": {
                 "labelFontSize": 17.32,
-                "titleFontSize": 16.5
+                "titleFontSize": 16.5,
+                "labelPadding": 9.0
               }
             }
           }
@@ -66,7 +69,11 @@
           "mark": {
             "type": "point",
             "filled": true,
-            "size": 96
+            "size": 96,
+            "fillOpacity": 0.5,
+            "stroke": "#4c78a8",
+            "strokeWidth": 2,
+            "strokeOpacity": 1
           },
           "encoding": {
             "x": {
@@ -86,7 +93,9 @@
               "axis": {
                 "labelFontSize": 17.32,
                 "titleFontSize": 12.375,
-                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]",
+                "labelAngle": -32.5,
+                "labelPadding": 6.0
               }
             },
             "xOffset": {
@@ -97,8 +106,8 @@
                   1.0
                 ],
                 "range": [
-                  5.77734375,
-                  17.77734375
+                  6.09375,
+                  18.09375
                 ]
               },
               "title": null,
@@ -116,7 +125,8 @@
               "type": "quantitative",
               "axis": {
                 "labelFontSize": 17.32,
-                "titleFontSize": 16.5
+                "titleFontSize": 16.5,
+                "labelPadding": 9.0
               }
             }
           }
@@ -139,7 +149,8 @@
               "type": "quantitative",
               "axis": {
                 "labelFontSize": 17.32,
-                "titleFontSize": 16.5
+                "titleFontSize": 16.5,
+                "labelPadding": 9.0
               }
             }
           },
@@ -162,9 +173,9 @@
         "anchor": "start",
         "color": "#0b0b0b",
         "fontSize": 12.375,
-        "dx": 33.79770267296361
+        "dx": 40.79770267296361
       },
-      "width": 125.625
+      "width": 126.0
     },
     {
       "layer": [
@@ -194,7 +205,9 @@
               "axis": {
                 "labelFontSize": 17.32,
                 "titleFontSize": 12.375,
-                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]",
+                "labelAngle": -32.5,
+                "labelPadding": 6.0
               }
             },
             "y": {
@@ -202,8 +215,8 @@
               "field": "value",
               "scale": {
                 "domain": [
-                  973.92,
-                  1410.08
+                  856.76,
+                  2165.24
                 ],
                 "nice": false
               },
@@ -211,7 +224,8 @@
               "type": "quantitative",
               "axis": {
                 "labelFontSize": 17.32,
-                "titleFontSize": 16.5
+                "titleFontSize": 16.5,
+                "format": "~s"
               }
             }
           }
@@ -220,7 +234,11 @@
           "mark": {
             "type": "point",
             "filled": true,
-            "size": 96
+            "size": 96,
+            "fillOpacity": 0.5,
+            "stroke": "#4c78a8",
+            "strokeWidth": 2,
+            "strokeOpacity": 1
           },
           "encoding": {
             "x": {
@@ -240,7 +258,9 @@
               "axis": {
                 "labelFontSize": 17.32,
                 "titleFontSize": 12.375,
-                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]"
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]",
+                "labelAngle": -32.5,
+                "labelPadding": 6.0
               }
             },
             "xOffset": {
@@ -251,8 +271,8 @@
                   1.0
                 ],
                 "range": [
-                  5.77734375,
-                  17.77734375
+                  6.09375,
+                  18.09375
                 ]
               },
               "title": null,
@@ -262,15 +282,16 @@
               "field": "value",
               "scale": {
                 "domain": [
-                  973.92,
-                  1410.08
+                  856.76,
+                  2165.24
                 ],
                 "nice": false
               },
               "type": "quantitative",
               "axis": {
                 "labelFontSize": 17.32,
-                "titleFontSize": 16.5
+                "titleFontSize": 16.5,
+                "format": "~s"
               }
             }
           }
@@ -285,15 +306,16 @@
               "field": "reference",
               "scale": {
                 "domain": [
-                  973.92,
-                  1410.08
+                  856.76,
+                  2165.24
                 ],
                 "nice": false
               },
               "type": "quantitative",
               "axis": {
                 "labelFontSize": 17.32,
-                "titleFontSize": 16.5
+                "titleFontSize": 16.5,
+                "format": "~s"
               }
             }
           },
@@ -316,9 +338,9 @@
         "anchor": "start",
         "color": "#0b0b0b",
         "fontSize": 12.375,
-        "dx": 44.01158477678433
+        "dx": 36.51263406664137
       },
-      "width": 125.625
+      "width": 126.0
     }
   ],
   "columns": 4,
@@ -657,7 +679,7 @@
   "padding": {
     "left": 5,
     "top": 5,
-    "right": 8.5,
+    "right": 9.5,
     "bottom": 5
   }
 }

@@ -405,6 +405,7 @@ def _(
         font_scale=1.0,
         panel_width=PANEL_WIDTH,
         axis_label_size=None,
+        x_label_angle=None,
         panel_title_scale=1.0,
         test_axis=False,
     ):
@@ -431,6 +432,8 @@ def _(
             title=TEST_AXIS_TITLE if test_axis else None,
             axis=alt.Axis(
                 labelFontSize=axis_label_size or 10 * font_scale,
+                # Some charts want the labels flatter than the shared config angle.
+                **({"labelAngle": x_label_angle} if x_label_angle is not None else {}),
                 **(
                     {"labelExpr": CONDITION_LABEL_EXPR, "titleFontSize": AXIS_TITLE_PX}
                     if test_axis
@@ -458,7 +461,11 @@ def _(
             )
             base = alt.Chart(rows)
             median = median_tick(base, x=x, y=alt.Y("median(value):Q", title=None, scale=scale))
-            points = base.mark_point(filled=True, size=96).encode(
+            # Dots: a full-strength ring around a half-strength fill stays readable
+            # where the fan's points overlap.
+            points = base.mark_point(
+                filled=True, size=96, fillOpacity=0.5, stroke="#4c78a8", strokeWidth=2, strokeOpacity=1
+            ).encode(
                 x=x,
                 xOffset=dot_offset(rows, centre),
                 y=alt.Y(
@@ -467,6 +474,8 @@ def _(
                     axis=alt.Axis(
                         labelFontSize=axis_label_size or 10 * font_scale,
                         titleFontSize=11 * font_scale,
+                        # LOC counts read better as 1k / 1.5k / 2k.
+                        **({"format": "~s"} if metric == "loc" else {}),
                     ),
                 ),
             )
@@ -1094,6 +1103,8 @@ def _(
     # Plot width that fills half the blog's 757px body (minus the 1rem gap) once the
     # y-axis and margins join in: the exported ladder renders exactly 370.5px wide.
     RATIO_WIDTH = 326.25
+    # Speed charts sit 10 degrees closer to horizontal than the rest of the blog's charts.
+    LADDER_LABEL_ANGLE = -27.5
 
 
     def nudges(values, tolerance=RATIO_TOLERANCE):
@@ -1149,6 +1160,7 @@ def _(
             axis=alt.Axis(
                 labelFontSize=AXIS_LABEL_PX,
                 labelExpr=CONDITION_LABEL_EXPR,
+                labelAngle=LADDER_LABEL_ANGLE,
                 titleFontSize=AXIS_TITLE_PX,
             ),
         )
@@ -1163,7 +1175,9 @@ def _(
         )
         dots = (
             alt.Chart(rows)
-            .mark_point(filled=True, size=136, opacity=0.5)
+            # Dots: a full-strength ring around a half-strength fill stays readable
+            # where the fan's points overlap.
+            .mark_point(filled=True, size=136, fillOpacity=0.5, stroke="#4c78a8", strokeWidth=2, strokeOpacity=1)
             .encode(
                 x=x,
                 xOffset=offset,

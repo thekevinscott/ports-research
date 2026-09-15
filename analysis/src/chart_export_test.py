@@ -7,7 +7,7 @@ import pytest
 
 from copy import deepcopy
 
-from src.chart_export import align_panel_titles, dark_spec, fit_pair, write_chart
+from src.chart_export import align_panel_titles, dark_spec, fit_pair, share_y_domains, write_chart
 
 CHARTS = Path(__file__).resolve().parents[1] / "charts"
 
@@ -138,6 +138,38 @@ def test_align_panel_titles_moves_panel_titles_onto_their_plots():
     assert [unit["title"]["dx"] for unit in aligned["concat"]] == [33.8, 15.0]
     assert "dx" not in spec["concat"][0]["title"]  # the input is never mutated
     assert align_panel_titles(aligned, measure=fake_positions) == aligned  # idempotent
+
+
+def _size_like(panel_rows):
+    return {
+        "datasets": {f"d{i}": rows for i, rows in enumerate(panel_rows)},
+        "concat": [
+            {
+                "data": {"name": f"d{i}"},
+                "layer": [
+                    {"encoding": {"y": {"field": "value", "scale": {"zero": False}}}},
+                    {"encoding": {"y": {"field": "reference", "scale": {"zero": False}}}},
+                ],
+            }
+            for i in range(2)
+        ],
+    }
+
+
+def test_share_y_domains_gives_a_pair_one_domain_per_panel():
+    a = _size_like([[{"value": 30, "reference": 28}], [{"value": 1000, "reference": 900}]])
+    b = _size_like([[{"value": 150, "reference": 140}], [{"value": 2000, "reference": 2100}]])
+    shared = share_y_domains([a, b])
+    domains = [
+        [unit["layer"][0]["encoding"]["y"]["scale"]["domain"] for unit in spec["concat"]]
+        for spec in shared
+    ]
+    assert domains[0] == domains[1]
+    assert domains[0][0] == [28 - 122 * 0.08, 150 + 122 * 0.08]  # 8% pad on the union span
+    assert domains[0][1] == [900 - 1200 * 0.08, 2100 + 1200 * 0.08]
+    # every y encoding carries the domain, and the inputs are never mutated
+    assert shared[0]["concat"][0]["layer"][1]["encoding"]["y"]["scale"]["domain"] == domains[0][0]
+    assert a["concat"][0]["layer"][0]["encoding"]["y"]["scale"] == {"zero": False}
 
 
 def test_fit_pair_grows_single_view_plots_and_keeps_matrices_square():
