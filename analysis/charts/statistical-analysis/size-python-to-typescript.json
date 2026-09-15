@@ -35,7 +35,7 @@
               "title": null,
               "type": "nominal",
               "axis": {
-                "labelFontSize": 15
+                "labelFontSize": 17.32
               }
             },
             "y": {
@@ -51,7 +51,7 @@
               "title": null,
               "type": "quantitative",
               "axis": {
-                "labelFontSize": 15,
+                "labelFontSize": 17.32,
                 "titleFontSize": 16.5
               }
             }
@@ -79,7 +79,7 @@
               "title": null,
               "type": "nominal",
               "axis": {
-                "labelFontSize": 15
+                "labelFontSize": 17.32
               }
             },
             "xOffset": {
@@ -90,8 +90,8 @@
                   1.0
                 ],
                 "range": [
-                  6.3046875,
-                  18.3046875
+                  5.77734375,
+                  17.77734375
                 ]
               },
               "title": null,
@@ -108,7 +108,7 @@
               },
               "type": "quantitative",
               "axis": {
-                "labelFontSize": 15,
+                "labelFontSize": 17.32,
                 "titleFontSize": 16.5
               }
             }
@@ -131,7 +131,7 @@
               },
               "type": "quantitative",
               "axis": {
-                "labelFontSize": 15,
+                "labelFontSize": 17.32,
                 "titleFontSize": 16.5
               }
             }
@@ -156,7 +156,7 @@
         "color": "#0b0b0b",
         "fontSize": 16.5
       },
-      "width": 131.25
+      "width": 125.625
     },
     {
       "layer": [
@@ -184,7 +184,7 @@
               "title": null,
               "type": "nominal",
               "axis": {
-                "labelFontSize": 15
+                "labelFontSize": 17.32
               }
             },
             "y": {
@@ -200,7 +200,7 @@
               "title": null,
               "type": "quantitative",
               "axis": {
-                "labelFontSize": 15,
+                "labelFontSize": 17.32,
                 "titleFontSize": 16.5
               }
             }
@@ -228,7 +228,7 @@
               "title": null,
               "type": "nominal",
               "axis": {
-                "labelFontSize": 15
+                "labelFontSize": 17.32
               }
             },
             "xOffset": {
@@ -239,8 +239,8 @@
                   1.0
                 ],
                 "range": [
-                  6.3046875,
-                  18.3046875
+                  5.77734375,
+                  17.77734375
                 ]
               },
               "title": null,
@@ -257,7 +257,7 @@
               },
               "type": "quantitative",
               "axis": {
-                "labelFontSize": 15,
+                "labelFontSize": 17.32,
                 "titleFontSize": 16.5
               }
             }
@@ -280,7 +280,7 @@
               },
               "type": "quantitative",
               "axis": {
-                "labelFontSize": 15,
+                "labelFontSize": 17.32,
                 "titleFontSize": 16.5
               }
             }
@@ -305,7 +305,7 @@
         "color": "#0b0b0b",
         "fontSize": 16.5
       },
-      "width": 131.25
+      "width": 125.625
     }
   ],
   "columns": 4,
@@ -644,7 +644,7 @@
   "padding": {
     "left": 5,
     "top": 5,
-    "right": 6.5,
+    "right": 8.5,
     "bottom": 5
   }
 }

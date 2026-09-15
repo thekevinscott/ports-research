@@ -391,6 +391,7 @@ def _(
         anchors=None,
         font_scale=1.0,
         panel_width=PANEL_WIDTH,
+        axis_label_size=None,
     ):
         metrics = ["duration_min" if metric == "duration" else metric for metric in metrics]
         labelled = with_conditions(frame, source_language, flags)
@@ -412,7 +413,7 @@ def _(
             sort=[label for label, *_ in conditions(source_language)],
             title=None,
             scale=alt.Scale(paddingInner=BAND_PADDING, paddingOuter=BAND_PADDING / 2),
-            axis=alt.Axis(labelFontSize=10 * font_scale),
+            axis=alt.Axis(labelFontSize=axis_label_size or 10 * font_scale),
         )
         # A continuous offset scale is measured from the band's left edge, not its middle,
         # so half a band puts the fan back under the label and on the median tick.
@@ -441,7 +442,8 @@ def _(
                     "value:Q",
                     scale=scale,
                     axis=alt.Axis(
-                        labelFontSize=10 * font_scale, titleFontSize=11 * font_scale
+                        labelFontSize=axis_label_size or 10 * font_scale,
+                        titleFontSize=11 * font_scale,
                     ),
                 ),
             )
@@ -1068,7 +1070,10 @@ def _(
     RATIO_TOLERANCE = 0.01
     # Plot width that fills half the blog's 757px body (minus the 1rem gap) once the
     # y-axis and margins join in: the exported ladder renders exactly 370.5px wide.
-    RATIO_WIDTH = 297.5
+    RATIO_WIDTH = 326.25
+    # X-axis labels match across the blog's charts: the size charts' 15px and the
+    # ladder's 20px met at sqrt(15 * 20), so both moved by the same 15.5%.
+    AXIS_LABEL_PX = 17.32
 
     def nudges(values, tolerance=RATIO_TOLERANCE):
         """Dots within `tolerance` of each other spread sideways; a dot on its own stays centred."""
@@ -1111,16 +1116,16 @@ def _(
         )
         y = alt.Y(
             "value:Q",
-            title=metric_title("ladder_ref_ratio"),
+            title=None,
             scale=scale,
-            axis=alt.Axis(labelFontSize=20, titleFontSize=22),
+            axis=alt.Axis(labelFontSize=AXIS_LABEL_PX),
         )
         parity = pl.DataFrame({"value": [1.0], "label": ["reference"]})
         x = alt.X(
             "condition:N",
             sort=[label for label, *_ in conditions(source_language)],
             title=None,
-            axis=alt.Axis(labelFontSize=20),
+            axis=alt.Axis(labelFontSize=AXIS_LABEL_PX),
         )
         # A continuous offset scale is measured from the band's left edge, so half a band
         # re-centres the dots under their label. The band scale keeps Vega-Lite's padding

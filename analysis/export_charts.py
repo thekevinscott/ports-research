@@ -26,7 +26,7 @@ SLOT_WIDTHS = {
     "statistical-analysis/port-to-port-matrix-": BODY_WIDTH,
 }
 # Builder widths that land each slot chart just under its slot; fit_pair pads the rest.
-SIZE_PANEL_WIDTH = 131.25
+SIZE_PANEL_WIDTH = 125.625
 MATRIX_SIDE = 598
 LANGUAGES = ("python", "typescript")
 # The notebook renders reverse_report for these two sections only: there is no reverse ladder.
@@ -64,9 +64,15 @@ def charts(notebook):
     sections = notebook["SECTIONS"]
     shim = notebook["SHIM_COLUMNS"]
 
+    axis_label_px = notebook["AXIS_LABEL_PX"]
+
     def section_charts(section, metrics, frame, target_language, source_language, flags):
         def build(columns, font_scale=1.0):
-            size = {"panel_width": SIZE_PANEL_WIDTH} if section == "size" else {}
+            size = (
+                {"panel_width": SIZE_PANEL_WIDTH, "axis_label_size": axis_label_px}
+                if section == "size"
+                else {}
+            )
             return chart(
                 frame, target_language, source_language, columns, flags, calibration, font_scale, **size
             )
@@ -75,7 +81,8 @@ def charts(notebook):
         if section_lead is None:
             if section == "size":
                 built = build(metrics, font_scale=1.5)
-                built = built.properties(title=f"{source_language} -> {target_language}")
+                # The blog frames the pair as one comparison, so both carry the same title.
+                built = built.properties(title="python -> typescript")
             else:
                 built = build(metrics)
             yield slug(section), built
