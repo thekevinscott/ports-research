@@ -24,6 +24,9 @@ node_modules/
 
 .claude/
 
+# One worktree per branch; see AGENTS.md.
+.worktrees/
+
 # Removed from the published repo in 0b1d77a. A local copy is restored on this
 # machine to take a screenshot; it must not come back into the tree.
 /webapp/

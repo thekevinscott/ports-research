@@ -10,6 +10,40 @@ This holds for known bugs. `Graph.print()` raising `AttributeError`, `Graph.__in
 
 The one sanctioned edit is removing whole colocated test files, driven by the `--include-*-tests` flags. Nothing else.
 
+## Worktrees — always
+
+**All work happens in git worktrees under `.worktrees/`.** Never edit files in
+the primary checkout; it stays on `main` and clean. `.worktrees/` is
+gitignored.
+
+- Create one worktree per branch/PR: `git worktree add .worktrees/<branch> -b <branch>`.
+  The worktree directory name and the branch name are **identical** —
+  `.worktrees/<branch>` always contains branch `<branch>`.
+- Branch names use **dashes only**: lowercase letters, digits, and `-`.
+  No slashes, no spaces (e.g., `whitelist-assembly`, not `feat/whitelist-assembly`).
+- Do all editing, building, and testing inside `.worktrees/<branch>/`.
+- When the PR merges, remove the worktree: `cd` to the root checkout first, then
+  `git worktree remove .worktrees/<branch>`.
+
+## Merging — always
+
+**Never merge into main locally.** Kevin, 2026-09-16: "never merge into main
+locally again. Only on Github via PRs."
+
+- Agents open PRs and stop there. Kevin merges through the GitHub UI.
+- Never merge on your own initiative, however green the checks are.
+- Never suggest merging, and never offer to merge as a next step.
+- Never push to `main`. Local `main` only ever moves by pulling from GitHub.
+- The only exception is an explicit, specific instruction from Kevin to merge a
+  named PR. That instruction is always his to initiate, and it is rare.
+
+## Journal — when something major happens
+
+`JOURNAL.md` at the repo root is the append-only lab record. A run started or
+finished, a finding, a decision, a tool landed: one entry each, UTC timestamp
+in the heading, newest at the bottom. Never edit an earlier entry; add a new
+one that corrects it.
+
 ## Running tests — always
 
 Three recipes per package, and nothing else: `just test-unit` (colocated `_test.py` under `src/`), `just test-integration` (`tests/integration`), `just test-e2e` (`tests/e2e`).
