@@ -5,15 +5,27 @@ Six items plus a follow-up fix, one commit each, plus two blog commits. Nothing 
 | Item | Commit | What changed |
 | --- | --- | --- |
 | 1. Drop the empty row and column | `f247fe5` | x domain `items[1:]`, y domain `items[:-1]` |
-| 2. Label the reference | `b49f125` | `REFERENCE_TICK = "reference"`; strips are conditions-only |
+| 2. Label the reference | `b49f125` | `REFERENCE_TICK = "reference"`; strips are conditions-only (item 9 put the strip entry back) |
 | 3. Print the reference values | `92626d6` | two text layers, ink/surface split at the ramp midpoint |
 | 4. Spread the scale | `7a5834e` | fixed `[25, 85]` + `clamp`, legend ticks 25/50/75/85 |
 | 5. Label size | `4930d24` | `MATRIX_LABEL_PX = 13`, refit to 757px |
 | 6. Dark ramp floor | `6309b75` | `DARK_BLUE_RAMP` opens at `#2d5a8e` |
 | 7. Dark ramp direction | `94da612` | five stops, monotonic to a pale top |
 | 8. Values everywhere, wider ramps | `34df6bb` | every cell prints; both ramps gain range at the ends |
+| 9. Reference in the key | `70aed94` | strip and legend regain a `reference` entry, swatch `MUTED_INK` |
 
-Blog: `thekevinscott.com` `af44427`, `231f32c` and `901f322` on `ks/picker-libre-franklin`.
+Blog: `thekevinscott.com` `af44427`, `231f32c`, `901f322` and `eea33c9` on
+`ks/picker-libre-franklin`.
+
+## Item 9, which partly reverses item 2
+
+Item 2 read "remove the reference from the strip legend" and that is what it did, but
+the strip above the reference column then drew nothing and the key said nothing about
+the column the chart exists to show. The entry is back as a fifth domain value with
+`MUTED_INK` `#898781` as its swatch, not a fifth condition colour — the reference is not
+a condition. `dark_spec` already maps `#898781` to `TEXT`, so it survives `#161513`
+without a second rule. The four condition colours are untouched. The y axis has no
+reference row, so the sidebar strip gains a domain entry it never draws.
 
 ## The blog downscale, which governs every font size here
 
