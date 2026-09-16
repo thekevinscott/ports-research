@@ -11,8 +11,20 @@ Six items plus a follow-up fix, one commit each, plus two blog commits. Nothing 
 | 5. Label size | `4930d24` | `MATRIX_LABEL_PX = 13`, refit to 757px |
 | 6. Dark ramp floor | `6309b75` | `DARK_BLUE_RAMP` opens at `#2d5a8e` |
 | 7. Dark ramp direction | `94da612` | five stops, monotonic to a pale top |
+| 8. Values everywhere, wider ramps | `34df6bb` | every cell prints; both ramps gain range at the ends |
 
-Blog: `thekevinscott.com` `af44427` and `231f32c` on `ks/picker-libre-franklin`.
+Blog: `thekevinscott.com` `af44427`, `231f32c` and `901f322` on `ks/picker-libre-franklin`.
+
+## The blog downscale, which governs every font size here
+
+The figure is fitted to a 757px slot, but the article's text column is 637.6px and
+`img { max-width: 100% }`, so the SVG arrives at 0.84 scale. An SVG pixel is *not* a
+page pixel. Widening the chart's natural width makes the text **smaller**, not larger —
+the column is the cap either way, so a wider natural width simply scales down further.
+The only levers are font size, or a markup change to break the figure out of the
+column, which would mean editing `index.md` and is not ours to make. Value text is
+therefore 11px in the SVG to land at 9.3px on the page;
+`test_matrix_value_text_survives_the_blog_downscale` pins that relationship.
 
 ## Item 7, the one that came back
 
@@ -31,14 +43,12 @@ Now `["#2d5a8e", "#3a7fc4", "#5c9be0", "#8fbdf0", "#c5ddf8"]`: five stops matchi
 `test_dark_ramp_matches_the_light_ramp_stop_count`, the latter reading the light range
 off the committed JSON rather than hardcoding 5.
 
-**Known weak spot.** A monotonic ramp puts mid-range values at mid luminance, where no
-text colour has much contrast. The reference column prints 0-50, and the light text on
-those cells measures 6.3:1 at the floor, 3.6:1 at 41, and 2.9:1 at the single 50 cell
-(5982b634, python to typescript). Legible on the screenshot, below WCAG AA for small
-text. The 55 threshold is already the best single split available: every printed value
-is under it, and moving it below 50 would hand that cell dark text at 2.8:1, which is
-worse. Fixing it properly means a text halo or a per-cell colour choice, neither of
-which was in scope.
+**Known weak spot, now spread across the whole chart.** A monotonic ramp puts mid-range
+values at mid luminance, where neither text colour has much contrast, and item 8 prints
+a number in all 210 cells rather than 20. Cells either side of the 55 threshold are the
+weakest; the ends of the ramp are comfortable. Widening both ramps in item 8 helped,
+because more of the domain now sits away from the middle. Fixing the midtones properly
+means a text halo or a per-cell colour choice, neither of which has been asked for.
 
 ## Acceptance, checked on 1100px-viewport screenshots
 
