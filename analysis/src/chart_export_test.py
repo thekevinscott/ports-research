@@ -141,11 +141,22 @@ def test_dark_spec_recolors_ink_in_categorical_scale_ranges():
     assert dark["encoding"]["color"]["scale"]["range"] == ["#2a78d6", TITLE]
 
 
+def _brightness(colour):
+    channels = colour.lstrip("#")
+    return sum(int(channels[i : i + 2], 16) for i in (0, 2, 4))
+
+
 def test_dark_ramp_floors_above_the_page_background():
     """The lowest stop must read as data, not as the empty triangle, on a near-black page."""
-    floor = DARK_BLUE_RAMP[0].lstrip("#")
-    brightness = sum(int(floor[i : i + 2], 16) for i in (0, 2, 4))
-    assert brightness > 120  # the old floor #161513 scored 61 and vanished
+    # The page is #161513 (brightness 61) and the lower triangle is not drawn at all.
+    assert _brightness(DARK_BLUE_RAMP[0]) > 250  # #1e3452 scored 164 and still vanished
+
+
+def test_dark_ramp_top_separates_from_its_floor():
+    """Lifting the floor is only worth it if the ramp still spans a visible range."""
+    floor = _brightness(DARK_BLUE_RAMP[0])
+    assert _brightness(DARK_BLUE_RAMP[-1]) - floor > 50
+    assert _brightness(max(DARK_BLUE_RAMP, key=_brightness)) - floor > 100
 
 
 def test_align_panel_titles_moves_panel_titles_onto_their_plots():

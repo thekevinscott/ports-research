@@ -213,9 +213,10 @@ TEXT = "#d8d3ca"
 TITLE = "#f3f1ec"
 GRID = "#2e2b26"
 TICK = "#4c4840"
-# The floor stays visibly blue: against the dark page a near-black cell would read
-# as the empty triangle, not as data.
-DARK_BLUE_RAMP = ["#1e3452", "#23466b", "#2f6fa3", "#3987e5", "#256abf"]
+# The floor stays visibly blue: against the dark page and the undrawn lower triangle
+# a dim cell would read as empty, not as data. The old #1e3452/#23466b stops both sat
+# below the new floor, so the ramp opens on it.
+DARK_BLUE_RAMP = ["#2d5a8e", "#2f6fa3", "#3987e5", "#256abf"]
 
 
 def dark_spec(spec, name):
