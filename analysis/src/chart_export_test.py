@@ -223,7 +223,8 @@ def test_matrix_axes_drop_the_empty_column_and_row():
         spec = json.loads(
             (CHARTS / f"statistical-analysis/port-to-port-matrix-{direction}.json").read_text()
         )
-        cells, header, sidebar, x_blocks, y_blocks, _xc, _yc = spec["layer"]
+        cells, header, sidebar = spec["layer"][:3]
+        x_blocks, y_blocks = spec["layer"][-4:-2]
         x_items = cells["encoding"]["x"]["scale"]["domain"]
         y_items = cells["encoding"]["y"]["scale"]["domain"]
         # Exactly one item differs each way: x keeps the reference, y keeps the first port.
@@ -255,3 +256,31 @@ def test_matrix_names_the_reference_and_keeps_the_strips_to_conditions():
             assert len(scale["range"]) == len(scale["domain"]) == 4
         assert not [r for r in spec["datasets"][header["data"]["name"]]
                     if r["condition"] == "reference"]
+
+
+def test_matrix_prints_the_reference_columns_values_only():
+    """A reader should not have to eyeball the reference column off the ramp."""
+    for direction in ("python-to-typescript", "typescript-to-python"):
+        spec = json.loads(
+            (CHARTS / f"statistical-analysis/port-to-port-matrix-{direction}.json").read_text()
+        )
+        cells = spec["layer"][0]
+        text = [layer for layer in spec["layer"] if layer["mark"]["type"] == "text"]
+        printed = []
+        for layer in text:
+            rows = spec["datasets"][layer["data"]["name"]]
+            assert rows  # an empty half is left out, not carried as a dead layer
+            printed += rows
+            # Ink on the pale half of the ramp, surface on the dark half.
+            pale = layer["mark"]["color"] == "#0b0b0b"
+            assert all((row["similarity_pct"] < 55) == pale for row in rows)
+            assert layer["encoding"]["text"]["format"] == ".0f"
+            assert layer["mark"]["fontSize"] == 10
+            for axis in ("x", "y"):
+                assert layer["encoding"][axis]["scale"] == cells["encoding"][axis]["scale"]
+        assert {row["port_a"] for row in printed} == {"reference"}
+        assert sorted(row["port_b"] for row in printed) == sorted(
+            row["port_b"]
+            for row in spec["datasets"][cells["data"]["name"]]
+            if row["port_a"] == "reference"
+        )

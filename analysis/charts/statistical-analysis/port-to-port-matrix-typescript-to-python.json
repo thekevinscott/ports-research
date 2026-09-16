@@ -291,6 +291,107 @@
     },
     {
       "data": {
+        "name": "data-10ad6df9fceeb8fb68299975e174b3b0"
+      },
+      "mark": {
+        "type": "text",
+        "color": "#0b0b0b",
+        "fontSize": 10
+      },
+      "encoding": {
+        "text": {
+          "field": "similarity_pct",
+          "format": ".0f",
+          "type": "quantitative"
+        },
+        "x": {
+          "axis": {
+            "domain": false,
+            "labelAngle": -90,
+            "labelColor": {
+              "expr": "datum.label === 'reference' ? '#0b0b0b' : '#898781'"
+            },
+            "labelFontSize": 11,
+            "labelFontWeight": {
+              "expr": "datum.label === 'reference' ? 'bold' : 'normal'"
+            },
+            "labelPadding": 17,
+            "ticks": false
+          },
+          "field": "port_a",
+          "scale": {
+            "domain": [
+              "f8ca89ff",
+              "2d7fbef6",
+              "670261ce",
+              "8e3da990",
+              "054a84ca",
+              "0947f229",
+              "3f62598c",
+              "461ef9c5",
+              "7c1544c0",
+              "fbe56704",
+              "f01d5496",
+              "8305aa82",
+              "609edff1",
+              "14873f98",
+              "9f286468",
+              "89df6247",
+              "2a16d72b",
+              "9de9fd66",
+              "089a4294",
+              "reference"
+            ]
+          },
+          "title": null,
+          "type": "nominal"
+        },
+        "y": {
+          "axis": {
+            "domain": false,
+            "labelColor": {
+              "expr": "datum.label === 'reference' ? '#0b0b0b' : '#898781'"
+            },
+            "labelFontSize": 11,
+            "labelFontWeight": {
+              "expr": "datum.label === 'reference' ? 'bold' : 'normal'"
+            },
+            "labelPadding": 17,
+            "ticks": false,
+            "labelAngle": 0
+          },
+          "field": "port_b",
+          "scale": {
+            "domain": [
+              "2da5a2c0",
+              "f8ca89ff",
+              "2d7fbef6",
+              "670261ce",
+              "8e3da990",
+              "054a84ca",
+              "0947f229",
+              "3f62598c",
+              "461ef9c5",
+              "7c1544c0",
+              "fbe56704",
+              "f01d5496",
+              "8305aa82",
+              "609edff1",
+              "14873f98",
+              "9f286468",
+              "89df6247",
+              "2a16d72b",
+              "9de9fd66",
+              "089a4294"
+            ]
+          },
+          "title": null,
+          "type": "nominal"
+        }
+      }
+    },
+    {
+      "data": {
         "name": "data-1f38d9b551839578f5e3e43064192fd3"
       },
       "mark": {
@@ -2315,6 +2416,168 @@
       {
         "port": "089a4294",
         "condition": "both tests"
+      }
+    ],
+    "data-10ad6df9fceeb8fb68299975e174b3b0": [
+      {
+        "port_a": "reference",
+        "port_b": "2da5a2c0",
+        "condition_a": "reference",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 33.7219730941704
+      },
+      {
+        "port_a": "reference",
+        "port_b": "f8ca89ff",
+        "condition_a": "reference",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 7.509106192210703
+      },
+      {
+        "port_a": "reference",
+        "port_b": "2d7fbef6",
+        "condition_a": "reference",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 32.690541781450875
+      },
+      {
+        "port_a": "reference",
+        "port_b": "670261ce",
+        "condition_a": "reference",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 0.0
+      },
+      {
+        "port_a": "reference",
+        "port_b": "8e3da990",
+        "condition_a": "reference",
+        "condition_b": "no tests",
+        "half": "colour",
+        "similarity_pct": 9.065507606333437
+      },
+      {
+        "port_a": "reference",
+        "port_b": "054a84ca",
+        "condition_a": "reference",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 34.301958307012
+      },
+      {
+        "port_a": "reference",
+        "port_b": "0947f229",
+        "condition_a": "reference",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 33.79586802343509
+      },
+      {
+        "port_a": "reference",
+        "port_b": "3f62598c",
+        "condition_a": "reference",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 32.34863995320269
+      },
+      {
+        "port_a": "reference",
+        "port_b": "461ef9c5",
+        "condition_a": "reference",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 32.57745129351645
+      },
+      {
+        "port_a": "reference",
+        "port_b": "7c1544c0",
+        "condition_a": "reference",
+        "condition_b": "source tests",
+        "half": "colour",
+        "similarity_pct": 33.54075917859365
+      },
+      {
+        "port_a": "reference",
+        "port_b": "fbe56704",
+        "condition_a": "reference",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 35.41994337842089
+      },
+      {
+        "port_a": "reference",
+        "port_b": "f01d5496",
+        "condition_a": "reference",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 33.62068965517241
+      },
+      {
+        "port_a": "reference",
+        "port_b": "8305aa82",
+        "condition_a": "reference",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 33.6827866080487
+      },
+      {
+        "port_a": "reference",
+        "port_b": "609edff1",
+        "condition_a": "reference",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 33.43205001645278
+      },
+      {
+        "port_a": "reference",
+        "port_b": "14873f98",
+        "condition_a": "reference",
+        "condition_b": "target tests",
+        "half": "colour",
+        "similarity_pct": 30.622660768969038
+      },
+      {
+        "port_a": "reference",
+        "port_b": "9f286468",
+        "condition_a": "reference",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 34.24657534246575
+      },
+      {
+        "port_a": "reference",
+        "port_b": "89df6247",
+        "condition_a": "reference",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 33.36809176225235
+      },
+      {
+        "port_a": "reference",
+        "port_b": "2a16d72b",
+        "condition_a": "reference",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 33.22237017310253
+      },
+      {
+        "port_a": "reference",
+        "port_b": "9de9fd66",
+        "condition_a": "reference",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 33.202099737532805
+      },
+      {
+        "port_a": "reference",
+        "port_b": "089a4294",
+        "condition_a": "reference",
+        "condition_b": "both tests",
+        "half": "colour",
+        "similarity_pct": 36.27813234800134
       }
     ],
     "data-1f38d9b551839578f5e3e43064192fd3": [

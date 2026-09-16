@@ -898,6 +898,8 @@ def _(
     SURFACE = "#fcfcfb"
     SEQUENTIAL_BLUE = ["#cde2fb", "#86b6ef", "#3987e5", "#256abf", "#0d366b"]
     REFERENCE_TICK = "reference"
+    # Printed reference values flip colour at the ramp's midpoint.
+    MATRIX_MIDPOINT = 55
 
     def matrix_ports(source_language):
         """The direction's 21 items in axis order: condition, then run id, reference last.
@@ -1039,6 +1041,20 @@ def _(
                 color=strip_colour(False),
             )
         )
+        # The reference column carries its numbers; nothing else does. The colour flips
+        # at the ramp's midpoint, and each half is its own layer because dark_spec
+        # rewrites a mark's colour but not a conditional's payload.
+        reference_cells = cells.filter(pl.col("port_a") == REFERENCE_TICK)
+        numbers = [
+            alt.Chart(half)
+            .mark_text(fontSize=10, color=colour)
+            .encode(x=x, y=y, text=alt.Text("similarity_pct:Q", format=".0f"))
+            for half, colour in (
+                (reference_cells.filter(pl.col("similarity_pct") < MATRIX_MIDPOINT), INK),
+                (reference_cells.filter(pl.col("similarity_pct") >= MATRIX_MIDPOINT), SURFACE),
+            )
+            if not half.is_empty()
+        ]
         # Thick rules box each condition block, each axis's rules running over that
         # axis's items and closing at its last one.
         edge = {"color": INK, "strokeWidth": 2, "opacity": 0.75}
@@ -1056,7 +1072,7 @@ def _(
             )
         ]
         return (
-            alt.layer(filled, header, sidebar, *rules)
+            alt.layer(filled, header, sidebar, *numbers, *rules)
             .resolve_scale(color="independent")
             .properties(
                 width=side,
