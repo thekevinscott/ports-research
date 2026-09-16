@@ -14,7 +14,7 @@
   "layer": [
     {
       "data": {
-        "name": "data-465819c042bad907db1ab02adc55a57e"
+        "name": "data-28cff9cad55b266df90f5dbd6c0373dc"
       },
       "mark": {
         "type": "rect",
@@ -50,11 +50,11 @@
             "domain": false,
             "labelAngle": -90,
             "labelColor": {
-              "expr": "datum.label === '' ? '#0b0b0b' : '#898781'"
+              "expr": "datum.label === 'reference' ? '#0b0b0b' : '#898781'"
             },
             "labelFontSize": 11,
             "labelFontWeight": {
-              "expr": "datum.label === '' ? 'bold' : 'normal'"
+              "expr": "datum.label === 'reference' ? 'bold' : 'normal'"
             },
             "labelPadding": 17,
             "ticks": false
@@ -81,7 +81,7 @@
               "2a16d72b",
               "9de9fd66",
               "089a4294",
-              ""
+              "reference"
             ]
           },
           "title": null,
@@ -91,11 +91,11 @@
           "axis": {
             "domain": false,
             "labelColor": {
-              "expr": "datum.label === '' ? '#0b0b0b' : '#898781'"
+              "expr": "datum.label === 'reference' ? '#0b0b0b' : '#898781'"
             },
             "labelFontSize": 11,
             "labelFontWeight": {
-              "expr": "datum.label === '' ? 'bold' : 'normal'"
+              "expr": "datum.label === 'reference' ? 'bold' : 'normal'"
             },
             "labelPadding": 17,
             "ticks": false,
@@ -133,7 +133,7 @@
     },
     {
       "data": {
-        "name": "data-0c8c20afef0e94207290b938ddfb22c6"
+        "name": "data-b54169bf2733b36630cb46e162e60ef2"
       },
       "mark": {
         "type": "rect"
@@ -151,15 +151,13 @@
               "no tests",
               "source tests",
               "target tests",
-              "both tests",
-              "reference"
+              "both tests"
             ],
             "range": [
               "#2a78d6",
               "#eb6834",
               "#1baf7a",
-              "#4a3aa7",
-              "#0b0b0b"
+              "#4a3aa7"
             ]
           },
           "type": "nominal"
@@ -169,11 +167,11 @@
             "domain": false,
             "labelAngle": -90,
             "labelColor": {
-              "expr": "datum.label === '' ? '#0b0b0b' : '#898781'"
+              "expr": "datum.label === 'reference' ? '#0b0b0b' : '#898781'"
             },
             "labelFontSize": 11,
             "labelFontWeight": {
-              "expr": "datum.label === '' ? 'bold' : 'normal'"
+              "expr": "datum.label === 'reference' ? 'bold' : 'normal'"
             },
             "labelPadding": 17,
             "ticks": false
@@ -200,7 +198,7 @@
               "2a16d72b",
               "9de9fd66",
               "089a4294",
-              ""
+              "reference"
             ]
           },
           "title": null,
@@ -230,15 +228,13 @@
               "no tests",
               "source tests",
               "target tests",
-              "both tests",
-              "reference"
+              "both tests"
             ],
             "range": [
               "#2a78d6",
               "#eb6834",
               "#1baf7a",
-              "#4a3aa7",
-              "#0b0b0b"
+              "#4a3aa7"
             ]
           },
           "type": "nominal"
@@ -253,11 +249,11 @@
           "axis": {
             "domain": false,
             "labelColor": {
-              "expr": "datum.label === '' ? '#0b0b0b' : '#898781'"
+              "expr": "datum.label === 'reference' ? '#0b0b0b' : '#898781'"
             },
             "labelFontSize": 11,
             "labelFontWeight": {
-              "expr": "datum.label === '' ? 'bold' : 'normal'"
+              "expr": "datum.label === 'reference' ? 'bold' : 'normal'"
             },
             "labelPadding": 17,
             "ticks": false,
@@ -295,7 +291,7 @@
     },
     {
       "data": {
-        "name": "data-04b4250989e03a9dd4c0af9abbe0f0b1"
+        "name": "data-1f38d9b551839578f5e3e43064192fd3"
       },
       "mark": {
         "type": "rule",
@@ -328,7 +324,7 @@
               "2a16d72b",
               "9de9fd66",
               "089a4294",
-              ""
+              "reference"
             ]
           },
           "type": "nominal"
@@ -379,7 +375,7 @@
     },
     {
       "data": {
-        "name": "data-60a2a85462df18174b77591c17302d23"
+        "name": "data-419c3610764c394fccfb17419b5b63cb"
       },
       "mark": {
         "type": "rule",
@@ -412,7 +408,7 @@
               "2a16d72b",
               "9de9fd66",
               "089a4294",
-              ""
+              "reference"
             ]
           },
           "type": "nominal"
@@ -479,7 +475,7 @@
   "width": 598,
   "$schema": "https://vega.github.io/schema/vega-lite/v6.4.1.json",
   "datasets": {
-    "data-465819c042bad907db1ab02adc55a57e": [
+    "data-28cff9cad55b266df90f5dbd6c0373dc": [
       {
         "port_a": "f8ca89ff",
         "port_b": "2da5a2c0",
@@ -633,7 +629,7 @@
         "similarity_pct": 63.465282284231016
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "2da5a2c0",
         "condition_a": "reference",
         "condition_b": "no tests",
@@ -785,7 +781,7 @@
         "similarity_pct": 33.87779794313369
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "f8ca89ff",
         "condition_a": "reference",
         "condition_b": "no tests",
@@ -929,7 +925,7 @@
         "similarity_pct": 66.77762982689747
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "2d7fbef6",
         "condition_a": "reference",
         "condition_b": "no tests",
@@ -1065,7 +1061,7 @@
         "similarity_pct": 35.62140913214394
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "670261ce",
         "condition_a": "reference",
         "condition_b": "no tests",
@@ -1193,7 +1189,7 @@
         "similarity_pct": 46.17985125084517
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "8e3da990",
         "condition_a": "reference",
         "condition_b": "no tests",
@@ -1313,7 +1309,7 @@
         "similarity_pct": 69.4454013089907
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "054a84ca",
         "condition_a": "reference",
         "condition_b": "source tests",
@@ -1425,7 +1421,7 @@
         "similarity_pct": 65.1006711409396
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "0947f229",
         "condition_a": "reference",
         "condition_b": "source tests",
@@ -1529,7 +1525,7 @@
         "similarity_pct": 60.70975918884664
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "3f62598c",
         "condition_a": "reference",
         "condition_b": "source tests",
@@ -1625,7 +1621,7 @@
         "similarity_pct": 67.71269177126918
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "461ef9c5",
         "condition_a": "reference",
         "condition_b": "source tests",
@@ -1713,7 +1709,7 @@
         "similarity_pct": 60.996272450016946
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "7c1544c0",
         "condition_a": "reference",
         "condition_b": "source tests",
@@ -1793,7 +1789,7 @@
         "similarity_pct": 67.8326474622771
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "fbe56704",
         "condition_a": "reference",
         "condition_b": "target tests",
@@ -1865,7 +1861,7 @@
         "similarity_pct": 69.30621140573919
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "f01d5496",
         "condition_a": "reference",
         "condition_b": "target tests",
@@ -1929,7 +1925,7 @@
         "similarity_pct": 67.63177431328879
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "8305aa82",
         "condition_a": "reference",
         "condition_b": "target tests",
@@ -1985,7 +1981,7 @@
         "similarity_pct": 68.87608069164266
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "609edff1",
         "condition_a": "reference",
         "condition_b": "target tests",
@@ -2033,7 +2029,7 @@
         "similarity_pct": 62.40657698056801
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "14873f98",
         "condition_a": "reference",
         "condition_b": "target tests",
@@ -2073,7 +2069,7 @@
         "similarity_pct": 67.78451658936854
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "9f286468",
         "condition_a": "reference",
         "condition_b": "both tests",
@@ -2105,7 +2101,7 @@
         "similarity_pct": 64.57536342769701
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "89df6247",
         "condition_a": "reference",
         "condition_b": "both tests",
@@ -2129,7 +2125,7 @@
         "similarity_pct": 69.68259759211966
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "2a16d72b",
         "condition_a": "reference",
         "condition_b": "both tests",
@@ -2145,7 +2141,7 @@
         "similarity_pct": 65.63734290843806
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "9de9fd66",
         "condition_a": "reference",
         "condition_b": "both tests",
@@ -2153,7 +2149,7 @@
         "similarity_pct": 33.202099737532805
       },
       {
-        "port_a": "",
+        "port_a": "reference",
         "port_b": "089a4294",
         "condition_a": "reference",
         "condition_b": "both tests",
@@ -2161,7 +2157,7 @@
         "similarity_pct": 36.27813234800134
       }
     ],
-    "data-0c8c20afef0e94207290b938ddfb22c6": [
+    "data-b54169bf2733b36630cb46e162e60ef2": [
       {
         "port": "f8ca89ff",
         "condition": "no tests"
@@ -2237,10 +2233,6 @@
       {
         "port": "089a4294",
         "condition": "both tests"
-      },
-      {
-        "port": "",
-        "condition": "reference"
       }
     ],
     "data-936e38fabab3f05ddd28d48856a734ac": [
@@ -2325,7 +2317,7 @@
         "condition": "both tests"
       }
     ],
-    "data-04b4250989e03a9dd4c0af9abbe0f0b1": [
+    "data-1f38d9b551839578f5e3e43064192fd3": [
       {
         "port": "f8ca89ff",
         "condition": "no tests"
@@ -2343,7 +2335,7 @@
         "condition": "both tests"
       },
       {
-        "port": "",
+        "port": "reference",
         "condition": "reference"
       }
     ],
@@ -2365,9 +2357,9 @@
         "condition": "both tests"
       }
     ],
-    "data-60a2a85462df18174b77591c17302d23": [
+    "data-419c3610764c394fccfb17419b5b63cb": [
       {
-        "port": ""
+        "port": "reference"
       }
     ],
     "data-68824a9eae53c11850caebba91dbb0e8": [

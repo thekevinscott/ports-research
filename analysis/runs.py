@@ -897,7 +897,7 @@ def _(
     REFERENCE_GREY = "#6e6e6e"
     SURFACE = "#fcfcfb"
     SEQUENTIAL_BLUE = ["#cde2fb", "#86b6ef", "#3987e5", "#256abf", "#0d366b"]
-    REFERENCE_TICK = ""
+    REFERENCE_TICK = "reference"
 
     def matrix_ports(source_language):
         """The direction's 21 items in axis order: condition, then run id, reference last.
@@ -1003,14 +1003,16 @@ def _(
         )
         strip = ordered.select("port", "condition")
         # Each strip covers its own axis's items.
-        header_strip = strip.filter(pl.col("port").is_in(items[1:]))
+        header_strip = strip.filter(
+            pl.col("port").is_in(items[1:]) & (pl.col("condition") != REFERENCE_LABEL)
+        )
         sidebar_strip = strip.filter(pl.col("port").is_in(items[:-1]))
         # Both strips share one scale, so only the header draws the key.
         def strip_colour(legend):
             return alt.Color(
                 "condition:N",
                 scale=alt.Scale(
-                    domain=map_labels(source_language), range=[*CONDITION_COLOURS, INK]
+                    domain=condition_labels(source_language), range=CONDITION_COLOURS
                 ),
                 legend=alt.Legend(title=None, symbolType="square", labelFontSize=9)
                 if legend

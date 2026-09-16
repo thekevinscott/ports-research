@@ -230,7 +230,28 @@ def test_matrix_axes_drop_the_empty_column_and_row():
         assert [p for p in x_items if p not in y_items] == [x_items[-1]]
         assert [p for p in y_items if p not in x_items] == [y_items[0]]
         rows = lambda layer: [r["port"] for r in spec["datasets"][layer["data"]["name"]]]
-        assert rows(header) == x_items
+        assert rows(header) == [p for p in x_items if p != "reference"]
         assert rows(sidebar) == y_items
         # The reference block boxes the reference column on x but has no row on y.
         assert len(rows(y_blocks)) == len(rows(x_blocks)) - 1
+
+
+def test_matrix_names_the_reference_and_keeps_the_strips_to_conditions():
+    """The reference is the point of the chart: it earns an axis label, not a swatch."""
+    for direction in ("python-to-typescript", "typescript-to-python"):
+        spec = json.loads(
+            (CHARTS / f"statistical-analysis/port-to-port-matrix-{direction}.json").read_text()
+        )
+        cells, header, sidebar = spec["layer"][:3]
+        assert cells["encoding"]["x"]["scale"]["domain"][-1] == "reference"
+        for axis in ("x", "y"):
+            expr = cells["encoding"][axis]["axis"]["labelColor"]["expr"]
+            assert "datum.label === 'reference'" in expr
+        assert "" not in {value for rows in spec["datasets"].values()
+                          for row in rows for value in row.values()}
+        for strip in (header, sidebar):
+            scale = strip["encoding"]["color"]["scale"]
+            assert "reference" not in scale["domain"]
+            assert len(scale["range"]) == len(scale["domain"]) == 4
+        assert not [r for r in spec["datasets"][header["data"]["name"]]
+                    if r["condition"] == "reference"]
