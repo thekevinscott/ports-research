@@ -981,9 +981,12 @@ def _(
         high = cells["similarity_pct"].max()
         # 598px of cells fills the blog's 757px body once axes and the legend join in.
         side = side or MATRIX_CELL_PX * len(items)
-        scale = alt.Scale(domain=items)
-        x = alt.X("port_a:N", scale=scale, title=None, axis=matrix_axis(labelAngle=-90))
-        y = alt.Y("port_b:N", scale=scale, title=None, axis=matrix_axis(labelAngle=0))
+        # Cells exist only above the diagonal, so the first column and the last row would
+        # sit as blank boxed strips: each axis drops its empty end.
+        x_scale = alt.Scale(domain=items[1:])
+        y_scale = alt.Scale(domain=items[:-1])
+        x = alt.X("port_a:N", scale=x_scale, title=None, axis=matrix_axis(labelAngle=-90))
+        y = alt.Y("port_b:N", scale=y_scale, title=None, axis=matrix_axis(labelAngle=0))
         filled = (
             alt.Chart(cells)
             .mark_rect(stroke=SURFACE, strokeWidth=1)
@@ -999,6 +1002,9 @@ def _(
             )
         )
         strip = ordered.select("port", "condition")
+        # Each strip covers its own axis's items.
+        header_strip = strip.filter(pl.col("port").is_in(items[1:]))
+        sidebar_strip = strip.filter(pl.col("port").is_in(items[:-1]))
         # Both strips share one scale, so only the header draws the key.
         def strip_colour(legend):
             return alt.Color(
@@ -1012,35 +1018,40 @@ def _(
             )
         near, far = MATRIX_STRIP_GAP, MATRIX_STRIP_GAP + MATRIX_STRIP_PX
         header = (
-            alt.Chart(strip)
+            alt.Chart(header_strip)
             .mark_rect()
             .encode(
-                x=alt.X("port:N", scale=scale, title=None, axis=matrix_axis(labelAngle=-90)),
+                x=alt.X("port:N", scale=x_scale, title=None, axis=matrix_axis(labelAngle=-90)),
                 y=alt.value(-far),
                 y2=alt.value(-near),
                 color=strip_colour(True),
             )
         )
         sidebar = (
-            alt.Chart(strip)
+            alt.Chart(sidebar_strip)
             .mark_rect()
             .encode(
-                y=alt.Y("port:N", scale=scale, title=None, axis=matrix_axis(labelAngle=0)),
+                y=alt.Y("port:N", scale=y_scale, title=None, axis=matrix_axis(labelAngle=0)),
                 x=alt.value(-far),
                 x2=alt.value(-near),
                 color=strip_colour(False),
             )
         )
-        # Thick rules box each 5x5 condition block, and the reference's own rank last.
-        blocks = matrix_blocks(ordered)
-        closing = pl.DataFrame({"port": [items[-1]]})
+        # Thick rules box each condition block, each axis's rules running over that
+        # axis's items and closing at its last one.
         edge = {"color": INK, "strokeWidth": 2, "opacity": 0.75}
         rules = [
             alt.Chart(frame)
             .mark_rule(**edge)
-            .encode(**{channel: builder("port:N", scale=scale, bandPosition=position)})
-            for frame, position in ((blocks, 0), (closing, 1))
-            for channel, builder in (("x", alt.X), ("y", alt.Y))
+            .encode(**{channel: builder("port:N", scale=axis_scale, bandPosition=position)})
+            for channel, builder, axis_scale, axis_items in (
+                ("x", alt.X, x_scale, items[1:]),
+                ("y", alt.Y, y_scale, items[:-1]),
+            )
+            for frame, position in (
+                (matrix_blocks(ordered.filter(pl.col("port").is_in(axis_items))), 0),
+                (pl.DataFrame({"port": [axis_items[-1]]}), 1),
+            )
         ]
         return (
             alt.layer(filled, header, sidebar, *rules)

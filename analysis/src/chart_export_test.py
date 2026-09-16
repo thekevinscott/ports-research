@@ -215,3 +215,22 @@ def test_fit_pair_grows_single_view_plots_and_keeps_matrices_square():
     (fitted_matrix,) = fit_pair([matrix], 757, measure=fake_geometry)
     assert fake_geometry(fitted_matrix)[0] == 757
     assert fitted_matrix["width"] == fitted_matrix["height"]
+
+
+def test_matrix_axes_drop_the_empty_column_and_row():
+    # Cells exist only above the diagonal, so the first column and last row are blank.
+    for direction in ("python-to-typescript", "typescript-to-python"):
+        spec = json.loads(
+            (CHARTS / f"statistical-analysis/port-to-port-matrix-{direction}.json").read_text()
+        )
+        cells, header, sidebar, x_blocks, y_blocks, _xc, _yc = spec["layer"]
+        x_items = cells["encoding"]["x"]["scale"]["domain"]
+        y_items = cells["encoding"]["y"]["scale"]["domain"]
+        # Exactly one item differs each way: x keeps the reference, y keeps the first port.
+        assert [p for p in x_items if p not in y_items] == [x_items[-1]]
+        assert [p for p in y_items if p not in x_items] == [y_items[0]]
+        rows = lambda layer: [r["port"] for r in spec["datasets"][layer["data"]["name"]]]
+        assert rows(header) == x_items
+        assert rows(sidebar) == y_items
+        # The reference block boxes the reference column on x but has no row on y.
+        assert len(rows(y_blocks)) == len(rows(x_blocks)) - 1
