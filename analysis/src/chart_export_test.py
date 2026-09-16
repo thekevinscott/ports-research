@@ -284,3 +284,39 @@ def test_matrix_prints_the_reference_columns_values_only():
             for row in spec["datasets"][cells["data"]["name"]]
             if row["port_a"] == "reference"
         )
+
+
+def _ramp_position(value, domain, stops=5):
+    """Where a value lands on the ramp, in stops, clamped to its ends."""
+    low, high = domain
+    return min(max((value - low) / (high - low), 0), 1) * (stops - 1)
+
+
+def test_matrix_scale_is_fixed_and_separates_the_two_medians():
+    """One outlier row pinned the floor, so both medians read as the same shade."""
+    import statistics
+
+    domains = []
+    for direction in ("python-to-typescript", "typescript-to-python"):
+        spec = json.loads(
+            (CHARTS / f"statistical-analysis/port-to-port-matrix-{direction}.json").read_text()
+        )
+        cells = spec["layer"][0]["encoding"]["color"]
+        scale = cells["scale"]
+        assert scale["domain"] == [25, 85] and scale["clamp"] is True
+        assert cells["legend"]["values"] == [25, 50, 75, 85]
+        domains.append(scale["domain"])
+        rows = spec["datasets"][spec["layer"][0]["data"]["name"]]
+        values = [row["similarity_pct"] for row in rows]
+        to_reference = statistics.median(
+            row["similarity_pct"] for row in rows if row["port_a"] == "reference"
+        )
+        port_to_port = statistics.median(
+            row["similarity_pct"] for row in rows if row["port_a"] != "reference"
+        )
+        gap = lambda domain: abs(
+            _ramp_position(port_to_port, domain) - _ramp_position(to_reference, domain)
+        )
+        assert gap(scale["domain"]) > gap([min(values), max(values)])
+        assert gap(scale["domain"]) > 1.5  # the data's own range managed 1.3
+    assert domains[0] == domains[1]  # the two directions compare by eye

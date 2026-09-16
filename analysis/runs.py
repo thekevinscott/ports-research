@@ -898,8 +898,12 @@ def _(
     SURFACE = "#fcfcfb"
     SEQUENTIAL_BLUE = ["#cde2fb", "#86b6ef", "#3987e5", "#256abf", "#0d366b"]
     REFERENCE_TICK = "reference"
+    # A fixed domain, not the data's own range: one outlier row at 1.2% would pin the
+    # floor and push the port-port and port-reference medians onto the same shade.
+    # Clamping keeps the tails on the ramp's ends.
+    MATRIX_DOMAIN = [25, 85]
     # Printed reference values flip colour at the ramp's midpoint.
-    MATRIX_MIDPOINT = 55
+    MATRIX_MIDPOINT = sum(MATRIX_DOMAIN) / 2
 
     def matrix_ports(source_language):
         """The direction's 21 items in axis order: condition, then run id, reference last.
@@ -979,8 +983,6 @@ def _(
         ordered = matrix_ports(source_language)
         items = ordered["port"].to_list()
         cells = matrix_cells(source_language, ordered)
-        low = cells["similarity_pct"].min()
-        high = cells["similarity_pct"].max()
         # 598px of cells fills the blog's 757px body once axes and the legend join in.
         side = side or MATRIX_CELL_PX * len(items)
         # Cells exist only above the diagonal, so the first column and the last row would
@@ -998,8 +1000,13 @@ def _(
                 color=alt.Color(
                     "similarity_pct:Q",
                     title="Similarity (%)",
-                    scale=alt.Scale(domain=[low, high], range=SEQUENTIAL_BLUE),
-                    legend=alt.Legend(titleFontSize=10, labelFontSize=9, gradientLength=side / 3),
+                    scale=alt.Scale(domain=MATRIX_DOMAIN, range=SEQUENTIAL_BLUE, clamp=True),
+                    legend=alt.Legend(
+                        titleFontSize=10,
+                        labelFontSize=9,
+                        gradientLength=side / 3,
+                        values=[25, 50, 75, 85],
+                    ),
                 ),
             )
         )

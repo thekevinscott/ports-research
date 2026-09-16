@@ -27,12 +27,19 @@
           "legend": {
             "gradientLength": 199.33333333333334,
             "labelFontSize": 9,
-            "titleFontSize": 10
+            "titleFontSize": 10,
+            "values": [
+              25,
+              50,
+              75,
+              85
+            ]
           },
           "scale": {
+            "clamp": true,
             "domain": [
-              0.0,
-              82.04592901878914
+              25,
+              85
             ],
             "range": [
               "#cde2fb",
