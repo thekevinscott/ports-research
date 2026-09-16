@@ -23,3 +23,10 @@ integration tests as separate conditions (2026-09-09), a fidelity scale
 settles it as a full re-run, since any assembly change moves the corpus.
 
 Plan written to `notes/PLAN_2026-09-16-v2.md` on branch `v2-plan`.
+
+## 2026-09-16T22:41Z whitelist placement decided
+
+Kevin: "the whitelist should be made generic, and there should be a way to
+define it from gbnf-experiment". The copy-by-allow-set step and its tests go in
+porting-harness, which today receives a finished tree and does no assembly.
+gbnf-experiment supplies the set and drops its three removers. Plan updated.
