@@ -896,14 +896,17 @@ def _(
     # sits between the two themes, so dark_spec leaves it alone.
     REFERENCE_GREY = "#6e6e6e"
     SURFACE = "#fcfcfb"
-    SEQUENTIAL_BLUE = ["#cde2fb", "#86b6ef", "#3987e5", "#256abf", "#0d366b"]
+    SEQUENTIAL_BLUE = ["#eef5fd", "#86b6ef", "#3987e5", "#256abf", "#0d366b"]
     REFERENCE_TICK = "reference"
     # A fixed domain, not the data's own range: one outlier row at 1.2% would pin the
     # floor and push the port-port and port-reference medians onto the same shade.
     # Clamping keeps the tails on the ramp's ends.
     MATRIX_DOMAIN = [25, 85]
-    # Printed reference values flip colour at the ramp's midpoint.
+    # Printed values flip colour at the ramp's midpoint.
     MATRIX_MIDPOINT = sum(MATRIX_DOMAIN) / 2
+    # The blog caps the figure at its 637.6px text column, so an SVG px arrives at
+    # 637.6/757 of its size. 11 here lands just over 9 on the page.
+    MATRIX_VALUE_PX = 11
 
     def matrix_ports(source_language):
         """The direction's 21 items in axis order: condition, then run id, reference last.
@@ -1048,17 +1051,16 @@ def _(
                 color=strip_colour(False),
             )
         )
-        # The reference column carries its numbers; nothing else does. The colour flips
-        # at the ramp's midpoint, and each half is its own layer because dark_spec
-        # rewrites a mark's colour but not a conditional's payload.
-        reference_cells = cells.filter(pl.col("port_a") == REFERENCE_TICK)
+        # Every filled cell carries its number. The colour flips at the ramp's midpoint,
+        # and each half is its own layer because dark_spec rewrites a mark's colour but
+        # not a conditional's payload.
         numbers = [
             alt.Chart(half)
-            .mark_text(fontSize=10, color=colour)
+            .mark_text(fontSize=MATRIX_VALUE_PX, color=colour)
             .encode(x=x, y=y, text=alt.Text("similarity_pct:Q", format=".0f"))
             for half, colour in (
-                (reference_cells.filter(pl.col("similarity_pct") < MATRIX_MIDPOINT), INK),
-                (reference_cells.filter(pl.col("similarity_pct") >= MATRIX_MIDPOINT), SURFACE),
+                (cells.filter(pl.col("similarity_pct") < MATRIX_MIDPOINT), INK),
+                (cells.filter(pl.col("similarity_pct") >= MATRIX_MIDPOINT), SURFACE),
             )
             if not half.is_empty()
         ]

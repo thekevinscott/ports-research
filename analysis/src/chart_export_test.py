@@ -18,6 +18,9 @@ from src.chart_export import (
 )
 
 CHARTS = Path(__file__).resolve().parents[1] / "charts"
+# Charts are fitted to a 757px slot; the blog's text column renders them at 637.6px.
+BLOG_SLOT_PX = 757
+BLOG_COLUMN_PX = 637.6
 
 
 @pytest.mark.parametrize("source", sorted(p for p in CHARTS.rglob("*.json")
@@ -146,10 +149,29 @@ def _brightness(colour):
     return sum(int(channels[i : i + 2], 16) for i in (0, 2, 4))
 
 
+def _contrast(one, other):
+    """WCAG contrast ratio, for reading a cell against the page it sits on."""
+
+    def channel(value):
+        value /= 255
+        return value / 12.92 if value <= 0.03928 else ((value + 0.055) / 1.055) ** 2.4
+
+    def relative(colour):
+        channels = colour.lstrip("#")
+        red, green, blue = (channel(int(channels[i : i + 2], 16)) for i in (0, 2, 4))
+        return 0.2126 * red + 0.7152 * green + 0.0722 * blue
+
+    low, high = sorted((relative(one), relative(other)))
+    return (high + 0.05) / (low + 0.05)
+
+
+PAGE_BACKGROUND = "#161513"
+
+
 def test_dark_ramp_floors_above_the_page_background():
     """The lowest stop must read as data, not as the empty triangle, on a near-black page."""
-    # The page is #161513 (brightness 61) and the lower triangle is not drawn at all.
-    assert _brightness(DARK_BLUE_RAMP[0]) > 250  # #1e3452 scored 164 and still vanished
+    # The lower triangle is not drawn at all, so the floor competes with the bare page.
+    assert _contrast(DARK_BLUE_RAMP[0], PAGE_BACKGROUND) > 1.7  # #1e3452 managed 1.45
 
 
 def _luminance(colour):
@@ -288,8 +310,8 @@ def test_matrix_names_the_reference_and_keeps_the_strips_to_conditions():
                     if r["condition"] == "reference"]
 
 
-def test_matrix_prints_the_reference_columns_values_only():
-    """A reader should not have to eyeball the reference column off the ramp."""
+def test_matrix_prints_a_value_in_every_filled_cell():
+    """Colour cannot be read back to a number, and every pair is part of the story."""
     for direction in ("python-to-typescript", "typescript-to-python"):
         spec = json.loads(
             (CHARTS / f"statistical-analysis/port-to-port-matrix-{direction}.json").read_text()
@@ -305,15 +327,23 @@ def test_matrix_prints_the_reference_columns_values_only():
             pale = layer["mark"]["color"] == "#0b0b0b"
             assert all((row["similarity_pct"] < 55) == pale for row in rows)
             assert layer["encoding"]["text"]["format"] == ".0f"
-            assert layer["mark"]["fontSize"] == 10
             for axis in ("x", "y"):
                 assert layer["encoding"][axis]["scale"] == cells["encoding"][axis]["scale"]
-        assert {row["port_a"] for row in printed} == {"reference"}
-        assert sorted(row["port_b"] for row in printed) == sorted(
-            row["port_b"]
-            for row in spec["datasets"][cells["data"]["name"]]
-            if row["port_a"] == "reference"
+        assert {layer["mark"]["fontSize"] for layer in text} == {11}
+        key = lambda row: (row["port_a"], row["port_b"])
+        assert sorted(map(key, printed)) == sorted(
+            map(key, spec["datasets"][cells["data"]["name"]])
         )
+
+
+def test_matrix_value_text_survives_the_blog_downscale():
+    """The blog caps the figure at its text column, so SVG px shrink on the way in."""
+    spec = json.loads(
+        (CHARTS / "statistical-analysis/port-to-port-matrix-python-to-typescript.json").read_text()
+    )
+    text = next(layer for layer in spec["layer"] if layer["mark"]["type"] == "text")
+    rendered = text["mark"]["fontSize"] * BLOG_COLUMN_PX / BLOG_SLOT_PX
+    assert rendered > 9  # 9px in the SVG arrived at 7.6 and read as grey mush
 
 
 def _ramp_position(value, domain, stops=5):
