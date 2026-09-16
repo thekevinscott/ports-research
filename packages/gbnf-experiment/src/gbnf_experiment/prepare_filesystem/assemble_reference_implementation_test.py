@@ -14,6 +14,15 @@ NESTED_COLOCATED_TEST = {
 }
 IMPLEMENTATION = {"typescript": "src/gbnf.ts", "python": "gbnf/parse.py"}
 COLOCATED_TEST_PATTERN = {"typescript": "*.test.ts", "python": "*_test.py"}
+CACHE_ARTEFACTS = (
+    "gbnf/__pycache__/parse_test.cpython-314-pytest-9.1.1.pyc",
+    ".pytest_cache/CACHEDIR.TAG",
+)
+FLAGS = [
+    {"include_typescript_tests": typescript, "include_python_tests": python}
+    for typescript in (False, True)
+    for python in (False, True)
+]
 
 
 @pytest.fixture
@@ -31,6 +40,11 @@ def derivation_directory(tmp_path):
             path = source / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(name)
+        if language == "python":
+            for name in CACHE_ARTEFACTS:
+                path = source / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"\x00compiled")
         tests = directory / "tests" / language
         tests.mkdir(parents=True)
         (tests / f"suite_{language}").write_text(language)
@@ -280,6 +294,21 @@ def describe_assemble_reference_implementation():
             )
 
             assert (output_directory / "source" / COLOCATED_TEST["typescript"]).is_file()
+
+    def describe_the_cache_artefacts():
+        @pytest.mark.parametrize("flags", FLAGS)
+        def it_copies_none_of_them_into_a_python_reference(
+            derivation_directory, output_directory, flags
+        ):
+            """Compiled tests are readable: a .pyc decompiles back to its source."""
+            assemble_reference_implementation(
+                derivation_directory=derivation_directory,
+                output_directory=output_directory,
+                source_language="python",
+                **flags,
+            )
+            source = output_directory / "source"
+            assert [name for name in CACHE_ARTEFACTS if (source / name).exists()] == []
 
     def describe_rebuilding():
         def it_removes_stale_contents(derivation_directory, output_directory):
