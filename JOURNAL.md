@@ -111,3 +111,8 @@ openrouter, same model: 16 of 16 with text. The gate on thinking text is
 dropped from the plan; pi via openrouter is expected to bank it. Kevin also put
 the agent in charge of statistics; a Statistics section is added under
 Analysis. exercise-api goes to v3, Kevin leaning to start fresh.
+
+## 2026-09-16T23:14Z thinking investigation moved to preparatory
+
+Kevin: "Thinking investigation needs to be part of v2 prepatory". It is now
+Preparatory item 7, with the comparison to run before the re-run.
