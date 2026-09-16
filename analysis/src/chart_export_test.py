@@ -152,11 +152,30 @@ def test_dark_ramp_floors_above_the_page_background():
     assert _brightness(DARK_BLUE_RAMP[0]) > 250  # #1e3452 scored 164 and still vanished
 
 
-def test_dark_ramp_top_separates_from_its_floor():
-    """Lifting the floor is only worth it if the ramp still spans a visible range."""
-    floor = _brightness(DARK_BLUE_RAMP[0])
-    assert _brightness(DARK_BLUE_RAMP[-1]) - floor > 50
-    assert _brightness(max(DARK_BLUE_RAMP, key=_brightness)) - floor > 100
+def _luminance(colour):
+    channels = colour.lstrip("#")
+    red, green, blue = (int(channels[i : i + 2], 16) for i in (0, 2, 4))
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue
+
+
+def test_dark_ramp_climbs_all_the_way_to_its_top():
+    """A stop dimmer than the one below it makes the most similar pairs dark specks."""
+    steps = [
+        _luminance(high) - _luminance(low)
+        for low, high in zip(DARK_BLUE_RAMP, DARK_BLUE_RAMP[1:])
+    ]
+    assert all(step > 0 for step in steps), steps
+    span = _luminance(DARK_BLUE_RAMP[-1]) - _luminance(DARK_BLUE_RAMP[0])
+    assert span > 100  # the reversed ramp ended 13 above its floor and read as flat
+
+
+def test_dark_ramp_matches_the_light_ramp_stop_count():
+    """Both feed the same quantitative scale; unequal stops interpolate differently."""
+    spec = json.loads(
+        (CHARTS / "statistical-analysis/port-to-port-matrix-python-to-typescript.json").read_text()
+    )
+    light = spec["layer"][0]["encoding"]["color"]["scale"]["range"]
+    assert len(DARK_BLUE_RAMP) == len(light)
 
 
 def test_align_panel_titles_moves_panel_titles_onto_their_plots():

@@ -213,10 +213,12 @@ TEXT = "#d8d3ca"
 TITLE = "#f3f1ec"
 GRID = "#2e2b26"
 TICK = "#4c4840"
-# The floor stays visibly blue: against the dark page and the undrawn lower triangle
-# a dim cell would read as empty, not as data. The old #1e3452/#23466b stops both sat
-# below the new floor, so the ramp opens on it.
-DARK_BLUE_RAMP = ["#2d5a8e", "#2f6fa3", "#3987e5", "#256abf"]
+# The dark ramp runs the opposite way to the light one: on a dark page the brightest
+# cell is the most similar pair, not the darkest. Reusing SEQUENTIAL_BLUE's order here
+# put the top stop below the one beneath it, so the closest pairs read as dark specks.
+# The floor stays visibly blue — against the undrawn lower triangle a dim cell would
+# read as empty, not as data.
+DARK_BLUE_RAMP = ["#2d5a8e", "#3a7fc4", "#5c9be0", "#8fbdf0", "#c5ddf8"]
 
 
 def dark_spec(spec, name):
