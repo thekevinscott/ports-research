@@ -9,6 +9,7 @@ from copy import deepcopy
 
 from src.chart_export import (
     DARK_BLUE_RAMP,
+    TEXT,
     TITLE,
     align_panel_titles,
     dark_spec,
@@ -21,6 +22,9 @@ CHARTS = Path(__file__).resolve().parents[1] / "charts"
 # Charts are fitted to a 757px slot; the blog's text column renders them at 637.6px.
 BLOG_SLOT_PX = 757
 BLOG_COLUMN_PX = 637.6
+# runs.py is a marimo notebook, so the matrix's palette is asserted against literals.
+CONDITION_COLOURS = ["#2a78d6", "#eb6834", "#1baf7a", "#4a3aa7"]
+MUTED_INK = "#898781"
 
 
 @pytest.mark.parametrize("source", sorted(p for p in CHARTS.rglob("*.json")
@@ -64,11 +68,8 @@ def test_matrix_dark_scale_preserves_domain_data_and_categorical_palette():
             assert dark_color["scale"]["domain"] == light_color["scale"]["domain"]
             assert dark_color["scale"]["range"] == DARK_BLUE_RAMP
         elif light_color.get("type") == "nominal":
-            # Category colours survive; only the ink (the reference swatch) lifts.
-            assert dark_color["scale"]["range"] == [
-                TITLE if colour == "#0b0b0b" else colour
-                for colour in light_color["scale"]["range"]
-            ]
+            # Category colours survive; only the neutral reference swatch lifts.
+            assert dark_color["scale"]["range"] == [*CONDITION_COLOURS, TEXT]
 
 
 def test_future_grid_charts_export_both_variants(tmp_path):
@@ -283,14 +284,14 @@ def test_matrix_axes_drop_the_empty_column_and_row():
         assert [p for p in x_items if p not in y_items] == [x_items[-1]]
         assert [p for p in y_items if p not in x_items] == [y_items[0]]
         rows = lambda layer: [r["port"] for r in spec["datasets"][layer["data"]["name"]]]
-        assert rows(header) == [p for p in x_items if p != "reference"]
+        assert rows(header) == x_items
         assert rows(sidebar) == y_items
         # The reference block boxes the reference column on x but has no row on y.
         assert len(rows(y_blocks)) == len(rows(x_blocks)) - 1
 
 
-def test_matrix_names_the_reference_and_keeps_the_strips_to_conditions():
-    """The reference is the point of the chart: it earns an axis label, not a swatch."""
+def test_matrix_names_the_reference_in_the_axis_and_the_key():
+    """The reference is the point of the chart, so it is labelled twice over."""
     for direction in ("python-to-typescript", "typescript-to-python"):
         spec = json.loads(
             (CHARTS / f"statistical-analysis/port-to-port-matrix-{direction}.json").read_text()
@@ -304,10 +305,17 @@ def test_matrix_names_the_reference_and_keeps_the_strips_to_conditions():
                           for row in rows for value in row.values()}
         for strip in (header, sidebar):
             scale = strip["encoding"]["color"]["scale"]
-            assert "reference" not in scale["domain"]
-            assert len(scale["range"]) == len(scale["domain"]) == 4
-        assert not [r for r in spec["datasets"][header["data"]["name"]]
-                    if r["condition"] == "reference"]
+            assert scale["domain"][-1] == "reference"
+            assert len(scale["range"]) == len(scale["domain"]) == 5
+            # A neutral, so the reference never reads as a fifth condition.
+            assert scale["range"][:4] == CONDITION_COLOURS
+            assert scale["range"][-1] == MUTED_INK
+        assert [r for r in spec["datasets"][header["data"]["name"]]
+                if r["condition"] == "reference"] == [{"port": "reference",
+                                                       "condition": "reference"}]
+        dark = dark_spec(spec, f"port-to-port-matrix-{direction}")
+        swatch = dark["layer"][1]["encoding"]["color"]["scale"]["range"][-1]
+        assert swatch != MUTED_INK and _contrast(swatch, PAGE_BACKGROUND) > 3
 
 
 def test_matrix_prints_a_value_in_every_filled_cell():

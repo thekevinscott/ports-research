@@ -1015,16 +1015,16 @@ def _(
         )
         strip = ordered.select("port", "condition")
         # Each strip covers its own axis's items.
-        header_strip = strip.filter(
-            pl.col("port").is_in(items[1:]) & (pl.col("condition") != REFERENCE_LABEL)
-        )
+        header_strip = strip.filter(pl.col("port").is_in(items[1:]))
         sidebar_strip = strip.filter(pl.col("port").is_in(items[:-1]))
         # Both strips share one scale, so only the header draws the key.
         def strip_colour(legend):
             return alt.Color(
                 "condition:N",
+                # The reference belongs to no condition, so it takes a neutral rather than
+                # a fifth category colour. dark_spec lifts MUTED_INK for the dark page.
                 scale=alt.Scale(
-                    domain=condition_labels(source_language), range=CONDITION_COLOURS
+                    domain=map_labels(source_language), range=[*CONDITION_COLOURS, MUTED_INK]
                 ),
                 legend=alt.Legend(title=None, symbolType="square", labelFontSize=9)
                 if legend

@@ -140,7 +140,7 @@
     },
     {
       "data": {
-        "name": "data-b54169bf2733b36630cb46e162e60ef2"
+        "name": "data-324f0f86a94ceb2fa862edcf20603be0"
       },
       "mark": {
         "type": "rect"
@@ -158,13 +158,15 @@
               "no tests",
               "source tests",
               "target tests",
-              "both tests"
+              "both tests",
+              "reference"
             ],
             "range": [
               "#2a78d6",
               "#eb6834",
               "#1baf7a",
-              "#4a3aa7"
+              "#4a3aa7",
+              "#898781"
             ]
           },
           "type": "nominal"
@@ -235,13 +237,15 @@
               "no tests",
               "source tests",
               "target tests",
-              "both tests"
+              "both tests",
+              "reference"
             ],
             "range": [
               "#2a78d6",
               "#eb6834",
               "#1baf7a",
-              "#4a3aa7"
+              "#4a3aa7",
+              "#898781"
             ]
           },
           "type": "nominal"
@@ -2366,7 +2370,7 @@
         "similarity_pct": 36.27813234800134
       }
     ],
-    "data-b54169bf2733b36630cb46e162e60ef2": [
+    "data-324f0f86a94ceb2fa862edcf20603be0": [
       {
         "port": "f8ca89ff",
         "condition": "no tests"
@@ -2442,6 +2446,10 @@
       {
         "port": "089a4294",
         "condition": "both tests"
+      },
+      {
+        "port": "reference",
+        "condition": "reference"
       }
     ],
     "data-936e38fabab3f05ddd28d48856a734ac": [
