@@ -74,3 +74,15 @@ last Analysis item, after the v2 results.
 
 Kevin: "same with mistral. So maybe it's _four_ sections". Mistral review and
 literature review now sit in an After v2 section, numbered from 1.
+
+## 2026-09-16T22:50Z fidelity scale deferred to v3
+
+Kevin: "A better understanding of what faithful means - totally want to dig in
+on this. this feels like a v3 thing though. My hope is that the initial
+experiment reveals some directions in which to go."
+
+## 2026-09-16T22:51Z check-in oracle idea parked
+
+Kevin proposed an in-loop oracle: a stronger model the agent can ask whether an
+action is "kosher", escalating to a human when unsure. He parked it as out of
+scope for v2. Recorded under earlier asks so it is not lost.
