@@ -1,9 +1,10 @@
 import shutil
 from pathlib import Path
 
-from .remove_builder import remove_builder
-from .remove_colocated_tests import remove_colocated_tests
-from .remove_dev_harness import remove_dev_harness
+from porting_harness.assemble_tree import AssemblyReport, assemble_tree
+
+from .reference_patterns import reference_patterns
+from .strip_builder_reexports import strip_builder_reexports
 
 
 def assemble_reference_implementation(
@@ -13,7 +14,7 @@ def assemble_reference_implementation(
     source_language: str,
     include_typescript_tests: bool,
     include_python_tests: bool,
-) -> Path:
+) -> tuple[Path, AssemblyReport]:
     source_directory = derivation_directory / "source" / source_language
     if not source_directory.is_dir():
         raise ValueError(f"No derived source for language: {source_language}")
@@ -23,19 +24,18 @@ def assemble_reference_implementation(
     }
     shutil.rmtree(output_directory, ignore_errors=True)
     output_directory.mkdir(parents=True)
-    shutil.copytree(source_directory, output_directory / "source")
-    remove_colocated_tests(
-        directory=output_directory / "source",
-        languages=[language for language, wanted in included.items() if not wanted],
+    (output_directory / "source").mkdir()
+    report = assemble_tree(
+        source=source_directory,
+        destination=output_directory / "source",
+        patterns=reference_patterns(
+            source_language=source_language,
+            include_typescript_tests=include_typescript_tests,
+            include_python_tests=include_python_tests,
+        ),
     )
-    remove_dev_harness(
-        directory=output_directory / "source",
-        language=source_language,
-    )
-    remove_builder(
-        directory=output_directory / "source",
-        language=source_language,
-    )
+    if source_language == "typescript":
+        strip_builder_reexports(output_directory / "source" / "src" / "index.ts")
     (output_directory / "tests").mkdir()
     for language, wanted in included.items():
         if wanted:
@@ -43,4 +43,4 @@ def assemble_reference_implementation(
                 derivation_directory / "tests" / language,
                 output_directory / "tests" / language,
             )
-    return output_directory
+    return output_directory, report

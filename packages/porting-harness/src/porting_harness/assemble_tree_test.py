@@ -16,6 +16,7 @@ TREE = {
     "pkg/__pycache__/parse.cpython-314.pyc": "\x00compiled",
     ".pytest_cache/CACHEDIR.TAG": "Signature: 8a477f597d28d172",
     "dev/browser/index.html": "<html>",
+    "dev/browser/README.md": "# demo app",
 }
 
 
@@ -66,7 +67,7 @@ def describe_assemble_tree():
         assert not destination.exists()
 
     def it_takes_several_named_files(assemble, destination):
-        assemble("pyproject.toml", "README.md")
+        assemble("/pyproject.toml", "/README.md")
         assert relative_files(destination) == ["README.md", "pyproject.toml"]
 
     def describe_globs():
@@ -98,6 +99,18 @@ def describe_assemble_tree():
             assemble("pkg/**/*.py")
             assert not (destination / "dev").exists()
 
+    def describe_anchoring():
+        def it_matches_a_bare_name_at_any_depth(assemble, destination):
+            assemble("README.md")
+            assert relative_files(destination) == [
+                "README.md",
+                "dev/browser/README.md",
+            ]
+
+        def it_matches_a_leading_slash_at_the_root_only(assemble, destination):
+            assemble("/README.md")
+            assert relative_files(destination) == ["README.md"]
+
     def describe_negation():
         def it_drops_a_file_a_later_pattern_excludes(assemble, destination):
             assemble("pkg/**/*.py", "!**/*_test.py")
@@ -108,7 +121,7 @@ def describe_assemble_tree():
             ]
 
         def it_excludes_nothing_that_was_never_included(assemble, destination):
-            assemble("README.md", "!**/*_test.py")
+            assemble("/README.md", "!**/*_test.py")
             assert relative_files(destination) == ["README.md"]
 
     def describe_the_artefacts_a_blacklist_let_through():

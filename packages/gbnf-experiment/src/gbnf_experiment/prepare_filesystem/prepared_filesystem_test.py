@@ -6,6 +6,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 from gbnf_experiment.prepare_filesystem import PreparedFilesystem
+from porting_harness.assemble_tree import AssemblyReport
 
 HEAD = "c" * 40
 IMAGE_ID = "sha256:" + "b" * 64
@@ -48,7 +49,14 @@ def assemble_reference_implementation(tmp_path):
         "gbnf_experiment.prepare_filesystem.prepared_filesystem.assemble_reference_implementation",
         autospec=True,
     ) as m:
-        m.return_value = tmp_path / "reference_implementation"
+        m.return_value = (
+            tmp_path / "reference_implementation",
+            AssemblyReport(
+                patterns=("/package.json",),
+                included=("package.json",),
+                excluded=("src/gbnf.test.ts",),
+            ),
+        )
         yield m
 
 

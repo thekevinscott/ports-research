@@ -6,6 +6,7 @@ from unittest.mock import DEFAULT, Mock, patch
 import pytest
 
 from gbnf_experiment.run_gbnf_experiment import run_gbnf_experiment
+from porting_harness.assemble_tree import AssemblyReport
 
 
 RUN_DIRECTORY_NAME = "20260906T142530Z_00000000"
@@ -57,9 +58,11 @@ def assemble_reference_implementation(tmp_path):
             path = corpus / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(text)
-        m.return_value = corpus
+        m.return_value = (corpus, EMPTY_REPORT)
         yield m
 
+
+EMPTY_REPORT = AssemblyReport(patterns=("/package.json",), included=(), excluded=())
 
 RESULT_JSON = '{"num_turns": 12, "total_cost_usd": 3.21, "is_error": false}'
 
@@ -170,7 +173,7 @@ def describe_run():
     ):
         experiment()
         assert run_porting_harness.call_args.kwargs["reference_implementation"] is (
-            assemble_reference_implementation.return_value
+            assemble_reference_implementation.return_value[0]
         )
         assert run_porting_harness.call_args.kwargs["output_directory"] == (
             settings.data_directory / RUN_DIRECTORY_NAME / "ported_implementation"
@@ -431,7 +434,7 @@ def describe_the_banked_reference():
         seen = {}
         assemble_reference_implementation.side_effect = lambda **kwargs: seen.update(
             existed=kwargs["output_directory"].parent.is_dir()
-        ) or kwargs["output_directory"]
+        ) or (kwargs["output_directory"], EMPTY_REPORT)
         experiment()
         assert seen["existed"] is True
 

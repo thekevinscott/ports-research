@@ -34,7 +34,10 @@ class PreparedFilesystem:
         # Scratch, not run record: the container reads this tree read-only for the
         # length of the run, and it is reassembled from the derivation cache.
         self._reference_implementation_staging = TemporaryDirectory()
-        self.reference_implementation_directory = assemble_reference_implementation(
+        (
+            self.reference_implementation_directory,
+            self.reference_implementation_report,
+        ) = assemble_reference_implementation(
             derivation_directory=self.derivation_directory,
             output_directory=Path(self._reference_implementation_staging.name)
             / "reference_implementation",
