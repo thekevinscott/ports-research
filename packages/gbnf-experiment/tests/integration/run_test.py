@@ -10,6 +10,7 @@ from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
 from gbnf_experiment import run_gbnf_experiment
 from gbnf_experiment.cli import cli
 from gbnf_experiment.config import derivation_cache_key, settings
+from gbnf_experiment.prepare_filesystem.reference_patterns import reference_patterns
 from porting_harness.run_porting_harness import PROMPT_PATH
 
 CONFIG = {
@@ -258,6 +259,7 @@ def describe_the_manifest():
             "completed_at",
             "condition",
             "derivation",
+            "reference_implementation",
             "sandbox",
             "harness",
         }
@@ -278,6 +280,26 @@ def describe_the_manifest():
             "effort": "low",
             "model": "claude-sonnet-4-5",
         }
+
+    def it_records_the_whitelist_the_reference_was_assembled_from(experiment, manifest):
+        experiment()
+        recorded = manifest()["reference_implementation"]
+        assert recorded["patterns"] == list(
+            reference_patterns(
+                source_language="typescript",
+                include_typescript_tests=False,
+                include_python_tests=False,
+            )
+        )
+
+    def it_accounts_for_every_file_the_whitelist_saw(experiment, manifest):
+        experiment()
+        recorded = manifest()["reference_implementation"]
+        assert recorded["excluded_count"] == len(recorded["excluded"])
+
+    def it_names_the_withheld_colocated_test(experiment, manifest):
+        experiment()
+        assert "src/index.test.ts" in manifest()["reference_implementation"]["excluded"]
 
     def it_records_the_pinned_commit(experiment, manifest):
         experiment()

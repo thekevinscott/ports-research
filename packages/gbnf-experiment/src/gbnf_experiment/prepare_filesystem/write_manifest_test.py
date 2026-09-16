@@ -6,6 +6,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 from gbnf_experiment.prepare_filesystem.write_manifest import write_manifest
+from porting_harness.assemble_tree import AssemblyReport
 
 ROOT = Path("/pkg/gbnf-experiment")
 IMAGE_ID = "sha256:" + "b" * 64
@@ -20,9 +21,15 @@ CONDITION = {
     "effort": "high",
     "model": "claude-opus-5",
 }
+REPORT = AssemblyReport(
+    patterns=("/package.json", "/src/*.ts", "!**/*.test.ts"),
+    included=("package.json", "src/gbnf.ts"),
+    excluded=("src/__pycache__/x.pyc", "src/gbnf.test.ts"),
+)
 CALL = {
     "timestamp": datetime(2026, 9, 6, 14, 25, 30, tzinfo=UTC),
     "condition": CONDITION,
+    "reference_implementation": REPORT,
     "image_tag": "agent-harness-sandbox-claude:latest",
     "gbnf_commit": "13f1aca",
 }
@@ -92,6 +99,7 @@ def describe_write_manifest():
             "completed_at",
             "condition",
             "derivation",
+            "reference_implementation",
             "sandbox",
             "harness",
         ]
@@ -111,6 +119,23 @@ def describe_write_manifest():
 
     def it_records_the_pinned_commit(manifest):
         assert manifest()["derivation"] == {"gbnf_commit": "13f1aca"}
+
+    def it_records_the_whitelist_the_reference_was_assembled_from(manifest):
+        assert manifest()["reference_implementation"]["patterns"] == [
+            "/package.json",
+            "/src/*.ts",
+            "!**/*.test.ts",
+        ]
+
+    def it_counts_what_the_whitelist_admitted_and_withheld(manifest):
+        recorded = manifest()["reference_implementation"]
+        assert (recorded["included_count"], recorded["excluded_count"]) == (2, 2)
+
+    def it_names_every_withheld_path(manifest):
+        assert manifest()["reference_implementation"]["excluded"] == [
+            "src/__pycache__/x.pyc",
+            "src/gbnf.test.ts",
+        ]
 
     def it_identifies_the_sandbox_by_image_id_not_by_tag(manifest):
         assert manifest()["sandbox"] == {"image_id": IMAGE_ID}

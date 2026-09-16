@@ -3,6 +3,7 @@ import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
 
+from porting_harness.assemble_tree import AssemblyReport
 from python_on_whales import docker
 
 from ..config import settings
@@ -16,6 +17,7 @@ def write_manifest(
     *,
     timestamp: datetime,
     condition: dict,
+    reference_implementation: AssemblyReport,
     image_tag: str,
     gbnf_commit: str,
     completed_at: datetime | None = None,
@@ -31,6 +33,12 @@ def write_manifest(
         "condition": condition,
         "derivation": {
             "gbnf_commit": gbnf_commit,
+        },
+        "reference_implementation": {
+            "patterns": list(reference_implementation.patterns),
+            "included_count": len(reference_implementation.included),
+            "excluded_count": len(reference_implementation.excluded),
+            "excluded": list(reference_implementation.excluded),
         },
         "sandbox": {
             "image_id": docker.image.inspect(image_tag).id,
