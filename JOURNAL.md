@@ -56,3 +56,21 @@ Mistral review feeding a v3 scaffold decision.
 
 Kevin: "let's get rid of derivation key". The Declined paragraph explaining it
 is removed; the plan no longer mentions it.
+
+## 2026-09-16T22:47Z plan reorganized into three sections
+
+Kevin: "4 does not belong in prepatory work. So there's 3 sections - prepatory,
+running, analysis", and "Let's number starting from 1 in each section". Agents
+and models moved under Running next to the re-run. Post-run work is now
+Analysis.
+
+## 2026-09-16T22:48Z literature review moved to the end
+
+Kevin: "Literature review - I think that should come after v2. Right? I don't
+want to bias myself; and I don't wanna go too deep too early". It is now the
+last Analysis item, after the v2 results.
+
+## 2026-09-16T22:48Z fourth section for outside reading
+
+Kevin: "same with mistral. So maybe it's _four_ sections". Mistral review and
+literature review now sit in an After v2 section, numbered from 1.
