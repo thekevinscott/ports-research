@@ -24,9 +24,30 @@ settles it as a full re-run, since any assembly change moves the corpus.
 
 Plan written to `notes/PLAN_2026-09-16-v2.md` on branch `v2-plan`.
 
-## 2026-09-16T22:41Z whitelist placement decided
+## 2026-09-16T22:27Z whitelist placement decided
 
 Kevin: "the whitelist should be made generic, and there should be a way to
 define it from gbnf-experiment". The copy-by-allow-set step and its tests go in
 porting-harness, which today receives a finished tree and does no assembly.
 gbnf-experiment supplies the set and drops its three removers. Plan updated.
+
+## 2026-09-16T22:29Z five decisions on the plan
+
+Kevin, reviewing the plan in flight. The prompt gets updated ("we'll want to
+update the prompt too"). Empty thinking text is on the fix list ("add this to
+the list of things to fix"); the lever is model choice, since opus-5 through the
+CLI writes none and fable does. API coverage tests are over gbnf's public
+surface, and the goal is to delete execute-test-suite's adapters ("I want to be
+able to remove the shim"). The plan cites the viewer's GitHub repo, not a local
+path, because the plan is public. He asked what the derivation key was; it is
+agent-proposed with no Kevin quote in the record, so writing it into the
+manifest moves to Declined.
+
+## 2026-09-16T22:31Z plan restructured into preparatory and post-run
+
+Kevin: "Let's separate into prepatory work and post-run work", and "pi will be
+done with openrouter, codex with openai, and claude with its denizens".
+Preparatory: whitelist, prompt, API tier and shim removal, three agents on
+three providers with a pilot each, viewer MVP. Then the re-run, 40 cells per
+agent. Post-run: the transcript questions, the analysis learning track, the
+Mistral review feeding a v3 scaffold decision.
