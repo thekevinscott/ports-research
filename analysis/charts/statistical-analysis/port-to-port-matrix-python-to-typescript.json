@@ -59,7 +59,7 @@
             "labelColor": {
               "expr": "datum.label === 'reference' ? '#0b0b0b' : '#898781'"
             },
-            "labelFontSize": 11,
+            "labelFontSize": 13,
             "labelFontWeight": {
               "expr": "datum.label === 'reference' ? 'bold' : 'normal'"
             },
@@ -100,7 +100,7 @@
             "labelColor": {
               "expr": "datum.label === 'reference' ? '#0b0b0b' : '#898781'"
             },
-            "labelFontSize": 11,
+            "labelFontSize": 13,
             "labelFontWeight": {
               "expr": "datum.label === 'reference' ? 'bold' : 'normal'"
             },
@@ -176,7 +176,7 @@
             "labelColor": {
               "expr": "datum.label === 'reference' ? '#0b0b0b' : '#898781'"
             },
-            "labelFontSize": 11,
+            "labelFontSize": 13,
             "labelFontWeight": {
               "expr": "datum.label === 'reference' ? 'bold' : 'normal'"
             },
@@ -258,7 +258,7 @@
             "labelColor": {
               "expr": "datum.label === 'reference' ? '#0b0b0b' : '#898781'"
             },
-            "labelFontSize": 11,
+            "labelFontSize": 13,
             "labelFontWeight": {
               "expr": "datum.label === 'reference' ? 'bold' : 'normal'"
             },
@@ -318,7 +318,7 @@
             "labelColor": {
               "expr": "datum.label === 'reference' ? '#0b0b0b' : '#898781'"
             },
-            "labelFontSize": 11,
+            "labelFontSize": 13,
             "labelFontWeight": {
               "expr": "datum.label === 'reference' ? 'bold' : 'normal'"
             },
@@ -359,7 +359,7 @@
             "labelColor": {
               "expr": "datum.label === 'reference' ? '#0b0b0b' : '#898781'"
             },
-            "labelFontSize": 11,
+            "labelFontSize": 13,
             "labelFontWeight": {
               "expr": "datum.label === 'reference' ? 'bold' : 'normal'"
             },
@@ -566,7 +566,7 @@
       }
     }
   ],
-  "height": 598,
+  "height": 589.0,
   "resolve": {
     "scale": {
       "color": "independent"
@@ -580,7 +580,7 @@
     "offset": 23,
     "subtitleFontSize": 10
   },
-  "width": 598,
+  "width": 589.0,
   "$schema": "https://vega.github.io/schema/vega-lite/v6.4.1.json",
   "datasets": {
     "data-ebdbc6effb92769e7902fdb3b00472b3": [

@@ -888,7 +888,7 @@ def _(
 
     # Compact cells leave room for readable run labels around the matrix.
     MATRIX_CELL_PX = 30
-    MATRIX_LABEL_PX = 11
+    MATRIX_LABEL_PX = 13
     MATRIX_STRIP_PX = 9
     MATRIX_STRIP_GAP = 4
     MUTED_INK = "#898781"

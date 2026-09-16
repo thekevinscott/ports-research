@@ -320,3 +320,21 @@ def test_matrix_scale_is_fixed_and_separates_the_two_medians():
         assert gap(scale["domain"]) > gap([min(values), max(values)])
         assert gap(scale["domain"]) > 1.5  # the data's own range managed 1.3
     assert domains[0] == domains[1]  # the two directions compare by eye
+
+
+def test_matrix_labels_hold_a_readable_size_in_the_blog_slot():
+    """The blog scales the SVG down, so 11px axis labels landed at about 9px."""
+    for direction in ("python-to-typescript", "typescript-to-python"):
+        spec = json.loads(
+            (CHARTS / f"statistical-analysis/port-to-port-matrix-{direction}.json").read_text()
+        )
+        axes = [
+            layer["encoding"][channel]["axis"]
+            for layer in spec["layer"]
+            for channel in ("x", "y")
+            if isinstance(layer["encoding"].get(channel, {}).get("axis"), dict)
+        ]
+        assert axes and {axis["labelFontSize"] for axis in axes} == {13}
+        # The legend and title keep their own sizes.
+        assert spec["layer"][0]["encoding"]["color"]["legend"]["labelFontSize"] == 9
+        assert spec["title"]["fontSize"] == 14
