@@ -86,3 +86,10 @@ experiment reveals some directions in which to go."
 Kevin proposed an in-loop oracle: a stronger model the agent can ask whether an
 action is "kosher", escalating to a human when unsure. He parked it as out of
 scope for v2. Recorded under earlier asks so it is not lost.
+
+## 2026-09-16T22:54Z post-hoc judge adopted
+
+The check-in oracle becomes a post-hoc judge: a stronger model scores every
+banked transcript against a fixed cheating rubric and escalates uncertain runs
+to Kevin. Kevin: "I love your counter proposal on my check-in! Yes absolutely."
+Added under Analysis, transcript questions.
