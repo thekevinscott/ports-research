@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "agent-harness-sandbox",
+    "pathspec>=1.1.1",
 ]
 
 [build-system]
