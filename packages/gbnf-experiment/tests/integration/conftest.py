@@ -8,6 +8,8 @@ from gbnf_experiment.config import settings
 
 GRAMMAR_FIXTURES = ("arithmetic", "json", "simple")
 MANIFESTS = {"typescript": "package.json", "python": "pyproject.toml"}
+SOURCE_DIRECTORIES = {"typescript": "src", "python": "gbnf"}
+IMPLEMENTATIONS = {"typescript": "index.ts", "python": "index.py"}
 COLOCATED_TESTS = {"typescript": "index.test.ts", "python": "index_test.py"}
 DEV_HARNESS = (
     "dev/browser/debug/index.html",
@@ -30,9 +32,10 @@ def write_derivation(directory: Path) -> None:
         source = directory / "source" / language
         source.mkdir(parents=True)
         (source / MANIFESTS[language]).write_text("{}")
-        (source / "src").mkdir()
-        (source / "src" / f"index.{language}").write_text(f"{language} source")
-        (source / "src" / COLOCATED_TESTS[language]).write_text(f"{language} tests")
+        code = source / SOURCE_DIRECTORIES[language]
+        code.mkdir()
+        (code / IMPLEMENTATIONS[language]).write_text(f"{language} source")
+        (code / COLOCATED_TESTS[language]).write_text(f"{language} tests")
         if language == "typescript":
             for name in DEV_HARNESS:
                 path = source / name

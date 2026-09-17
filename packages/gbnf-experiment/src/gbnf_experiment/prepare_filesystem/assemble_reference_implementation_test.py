@@ -13,6 +13,7 @@ NESTED_COLOCATED_TEST = {
     "python": "gbnf/utils/is_point_in_range_test.py",
 }
 IMPLEMENTATION = {"typescript": "src/gbnf.ts", "python": "gbnf/parse.py"}
+MANIFEST = {"typescript": "package.json", "python": "pyproject.toml"}
 COLOCATED_TEST_PATTERN = {"typescript": "*.test.ts", "python": "*_test.py"}
 CACHE_ARTEFACTS = (
     "gbnf/__pycache__/parse_test.cpython-314-pytest-9.1.1.pyc",
@@ -31,7 +32,7 @@ def derivation_directory(tmp_path):
     for language in ("typescript", "python"):
         source = directory / "source" / language
         source.mkdir(parents=True)
-        (source / f"index.{language}").write_text(language)
+        (source / MANIFEST[language]).write_text(language)
         for name in (
             IMPLEMENTATION[language],
             COLOCATED_TEST[language],
@@ -66,7 +67,7 @@ def surviving_colocated_tests(source: Path, language: str) -> list[str]:
 
 def describe_assemble_reference_implementation():
     def it_returns_the_output_directory(derivation_directory, output_directory):
-        assembled = assemble_reference_implementation(
+        assembled, *_ = assemble_reference_implementation(
             derivation_directory=derivation_directory,
             output_directory=output_directory,
             source_language="typescript",
@@ -83,7 +84,9 @@ def describe_assemble_reference_implementation():
             include_typescript_tests=False,
             include_python_tests=False,
         )
-        assert (output_directory / "source" / "index.typescript").read_text() == "typescript"
+        assert (output_directory / "source" / MANIFEST["typescript"]).read_text() == (
+            "typescript"
+        )
 
     def it_copies_the_other_source_language_when_asked(derivation_directory, output_directory):
         assemble_reference_implementation(
@@ -93,7 +96,7 @@ def describe_assemble_reference_implementation():
             include_typescript_tests=False,
             include_python_tests=False,
         )
-        assert (output_directory / "source" / "index.python").read_text() == "python"
+        assert (output_directory / "source" / MANIFEST["python"]).read_text() == "python"
 
     def it_rejects_a_language_with_no_derived_source(derivation_directory, output_directory):
         with pytest.raises(ValueError, match="No derived source for language: rust"):
@@ -259,7 +262,7 @@ def describe_assemble_reference_implementation():
                 include_python_tests=False,
             )
             source = output_directory / "source"
-            assert (source / "index.typescript").read_text() == "typescript"
+            assert (source / MANIFEST["typescript"]).read_text() == "typescript"
             assert (source / IMPLEMENTATION["typescript"]).read_text() == (
                 IMPLEMENTATION["typescript"]
             )

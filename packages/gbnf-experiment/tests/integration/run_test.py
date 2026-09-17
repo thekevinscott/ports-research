@@ -69,7 +69,7 @@ def describe_gbnf_experiment():
             [call] = porting_calls
             assert call["container_tree"] == [
                 "/workspace/reference_implementation/package.json",
-                "/workspace/reference_implementation/src/index.typescript",
+                "/workspace/reference_implementation/src/index.ts",
             ]
 
         def it_carries_the_python_source_when_porting_the_other_way(
@@ -78,8 +78,8 @@ def describe_gbnf_experiment():
             experiment(source_language="python")
             [call] = porting_calls
             assert call["container_tree"] == [
+                "/workspace/reference_implementation/gbnf/index.py",
                 "/workspace/reference_implementation/pyproject.toml",
-                "/workspace/reference_implementation/src/index.python",
             ]
 
         def it_keeps_the_typescript_colocated_tests_when_that_suite_was_included(
@@ -98,7 +98,7 @@ def describe_gbnf_experiment():
             experiment(source_language="python", include_python_tests=True)
             [call] = porting_calls
             assert (
-                "/workspace/reference_implementation/src/index_test.py"
+                "/workspace/reference_implementation/gbnf/index_test.py"
                 in call["container_tree"]
             )
 
