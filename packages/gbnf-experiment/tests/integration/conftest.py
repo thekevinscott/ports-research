@@ -144,7 +144,7 @@ def lockdown_docker():
     """
     with (
         patch("agent_harness_sandbox.utils.lockdown.docker", autospec=True) as m,
-        patch("agent_harness_sandbox.utils.lockdown.docker_cli", autospec=True),
+        patch("agent_harness_sandbox.utils.lockdown.docker_utils", autospec=True),
     ):
         m.image.exists.return_value = True
         m.network.docker_cmd = ["docker"]
