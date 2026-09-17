@@ -1,1 +1,679 @@
-{"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "concat": [{"layer": [{"mark": {"type": "tick", "color": "#0b0b0b", "opacity": 0.7, "size": 30, "thickness": 2}, "encoding": {"x": {"field": "condition", "scale": {"paddingInner": 0.25, "paddingOuter": 0.125}, "sort": ["no tests", "source tests", "target tests", "both tests"], "title": null, "type": "nominal"}, "y": {"aggregate": "median", "field": "value", "scale": {"domain": [23.96, 155.04], "nice": false}, "title": null, "type": "quantitative"}}}, {"mark": {"type": "point"}, "encoding": {"x": {"field": "condition", "scale": {"paddingInner": 0.25, "paddingOuter": 0.125}, "sort": ["no tests", "source tests", "target tests", "both tests"], "title": null, "type": "nominal"}, "xOffset": {"field": "nudge", "scale": {"domain": [-1.0, 1.0], "range": [9.0, 21.0]}, "title": null, "type": "quantitative"}, "y": {"field": "value", "scale": {"domain": [23.96, 155.04], "nice": false}, "type": "quantitative"}}}, {"mark": {"type": "rule"}, "encoding": {"y": {"aggregate": "median", "field": "reference", "scale": {"domain": [23.96, 155.04], "nice": false}, "type": "quantitative"}}, "transform": [{"filter": {"field": "reference", "valid": true}}]}], "data": {"name": "data-0dd52b264c45575ef80ee2be7fb37794"}, "height": 140, "title": {"text": "Files", "anchor": "start", "color": "#0b0b0b", "fontSize": 11}, "width": 160}, {"layer": [{"mark": {"type": "tick", "color": "#0b0b0b", "opacity": 0.7, "size": 30, "thickness": 2}, "encoding": {"x": {"field": "condition", "scale": {"paddingInner": 0.25, "paddingOuter": 0.125}, "sort": ["no tests", "source tests", "target tests", "both tests"], "title": null, "type": "nominal"}, "y": {"aggregate": "median", "field": "value", "scale": {"domain": [973.92, 1410.08], "nice": false}, "title": null, "type": "quantitative"}}}, {"mark": {"type": "point"}, "encoding": {"x": {"field": "condition", "scale": {"paddingInner": 0.25, "paddingOuter": 0.125}, "sort": ["no tests", "source tests", "target tests", "both tests"], "title": null, "type": "nominal"}, "xOffset": {"field": "nudge", "scale": {"domain": [-1.0, 1.0], "range": [9.0, 21.0]}, "title": null, "type": "quantitative"}, "y": {"field": "value", "scale": {"domain": [973.92, 1410.08], "nice": false}, "type": "quantitative"}}}, {"mark": {"type": "rule"}, "encoding": {"y": {"aggregate": "median", "field": "reference", "scale": {"domain": [973.92, 1410.08], "nice": false}, "type": "quantitative"}}, "transform": [{"filter": {"field": "reference", "valid": true}}]}], "data": {"name": "data-57e6dfa4703c2c07c56e1e6b0a97b20b"}, "height": 140, "title": {"text": "Lines of code", "anchor": "start", "color": "#0b0b0b", "fontSize": 11}, "width": 160}, {"layer": [{"mark": {"type": "tick", "color": "#0b0b0b", "opacity": 0.7, "size": 30, "thickness": 2}, "encoding": {"x": {"field": "condition", "scale": {"paddingInner": 0.25, "paddingOuter": 0.125}, "sort": ["no tests", "source tests", "target tests", "both tests"], "title": null, "type": "nominal"}, "y": {"aggregate": "median", "field": "value", "scale": {"domain": [2.4786206896551723, 3.0386206896551724], "nice": false}, "title": null, "type": "quantitative"}}}, {"mark": {"type": "point"}, "encoding": {"x": {"field": "condition", "scale": {"paddingInner": 0.25, "paddingOuter": 0.125}, "sort": ["no tests", "source tests", "target tests", "both tests"], "title": null, "type": "nominal"}, "xOffset": {"field": "nudge", "scale": {"domain": [-1.0, 1.0], "range": [9.0, 21.0]}, "title": null, "type": "quantitative"}, "y": {"field": "value", "scale": {"domain": [2.4786206896551723, 3.0386206896551724], "nice": false}, "type": "quantitative"}}}, {"mark": {"type": "rule"}, "encoding": {"y": {"aggregate": "median", "field": "reference", "scale": {"domain": [2.4786206896551723, 3.0386206896551724], "nice": false}, "type": "quantitative"}}, "transform": [{"filter": {"field": "reference", "valid": true}}]}], "data": {"name": "data-6ce6bce2af6c188dca6ea08ad52b77d4"}, "height": 140, "title": {"text": "Mean cyclomatic complexity", "anchor": "start", "color": "#0b0b0b", "fontSize": 11}, "width": 160}], "columns": 4, "$schema": "https://vega.github.io/schema/vega-lite/v6.4.1.json", "datasets": {"data-0dd52b264c45575ef80ee2be7fb37794": [{"condition": "no tests", "layout": "rebuilt the file layout", "metric": "file_count", "value": 36.0, "reference": 45.0, "nudge": -0.5}, {"condition": "no tests", "layout": "kept the file layout", "metric": "file_count", "value": 36.0, "reference": 45.0, "nudge": 0.5}, {"condition": "no tests", "layout": "kept the file layout", "metric": "file_count", "value": 146.0, "reference": 45.0, "nudge": 0.0}, {"condition": "no tests", "layout": "rebuilt the file layout", "metric": "file_count", "value": 41.0, "reference": 45.0, "nudge": 0.0}, {"condition": "no tests", "layout": "rebuilt the file layout", "metric": "file_count", "value": 37.0, "reference": 45.0, "nudge": 0.0}, {"condition": "source tests", "layout": "kept the file layout", "metric": "file_count", "value": 36.0, "reference": 45.0, "nudge": -0.5}, {"condition": "source tests", "layout": "kept the file layout", "metric": "file_count", "value": 36.0, "reference": 45.0, "nudge": 0.5}, {"condition": "source tests", "layout": "kept the file layout", "metric": "file_count", "value": 38.0, "reference": 45.0, "nudge": 0.0}, {"condition": "source tests", "layout": "kept the file layout", "metric": "file_count", "value": 34.0, "reference": 45.0, "nudge": 0.0}, {"condition": "source tests", "layout": "rebuilt the file layout", "metric": "file_count", "value": 37.0, "reference": 45.0, "nudge": 0.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "file_count", "value": 35.0, "reference": 45.0, "nudge": -1.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "file_count", "value": 35.0, "reference": 45.0, "nudge": 0.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "file_count", "value": 35.0, "reference": 45.0, "nudge": 1.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "file_count", "value": 36.0, "reference": 45.0, "nudge": 0.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "file_count", "value": 37.0, "reference": 45.0, "nudge": 0.0}, {"condition": "both tests", "layout": "kept the file layout", "metric": "file_count", "value": 33.0, "reference": 45.0, "nudge": 0.0}, {"condition": "both tests", "layout": "kept the file layout", "metric": "file_count", "value": 36.0, "reference": 45.0, "nudge": -0.5}, {"condition": "both tests", "layout": "kept the file layout", "metric": "file_count", "value": 36.0, "reference": 45.0, "nudge": 0.5}, {"condition": "both tests", "layout": "kept the file layout", "metric": "file_count", "value": 34.0, "reference": 45.0, "nudge": 0.0}, {"condition": "both tests", "layout": "kept the file layout", "metric": "file_count", "value": 35.0, "reference": 45.0, "nudge": 0.0}], "data-57e6dfa4703c2c07c56e1e6b0a97b20b": [{"condition": "no tests", "layout": "rebuilt the file layout", "metric": "loc", "value": 1044.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "no tests", "layout": "kept the file layout", "metric": "loc", "value": 1380.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "no tests", "layout": "rebuilt the file layout", "metric": "loc", "value": 1323.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "no tests", "layout": "rebuilt the file layout", "metric": "loc", "value": 1135.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "no tests", "layout": "kept the file layout", "metric": "loc", "value": 1234.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "source tests", "layout": "kept the file layout", "metric": "loc", "value": 1096.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "source tests", "layout": "kept the file layout", "metric": "loc", "value": 1256.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "source tests", "layout": "kept the file layout", "metric": "loc", "value": 1050.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "source tests", "layout": "rebuilt the file layout", "metric": "loc", "value": 1148.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "source tests", "layout": "kept the file layout", "metric": "loc", "value": 1082.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "loc", "value": 1117.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "loc", "value": 1114.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "loc", "value": 1131.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "loc", "value": 1129.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "loc", "value": 1039.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "both tests", "layout": "kept the file layout", "metric": "loc", "value": 1131.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "both tests", "layout": "kept the file layout", "metric": "loc", "value": 1170.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "both tests", "layout": "kept the file layout", "metric": "loc", "value": 1004.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "both tests", "layout": "kept the file layout", "metric": "loc", "value": 1133.0, "reference": 1143.0, "nudge": 0.0}, {"condition": "both tests", "layout": "kept the file layout", "metric": "loc", "value": 1025.0, "reference": 1143.0, "nudge": 0.0}], "data-6ce6bce2af6c188dca6ea08ad52b77d4": [{"condition": "no tests", "layout": "rebuilt the file layout", "metric": "mean_cyclomatic", "value": 2.784, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "no tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.6538461538461537, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "no tests", "layout": "rebuilt the file layout", "metric": "mean_cyclomatic", "value": 2.5314685314685317, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "no tests", "layout": "rebuilt the file layout", "metric": "mean_cyclomatic", "value": 2.748148148148148, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "no tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.7037037037037037, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "source tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.6929133858267718, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "source tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.6859504132231407, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "source tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.7063492063492065, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "source tests", "layout": "rebuilt the file layout", "metric": "mean_cyclomatic", "value": 2.5172413793103448, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "source tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.875, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.8545454545454545, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.871559633027523, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.90990990990991, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.891891891891892, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "target tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 3.0, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "both tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.8981481481481484, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "both tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.765217391304348, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "both tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.989795918367347, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "both tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.8796296296296298, "reference": 2.658333333333333, "nudge": 0.0}, {"condition": "both tests", "layout": "kept the file layout", "metric": "mean_cyclomatic", "value": 2.895238095238095, "reference": 2.658333333333333, "nudge": 0.0}]}}
+{
+  "config": {
+    "view": {
+      "continuousWidth": 300,
+      "continuousHeight": 300
+    },
+    "axis": {
+      "labelAngle": -45
+    },
+    "axisX": {
+      "labelAngle": -37.5
+    }
+  },
+  "concat": [
+    {
+      "layer": [
+        {
+          "mark": {
+            "type": "tick",
+            "color": "#0b0b0b",
+            "opacity": 0.7,
+            "size": 30,
+            "thickness": 2
+          },
+          "encoding": {
+            "x": {
+              "field": "condition",
+              "scale": {
+                "paddingInner": 0.25,
+                "paddingOuter": 0.125
+              },
+              "sort": [
+                "no tests",
+                "source tests",
+                "target tests",
+                "both tests"
+              ],
+              "title": "test inclusion",
+              "type": "nominal",
+              "axis": {
+                "labelFontSize": 17.32,
+                "titleFontSize": 12.375,
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]",
+                "labelAngle": -32.5,
+                "labelPadding": 6.0
+              }
+            },
+            "y": {
+              "aggregate": "median",
+              "field": "value",
+              "scale": {
+                "domain": [
+                  31.56,
+                  52.44
+                ],
+                "nice": false
+              },
+              "title": null,
+              "type": "quantitative",
+              "axis": {
+                "labelFontSize": 17.32,
+                "titleFontSize": 16.5,
+                "labelPadding": 9.0
+              }
+            }
+          }
+        },
+        {
+          "mark": {
+            "type": "point",
+            "filled": true,
+            "size": 96,
+            "fillOpacity": 0.5,
+            "stroke": "#4c78a8",
+            "strokeWidth": 2,
+            "strokeOpacity": 1
+          },
+          "encoding": {
+            "x": {
+              "field": "condition",
+              "scale": {
+                "paddingInner": 0.25,
+                "paddingOuter": 0.125
+              },
+              "sort": [
+                "no tests",
+                "source tests",
+                "target tests",
+                "both tests"
+              ],
+              "title": "test inclusion",
+              "type": "nominal",
+              "axis": {
+                "labelFontSize": 17.32,
+                "titleFontSize": 12.375,
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]",
+                "labelAngle": -32.5,
+                "labelPadding": 6.0
+              }
+            },
+            "xOffset": {
+              "field": "nudge",
+              "scale": {
+                "domain": [
+                  -1.0,
+                  1.0
+                ],
+                "range": [
+                  6.08203125,
+                  18.08203125
+                ]
+              },
+              "title": null,
+              "type": "quantitative"
+            },
+            "y": {
+              "field": "value",
+              "scale": {
+                "domain": [
+                  31.56,
+                  52.44
+                ],
+                "nice": false
+              },
+              "type": "quantitative",
+              "axis": {
+                "labelFontSize": 17.32,
+                "titleFontSize": 16.5,
+                "labelPadding": 9.0
+              }
+            }
+          }
+        },
+        {
+          "mark": {
+            "type": "rule",
+            "color": "#6e6e6e"
+          },
+          "encoding": {
+            "y": {
+              "aggregate": "median",
+              "field": "reference",
+              "scale": {
+                "domain": [
+                  31.56,
+                  52.44
+                ],
+                "nice": false
+              },
+              "type": "quantitative",
+              "axis": {
+                "labelFontSize": 17.32,
+                "titleFontSize": 16.5,
+                "labelPadding": 9.0
+              }
+            }
+          },
+          "transform": [
+            {
+              "filter": {
+                "field": "reference",
+                "valid": true
+              }
+            }
+          ]
+        }
+      ],
+      "data": {
+        "name": "data-0dd52b264c45575ef80ee2be7fb37794"
+      },
+      "height": 140,
+      "title": {
+        "text": "Files",
+        "anchor": "start",
+        "color": "#0b0b0b",
+        "fontSize": 12.375,
+        "dx": 33.9864563580015
+      },
+      "width": 128.875
+    },
+    {
+      "layer": [
+        {
+          "mark": {
+            "type": "tick",
+            "color": "#0b0b0b",
+            "opacity": 0.7,
+            "size": 30,
+            "thickness": 2
+          },
+          "encoding": {
+            "x": {
+              "field": "condition",
+              "scale": {
+                "paddingInner": 0.25,
+                "paddingOuter": 0.125
+              },
+              "sort": [
+                "no tests",
+                "source tests",
+                "target tests",
+                "both tests"
+              ],
+              "title": "test inclusion",
+              "type": "nominal",
+              "axis": {
+                "labelFontSize": 17.32,
+                "titleFontSize": 12.375,
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]",
+                "labelAngle": -32.5,
+                "labelPadding": 6.0
+              }
+            },
+            "y": {
+              "aggregate": "median",
+              "field": "value",
+              "scale": {
+                "domain": [
+                  906.44,
+                  1494.56
+                ],
+                "nice": false
+              },
+              "title": null,
+              "type": "quantitative",
+              "axis": {
+                "labelFontSize": 17.32,
+                "titleFontSize": 16.5,
+                "format": "~s"
+              }
+            }
+          }
+        },
+        {
+          "mark": {
+            "type": "point",
+            "filled": true,
+            "size": 96,
+            "fillOpacity": 0.5,
+            "stroke": "#4c78a8",
+            "strokeWidth": 2,
+            "strokeOpacity": 1
+          },
+          "encoding": {
+            "x": {
+              "field": "condition",
+              "scale": {
+                "paddingInner": 0.25,
+                "paddingOuter": 0.125
+              },
+              "sort": [
+                "no tests",
+                "source tests",
+                "target tests",
+                "both tests"
+              ],
+              "title": "test inclusion",
+              "type": "nominal",
+              "axis": {
+                "labelFontSize": 17.32,
+                "titleFontSize": 12.375,
+                "labelExpr": "{'no tests': 'none', 'source tests': 'source', 'target tests': 'target', 'both tests': 'both'}[datum.label]",
+                "labelAngle": -32.5,
+                "labelPadding": 6.0
+              }
+            },
+            "xOffset": {
+              "field": "nudge",
+              "scale": {
+                "domain": [
+                  -1.0,
+                  1.0
+                ],
+                "range": [
+                  6.08203125,
+                  18.08203125
+                ]
+              },
+              "title": null,
+              "type": "quantitative"
+            },
+            "y": {
+              "field": "value",
+              "scale": {
+                "domain": [
+                  906.44,
+                  1494.56
+                ],
+                "nice": false
+              },
+              "type": "quantitative",
+              "axis": {
+                "labelFontSize": 17.32,
+                "titleFontSize": 16.5,
+                "format": "~s"
+              }
+            }
+          }
+        },
+        {
+          "mark": {
+            "type": "rule",
+            "color": "#6e6e6e"
+          },
+          "encoding": {
+            "y": {
+              "aggregate": "median",
+              "field": "reference",
+              "scale": {
+                "domain": [
+                  906.44,
+                  1494.56
+                ],
+                "nice": false
+              },
+              "type": "quantitative",
+              "axis": {
+                "labelFontSize": 17.32,
+                "titleFontSize": 16.5,
+                "format": "~s"
+              }
+            }
+          },
+          "transform": [
+            {
+              "filter": {
+                "field": "reference",
+                "valid": true
+              }
+            }
+          ]
+        }
+      ],
+      "data": {
+        "name": "data-57e6dfa4703c2c07c56e1e6b0a97b20b"
+      },
+      "height": 140,
+      "title": {
+        "text": "LOC",
+        "anchor": "start",
+        "color": "#0b0b0b",
+        "fontSize": 12.375,
+        "dx": 36.51263406664137
+      },
+      "width": 128.875
+    }
+  ],
+  "columns": 4,
+  "title": {
+    "text": "python \u2192 typescript*",
+    "fontSize": 19.5,
+    "anchor": "start"
+  },
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.4.1.json",
+  "datasets": {
+    "data-0dd52b264c45575ef80ee2be7fb37794": [
+      {
+        "condition": "no tests",
+        "layout": "rebuilt the file layout",
+        "metric": "file_count",
+        "value": 36.0,
+        "reference": 45.0,
+        "nudge": -0.5
+      },
+      {
+        "condition": "no tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 36.0,
+        "reference": 45.0,
+        "nudge": 0.5
+      },
+      {
+        "condition": "no tests",
+        "layout": "rebuilt the file layout",
+        "metric": "file_count",
+        "value": 41.0,
+        "reference": 45.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "no tests",
+        "layout": "rebuilt the file layout",
+        "metric": "file_count",
+        "value": 37.0,
+        "reference": 45.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "source tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 36.0,
+        "reference": 45.0,
+        "nudge": -0.5
+      },
+      {
+        "condition": "source tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 36.0,
+        "reference": 45.0,
+        "nudge": 0.5
+      },
+      {
+        "condition": "source tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 38.0,
+        "reference": 45.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "source tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 34.0,
+        "reference": 45.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "source tests",
+        "layout": "rebuilt the file layout",
+        "metric": "file_count",
+        "value": 37.0,
+        "reference": 45.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "target tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 35.0,
+        "reference": 45.0,
+        "nudge": -1.0
+      },
+      {
+        "condition": "target tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 35.0,
+        "reference": 45.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "target tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 35.0,
+        "reference": 45.0,
+        "nudge": 1.0
+      },
+      {
+        "condition": "target tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 36.0,
+        "reference": 45.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "target tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 37.0,
+        "reference": 45.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "both tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 33.0,
+        "reference": 45.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "both tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 36.0,
+        "reference": 45.0,
+        "nudge": -0.5
+      },
+      {
+        "condition": "both tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 36.0,
+        "reference": 45.0,
+        "nudge": 0.5
+      },
+      {
+        "condition": "both tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 34.0,
+        "reference": 45.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "both tests",
+        "layout": "kept the file layout",
+        "metric": "file_count",
+        "value": 35.0,
+        "reference": 45.0,
+        "nudge": 0.0
+      }
+    ],
+    "data-57e6dfa4703c2c07c56e1e6b0a97b20b": [
+      {
+        "condition": "no tests",
+        "layout": "rebuilt the file layout",
+        "metric": "loc",
+        "value": 1044.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "no tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1380.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "no tests",
+        "layout": "rebuilt the file layout",
+        "metric": "loc",
+        "value": 1323.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "no tests",
+        "layout": "rebuilt the file layout",
+        "metric": "loc",
+        "value": 1135.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "no tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1234.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "source tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1096.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "source tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1256.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "source tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1050.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "source tests",
+        "layout": "rebuilt the file layout",
+        "metric": "loc",
+        "value": 1148.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "source tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1082.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "target tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1117.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "target tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1114.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "target tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1131.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "target tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1129.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "target tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1039.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "both tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1131.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "both tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1170.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "both tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1004.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "both tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1133.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      },
+      {
+        "condition": "both tests",
+        "layout": "kept the file layout",
+        "metric": "loc",
+        "value": 1025.0,
+        "reference": 1143.0,
+        "nudge": 0.0
+      }
+    ]
+  },
+  "padding": {
+    "left": 5,
+    "top": 5,
+    "right": 10.5,
+    "bottom": 5
+  }
+}

@@ -8,6 +8,7 @@ dependencies = [
     "dirsql>=0.4.39",
     "gbnf-experiment",
     "marimo>=0.24.0",
+    "measure-embedding",
     "polars>=1.44.1",
     "pygount>=3.2.0",
     "scikit-learn>=1.9.0",
@@ -26,3 +27,4 @@ watcher_on_save = "autorun"
 
 [tool.uv.sources]
 gbnf-experiment = { path = "../packages/gbnf-experiment", editable = true }
+measure-embedding = { path = "../proposed-projects/measure-embedding", editable = true }

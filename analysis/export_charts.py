@@ -10,13 +10,31 @@ the first chart is built.
 
 from pathlib import Path
 
+import altair as alt
 import polars as pl
 
 from runs import app
+from src.chart_export import align_panel_titles, fit_pair, share_y_domains, write_chart
 
 CHARTS = Path(__file__).resolve().parent / "charts"
+# Blog slots: a 757px body; side-by-side pairs split it with a 1rem (16px) gap. Charts in
+# a slot render 1:1 at these widths, so fonts hold one pixel size across the blog.
+BODY_WIDTH = 757
+HALF_WIDTH = (BODY_WIDTH - 16) / 2
+SLOT_WIDTHS = {
+    "performance/ladder-ref-ratio-": HALF_WIDTH,
+    "statistical-analysis/size-": HALF_WIDTH,
+    "statistical-analysis/port-to-port-matrix-": BODY_WIDTH,
+}
+# Builder widths that land each slot chart just under its slot; fit_pair pads the rest.
+SIZE_PANEL_WIDTH = 128.875
+SIZE_LABEL_ANGLE = -32.5  # 5 degrees closer to horizontal than the blog's default
+# One py->ts run exploded to 146 files (every other run lands at 33-51) and one
+# ts->py run to 2,075 LOC; both squash their panels' ranges. The size charts drop
+# those runs and carry an asterisk.
+SIZE_OUTLIER = (pl.col("file_count") > 100) | (pl.col("loc") > 2000)
+MATRIX_SIDE = 598
 LANGUAGES = ("python", "typescript")
-FORMATS = {".svg": {}, ".png": {"scale_factor": 2}, ".json": {}}
 # The notebook renders reverse_report for these two sections only: there is no reverse ladder.
 REVERSE_SECTIONS = ("diff", "embeddings")
 GROUPS = {"embeddings": "embeddings", "performance": "performance"}
@@ -36,6 +54,13 @@ def slug(name):
 
 def charts(notebook):
     """Every chart runs.py renders, as (path stem, chart)."""
+    for source, target in (("python", "typescript"), ("typescript", "python")):
+        yield (
+            f"embeddings/port-pairs-{source}-to-{target}",
+            notebook["embedding_pair_chart"](
+                notebook["embedding_pair_report"]["comparisons"], source, target
+            ),
+        )
     chart = notebook["chart"]
     calibration = notebook["CALIBRATION"]
     lead = notebook["DIFF_LEAD"]
@@ -45,13 +70,40 @@ def charts(notebook):
     sections = notebook["SECTIONS"]
     shim = notebook["SHIM_COLUMNS"]
 
+    axis_label_px = notebook["AXIS_LABEL_PX"]
+    main_title_px = notebook["MAIN_TITLE_PX"]
+
     def section_charts(section, metrics, frame, target_language, source_language, flags):
-        def build(columns):
-            return chart(frame, target_language, source_language, columns, flags, calibration)
+        def build(columns, font_scale=1.0):
+            size = (
+                {
+                    "panel_width": SIZE_PANEL_WIDTH,
+                    "axis_label_size": axis_label_px,
+                    "x_label_angle": SIZE_LABEL_ANGLE,
+                    "panel_title_scale": 0.75,
+                    "test_axis": True,
+                }
+                if section == "size"
+                else {}
+            )
+            return chart(
+                frame, target_language, source_language, columns, flags, calibration, font_scale, **size
+            )
 
         section_lead = next((metric for metric in metrics if metric in leads), None)
         if section_lead is None:
-            yield slug(section), build(metrics)
+            if section == "size":
+                built = build(metrics, font_scale=1.5)
+                built = built.properties(
+                    title=alt.TitleParams(
+                        f"{source_language} → {target_language}*",
+                        fontSize=main_title_px,
+                        anchor="start",
+                    )
+                )
+            else:
+                built = build(metrics)
+            yield slug(section), built
             return
         # section_chart splits a led section: the lead on its own, the rest in an accordion.
         yield slug(section_lead), build([section_lead])
@@ -78,7 +130,7 @@ def charts(notebook):
             for name, built in section_charts(
                 section,
                 metrics,
-                by_source,
+                by_source.filter(~SIZE_OUTLIER) if section == "size" else by_source,
                 target_language,
                 source_language,
                 notebook["CONDITION_FLAGS"],
@@ -102,7 +154,7 @@ def charts(notebook):
         )
         yield (
             f"{FORWARD_GROUP}/port-to-port-matrix-{direction}",
-            notebook["pair_matrix_chart"](source_language),
+            notebook["pair_matrix_chart"](source_language, side=MATRIX_SIDE),
         )
 
     yield f"{FORWARD_GROUP}/port-to-port-similarity-pct", notebook["pair_chart"]()
@@ -145,21 +197,34 @@ def charts(notebook):
 
 
 def write(chart, stem):
-    base = CHARTS / stem
-    base.parent.mkdir(parents=True, exist_ok=True)
-    written = []
-    for suffix, options in FORMATS.items():
-        path = base.with_name(base.name + suffix)
-        chart.save(str(path), **options)
-        written.append(path)
-    return written
+    return write_chart(chart, CHARTS / stem)
 
 
 def main():
     _outputs, notebook = app.run()
+    pending = {}
     for stem, chart in charts(notebook):
-        for path in write(chart, stem):
-            print(path.relative_to(CHARTS.parent))
+        slot = next(
+            ((prefix, width) for prefix, width in SLOT_WIDTHS.items() if stem.startswith(prefix)),
+            None,
+        )
+        if slot is None:
+            for path in write(chart, stem):
+                print(path.relative_to(CHARTS.parent))
+        else:
+            pending.setdefault(slot, []).append((stem, chart))
+    for (prefix, width), group in pending.items():
+        specs = [chart.to_dict() for _, chart in group]
+        if prefix == "statistical-analysis/size-":
+            # The two directions share each panel's y domain so the pair compares by eye.
+            specs = share_y_domains(specs)
+        fitted = fit_pair(specs, width)
+        if prefix == "statistical-analysis/size-":
+            # Panel-title dx goes on last, after fit_pair has settled the margins.
+            fitted = [align_panel_titles(spec) for spec in fitted]
+        for (stem, _), spec in zip(group, fitted):
+            for path in write(spec, stem):
+                print(path.relative_to(CHARTS.parent))
 
 
 if __name__ == "__main__":
