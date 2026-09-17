@@ -33,4 +33,8 @@ WORKDIR /repository/packages/gbnf/javascript
 
 COPY scaffolding/ /scaffolding/
 COPY prepare.sh /prepare.sh
-CMD ["/bin/sh", "/prepare.sh"]
+RUN /bin/sh /prepare.sh
+
+# cp, not cp -a: the run-time user is the host uid and cannot preserve the
+# build-time root ownership.
+CMD ["/bin/sh", "-c", "cp -r /prepared/. /prepared-output/"]
