@@ -66,6 +66,8 @@ class PreparedFilesystem:
             condition={
                 **kwargs,
             },
+            patterns=self.reference_implementation_patterns,
+            included=self.reference_implementation_included,
             image_tag=agent.image,
             gbnf_commit=settings.gbnf_commit,
             completed_at=None,
@@ -82,6 +84,8 @@ class PreparedFilesystem:
             condition={
                 **kwargs,
             },
+            patterns=self.reference_implementation_patterns,
+            included=self.reference_implementation_included,
             image_tag=agent.image,
             gbnf_commit=settings.gbnf_commit,
             completed_at=datetime.now(UTC),

@@ -10,6 +10,7 @@ from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
 from gbnf_experiment import run_gbnf_experiment
 from gbnf_experiment.cli import cli
 from gbnf_experiment.config import derivation_cache_key, settings
+from gbnf_experiment.prepare_filesystem.reference_patterns import reference_patterns
 from porting_harness.run_porting_harness import PROMPT_PATH
 
 CONFIG = {
@@ -258,6 +259,7 @@ def describe_the_manifest():
             "completed_at",
             "condition",
             "derivation",
+            "reference_implementation",
             "sandbox",
             "harness",
         }
@@ -278,6 +280,35 @@ def describe_the_manifest():
             "effort": "low",
             "model": "claude-sonnet-4-5",
         }
+
+    def it_records_the_whitelist_the_reference_was_assembled_from(experiment, manifest):
+        experiment()
+        assert manifest()["reference_implementation"]["patterns"] == list(
+            reference_patterns(
+                source_language="typescript",
+                include_typescript_tests=False,
+                include_python_tests=False,
+            )
+        )
+
+    def it_counts_every_path_it_named(experiment, manifest):
+        experiment()
+        recorded = manifest()["reference_implementation"]
+        assert recorded["included_count"] == len(recorded["included"])
+
+    def it_withholds_the_colocated_test_from_the_record_and_the_tree(
+        experiment, manifest, porting_calls
+    ):
+        experiment()
+        assert (
+            "src/index.test.ts"
+            not in manifest()["reference_implementation"]["included"]
+        )
+        [call] = porting_calls
+        assert (
+            "/workspace/reference_implementation/src/index.test.ts"
+            not in call["container_tree"]
+        )
 
     def it_records_the_pinned_commit(experiment, manifest):
         experiment()

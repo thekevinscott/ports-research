@@ -1,5 +1,6 @@
 import json
 import subprocess
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -16,6 +17,8 @@ def write_manifest(
     *,
     timestamp: datetime,
     condition: dict,
+    patterns: Sequence[str],
+    included: Sequence[str],
     image_tag: str,
     gbnf_commit: str,
     completed_at: datetime | None = None,
@@ -31,6 +34,11 @@ def write_manifest(
         "condition": condition,
         "derivation": {
             "gbnf_commit": gbnf_commit,
+        },
+        "reference_implementation": {
+            "patterns": list(patterns),
+            "included_count": len(included),
+            "included": list(included),
         },
         "sandbox": {
             "image_id": docker.image.inspect(image_tag).id,
