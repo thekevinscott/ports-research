@@ -69,7 +69,7 @@ def describe_gbnf_experiment():
             [call] = porting_calls
             assert call["container_tree"] == [
                 "/workspace/reference_implementation/package.json",
-                "/workspace/reference_implementation/src/index.typescript",
+                "/workspace/reference_implementation/src/index.ts",
             ]
 
         def it_carries_the_python_source_when_porting_the_other_way(
@@ -78,28 +78,28 @@ def describe_gbnf_experiment():
             experiment(source_language="python")
             [call] = porting_calls
             assert call["container_tree"] == [
+                "/workspace/reference_implementation/gbnf/index.py",
                 "/workspace/reference_implementation/pyproject.toml",
-                "/workspace/reference_implementation/src/index.python",
             ]
 
-        def it_keeps_the_typescript_colocated_tests_when_that_suite_was_included(
+        def it_withholds_the_typescript_colocated_tests_even_when_that_suite_was_included(
             experiment, porting_calls
         ):
             experiment(include_typescript_tests=True)
             [call] = porting_calls
             assert (
                 "/workspace/reference_implementation/src/index.test.ts"
-                in call["container_tree"]
+                not in call["container_tree"]
             )
 
-        def it_keeps_the_python_colocated_tests_when_that_suite_was_included(
+        def it_withholds_the_python_colocated_tests_even_when_that_suite_was_included(
             experiment, porting_calls
         ):
             experiment(source_language="python", include_python_tests=True)
             [call] = porting_calls
             assert (
-                "/workspace/reference_implementation/src/index_test.py"
-                in call["container_tree"]
+                "/workspace/reference_implementation/gbnf/index_test.py"
+                not in call["container_tree"]
             )
 
         def it_hides_the_typescript_dev_harness(experiment, porting_calls):
@@ -258,6 +258,7 @@ def describe_the_manifest():
             "completed_at",
             "condition",
             "derivation",
+            "reference_implementation",
             "sandbox",
             "harness",
         }
@@ -278,6 +279,32 @@ def describe_the_manifest():
             "effort": "low",
             "model": "claude-sonnet-4-5",
         }
+
+    def it_records_the_whitelist_the_reference_was_assembled_from(experiment, manifest):
+        experiment()
+        patterns = manifest()["reference_implementation"]["patterns"]
+        assert "/src/**/*.ts" in patterns
+        assert "/gbnf/**/*.py" not in patterns
+        assert "!**/*.test.ts" in patterns
+
+    def it_counts_every_path_it_named(experiment, manifest):
+        experiment()
+        recorded = manifest()["reference_implementation"]
+        assert recorded["included_count"] == len(recorded["included"])
+
+    def it_withholds_the_colocated_test_from_the_record_and_the_tree(
+        experiment, manifest, porting_calls
+    ):
+        experiment()
+        assert (
+            "src/index.test.ts"
+            not in manifest()["reference_implementation"]["included"]
+        )
+        [call] = porting_calls
+        assert (
+            "/workspace/reference_implementation/src/index.test.ts"
+            not in call["container_tree"]
+        )
 
     def it_records_the_pinned_commit(experiment, manifest):
         experiment()
