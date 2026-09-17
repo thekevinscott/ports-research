@@ -26,22 +26,26 @@ Three packages, each configuring the one above it.
   directory, mounts each read-only, and binds the output directory writable.
 - `packages/gbnf-experiment` — configures porting-harness specifically for
   gbnf. Runs necessary pre-work such as generating the test suite (the
-  derivation image in `docker/derivation`, cached under
-  `~/.cache/ports/gbnf-experiment/derivations/`). Otherwise minimal. CLI
+  gbnf-prepare image in `docker/gbnf-prepare`, cached under
+  `~/.cache/ports/gbnf-experiment/prepared/`). Otherwise minimal. CLI
   `run-gbnf-experiment`; each invocation writes one run directory under `data/`.
 
 ## Reference provenance
 
-The derivation Dockerfile clones `github.com/thekevinscott/gbnf`, checks out
+The gbnf-prepare Dockerfile clones `github.com/thekevinscott/gbnf`, checks out
 the pin in `gbnf_experiment/config.py` (`13f1aca`, the merge of gbnf PR #81)
 and applies `patches/`.
 
 Runs banked before the bundle removal record `derivation_cache_key =
-390bf534c55d496b` in their manifests; the current key is `af673dbe41be73ce`.
-Only the hash input set changed, not the corpus: rebuilding at the new key and
-running `diff -rq` against the old tree reports both identical across all 250
-files, differing only in `__pycache__` bytecode the old tree accumulated after
-derivation. Manifests are left as banked.
+390bf534c55d496b` in their manifests; the key after that was
+`af673dbe41be73ce`. Only the hash input set changed, not the corpus:
+rebuilding at the new key and running `diff -rq` against the old tree reports
+both identical across all 250 files, differing only in `__pycache__` bytecode
+the old tree accumulated after derivation. Manifests are left as banked.
+
+Renaming the container to gbnf-prepare moved the key again, to
+`771a734d60ecbae5`. Only names changed; the corpus the container emits is the
+same.
 
 ## Supporting packages
 
@@ -49,7 +53,7 @@ derivation. Manifests are left as banked.
   <python|typescript|javascript> --target <dir>`. Runs gbnf's derived test
   suite against one ported implementation on the host, prints one line of JSON
   with pass, fail, error and skip counts, and exits 0 on success. Needs the
-  derivation cache, which a gbnf-experiment run builds. Calls no model.
+  prepared corpus cache, which a gbnf-experiment run builds. Calls no model.
 - `packages/generate-embedding` — CLI `generate-embedding <file> --model
   <name>`. Embeds one code file through an OpenAI-compatible `/v1/embeddings`
   endpoint (`GENERATE_EMBEDDING_BASE_URL`, optional `GENERATE_EMBEDDING_API_KEY`)
@@ -99,7 +103,7 @@ package. The core packages chain through editable path deps: porting-harness
 -> agent-harness-sandbox, gbnf-experiment -> porting-harness,
 execute-test-suite -> gbnf-experiment. gbnf-experiment reads
 `GBNF_EXPERIMENT_*` env vars (pydantic-settings; among them `DATA_DIRECTORY`,
-`DERIVATIONS_DIRECTORY`, `GBNF_COMMIT`, `IMAGE_TAG`) and `XDG_CACHE_HOME` for
+`PREPARED_DIRECTORY`, `GBNF_COMMIT`, `IMAGE_TAG`) and `XDG_CACHE_HOME` for
 the cache root.
 
 Auth: no API key env var. `ClaudeAgent` copies the host's

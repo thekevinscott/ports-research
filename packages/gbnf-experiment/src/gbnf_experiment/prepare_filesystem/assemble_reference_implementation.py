@@ -8,15 +8,15 @@ from .remove_dev_harness import remove_dev_harness
 
 def assemble_reference_implementation(
     *,
-    derivation_directory: Path,
+    prepared_directory: Path,
     output_directory: Path,
     source_language: str,
     include_typescript_tests: bool,
     include_python_tests: bool,
 ) -> Path:
-    source_directory = derivation_directory / "source" / source_language
+    source_directory = prepared_directory / "source" / source_language
     if not source_directory.is_dir():
-        raise ValueError(f"No derived source for language: {source_language}")
+        raise ValueError(f"No prepared source for language: {source_language}")
     included = {
         "typescript": include_typescript_tests,
         "python": include_python_tests,
@@ -40,7 +40,7 @@ def assemble_reference_implementation(
     for language, wanted in included.items():
         if wanted:
             shutil.copytree(
-                derivation_directory / "tests" / language,
+                prepared_directory / "tests" / language,
                 output_directory / "tests" / language,
             )
     return output_directory

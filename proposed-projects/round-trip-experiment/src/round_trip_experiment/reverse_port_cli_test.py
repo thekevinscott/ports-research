@@ -30,7 +30,7 @@ REPORT = {
     "reverse_root": "/pkg/reverse/20260909T001426Z_1c28aa33",
     "argv": ["uv", "run", "--directory", "/repo/packages/gbnf-experiment", "run-gbnf-experiment"],
     "env": {
-        "GBNF_EXPERIMENT_DERIVATIONS_DIRECTORY": "/cache/staging/20260909T001426Z_1c28aa33",
+        "GBNF_EXPERIMENT_PREPARED_DIRECTORY": "/cache/staging/20260909T001426Z_1c28aa33",
         "GBNF_EXPERIMENT_DATA_DIRECTORY": "/pkg/reverse/20260909T001426Z_1c28aa33",
     },
     "estimate": {"total_tokens": 4697263, "api_calls": 63, "duration_ms": 456517},
@@ -91,7 +91,7 @@ def launch():
 @pytest.fixture
 def places():
     with (
-        patch("round_trip_experiment.reverse_port_cli.derivation_cache_key", "390bf534c55d496b"),
+        patch("round_trip_experiment.reverse_port_cli.prepare_cache_key", "390bf534c55d496b"),
         patch("round_trip_experiment.reverse_port_cli.gbnf_settings") as gbnf,
         patch("round_trip_experiment.reverse_port_cli.settings") as own,
         patch(
@@ -99,7 +99,7 @@ def places():
             Path("/repo/packages/gbnf-experiment"),
         ),
     ):
-        gbnf.derivations_directory = Path("/cache/gbnf-experiment/derivations")
+        gbnf.prepared_directory = Path("/cache/gbnf-experiment/derivations")
         own.staging_directory = Path("/cache/staging")
         own.reverse_directory = Path("/pkg/reverse")
         yield

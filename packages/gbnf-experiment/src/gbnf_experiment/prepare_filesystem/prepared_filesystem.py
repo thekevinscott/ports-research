@@ -4,7 +4,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Tuple
 from agent_harness_sandbox.agents.agent import Agent
-from ..config import settings, derivation_cache_key
+from ..config import settings, prepare_cache_key
 from .assemble_reference_implementation import assemble_reference_implementation
 from .prepare_reference_implementation import prepare_reference_implementation
 from .run_directory_name import run_directory_name
@@ -20,10 +20,10 @@ class PreparedFilesystem:
         debug: bool,
     ):
         self.timestamp = datetime.now(UTC)
-        self.derivation_directory = settings.derivations_directory / derivation_cache_key
-        if not self.derivation_directory.exists():
+        self.prepared_directory = settings.prepared_directory / prepare_cache_key
+        if not self.prepared_directory.exists():
             prepare_reference_implementation(
-                output_directory=self.derivation_directory, 
+                output_directory=self.prepared_directory, 
                 debug=debug,
             )
         self.run_directory = settings.data_directory / run_directory_name(self.timestamp)
@@ -32,10 +32,10 @@ class PreparedFilesystem:
         self.transcript_directory = self.run_directory / "transcript"
         self.transcript_directory.mkdir()
         # Scratch, not run record: the container reads this tree read-only for the
-        # length of the run, and it is reassembled from the derivation cache.
+        # length of the run, and it is reassembled from the prepared corpus cache.
         self._reference_implementation_staging = TemporaryDirectory()
         self.reference_implementation_directory = assemble_reference_implementation(
-            derivation_directory=self.derivation_directory,
+            prepared_directory=self.prepared_directory,
             output_directory=Path(self._reference_implementation_staging.name)
             / "reference_implementation",
             source_language=source_language,

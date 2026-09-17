@@ -1,7 +1,7 @@
 [project]
 name = "gbnf-experiment"
 version = "0.1.0"
-description = "The GBNF porting experiment: derive a reference corpus, port it in a sandbox, grade the port by test pass rate"
+description = "The GBNF porting experiment: prepare a reference corpus, port it in a sandbox, grade the port by test pass rate"
 readme = "README.md"
 authors = [
     { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }

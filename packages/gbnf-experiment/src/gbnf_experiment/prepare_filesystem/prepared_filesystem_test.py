@@ -27,7 +27,7 @@ def settings(tmp_path):
     with patch(
         "gbnf_experiment.prepare_filesystem.prepared_filesystem.settings", autospec=True
     ) as m:
-        m.derivations_directory = tmp_path / "cache" / "derivations"
+        m.prepared_directory = tmp_path / "cache" / "prepared"
         m.data_directory = tmp_path / "data"
         m.gbnf_commit = "13f1aca"
         yield m

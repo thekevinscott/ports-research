@@ -24,8 +24,8 @@ def volume_source(volumes, target):
     return Path(source)
 
 
-def write_derivation(directory: Path) -> None:
-    """What the real derivation container emits into /derivation-output."""
+def write_prepared_output(directory: Path) -> None:
+    """What the real gbnf-prepare container emits into /prepared-output."""
     for language in ("typescript", "python"):
         source = directory / "source" / language
         source.mkdir(parents=True)
@@ -64,28 +64,28 @@ def data_directory(tmp_path):
 
 
 @pytest.fixture(autouse=True)
-def derivations_directory(tmp_path):
-    """The derivation cache, redirected out of the user's real ~/.cache.
+def prepared_directory(tmp_path):
+    """The prepared corpus cache, redirected out of the user's real ~/.cache.
 
     Autouse: the cache no longer sits under data_directory, so redirecting that
-    alone would leave any test that derives writing into the host's cache.
+    alone would leave any test that prepares writing into the host's cache.
     """
-    directory = tmp_path / "cache" / "derivations"
-    with patch.object(settings, "derivations_directory", directory):
+    directory = tmp_path / "cache" / "prepared"
+    with patch.object(settings, "prepared_directory", directory):
         yield directory
 
 
 @pytest.fixture
-def derivation_docker():
-    """The derivation container, faked at the docker boundary."""
+def prepare_docker():
+    """The gbnf-prepare container, faked at the docker boundary."""
     with patch(
         "gbnf_experiment.prepare_filesystem.prepare_reference_implementation.docker",
         autospec=True,
     ) as m:
 
         def fake_run(tag, user=None, volumes=None, remove=None):
-            write_derivation(volume_source(volumes, "/derivation-output"))
-            return "derived"
+            write_prepared_output(volume_source(volumes, "/prepared-output"))
+            return "prepared"
 
         m.run.side_effect = fake_run
         yield m

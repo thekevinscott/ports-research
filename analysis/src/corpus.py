@@ -10,8 +10,8 @@ from src.run_table import completed_runs
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "packages" / "gbnf-experiment" / "data"
 REVERSE = ROOT / "proposed-projects" / "round-trip-experiment" / "reverse"
-DERIVATION = "af673dbe41be73ce"
-REFERENCE = Path.home() / ".cache" / "ports" / "gbnf-experiment" / "derivations" / DERIVATION / "source"
+PREPARED = "771a734d60ecbae5"
+REFERENCE = Path.home() / ".cache" / "ports" / "gbnf-experiment" / "prepared" / PREPARED / "source"
 EXCLUDE = [
     "node_modules",
     "__pycache__",

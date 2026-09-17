@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
-from gbnf_experiment.config import derivation_cache_key, settings
+from gbnf_experiment.config import prepare_cache_key, settings
 
 from execute_test_suite.cli import cli
 
@@ -79,18 +79,18 @@ def describe_cli():
         assert execute_test_suite_function.call_args.kwargs["language"] == "python"
         assert execute_test_suite_function.call_args.kwargs["target"] == target
 
-    def it_forwards_the_real_derivation_cache_key_and_directory(
+    def it_forwards_the_real_prepare_cache_key_and_directory(
         execute_test_suite_function, target
     ):
         invoke(target)
 
         assert (
             execute_test_suite_function.call_args.kwargs["derivation_cache_key"]
-            == derivation_cache_key
+            == prepare_cache_key
         )
         assert (
             execute_test_suite_function.call_args.kwargs["derivations_directory"]
-            == settings.derivations_directory
+            == settings.prepared_directory
         )
 
     def it_forwards_no_suite_by_default(execute_test_suite_function, target):

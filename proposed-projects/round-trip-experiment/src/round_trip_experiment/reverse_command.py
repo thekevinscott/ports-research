@@ -28,7 +28,7 @@ def reverse_command(
             "--model", condition["model"],
         ],
         "env": {
-            "GBNF_EXPERIMENT_DERIVATIONS_DIRECTORY": str(staged_derivations_directory),
+            "GBNF_EXPERIMENT_PREPARED_DIRECTORY": str(staged_derivations_directory),
             "GBNF_EXPERIMENT_DATA_DIRECTORY": str(reverse_run_root),
         },
     }
