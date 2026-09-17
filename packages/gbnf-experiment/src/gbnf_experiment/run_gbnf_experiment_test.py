@@ -57,9 +57,11 @@ def assemble_reference_implementation(tmp_path):
             path = corpus / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(text)
-        m.return_value = corpus
+        m.return_value = (corpus, PATTERNS, [])
         yield m
 
+
+PATTERNS = ["/package.json"]
 
 RESULT_JSON = '{"num_turns": 12, "total_cost_usd": 3.21, "is_error": false}'
 
@@ -170,7 +172,7 @@ def describe_run():
     ):
         experiment()
         assert run_porting_harness.call_args.kwargs["reference_implementation"] is (
-            assemble_reference_implementation.return_value
+            assemble_reference_implementation.return_value[0]
         )
         assert run_porting_harness.call_args.kwargs["output_directory"] == (
             settings.data_directory / RUN_DIRECTORY_NAME / "ported_implementation"
@@ -431,7 +433,7 @@ def describe_the_banked_reference():
         seen = {}
         assemble_reference_implementation.side_effect = lambda **kwargs: seen.update(
             existed=kwargs["output_directory"].parent.is_dir()
-        ) or kwargs["output_directory"]
+        ) or (kwargs["output_directory"], PATTERNS, [])
         experiment()
         assert seen["existed"] is True
 

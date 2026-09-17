@@ -34,7 +34,11 @@ class PreparedFilesystem:
         # Scratch, not run record: the container reads this tree read-only for the
         # length of the run, and it is reassembled from the prepared corpus cache.
         self._reference_implementation_staging = TemporaryDirectory()
-        self.reference_implementation_directory = assemble_reference_implementation(
+        (
+            self.reference_implementation_directory,
+            self.reference_implementation_patterns,
+            self.reference_implementation_included,
+        ) = assemble_reference_implementation(
             prepared_directory=self.prepared_directory,
             output_directory=Path(self._reference_implementation_staging.name)
             / "reference_implementation",
@@ -62,6 +66,8 @@ class PreparedFilesystem:
             condition={
                 **kwargs,
             },
+            patterns=self.reference_implementation_patterns,
+            included=self.reference_implementation_included,
             image_tag=agent.image,
             gbnf_commit=settings.gbnf_commit,
             completed_at=None,
@@ -78,6 +84,8 @@ class PreparedFilesystem:
             condition={
                 **kwargs,
             },
+            patterns=self.reference_implementation_patterns,
+            included=self.reference_implementation_included,
             image_tag=agent.image,
             gbnf_commit=settings.gbnf_commit,
             completed_at=datetime.now(UTC),
