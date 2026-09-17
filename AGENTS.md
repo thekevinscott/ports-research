@@ -44,6 +44,28 @@ finished, a finding, a decision, a tool landed: one entry each, UTC timestamp
 in the heading, newest at the bottom. Never edit an earlier entry; add a new
 one that corrects it.
 
+## Handoff — at every stopping point
+
+Every substantial chunk of work ends with a handoff file. A stopping point is
+a push, an opened PR, a finished investigation, a run started or finished, or
+being blocked on Kevin. It is a checkpoint, not the end: write the file, then
+keep going. The pattern is `thekevinscott/dirsql`'s session handoff doc, kept
+on disk here instead of in `/tmp`.
+
+- One file per session: `internal/SESSION_HANDOFF_<YYYY-MM-DD>[-<topic>].md`.
+  `internal/` is gitignored. Never commit, stage, or link to it.
+- Rewrite the same file in place at each checkpoint, then print its path so
+  the freshest copy sits near the bottom of the conversation.
+- Write it standalone. A new session with zero context must be able to resume
+  from it alone: the task and its status (done, in progress, next); branches,
+  worktrees, PRs and issues by number with CI state; decisions and discovered
+  constraints with one-line reasons; the exact next commands; anything waiting
+  on Kevin.
+- The main thread writes it. It is coordination paperwork, not delegated work.
+
+The handoff is the resume document. `JOURNAL.md` is the lab record. A finding
+goes in both; a branch name and a next command go only in the handoff.
+
 ## Running tests — always
 
 Three recipes per package, and nothing else: `just test-unit` (colocated `_test.py` under `src/`), `just test-integration` (`tests/integration`), `just test-e2e` (`tests/e2e`).
