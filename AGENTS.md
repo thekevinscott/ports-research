@@ -34,6 +34,12 @@ locally again. Only on Github via PRs."
 - Never merge on your own initiative, however green the checks are.
 - Never suggest merging, and never offer to merge as a next step.
 - Never push to `main`. Local `main` only ever moves by pulling from GitHub.
+- **Every PR targets `main`. No stacked PRs, ever.** Kevin, 2026-09-17: "do
+  not open PRs that merge into other branches!!!! NEVER NEVER NEVER". A PR
+  based on another branch merges into that branch, not `main`, and the base
+  PR silently grows. When work depends on an unmerged PR, wait for it to land,
+  rebase, then open the next one. Small PRs come from doing the work in
+  sequence, not from stacking.
 - The only exception is an explicit, specific instruction from Kevin to merge a
   named PR. That instruction is always his to initiate, and it is rare.
 
