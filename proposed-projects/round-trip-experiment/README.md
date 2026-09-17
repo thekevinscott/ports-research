@@ -136,7 +136,7 @@ suite have to exist and be non-empty. A missing cache-key directory reads as a c
 twenty-minute docker build against the wrong input.
 
 Two env assignments over the inherited environment are the whole redirection:
-`GBNF_EXPERIMENT_DERIVATIONS_DIRECTORY=<staging>/<forward run id>`, whose one entry is the
+`GBNF_EXPERIMENT_PREPARED_DIRECTORY=<staging>/<forward run id>`, whose one entry is the
 staged port under the harness's own cache key, and
 `GBNF_EXPERIMENT_DATA_DIRECTORY=<reverse>/<forward run id>` for the output.
 

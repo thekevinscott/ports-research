@@ -65,7 +65,7 @@ def derivation_cache(places):
 def env(places):
     return {
         **os.environ,
-        "GBNF_EXPERIMENT_DERIVATIONS_DIRECTORY": str(places["derivations"]),
+        "GBNF_EXPERIMENT_PREPARED_DIRECTORY": str(places["derivations"]),
         "ROUND_TRIP_EXPERIMENT_STAGING_DIRECTORY": str(places["staging"]),
         "ROUND_TRIP_EXPERIMENT_REVERSE_DIRECTORY": str(places["reverse"]),
     }
@@ -144,7 +144,7 @@ def describe_stage():
         staged_report, places, forward_run
     ):
         assert staged_report["env"] == {
-            "GBNF_EXPERIMENT_DERIVATIONS_DIRECTORY": str(places["staging"] / forward_run.name),
+            "GBNF_EXPERIMENT_PREPARED_DIRECTORY": str(places["staging"] / forward_run.name),
             "GBNF_EXPERIMENT_DATA_DIRECTORY": str(places["reverse"] / forward_run.name),
         }
 
@@ -234,7 +234,7 @@ def describe_run():
 
     def it_launches_the_harness_against_the_staged_derivation(report, places, forward_run):
         launched = json.loads((Path(report["run_directory"]) / "env.json").read_text())
-        assert launched["GBNF_EXPERIMENT_DERIVATIONS_DIRECTORY"] == str(places["staging"] / forward_run.name)
+        assert launched["GBNF_EXPERIMENT_PREPARED_DIRECTORY"] == str(places["staging"] / forward_run.name)
         assert launched["GBNF_EXPERIMENT_DATA_DIRECTORY"] == str(places["reverse"] / forward_run.name)
 
     def it_banks_the_leg_under_the_forward_run(report, places, forward_run):

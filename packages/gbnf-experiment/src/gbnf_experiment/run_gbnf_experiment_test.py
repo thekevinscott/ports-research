@@ -16,15 +16,15 @@ def settings(tmp_path):
     with patch(
         "gbnf_experiment.prepare_filesystem.prepared_filesystem.settings", autospec=True
     ) as m:
-        m.derivations_directory = tmp_path / "cache" / "derivations"
+        m.prepared_directory = tmp_path / "cache" / "prepared"
         m.data_directory = tmp_path / "data"
         yield m
 
 
 @pytest.fixture
-def derivation_cache_key():
+def prepare_cache_key():
     with patch(
-        "gbnf_experiment.prepare_filesystem.prepared_filesystem.derivation_cache_key",
+        "gbnf_experiment.prepare_filesystem.prepared_filesystem.prepare_cache_key",
         "cachekey",
     ):
         yield "cachekey"
@@ -109,7 +109,7 @@ CONFIG = {
 @pytest.fixture
 def experiment(
     settings,
-    derivation_cache_key,
+    prepare_cache_key,
     run_directory_name,
     write_manifest,
 ):
@@ -135,29 +135,29 @@ def describe_the_signature():
 
 
 def describe_run():
-    def it_derives_when_the_keyed_directory_is_absent(
+    def it_prepares_when_the_keyed_directory_is_absent(
         experiment,
         settings,
-        derivation_cache_key,
+        prepare_cache_key,
         prepare_reference_implementation,
         assemble_reference_implementation,
         run_porting_harness,
     ):
         experiment()
         prepare_reference_implementation.assert_called_once_with(
-            output_directory=settings.derivations_directory / derivation_cache_key,
+            output_directory=settings.prepared_directory / prepare_cache_key,
             debug=False,
         )
 
-    def it_skips_deriving_when_the_keyed_directory_exists(
+    def it_skips_preparing_when_the_keyed_directory_exists(
         experiment,
         settings,
-        derivation_cache_key,
+        prepare_cache_key,
         prepare_reference_implementation,
         assemble_reference_implementation,
         run_porting_harness,
     ):
-        (settings.derivations_directory / derivation_cache_key).mkdir(parents=True)
+        (settings.prepared_directory / prepare_cache_key).mkdir(parents=True)
         experiment()
         prepare_reference_implementation.assert_not_called()
 
@@ -194,7 +194,7 @@ def describe_run():
         experiment(model="claude-sonnet-4-5")
         assert run_porting_harness.call_args.kwargs["model"] == "claude-sonnet-4-5"
 
-    def it_forwards_debug_to_the_derivation_and_the_port(
+    def it_forwards_debug_to_the_preparation_and_the_port(
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
@@ -390,7 +390,7 @@ def describe_the_manifest():
             run_directory_name.call_args.args[0]
         )
 
-    def it_stamps_the_run_from_before_the_derivation(
+    def it_stamps_the_run_from_before_the_preparation(
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
@@ -399,13 +399,13 @@ def describe_the_manifest():
     ):
         seen = {}
 
-        def derive(*args, **kwargs):
+        def prepare(*args, **kwargs):
             sleep(0.002)
-            seen["derived_at"] = datetime.now(UTC)
+            seen["prepared_at"] = datetime.now(UTC)
 
-        prepare_reference_implementation.side_effect = derive
+        prepare_reference_implementation.side_effect = prepare
         experiment()
-        assert write_manifest.call_args.kwargs["timestamp"] < seen["derived_at"]
+        assert write_manifest.call_args.kwargs["timestamp"] < seen["prepared_at"]
 
     def it_is_written_after_the_port(
         experiment,

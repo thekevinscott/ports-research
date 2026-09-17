@@ -9,7 +9,7 @@ from python_on_whales.exceptions import DockerException
 from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
 from gbnf_experiment import run_gbnf_experiment
 from gbnf_experiment.cli import cli
-from gbnf_experiment.config import derivation_cache_key, settings
+from gbnf_experiment.config import prepare_cache_key, settings
 from porting_harness.run_porting_harness import PROMPT_PATH
 
 CONFIG = {
@@ -24,7 +24,7 @@ CONFIG = {
 
 
 @pytest.fixture
-def experiment(data_directory, derivation_docker, porting_docker):
+def experiment(data_directory, prepare_docker, porting_docker):
     def run(**kwargs):
         return run_gbnf_experiment(**{**CONFIG, **kwargs})
 
@@ -41,27 +41,27 @@ def manifest(data_directory):
 
 
 def describe_gbnf_experiment():
-    def it_caches_the_derivation_under_the_content_key(
-        experiment, derivations_directory
+    def it_caches_the_prepared_corpus_under_the_content_key(
+        experiment, prepared_directory
     ):
         experiment()
-        assert (derivations_directory / derivation_cache_key).is_dir()
+        assert (prepared_directory / prepare_cache_key).is_dir()
 
-    def it_caches_the_derivation_outside_the_data_tree(
-        experiment, data_directory, derivations_directory
+    def it_caches_the_prepared_corpus_outside_the_data_tree(
+        experiment, data_directory, prepared_directory
     ):
         """The cache is rebuildable, so it is not part of the run record."""
         experiment()
-        assert data_directory not in derivations_directory.parents
+        assert data_directory not in prepared_directory.parents
 
-    def it_derives_once_across_conditions(experiment, derivation_docker):
+    def it_prepares_once_across_conditions(experiment, prepare_docker):
         experiment()
         experiment(include_python_tests=True)
-        derivation_docker.run.assert_called_once()
+        prepare_docker.run.assert_called_once()
 
-    def it_leaves_no_staging_directory_behind(experiment, derivations_directory):
+    def it_leaves_no_staging_directory_behind(experiment, prepared_directory):
         experiment()
-        assert list(derivations_directory.glob("*.staging")) == []
+        assert list(prepared_directory.glob("*.staging")) == []
 
     def describe_the_assembled_reference():
         def it_carries_only_the_source_when_no_suite_is_included(experiment, porting_calls):
@@ -371,12 +371,12 @@ def staged_reference(call):
 
 
 def describe_the_staged_reference_corpus():
-    def it_binds_a_staged_copy_not_the_derivation_cache(
-        experiment, porting_calls, derivations_directory
+    def it_binds_a_staged_copy_not_the_prepared_cache(
+        experiment, porting_calls, prepared_directory
     ):
         experiment()
         [call] = porting_calls
-        assert derivations_directory not in staged_reference(call).parents
+        assert prepared_directory not in staged_reference(call).parents
 
     def it_binds_the_source_and_test_trees_from_one_staging_root(
         experiment, porting_calls
@@ -435,7 +435,7 @@ def describe_the_container_view():
 
 def describe_cli():
     def it_prints_where_the_run_landed(
-        data_directory, derivation_docker, porting_docker
+        data_directory, prepare_docker, porting_docker
     ):
         result = CliRunner().invoke(cli, ["--source-language", "typescript"])
         [run_directory] = data_directory.iterdir()

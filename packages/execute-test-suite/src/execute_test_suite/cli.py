@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 import click
-from gbnf_experiment.config import derivation_cache_key, settings
+from gbnf_experiment.config import prepare_cache_key, settings
 
 from .execute_test_suite import execute_test_suite
 
@@ -30,8 +30,8 @@ def cli(language: str, target: Path, suite: str | None, adapt: bool, coverage: b
             suite=suite,
             adapt=adapt,
             coverage=coverage,
-            derivations_directory=settings.derivations_directory,
-            derivation_cache_key=derivation_cache_key,
+            derivations_directory=settings.prepared_directory,
+            derivation_cache_key=prepare_cache_key,
         )
     except Exception as e:
         raise click.ClickException(str(e))

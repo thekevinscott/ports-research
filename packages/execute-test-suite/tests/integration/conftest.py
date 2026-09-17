@@ -2,7 +2,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from gbnf_experiment.config import derivation_cache_key as DERIVATION_CACHE_KEY
+from gbnf_experiment.config import prepare_cache_key as DERIVATION_CACHE_KEY
 from gbnf_experiment.config import settings
 
 
@@ -187,9 +187,9 @@ def typescript_named_target(tmp_path):
 def settings_derivations_directory(derivations_directory):
     """Redirects the CLI's derivation cache lookup at this fixture's synthetic cache.
 
-    `settings.derivations_directory` is first-party and the CLI takes no parameter for
+    `settings.prepared_directory` is first-party and the CLI takes no parameter for
     it, so this is patched at its own binding rather than threaded through — the same
     carve-out gbnf-experiment's own tests/integration/conftest.py takes for the same field.
     """
-    with patch.object(settings, "derivations_directory", derivations_directory):
+    with patch.object(settings, "prepared_directory", derivations_directory):
         yield

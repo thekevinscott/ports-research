@@ -43,7 +43,7 @@ def describe_reverse_command():
         assert "--include-python-tests" not in command["argv"]
 
     def it_reads_the_reference_from_the_staged_derivations_root(command):
-        assert command["env"]["GBNF_EXPERIMENT_DERIVATIONS_DIRECTORY"] == (
+        assert command["env"]["GBNF_EXPERIMENT_PREPARED_DIRECTORY"] == (
             "/cache/round-trip-experiment/derivations/20260909T001426Z_1c28aa33"
         )
 
@@ -54,6 +54,6 @@ def describe_reverse_command():
 
     def it_sets_no_other_environment(command):
         assert set(command["env"]) == {
-            "GBNF_EXPERIMENT_DERIVATIONS_DIRECTORY",
+            "GBNF_EXPERIMENT_PREPARED_DIRECTORY",
             "GBNF_EXPERIMENT_DATA_DIRECTORY",
         }

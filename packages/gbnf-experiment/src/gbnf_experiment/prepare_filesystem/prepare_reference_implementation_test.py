@@ -14,7 +14,7 @@ def settings(tmp_path):
         "gbnf_experiment.prepare_filesystem.prepare_reference_implementation.settings",
         autospec=True,
     ) as m:
-        m.derivation_docker_directory = tmp_path / "docker" / "derivation"
+        m.prepare_docker_directory = tmp_path / "docker" / "gbnf-prepare"
         m.image_tag = "image:tag"
         m.gbnf_commit = "abc123"
         yield m
@@ -29,9 +29,9 @@ def docker():
 
         def fake_run(tag, user=None, volumes=None, remove=None):
             [staging_directory] = [
-                source for source, target, _ in volumes if target == "/derivation-output"
+                source for source, target, _ in volumes if target == "/prepared-output"
             ]
-            (Path(staging_directory) / "derived.txt").write_text("output")
+            (Path(staging_directory) / "prepared.txt").write_text("output")
             return "container output"
 
         m.run.side_effect = fake_run
@@ -40,7 +40,7 @@ def docker():
 
 @pytest.fixture
 def output_directory(tmp_path):
-    return tmp_path / "derivations" / "key"
+    return tmp_path / "prepared" / "key"
 
 
 def describe_prepare_reference_implementation():
@@ -49,13 +49,13 @@ def describe_prepare_reference_implementation():
 
     def it_renames_the_staging_directory_into_place(docker, settings, output_directory):
         prepare_reference_implementation(output_directory=output_directory, debug=False)
-        assert (output_directory / "derived.txt").read_text() == "output"
+        assert (output_directory / "prepared.txt").read_text() == "output"
 
     def it_leaves_no_staging_directory_behind(docker, settings, output_directory):
         prepare_reference_implementation(output_directory=output_directory, debug=False)
         assert not output_directory.with_name(output_directory.name + ".staging").exists()
 
-    def it_removes_the_container_when_the_derivation_finishes(
+    def it_removes_the_container_when_the_preparation_finishes(
         docker, settings, output_directory
     ):
         prepare_reference_implementation(output_directory=output_directory, debug=False)
@@ -66,7 +66,7 @@ def describe_prepare_reference_implementation():
         [staged] = [
             source
             for source, target, _ in docker.run.call_args.kwargs["volumes"]
-            if target == "/derivation-output"
+            if target == "/prepared-output"
         ]
         assert staged.endswith(".staging")
 
@@ -75,7 +75,7 @@ def describe_prepare_reference_implementation():
         [mode] = [
             mode
             for _, target, mode in docker.run.call_args.kwargs["volumes"]
-            if target == "/derivation-output"
+            if target == "/prepared-output"
         ]
         assert mode == "rw"
 
@@ -99,9 +99,9 @@ def describe_prepare_reference_implementation():
         assert not output_directory.exists()
 
     def describe_build():
-        def it_builds_the_derivation_image(docker, settings, output_directory):
+        def it_builds_the_prepare_image(docker, settings, output_directory):
             prepare_reference_implementation(output_directory=output_directory, debug=False)
-            assert docker.build.call_args.args[0] == settings.derivation_docker_directory
+            assert docker.build.call_args.args[0] == settings.prepare_docker_directory
             assert docker.build.call_args.kwargs["tags"] == "image:tag"
 
         def it_passes_the_pinned_commit_as_a_build_arg(docker, settings, output_directory):

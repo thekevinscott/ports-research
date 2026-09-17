@@ -7,7 +7,7 @@ RUN npm install -g pnpm@9.4.0
 ARG GBNF_COMMIT
 
 WORKDIR /repository
-# The pin, not the branch tip, is what makes the derived corpus reproducible,
+# The pin, not the branch tip, is what makes the prepared corpus reproducible,
 # so fetch it by SHA: the layer then busts when the pin moves.
 RUN git init -q .
 RUN git remote add origin https://github.com/thekevinscott/gbnf
@@ -25,12 +25,12 @@ RUN pnpm --dir packages/test-writer build
 RUN cd packages/test-writer && node -e "import('pyodide').then(async ({ loadPyodide }) => { const pyodide = await loadPyodide(); await pyodide.loadPackage('micropip'); await pyodide.pyimport('micropip').install(['black==26.5.1']); })"
 
 # After the build steps above, so the runtime host uid finds nothing already there root-owned.
-ENV HOME=/tmp/derivation-home \
-    XDG_DATA_HOME=/tmp/derivation-home/.local/share \
-    XDG_CACHE_HOME=/tmp/derivation-home/.cache
+ENV HOME=/tmp/prepare-home \
+    XDG_DATA_HOME=/tmp/prepare-home/.local/share \
+    XDG_CACHE_HOME=/tmp/prepare-home/.cache
 
 WORKDIR /repository/packages/gbnf/javascript
 
 COPY scaffolding/ /scaffolding/
-COPY derive.sh /derive.sh
-CMD ["/bin/sh", "/derive.sh"]
+COPY prepare.sh /prepare.sh
+CMD ["/bin/sh", "/prepare.sh"]
