@@ -13,7 +13,6 @@ from gbnf_experiment.config import prepare_cache_key, settings
 from porting_harness.run_porting_harness import PROMPT_PATH
 
 CONFIG = {
-    "agent": ClaudeAgent(),
     "source_language": "typescript",
     "include_typescript_tests": False,
     "include_python_tests": False,
@@ -24,9 +23,10 @@ CONFIG = {
 
 
 @pytest.fixture
-def experiment(data_directory, prepare_docker, porting_docker):
+def experiment(data_directory, prepare_docker, porting_docker, claude_home):
     def run(**kwargs):
-        return run_gbnf_experiment(**{**CONFIG, **kwargs})
+        agent = ClaudeAgent(host_home=claude_home)
+        return run_gbnf_experiment(**{"agent": agent, **CONFIG, **kwargs})
 
     return run
 
