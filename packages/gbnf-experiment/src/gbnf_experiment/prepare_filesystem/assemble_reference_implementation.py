@@ -1,5 +1,4 @@
 import shutil
-from collections.abc import Sequence
 from pathlib import Path
 
 from porting_harness.select_files import select_files
@@ -12,7 +11,7 @@ def assemble_reference_implementation(
     prepared_directory: Path,
     output_directory: Path,
     source_language: str,
-    patterns: Sequence[str],
+    patterns: list[str],
     include_typescript_tests: bool,
     include_python_tests: bool,
 ) -> Path:
@@ -26,7 +25,7 @@ def assemble_reference_implementation(
     shutil.rmtree(output_directory, ignore_errors=True)
     output_directory.mkdir(parents=True)
     (output_directory / "source").mkdir()
-    selected = select_files(source=source_directory, patterns=list(patterns))
+    selected = select_files(source=source_directory, patterns=patterns)
     for relative in selected:
         target = output_directory / "source" / relative
         target.parent.mkdir(parents=True, exist_ok=True)
