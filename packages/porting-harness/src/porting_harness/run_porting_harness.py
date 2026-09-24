@@ -27,8 +27,9 @@ def run_porting_harness(
     A caller says what it wants ported and in which direction, never how to
     phrase it — one wording across every arm is what makes the arms comparable.
 
-    reference_implementation holds the source tree under `source/` and the test
-    suites under `tests/`; the two mount read-only and separately.
+    reference_implementation holds the source tree under `source/` and, when a
+    suite was selected, the test suites under `tests/`; the two mount read-only
+    and separately, and tests/ is not mounted at all when it is absent.
     output_directory is bound writable and is the port, as the agent leaves it.
     transcripts is a host directory the CLI writes the session jsonl into and
     proxy_log a host file the sidecar's log is drained to at teardown.
@@ -43,7 +44,11 @@ def run_porting_harness(
         inputs={
             reference_implementation
             / "source": DOCKER_HOMEBASE / "reference_implementation",
-            reference_implementation / "tests": DOCKER_HOMEBASE / "tests",
+            **(
+                {reference_implementation / "tests": DOCKER_HOMEBASE / "tests"}
+                if (reference_implementation / "tests").is_dir()
+                else {}
+            ),
         },
         outputs={output_directory: DOCKER_HOMEBASE / "ported_implementation"},
         envs={},
