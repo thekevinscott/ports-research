@@ -6,6 +6,7 @@ from gbnf_experiment.prepare_filesystem.assemble_reference_implementation import
     assemble_reference_implementation,
 )
 from gbnf_experiment.prepare_filesystem.reference_patterns import PATTERNS
+from porting_harness.select_files import select_files
 
 
 COLOCATED_TEST = {"typescript": "src/gbnf.test.ts", "python": "gbnf/parse_test.py"}
@@ -58,6 +59,12 @@ def output_directory(tmp_path):
     return tmp_path / "data" / "20260906T142530Z_9f2b1c04" / "reference_implementation"
 
 
+def selected(prepared_directory: Path, language: str) -> list[Path]:
+    return select_files(
+        source=prepared_directory / "source" / language, patterns=PATTERNS[language]
+    )
+
+
 def surviving_colocated_tests(source: Path, language: str) -> list[str]:
     """Every colocated test of one language left anywhere under the tree."""
     return sorted(
@@ -68,11 +75,11 @@ def surviving_colocated_tests(source: Path, language: str) -> list[str]:
 
 def describe_assemble_reference_implementation():
     def it_returns_the_output_directory(prepared_directory, output_directory):
-        assembled, _ = assemble_reference_implementation(
+        assembled = assemble_reference_implementation(
             prepared_directory=prepared_directory,
             output_directory=output_directory,
             source_language="typescript",
-            patterns=PATTERNS["typescript"],
+            files=selected(prepared_directory, "typescript"),
             include_typescript_tests=False,
             include_python_tests=False,
         )
@@ -83,7 +90,7 @@ def describe_assemble_reference_implementation():
             prepared_directory=prepared_directory,
             output_directory=output_directory,
             source_language="typescript",
-            patterns=PATTERNS["typescript"],
+            files=selected(prepared_directory, "typescript"),
             include_typescript_tests=False,
             include_python_tests=False,
         )
@@ -96,7 +103,7 @@ def describe_assemble_reference_implementation():
             prepared_directory=prepared_directory,
             output_directory=output_directory,
             source_language="python",
-            patterns=PATTERNS["python"],
+            files=selected(prepared_directory, "python"),
             include_typescript_tests=False,
             include_python_tests=False,
         )
@@ -111,7 +118,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
@@ -122,7 +129,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_typescript_tests=True,
                 include_python_tests=False,
             )
@@ -134,7 +141,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_python_tests=True,
                 include_typescript_tests=False,
             )
@@ -146,7 +153,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_typescript_tests=True,
                 include_python_tests=True,
             )
@@ -161,7 +168,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
@@ -176,7 +183,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="python",
-                patterns=PATTERNS["python"],
+                files=selected(prepared_directory, "python"),
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
@@ -189,7 +196,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_typescript_tests=True,
                 include_python_tests=False,
             )
@@ -204,7 +211,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="python",
-                patterns=PATTERNS["python"],
+                files=selected(prepared_directory, "python"),
                 include_python_tests=True,
                 include_typescript_tests=False,
             )
@@ -217,7 +224,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_python_tests=True,
                 include_typescript_tests=False,
             )
@@ -232,7 +239,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
@@ -248,7 +255,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_typescript_tests=True,
                 include_python_tests=False,
             )
@@ -264,7 +271,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
@@ -279,7 +286,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_python_tests=True,
                 include_typescript_tests=False,
             )
@@ -292,7 +299,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
@@ -311,7 +318,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="python",
-                patterns=PATTERNS["python"],
+                files=selected(prepared_directory, "python"),
                 **flags,
             )
             source = output_directory / "source"
@@ -326,7 +333,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
@@ -341,7 +348,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_python_tests=True,
                 include_typescript_tests=False,
             )
@@ -350,7 +357,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
-                patterns=PATTERNS["typescript"],
+                files=selected(prepared_directory, "typescript"),
                 include_typescript_tests=False,
                 include_python_tests=False,
             )

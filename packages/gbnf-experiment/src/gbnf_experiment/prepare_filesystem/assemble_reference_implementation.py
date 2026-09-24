@@ -1,18 +1,16 @@
 import shutil
 from pathlib import Path
 
-from porting_harness.select_files import select_files
-
 
 def assemble_reference_implementation(
     *,
     prepared_directory: Path,
     output_directory: Path,
     source_language: str,
-    patterns: list[str],
+    files: list[Path],
     include_typescript_tests: bool,
     include_python_tests: bool,
-) -> tuple[Path, list[str]]:
+) -> Path:
     source_directory = prepared_directory / "source" / source_language
     included = {
         "typescript": include_typescript_tests,
@@ -21,8 +19,7 @@ def assemble_reference_implementation(
     shutil.rmtree(output_directory, ignore_errors=True)
     output_directory.mkdir(parents=True)
     (output_directory / "source").mkdir()
-    selected = select_files(source=source_directory, patterns=patterns)
-    for relative in selected:
+    for relative in files:
         target = output_directory / "source" / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source_directory / relative, target)
@@ -33,4 +30,4 @@ def assemble_reference_implementation(
                 prepared_directory / "tests" / language,
                 output_directory / "tests" / language,
             )
-    return output_directory, [path.as_posix() for path in selected]
+    return output_directory
