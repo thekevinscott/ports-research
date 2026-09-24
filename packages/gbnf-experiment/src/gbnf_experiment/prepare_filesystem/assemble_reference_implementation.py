@@ -12,7 +12,7 @@ def assemble_reference_implementation(
     patterns: list[str],
     include_typescript_tests: bool,
     include_python_tests: bool,
-) -> Path:
+) -> tuple[Path, list[str]]:
     source_directory = prepared_directory / "source" / source_language
     included = {
         "typescript": include_typescript_tests,
@@ -33,4 +33,4 @@ def assemble_reference_implementation(
                 prepared_directory / "tests" / language,
                 output_directory / "tests" / language,
             )
-    return output_directory
+    return output_directory, [path.as_posix() for path in selected]

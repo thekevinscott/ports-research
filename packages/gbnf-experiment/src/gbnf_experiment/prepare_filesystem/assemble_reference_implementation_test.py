@@ -68,7 +68,7 @@ def surviving_colocated_tests(source: Path, language: str) -> list[str]:
 
 def describe_assemble_reference_implementation():
     def it_returns_the_output_directory(prepared_directory, output_directory):
-        assembled = assemble_reference_implementation(
+        assembled, _ = assemble_reference_implementation(
             prepared_directory=prepared_directory,
             output_directory=output_directory,
             source_language="typescript",

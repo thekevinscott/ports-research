@@ -48,7 +48,7 @@ def assemble_reference_implementation(tmp_path):
         "gbnf_experiment.prepare_filesystem.prepared_filesystem.assemble_reference_implementation",
         autospec=True,
     ) as m:
-        m.return_value = tmp_path / "reference_implementation"
+        m.return_value = (tmp_path / "reference_implementation", ["package.json"])
         yield m
 
 
