@@ -2,6 +2,11 @@ import shutil
 from pathlib import Path
 
 
+def copy_file(source: Path, target: Path) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source, target)
+
+
 def assemble_reference_implementation(
     *,
     prepared_directory: Path,
@@ -20,9 +25,7 @@ def assemble_reference_implementation(
     output_directory.mkdir(parents=True)
     (output_directory / "source").mkdir()
     for relative in files:
-        target = output_directory / "source" / relative
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source_directory / relative, target)
+        copy_file(source_directory / relative, output_directory / "source" / relative)
     (output_directory / "tests").mkdir()
     for language, wanted in included.items():
         if wanted:
