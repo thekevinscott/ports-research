@@ -128,6 +128,17 @@ def describe_run_porting_harness():
             "proxy_log": tmp_path / "proxy.log",
         }
 
+    def it_leaves_tests_unmounted_when_the_reference_has_none(
+        run_agent_harness_sandbox, options, reference_implementation
+    ):
+        """An empty read-only /workspace/tests is where the v1 EROFS behaviour came from."""
+        (reference_implementation / "tests").rmdir()
+        run_porting_harness(**options())
+
+        assert list(run_agent_harness_sandbox.call_args.kwargs["inputs"].values()) == [
+            Path("/workspace/reference_implementation")
+        ]
+
     def it_binds_the_directory_the_caller_named(
         run_agent_harness_sandbox, options, output_directory
     ):
