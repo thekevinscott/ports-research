@@ -7,6 +7,7 @@ from agent_harness_sandbox.agents.agent import Agent
 from ..config import settings, prepare_cache_key
 from .assemble_reference_implementation import assemble_reference_implementation
 from .prepare_reference_implementation import prepare_reference_implementation
+from .reference_patterns import PATTERNS
 from .run_directory_name import run_directory_name
 from .write_manifest import write_manifest as _write_manifest
 
@@ -39,6 +40,7 @@ class PreparedFilesystem:
             output_directory=Path(self._reference_implementation_staging.name)
             / "reference_implementation",
             source_language=source_language,
+            patterns=PATTERNS[source_language],
             include_typescript_tests=include_typescript_tests,
             include_python_tests=include_python_tests,
         )

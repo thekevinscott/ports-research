@@ -16,6 +16,8 @@ RUN git checkout ${GBNF_COMMIT}
 
 COPY patches/ /tmp/patches/
 RUN git apply /tmp/patches/*.patch
+# prepare.sh archives HEAD, which only sees the patches once they are committed.
+RUN git -c user.name=gbnf-prepare -c user.email=gbnf-prepare@localhost commit -q -am "Apply patches"
 
 RUN git config --system --add safe.directory /repository
 

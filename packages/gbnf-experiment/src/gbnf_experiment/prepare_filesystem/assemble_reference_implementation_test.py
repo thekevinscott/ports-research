@@ -5,6 +5,7 @@ import pytest
 from gbnf_experiment.prepare_filesystem.assemble_reference_implementation import (
     assemble_reference_implementation,
 )
+from gbnf_experiment.prepare_filesystem.reference_patterns import PATTERNS
 
 
 COLOCATED_TEST = {"typescript": "src/gbnf.test.ts", "python": "gbnf/parse_test.py"}
@@ -13,7 +14,17 @@ NESTED_COLOCATED_TEST = {
     "python": "gbnf/utils/is_point_in_range_test.py",
 }
 IMPLEMENTATION = {"typescript": "src/gbnf.ts", "python": "gbnf/parse.py"}
+MANIFEST = {"typescript": "package.json", "python": "pyproject.toml"}
 COLOCATED_TEST_PATTERN = {"typescript": "*.test.ts", "python": "*_test.py"}
+CACHE_ARTEFACTS = (
+    "gbnf/__pycache__/parse_test.cpython-314-pytest-9.1.1.pyc",
+    ".pytest_cache/CACHEDIR.TAG",
+)
+FLAGS = [
+    {"include_typescript_tests": typescript, "include_python_tests": python}
+    for typescript in (False, True)
+    for python in (False, True)
+]
 
 
 @pytest.fixture
@@ -22,7 +33,7 @@ def prepared_directory(tmp_path):
     for language in ("typescript", "python"):
         source = directory / "source" / language
         source.mkdir(parents=True)
-        (source / f"index.{language}").write_text(language)
+        (source / MANIFEST[language]).write_text(language)
         for name in (
             IMPLEMENTATION[language],
             COLOCATED_TEST[language],
@@ -31,6 +42,11 @@ def prepared_directory(tmp_path):
             path = source / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(name)
+        if language == "python":
+            for name in CACHE_ARTEFACTS:
+                path = source / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"\x00compiled")
         tests = directory / "tests" / language
         tests.mkdir(parents=True)
         (tests / f"suite_{language}").write_text(language)
@@ -56,6 +72,7 @@ def describe_assemble_reference_implementation():
             prepared_directory=prepared_directory,
             output_directory=output_directory,
             source_language="typescript",
+            patterns=PATTERNS["typescript"],
             include_typescript_tests=False,
             include_python_tests=False,
         )
@@ -66,20 +83,24 @@ def describe_assemble_reference_implementation():
             prepared_directory=prepared_directory,
             output_directory=output_directory,
             source_language="typescript",
+            patterns=PATTERNS["typescript"],
             include_typescript_tests=False,
             include_python_tests=False,
         )
-        assert (output_directory / "source" / "index.typescript").read_text() == "typescript"
+        assert (output_directory / "source" / MANIFEST["typescript"]).read_text() == (
+            "typescript"
+        )
 
     def it_copies_the_other_source_language_when_asked(prepared_directory, output_directory):
         assemble_reference_implementation(
             prepared_directory=prepared_directory,
             output_directory=output_directory,
             source_language="python",
+            patterns=PATTERNS["python"],
             include_typescript_tests=False,
             include_python_tests=False,
         )
-        assert (output_directory / "source" / "index.python").read_text() == "python"
+        assert (output_directory / "source" / MANIFEST["python"]).read_text() == "python"
 
     def it_rejects_a_language_with_no_prepared_source(prepared_directory, output_directory):
         with pytest.raises(ValueError, match="No prepared source for language: rust"):
@@ -87,6 +108,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="rust",
+                patterns=[],
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
@@ -100,6 +122,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
@@ -110,6 +133,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_typescript_tests=True,
                 include_python_tests=False,
             )
@@ -121,6 +145,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_python_tests=True,
                 include_typescript_tests=False,
             )
@@ -132,6 +157,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_typescript_tests=True,
                 include_python_tests=True,
             )
@@ -146,6 +172,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
@@ -160,34 +187,39 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="python",
+                patterns=PATTERNS["python"],
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
             assert not (output_directory / "source" / COLOCATED_TEST["python"]).exists()
 
-        def it_keeps_them_when_the_typescript_suite_was_included(
+        def it_withholds_them_even_when_the_typescript_suite_was_included(
             prepared_directory, output_directory
         ):
             assemble_reference_implementation(
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_typescript_tests=True,
                 include_python_tests=False,
             )
-            assert (output_directory / "source" / COLOCATED_TEST["typescript"]).is_file()
+            assert not (
+                output_directory / "source" / COLOCATED_TEST["typescript"]
+            ).exists()
 
-        def it_keeps_them_when_the_python_suite_was_included(
+        def it_withholds_them_even_when_the_python_suite_was_included(
             prepared_directory, output_directory
         ):
             assemble_reference_implementation(
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="python",
+                patterns=PATTERNS["python"],
                 include_python_tests=True,
                 include_typescript_tests=False,
             )
-            assert (output_directory / "source" / COLOCATED_TEST["python"]).is_file()
+            assert not (output_directory / "source" / COLOCATED_TEST["python"]).exists()
 
         def it_strips_a_typescript_reference_the_python_flag_left_alone(
             prepared_directory, output_directory
@@ -196,6 +228,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_python_tests=True,
                 include_typescript_tests=False,
             )
@@ -210,6 +243,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
@@ -218,20 +252,20 @@ def describe_assemble_reference_implementation():
                 == []
             )
 
-        def it_leaves_them_all_when_the_language_was_included(
+        def it_leaves_none_anywhere_even_when_the_language_was_included(
             prepared_directory, output_directory
         ):
             assemble_reference_implementation(
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_typescript_tests=True,
                 include_python_tests=False,
             )
-            assert surviving_colocated_tests(
-                output_directory / "source", "typescript"
-            ) == sorted(
-                [COLOCATED_TEST["typescript"], NESTED_COLOCATED_TEST["typescript"]]
+            assert (
+                surviving_colocated_tests(output_directory / "source", "typescript")
+                == []
             )
 
         def it_leaves_the_implementation_untouched(
@@ -241,11 +275,12 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
             source = output_directory / "source"
-            assert (source / "index.typescript").read_text() == "typescript"
+            assert (source / MANIFEST["typescript"]).read_text() == "typescript"
             assert (source / IMPLEMENTATION["typescript"]).read_text() == (
                 IMPLEMENTATION["typescript"]
             )
@@ -255,6 +290,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_python_tests=True,
                 include_typescript_tests=False,
             )
@@ -267,19 +303,30 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
 
+            assert (
+                prepared_directory / "source" / "typescript" / COLOCATED_TEST["typescript"]
+            ).is_file()
+
+    def describe_the_cache_artefacts():
+        @pytest.mark.parametrize("flags", FLAGS)
+        def it_copies_none_of_them_into_a_python_reference(
+            prepared_directory, output_directory, flags
+        ):
+            """Compiled tests are readable: a .pyc decompiles back to its source."""
             assemble_reference_implementation(
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
-                source_language="typescript",
-                include_typescript_tests=True,
-                include_python_tests=False,
+                source_language="python",
+                patterns=PATTERNS["python"],
+                **flags,
             )
-
-            assert (output_directory / "source" / COLOCATED_TEST["typescript"]).is_file()
+            source = output_directory / "source"
+            assert [name for name in CACHE_ARTEFACTS if (source / name).exists()] == []
 
     def describe_rebuilding():
         def it_removes_stale_contents(prepared_directory, output_directory):
@@ -290,6 +337,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_typescript_tests=False,
                 include_python_tests=False,
             )
@@ -304,6 +352,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_python_tests=True,
                 include_typescript_tests=False,
             )
@@ -312,6 +361,7 @@ def describe_assemble_reference_implementation():
                 prepared_directory=prepared_directory,
                 output_directory=output_directory,
                 source_language="typescript",
+                patterns=PATTERNS["typescript"],
                 include_typescript_tests=False,
                 include_python_tests=False,
             )

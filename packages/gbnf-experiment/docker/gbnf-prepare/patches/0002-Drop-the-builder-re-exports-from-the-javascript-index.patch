@@ -1,0 +1,26 @@
+From c094acc35cafd605b26ff06c87a2ab072cb2b548 Mon Sep 17 00:00:00 2001
+From: thekevinbot <248217931+thekevinbot@users.noreply.github.com>
+Date: Thu, 24 Sep 2026 16:41:45 -0400
+Subject: [PATCH] Drop the builder re-exports from the javascript index
+
+---
+ packages/gbnf/javascript/src/index.ts | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/packages/gbnf/javascript/src/index.ts b/packages/gbnf/javascript/src/index.ts
+index 42bf767..51c9025 100644
+--- a/packages/gbnf/javascript/src/index.ts
++++ b/packages/gbnf/javascript/src/index.ts
+@@ -17,9 +17,3 @@ export {
+ export {
+   GrammarParseError,
+ } from './utils/errors/grammar-parse-error.js';
+-
+-export * from "./builder/index.js";
+-
+-export {
+-  type ToStringArgs,
+-} from './builder/types.js';
+-- 
+2.43.0
+
