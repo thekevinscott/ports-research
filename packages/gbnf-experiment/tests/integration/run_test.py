@@ -258,6 +258,7 @@ def describe_the_manifest():
             "completed_at",
             "condition",
             "derivation",
+            "reference_implementation",
             "sandbox",
             "harness",
         }
@@ -278,6 +279,20 @@ def describe_the_manifest():
             "effort": "low",
             "model": "claude-sonnet-4-5",
         }
+
+    def it_withholds_the_colocated_test_from_the_record_and_the_tree(
+        experiment, manifest, porting_calls
+    ):
+        experiment()
+        assert (
+            "src/index.test.ts"
+            not in manifest()["reference_implementation"]["included"]
+        )
+        [call] = porting_calls
+        assert (
+            "/workspace/reference_implementation/src/index.test.ts"
+            not in call["container_tree"]
+        )
 
     def it_records_the_pinned_commit(experiment, manifest):
         experiment()

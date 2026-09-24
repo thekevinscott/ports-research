@@ -16,6 +16,7 @@ def write_manifest(
     *,
     timestamp: datetime,
     condition: dict,
+    included: list[str],
     image_tag: str,
     gbnf_commit: str,
     completed_at: datetime | None = None,
@@ -32,6 +33,7 @@ def write_manifest(
         "derivation": {
             "gbnf_commit": gbnf_commit,
         },
+        "reference_implementation": {"included": included},
         "sandbox": {
             "image_id": docker.image.inspect(image_tag).id,
         },
