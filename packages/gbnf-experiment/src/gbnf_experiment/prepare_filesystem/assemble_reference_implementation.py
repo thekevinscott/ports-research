@@ -3,8 +3,6 @@ from pathlib import Path
 
 from porting_harness.select_files import select_files
 
-from .strip_builder_reexports import strip_builder_reexports
-
 
 def assemble_reference_implementation(
     *,
@@ -30,8 +28,6 @@ def assemble_reference_implementation(
         target = output_directory / "source" / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source_directory / relative, target)
-    if source_language == "typescript":
-        strip_builder_reexports(output_directory / "source" / "src" / "index.ts")
     (output_directory / "tests").mkdir()
     for language, wanted in included.items():
         if wanted:
