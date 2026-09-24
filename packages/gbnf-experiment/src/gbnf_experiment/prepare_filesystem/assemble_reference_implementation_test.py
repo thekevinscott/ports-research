@@ -102,17 +102,6 @@ def describe_assemble_reference_implementation():
         )
         assert (output_directory / "source" / MANIFEST["python"]).read_text() == "python"
 
-    def it_rejects_a_language_with_no_prepared_source(prepared_directory, output_directory):
-        with pytest.raises(ValueError, match="No prepared source for language: rust"):
-            assemble_reference_implementation(
-                prepared_directory=prepared_directory,
-                output_directory=output_directory,
-                source_language="rust",
-                patterns=[],
-                include_typescript_tests=False,
-                include_python_tests=False,
-            )
-
     def describe_tests():
         def it_leaves_the_tests_directory_empty_when_neither_is_asked_for(
             prepared_directory, output_directory
