@@ -5,10 +5,7 @@ import pytest
 from gbnf_experiment.prepare_filesystem.assemble_reference_implementation import (
     assemble_reference_implementation,
 )
-from gbnf_experiment.prepare_filesystem.reference_patterns import (
-    PYTHON_PATTERNS,
-    TYPESCRIPT_PATTERNS,
-)
+from gbnf_experiment.prepare_filesystem.reference_patterns import PATTERNS
 
 
 COLOCATED_TEST = {"typescript": "src/gbnf.test.ts", "python": "gbnf/parse_test.py"}
@@ -18,7 +15,6 @@ NESTED_COLOCATED_TEST = {
 }
 IMPLEMENTATION = {"typescript": "src/gbnf.ts", "python": "gbnf/parse.py"}
 MANIFEST = {"typescript": "package.json", "python": "pyproject.toml"}
-PATTERNS = {"typescript": TYPESCRIPT_PATTERNS, "python": PYTHON_PATTERNS}
 COLOCATED_TEST_PATTERN = {"typescript": "*.test.ts", "python": "*_test.py"}
 CACHE_ARTEFACTS = (
     "gbnf/__pycache__/parse_test.cpython-314-pytest-9.1.1.pyc",
