@@ -13,24 +13,14 @@ def assemble_reference_implementation(
     output_directory: Path,
     source_language: str,
     files: list[Path],
-    include_typescript_tests: bool,
-    include_python_tests: bool,
+    test_files: list[Path],
 ) -> Path:
     source_directory = prepared_directory / "source" / source_language
-    included = {
-        "typescript": include_typescript_tests,
-        "python": include_python_tests,
-    }
     shutil.rmtree(output_directory, ignore_errors=True)
     output_directory.mkdir(parents=True)
     (output_directory / "source").mkdir()
     for relative in files:
         copy_file(source_directory / relative, output_directory / "source" / relative)
-    (output_directory / "tests").mkdir()
-    for language, wanted in included.items():
-        if wanted:
-            shutil.copytree(
-                prepared_directory / "tests" / language,
-                output_directory / "tests" / language,
-            )
+    for relative in test_files:
+        copy_file(prepared_directory / "tests" / relative, output_directory / "tests" / relative)
     return output_directory

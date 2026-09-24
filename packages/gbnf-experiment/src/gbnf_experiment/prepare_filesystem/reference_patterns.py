@@ -30,3 +30,9 @@ PATTERNS = {
         "!**/*.test.ts",
     ],
 }
+
+# The generated suites under the prepared tests/, one pattern per language.
+TEST_PATTERNS = {
+    "python": "/python/**",
+    "typescript": "/typescript/**",
+}
