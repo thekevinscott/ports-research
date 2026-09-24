@@ -46,6 +46,10 @@ def describe_the_container():
     def it_names_its_own_image(agent):
         assert agent.image == "agent-harness-sandbox-claude:latest"
 
+    def it_reads_the_default_home_when_it_is_built(claude_home):
+        with patch("agent_harness_sandbox.agents.ClaudeAgent.CLAUDE_HOME", claude_home):
+            assert ClaudeAgent().host_home == claude_home
+
     def it_binds_host_home_by_keyword_only(claude_home):
         with pytest.raises(TypeError):
             ClaudeAgent(claude_home)
