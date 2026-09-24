@@ -20,12 +20,10 @@ CONDITION = {
     "effort": "high",
     "model": "claude-opus-5",
 }
-PATTERNS = ("/package.json", "/src/*.ts", "!**/*.test.ts")
-INCLUDED = ("package.json", "src/gbnf.ts")
+INCLUDED = ["package.json", "src/gbnf.ts"]
 CALL = {
     "timestamp": datetime(2026, 9, 6, 14, 25, 30, tzinfo=UTC),
     "condition": CONDITION,
-    "patterns": PATTERNS,
     "included": INCLUDED,
     "image_tag": "agent-harness-sandbox-claude:latest",
     "gbnf_commit": "13f1aca",
@@ -117,21 +115,10 @@ def describe_write_manifest():
     def it_records_the_pinned_commit(manifest):
         assert manifest()["derivation"] == {"gbnf_commit": "13f1aca"}
 
-    def it_records_the_whitelist_the_reference_was_assembled_from(manifest):
-        assert manifest()["reference_implementation"]["patterns"] == [
-            "/package.json",
-            "/src/*.ts",
-            "!**/*.test.ts",
-        ]
-
     def it_names_every_included_path(manifest):
-        assert manifest()["reference_implementation"]["included"] == [
-            "package.json",
-            "src/gbnf.ts",
-        ]
-
-    def it_counts_what_the_whitelist_admitted(manifest):
-        assert manifest()["reference_implementation"]["included_count"] == 2
+        assert manifest()["reference_implementation"] == {
+            "included": ["package.json", "src/gbnf.ts"]
+        }
 
     def it_identifies_the_sandbox_by_image_id_not_by_tag(manifest):
         assert manifest()["sandbox"] == {"image_id": IMAGE_ID}
