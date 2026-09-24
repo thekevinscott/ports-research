@@ -20,8 +20,8 @@ class ClaudeAgent:
     transcripts = "/home/node/.claude/projects"
     allow = ("api.anthropic.com",)
 
-    def __init__(self, *, host_home: Path = CLAUDE_HOME) -> None:
-        self.host_home = host_home
+    def __init__(self, *, host_home: Path | None = None) -> None:
+        self.host_home = CLAUDE_HOME if host_home is None else host_home
 
     def command(self, prompt: str, *, effort: str, model: str) -> list[str]:
         if effort not in EFFORT_LEVELS:
