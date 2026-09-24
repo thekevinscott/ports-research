@@ -69,7 +69,7 @@ def describe_gbnf_experiment():
             [call] = porting_calls
             assert call["container_tree"] == [
                 "/workspace/reference_implementation/package.json",
-                "/workspace/reference_implementation/src/index.typescript",
+                "/workspace/reference_implementation/src/index.ts",
             ]
 
         def it_carries_the_python_source_when_porting_the_other_way(
@@ -78,28 +78,28 @@ def describe_gbnf_experiment():
             experiment(source_language="python")
             [call] = porting_calls
             assert call["container_tree"] == [
+                "/workspace/reference_implementation/gbnf/index.py",
                 "/workspace/reference_implementation/pyproject.toml",
-                "/workspace/reference_implementation/src/index.python",
             ]
 
-        def it_keeps_the_typescript_colocated_tests_when_that_suite_was_included(
+        def it_withholds_the_typescript_colocated_tests_even_when_that_suite_was_included(
             experiment, porting_calls
         ):
             experiment(include_typescript_tests=True)
             [call] = porting_calls
             assert (
                 "/workspace/reference_implementation/src/index.test.ts"
-                in call["container_tree"]
+                not in call["container_tree"]
             )
 
-        def it_keeps_the_python_colocated_tests_when_that_suite_was_included(
+        def it_withholds_the_python_colocated_tests_even_when_that_suite_was_included(
             experiment, porting_calls
         ):
             experiment(source_language="python", include_python_tests=True)
             [call] = porting_calls
             assert (
-                "/workspace/reference_implementation/src/index_test.py"
-                in call["container_tree"]
+                "/workspace/reference_implementation/gbnf/index_test.py"
+                not in call["container_tree"]
             )
 
         def it_hides_the_typescript_dev_harness(experiment, porting_calls):

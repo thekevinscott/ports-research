@@ -1,9 +1,10 @@
 import shutil
 from pathlib import Path
 
-from .remove_builder import remove_builder
-from .remove_colocated_tests import remove_colocated_tests
-from .remove_dev_harness import remove_dev_harness
+from porting_harness.select_files import select_files
+
+from .reference_patterns import PYTHON_PATTERNS, TYPESCRIPT_PATTERNS
+from .strip_builder_reexports import strip_builder_reexports
 
 
 def assemble_reference_implementation(
@@ -23,19 +24,15 @@ def assemble_reference_implementation(
     }
     shutil.rmtree(output_directory, ignore_errors=True)
     output_directory.mkdir(parents=True)
-    shutil.copytree(source_directory, output_directory / "source")
-    remove_colocated_tests(
-        directory=output_directory / "source",
-        languages=[language for language, wanted in included.items() if not wanted],
-    )
-    remove_dev_harness(
-        directory=output_directory / "source",
-        language=source_language,
-    )
-    remove_builder(
-        directory=output_directory / "source",
-        language=source_language,
-    )
+    (output_directory / "source").mkdir()
+    patterns = PYTHON_PATTERNS if source_language == "python" else TYPESCRIPT_PATTERNS
+    selected = select_files(source=source_directory, patterns=list(patterns))
+    for relative in selected:
+        target = output_directory / "source" / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source_directory / relative, target)
+    if source_language == "typescript":
+        strip_builder_reexports(output_directory / "source" / "src" / "index.ts")
     (output_directory / "tests").mkdir()
     for language, wanted in included.items():
         if wanted:
