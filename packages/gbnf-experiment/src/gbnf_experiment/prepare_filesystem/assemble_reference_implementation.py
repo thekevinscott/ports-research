@@ -1,9 +1,9 @@
 import shutil
+from collections.abc import Sequence
 from pathlib import Path
 
 from porting_harness.select_files import select_files
 
-from .reference_patterns import PYTHON_PATTERNS, TYPESCRIPT_PATTERNS
 from .strip_builder_reexports import strip_builder_reexports
 
 
@@ -12,6 +12,7 @@ def assemble_reference_implementation(
     prepared_directory: Path,
     output_directory: Path,
     source_language: str,
+    patterns: Sequence[str],
     include_typescript_tests: bool,
     include_python_tests: bool,
 ) -> Path:
@@ -25,7 +26,6 @@ def assemble_reference_implementation(
     shutil.rmtree(output_directory, ignore_errors=True)
     output_directory.mkdir(parents=True)
     (output_directory / "source").mkdir()
-    patterns = PYTHON_PATTERNS if source_language == "python" else TYPESCRIPT_PATTERNS
     selected = select_files(source=source_directory, patterns=list(patterns))
     for relative in selected:
         target = output_directory / "source" / relative
