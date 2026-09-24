@@ -14,8 +14,6 @@ def assemble_reference_implementation(
     include_python_tests: bool,
 ) -> Path:
     source_directory = prepared_directory / "source" / source_language
-    if not source_directory.is_dir():
-        raise ValueError(f"No prepared source for language: {source_language}")
     included = {
         "typescript": include_typescript_tests,
         "python": include_python_tests,
