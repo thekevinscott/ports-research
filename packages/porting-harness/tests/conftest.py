@@ -9,10 +9,10 @@ import pytest
 
 collect_ignore = ["fixtures"]
 
-TWO_NUMBER_ADDER = Path(__file__).parent / "fixtures" / "two_number_adder"
+FIXTURES = Path(__file__).parent / "fixtures"
 
 
 @pytest.fixture(scope="session")
-def two_number_adder() -> Path:
-    """The fixture library: both reference packages and both mounted suites."""
-    return TWO_NUMBER_ADDER
+def fixtures() -> Path:
+    """The docker context: the two_number_adder library and the Dockerfile that bakes it."""
+    return FIXTURES

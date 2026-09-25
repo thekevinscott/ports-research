@@ -7,7 +7,7 @@ from porting_harness.run_porting_harness import PROMPT_PATH, run_porting_harness
 
 OPTIONS = (
     "agent",
-    "reference_implementation",
+    "image",
     "target_language",
     "output_directory",
     "debug",
@@ -37,14 +37,6 @@ def render_prompt():
 
 
 @pytest.fixture
-def reference_implementation(tmp_path):
-    directory = tmp_path / "reference_implementation"
-    (directory / "source").mkdir(parents=True)
-    (directory / "tests").mkdir()
-    return directory
-
-
-@pytest.fixture
 def output_directory(tmp_path):
     return tmp_path / "ported_implementation"
 
@@ -55,11 +47,11 @@ def agent():
 
 
 @pytest.fixture
-def options(agent, reference_implementation, output_directory, tmp_path):
+def options(agent, output_directory, tmp_path):
     def build(**overrides):
         return {
             "agent": agent,
-            "reference_implementation": reference_implementation,
+            "image": "a-workspace:abc",
             "target_language": "python",
             "output_directory": output_directory,
             "debug": False,
@@ -101,11 +93,10 @@ def describe_run_porting_harness():
 
         assert output_directory.is_dir()
 
-    def it_wires_the_mounts_and_home_into_the_sandbox(
+    def it_wires_the_image_the_mount_and_home_into_the_sandbox(
         run_agent_harness_sandbox,
         options,
         agent,
-        reference_implementation,
         output_directory,
         tmp_path,
     ):
@@ -113,11 +104,8 @@ def describe_run_porting_harness():
 
         assert run_agent_harness_sandbox.call_args.kwargs == {
             "agent": agent,
-            "inputs": {
-                reference_implementation
-                / "source": Path("/workspace/reference_implementation"),
-                reference_implementation / "tests": Path("/workspace/tests"),
-            },
+            "image": "a-workspace:abc",
+            "inputs": {},
             "outputs": {output_directory: Path("/workspace/ported_implementation")},
             "envs": {},
             "debug": False,
@@ -128,16 +116,16 @@ def describe_run_porting_harness():
             "proxy_log": tmp_path / "proxy.log",
         }
 
-    def it_leaves_tests_unmounted_when_the_reference_has_none(
-        run_agent_harness_sandbox, options, reference_implementation
-    ):
-        """An empty read-only /workspace/tests is where the v1 EROFS behaviour came from."""
-        (reference_implementation / "tests").rmdir()
+    def it_mounts_nothing_in(run_agent_harness_sandbox, options):
+        """The reference is in the image; a mount could show the agent something else."""
         run_porting_harness(**options())
 
-        assert list(run_agent_harness_sandbox.call_args.kwargs["inputs"].values()) == [
-            Path("/workspace/reference_implementation")
-        ]
+        assert run_agent_harness_sandbox.call_args.kwargs["inputs"] == {}
+
+    def it_runs_the_image_the_caller_built(run_agent_harness_sandbox, options):
+        run_porting_harness(**options(image="another:def"))
+
+        assert run_agent_harness_sandbox.call_args.kwargs["image"] == "another:def"
 
     def it_binds_the_directory_the_caller_named(
         run_agent_harness_sandbox, options, output_directory

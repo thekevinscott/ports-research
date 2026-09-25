@@ -16,48 +16,47 @@ def settings(tmp_path):
     with patch(
         "gbnf_experiment.prepare_filesystem.prepared_filesystem.settings", autospec=True
     ) as m:
-        m.prepared_directory = tmp_path / "cache" / "prepared"
         m.data_directory = tmp_path / "data"
         yield m
 
 
-@pytest.fixture
-def prepare_cache_key():
-    with patch(
-        "gbnf_experiment.prepare_filesystem.prepared_filesystem.prepare_cache_key",
-        "cachekey",
-    ):
-        yield "cachekey"
+LISTING = [
+    "reference_implementation/typescript/package.json",
+    "reference_implementation/typescript/src/index.ts",
+    "reference_implementation/python/pyproject.toml",
+    "tests/python/grammars/arithmetic.gbnf",
+]
+AGENT_IMAGE = "agent-harness-sandbox-claude:latest"
+WORKSPACE_IMAGE = "gbnf-workspace:0123456789abcdef"
 
 
 @pytest.fixture
-def prepare_reference_implementation():
+def list_prepared_files():
     with patch(
-        "gbnf_experiment.prepare_filesystem.prepared_filesystem.prepare_reference_implementation",
+        "gbnf_experiment.prepare_filesystem.prepared_filesystem.list_prepared_files",
         autospec=True,
     ) as m:
+        m.return_value = list(LISTING)
         yield m
 
 
-CORPUS = {
-    "source/package.json": "{}",
-    "source/src/index.js": "export const parse = () => {};\n",
-    "tests/python/grammars/arithmetic.gbnf": "root ::= 'x'\n",
-}
+@pytest.fixture
+def build_agent_image():
+    with patch(
+        "gbnf_experiment.prepare_filesystem.prepared_filesystem.build_agent_image",
+        autospec=True,
+    ) as m:
+        m.return_value = AGENT_IMAGE
+        yield m
 
 
 @pytest.fixture
-def assemble_reference_implementation(tmp_path):
+def build_workspace_image():
     with patch(
-        "gbnf_experiment.prepare_filesystem.prepared_filesystem.assemble_reference_implementation",
+        "gbnf_experiment.prepare_filesystem.prepared_filesystem.build_workspace_image",
         autospec=True,
     ) as m:
-        corpus = tmp_path / "corpus"
-        for name, text in CORPUS.items():
-            path = corpus / name
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(text)
-        m.return_value = corpus
+        m.return_value = WORKSPACE_IMAGE
         yield m
 
 
@@ -109,7 +108,9 @@ CONFIG = {
 @pytest.fixture
 def experiment(
     settings,
-    prepare_cache_key,
+    list_prepared_files,
+    build_agent_image,
+    build_workspace_image,
     run_directory_name,
     write_manifest,
 ):
@@ -135,51 +136,33 @@ def describe_the_signature():
 
 
 def describe_run():
-    def it_prepares_when_the_keyed_directory_is_absent(
+    def it_ports_inside_the_workspace_image(
         experiment,
         settings,
-        prepare_cache_key,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         experiment()
-        prepare_reference_implementation.assert_called_once_with(
-            output_directory=settings.prepared_directory / prepare_cache_key,
-            debug=False,
-        )
-
-    def it_skips_preparing_when_the_keyed_directory_exists(
-        experiment,
-        settings,
-        prepare_cache_key,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
-        run_porting_harness,
-    ):
-        (settings.prepared_directory / prepare_cache_key).mkdir(parents=True)
-        experiment()
-        prepare_reference_implementation.assert_not_called()
-
-    def it_ports_the_assembled_reference(
-        experiment,
-        settings,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
-        run_porting_harness,
-    ):
-        experiment()
-        assert run_porting_harness.call_args.kwargs["reference_implementation"] is (
-            assemble_reference_implementation.return_value
-        )
+        assert run_porting_harness.call_args.kwargs["image"] == WORKSPACE_IMAGE
         assert run_porting_harness.call_args.kwargs["output_directory"] == (
             settings.data_directory / RUN_DIRECTORY_NAME / "ported_implementation"
         )
 
+    def it_mounts_no_reference_of_its_own(experiment, run_porting_harness):
+        experiment()
+        assert "reference_implementation" not in run_porting_harness.call_args.kwargs
+
+    def it_bakes_the_selected_files_onto_the_agents_image(
+        experiment, build_agent_image, build_workspace_image, run_porting_harness
+    ):
+        experiment()
+        assert build_workspace_image.call_args.kwargs["agent_image"] == AGENT_IMAGE
+        assert [p.as_posix() for p in build_workspace_image.call_args.kwargs["files"]] == [
+            "reference_implementation/typescript/package.json",
+            "reference_implementation/typescript/src/index.ts",
+        ]
+
     def it_ports_at_the_configured_effort(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         experiment(effort="max")
@@ -187,27 +170,26 @@ def describe_run():
 
     def it_ports_on_the_configured_model(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         experiment(model="claude-sonnet-4-5")
         assert run_porting_harness.call_args.kwargs["model"] == "claude-sonnet-4-5"
 
-    def it_forwards_debug_to_the_preparation_and_the_port(
+    def it_forwards_debug_to_every_build_and_the_port(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
+        list_prepared_files,
+        build_agent_image,
+        build_workspace_image,
         run_porting_harness,
     ):
         experiment(debug=True)
-        assert prepare_reference_implementation.call_args.kwargs["debug"] is True
+        assert list_prepared_files.call_args.kwargs["debug"] is True
+        assert build_agent_image.call_args.kwargs["debug"] is True
+        assert build_workspace_image.call_args.kwargs["debug"] is True
         assert run_porting_harness.call_args.kwargs["debug"] is True
 
     def it_names_the_direction_and_leaves_the_wording_to_the_harness(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         experiment(source_language="python")
@@ -216,8 +198,6 @@ def describe_run():
 
     def it_targets_python_when_porting_from_typescript(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         experiment(source_language="typescript")
@@ -228,8 +208,6 @@ def describe_the_run_directory():
     def it_lands_directly_in_the_data_directory(
         experiment,
         settings,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         run_directory = experiment()
@@ -237,8 +215,6 @@ def describe_the_run_directory():
 
     def it_names_the_directory_from_the_timestamp_alone(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
         run_directory_name,
     ):
@@ -248,8 +224,6 @@ def describe_the_run_directory():
 
     def it_stamps_the_name_with_the_current_utc_time(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
         run_directory_name,
     ):
@@ -261,8 +235,6 @@ def describe_the_run_directory():
 
     def it_exists_before_the_container_starts(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         seen = {}
@@ -275,16 +247,12 @@ def describe_the_run_directory():
     def it_keeps_consecutive_runs_apart(
         experiment,
         settings,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         assert experiment() != experiment()
 
     def it_captures_the_transcript_beside_the_manifest(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         run_directory = experiment()
@@ -294,8 +262,6 @@ def describe_the_run_directory():
 
     def it_banks_the_proxy_denial_log_beside_the_manifest(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         run_directory = experiment()
@@ -305,8 +271,6 @@ def describe_the_run_directory():
 
     def it_creates_the_transcript_directory_before_the_port(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         seen = {}
@@ -320,8 +284,6 @@ def describe_the_run_directory():
 def describe_the_manifest():
     def it_is_written_into_the_run_directory(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
         write_manifest,
     ):
@@ -330,8 +292,6 @@ def describe_the_manifest():
 
     def it_records_the_condition_that_ran(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
         write_manifest,
     ):
@@ -354,8 +314,6 @@ def describe_the_manifest():
     def it_records_the_pinned_commit(
         experiment,
         settings,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
         write_manifest,
     ):
@@ -364,23 +322,21 @@ def describe_the_manifest():
 
     def it_runs_and_records_the_agent_the_caller_chose(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
+        build_agent_image,
         run_porting_harness,
         write_manifest,
     ):
-        """The manifest's image id has to name the harness the port actually ran under."""
+        """The manifest's image id has to name the workspace the port actually ran in."""
         chosen = Mock(name="chosen")
 
         experiment(agent=chosen)
 
+        assert build_agent_image.call_args.kwargs["agent"] is chosen
         assert run_porting_harness.call_args.kwargs["agent"] is chosen
-        assert write_manifest.call_args.kwargs["image_tag"] is chosen.image
+        assert write_manifest.call_args.kwargs["image"] == WORKSPACE_IMAGE
 
     def it_shares_the_timestamp_with_the_directory_name(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
         run_directory_name,
         write_manifest,
@@ -392,8 +348,7 @@ def describe_the_manifest():
 
     def it_stamps_the_run_from_before_the_preparation(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
+        list_prepared_files,
         run_porting_harness,
         write_manifest,
     ):
@@ -402,15 +357,14 @@ def describe_the_manifest():
         def prepare(*args, **kwargs):
             sleep(0.002)
             seen["prepared_at"] = datetime.now(UTC)
+            return list(LISTING)
 
-        prepare_reference_implementation.side_effect = prepare
+        list_prepared_files.side_effect = prepare
         experiment()
         assert write_manifest.call_args.kwargs["timestamp"] < seen["prepared_at"]
 
     def it_is_written_after_the_port(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
         write_manifest,
     ):
@@ -422,23 +376,8 @@ def describe_the_manifest():
 
 
 def describe_the_banked_reference():
-    def it_assembles_into_a_run_directory_that_already_exists(
+    def it_never_materialises_the_corpus_on_the_host(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
-        run_porting_harness,
-    ):
-        seen = {}
-        assemble_reference_implementation.side_effect = lambda **kwargs: seen.update(
-            existed=kwargs["output"].parent.is_dir()
-        ) or kwargs["output"]
-        experiment()
-        assert seen["existed"] is True
-
-    def it_never_materialises_the_corpus_a_second_time(
-        experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         run_directory = experiment()
@@ -448,8 +387,6 @@ def describe_the_banked_reference():
 def describe_the_result():
     def it_banks_the_harness_result_as_result_json(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         run_porting_harness.return_value = RESULT_JSON
@@ -461,8 +398,6 @@ def describe_the_result():
     def it_writes_no_result_when_the_port_dies(
         experiment,
         settings,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         run_porting_harness.side_effect = RuntimeError("the container died")
@@ -474,8 +409,6 @@ def describe_the_result():
     def it_banks_what_a_dead_port_printed(
         experiment,
         settings,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
     ):
         died = RuntimeError("exited 1")
@@ -488,8 +421,6 @@ def describe_the_result():
 
     def it_completes_the_manifest_with_the_error_when_the_port_dies(
         experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
         run_porting_harness,
         write_manifest,
     ):

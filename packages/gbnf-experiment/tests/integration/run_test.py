@@ -9,7 +9,7 @@ from python_on_whales.exceptions import DockerException
 from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
 from gbnf_experiment import run_gbnf_experiment
 from gbnf_experiment.cli import cli
-from gbnf_experiment.config import prepare_cache_key, settings
+from gbnf_experiment.config import settings
 from porting_harness.run_porting_harness import PROMPT_PATH
 
 from conftest import GRAMMAR_FIXTURES
@@ -48,7 +48,7 @@ CONFIG = {
 
 
 @pytest.fixture
-def experiment(data_directory, prepare_docker, porting_docker, claude_home):
+def experiment(data_directory, porting_docker, claude_home):
     def run(**kwargs):
         agent = ClaudeAgent(host_home=claude_home)
         return run_gbnf_experiment(**{"agent": agent, **CONFIG, **kwargs})
@@ -66,29 +66,59 @@ def manifest(data_directory):
 
 
 def describe_gbnf_experiment():
-    def it_caches_the_prepared_corpus_under_the_content_key(
-        experiment, prepared_directory
-    ):
-        experiment()
-        assert (prepared_directory / prepare_cache_key).is_dir()
+    def describe_the_workspace_image():
+        def it_runs_the_image_it_built(experiment, porting_calls, workspace_builds):
+            experiment()
+            [call] = porting_calls
+            assert list(workspace_builds) == [call["image"]]
 
-    def it_caches_the_prepared_corpus_outside_the_data_tree(
-        experiment, data_directory, prepared_directory
-    ):
-        """The cache is rebuildable, so it is not part of the run record."""
-        experiment()
-        assert data_directory not in prepared_directory.parents
+        def it_builds_on_the_claude_agent_image(experiment, workspace_builds):
+            experiment()
+            [args] = workspace_builds.values()
+            assert args["AGENT_IMAGE"] == "agent-harness-sandbox-claude:latest"
 
-    def it_prepares_once_across_conditions(experiment, prepare_docker):
-        experiment()
-        experiment(include_python_tests=True)
-        prepare_docker.run.assert_called_once()
+        def it_builds_the_prepare_stage_at_the_pin(experiment, prepare_build_docker):
+            experiment()
+            assert prepare_build_docker.build.call_args.kwargs["target"] == "prepare"
+            assert prepare_build_docker.build.call_args.kwargs["build_args"] == {
+                "GBNF_COMMIT": settings.gbnf_commit
+            }
 
-    def it_leaves_no_staging_directory_behind(experiment, prepared_directory):
-        experiment()
-        assert list(prepared_directory.glob("*.staging")) == []
+        def it_selects_on_the_host_not_in_the_container(
+            experiment, prepare_docker, workspace_builds
+        ):
+            """Kevin: no evaluation within the Docker container. The stage lists; the host picks."""
+            experiment()
+            prepare_docker.run.assert_called_once_with(
+                "gbnf-prepare:latest", ["cat", "/prepared.list"], remove=True
+            )
+            [args] = workspace_builds.values()
+            assert set(args) == {"GBNF_COMMIT", "AGENT_IMAGE", "FILES"}
 
-    def describe_the_assembled_reference():
+        def it_gives_two_conditions_two_tags(experiment, workspace_builds):
+            experiment()
+            experiment(include_python_tests=True)
+            assert len(workspace_builds) == 2
+
+        def it_gives_one_condition_one_tag(experiment, workspace_builds):
+            experiment()
+            experiment()
+            assert len(workspace_builds) == 1
+
+        def it_rebuilds_the_agent_image_before_the_workspace(
+            experiment, agent_image_docker, workspace_docker
+        ):
+            order = []
+            record = workspace_docker.build.side_effect
+            agent_image_docker.build.side_effect = lambda *a, **k: order.append("agent")
+            workspace_docker.build.side_effect = lambda *a, **k: (
+                order.append("workspace"),
+                record(*a, **k),
+            )
+            experiment()
+            assert order == ["agent", "agent", "workspace"]
+
+    def describe_the_workspace_tree():
         @pytest.mark.parametrize(
             ("source_language", "typescript", "python", "expected"),
             [
@@ -129,15 +159,15 @@ def describe_gbnf_experiment():
             [call] = porting_calls
             assert call["container_tree"] == expected
 
-        def it_mounts_no_tests_directory_when_neither_suite_is_asked_for(
-            experiment, porting_calls
-        ):
-            experiment()
+        def it_mounts_only_the_port(experiment, porting_calls):
+            experiment(include_python_tests=True, include_typescript_tests=True)
             [call] = porting_calls
-            assert "/workspace/tests" not in [str(target) for _, target, _ in call["volumes"]]
+            assert [
+                str(target) for _, target, _ in call["volumes"] if str(target).startswith("/workspace")
+            ] == ["/workspace/ported_implementation"]
 
-        def it_stages_the_assembly_outside_the_run_record(experiment, data_directory):
-            """The corpus is rebuildable from the cache, so no run banks a copy."""
+        def it_banks_no_copy_of_the_reference_in_the_run_record(experiment, data_directory):
+            """The workspace is an image; the manifest names it by id."""
             experiment()
             experiment(include_python_tests=True)
             assert all(
@@ -280,7 +310,7 @@ def describe_the_manifest():
     ):
         experiment()
         assert (
-            "source/typescript/src/index.test.ts"
+            "reference_implementation/typescript/src/index.test.ts"
             not in manifest()["reference_implementation"]["included"]
         )
         [call] = porting_calls
@@ -293,7 +323,7 @@ def describe_the_manifest():
         """One list, one root: source and suite paths side by side."""
         experiment(include_python_tests=True)
         included = manifest()["reference_implementation"]["included"]
-        assert "source/typescript/src/index.ts" in included
+        assert "reference_implementation/typescript/src/index.ts" in included
         assert "tests/python/validation/validate_test.python" in included
 
     def it_records_the_pinned_commit(experiment, manifest):
@@ -303,9 +333,18 @@ def describe_the_manifest():
     def it_identifies_the_sandbox_by_image_id_alone(
         experiment, manifest, sandbox_image_id
     ):
-        """The tag is a constant, so only the id says which image ran."""
+        """The tag is a digest of the list, so only the id says which image ran."""
         experiment()
         assert manifest()["sandbox"] == {"image_id": sandbox_image_id}
+
+    def it_inspects_the_workspace_image_the_port_ran_in(
+        experiment, porting_calls, sandbox_image_docker
+    ):
+        experiment()
+        [call] = porting_calls
+        assert {c.args for c in sandbox_image_docker.image.inspect.call_args_list} == {
+            (call["image"],)
+        }
 
     def it_records_one_commit_for_the_whole_harness(experiment, manifest):
         experiment()
@@ -373,44 +412,6 @@ def describe_a_run_that_dies():
         assert manifest()["error"]
 
 
-def staged_reference(call):
-    """Where assembly put the corpus, read back off the mount the container got.
-
-    Assembly writes source/ and tests/ under one root; the harness binds those
-    at /workspace/reference_implementation and /workspace/tests.
-    """
-    [source] = [
-        Path(source)
-        for source, target, _ in call["volumes"]
-        if str(target) == "/workspace/reference_implementation"
-    ]
-    return source.parent
-
-
-def describe_the_staged_reference_corpus():
-    def it_binds_a_staged_copy_not_the_prepared_cache(
-        experiment, porting_calls, prepared_directory
-    ):
-        experiment()
-        [call] = porting_calls
-        assert prepared_directory not in staged_reference(call).parents
-
-    def it_binds_the_source_and_test_trees_from_one_staging_root(
-        experiment, porting_calls
-    ):
-        experiment(include_python_tests=True)
-        [call] = porting_calls
-        staged = staged_reference(call)
-        sources = [Path(source) for source, _, _ in call["volumes"]]
-        assert staged / "source" in sources
-        assert staged / "tests" in sources
-
-    def it_throws_the_staged_corpus_away_when_the_run_ends(experiment, porting_calls):
-        experiment()
-        [call] = porting_calls
-        assert not staged_reference(call).exists()
-
-
 def describe_the_rendered_prompt():
     def it_sends_the_target_language_not_the_template(experiment, porting_calls):
         experiment(source_language="typescript")
@@ -451,9 +452,7 @@ def describe_the_container_view():
 
 
 def describe_cli():
-    def it_prints_where_the_run_landed(
-        data_directory, prepare_docker, porting_docker
-    ):
+    def it_prints_where_the_run_landed(data_directory, porting_docker):
         result = CliRunner().invoke(cli, ["--source-language", "typescript"])
         [run_directory] = data_directory.iterdir()
         assert f"Run directory: {run_directory}" in result.output

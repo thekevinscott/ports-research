@@ -1,34 +1,34 @@
-# One whitelist per gbnf package, rooted at the prepared tree: source/<language>
+# One whitelist per gbnf package, rooted at the prepared tree: reference_implementation/<language>
 # holds packages/gbnf/{python,javascript}, tests/<language> the generated suites.
 # Colocated tests are withheld under every condition; a tests flag adds one
 # suite and nothing else.
 SOURCE = {
     "python": [
-        "/source/python/.gitignore",
-        "/source/python/Makefile",
-        "/source/python/MANIFEST.in",
-        "/source/python/README.md",
-        "/source/python/gbnf/**/*.py",
-        "/source/python/pyproject.toml",
-        "/source/python/requirements.txt",
-        "/source/python/uv.lock",
-        "!/source/python/**/*_test.py",
+        "/reference_implementation/python/.gitignore",
+        "/reference_implementation/python/Makefile",
+        "/reference_implementation/python/MANIFEST.in",
+        "/reference_implementation/python/README.md",
+        "/reference_implementation/python/gbnf/**/*.py",
+        "/reference_implementation/python/pyproject.toml",
+        "/reference_implementation/python/requirements.txt",
+        "/reference_implementation/python/uv.lock",
+        "!/reference_implementation/python/**/*_test.py",
     ],
     # dev/ is browser and node demo apps, not named. src/builder/ is a
     # grammar-authoring DSL with no counterpart to port.
     "typescript": [
-        "/source/typescript/.eslintrc.cjs",
-        "/source/typescript/.gitignore",
-        "/source/typescript/.npmignore",
-        "/source/typescript/README.md",
-        "/source/typescript/package.json",
-        "/source/typescript/src/**/*.ts",
-        "!/source/typescript/src/builder/**",
-        "/source/typescript/tsconfig.json",
-        "/source/typescript/tsconfig.test.json",
-        "/source/typescript/vite.config*.ts",
-        "/source/typescript/vitest.config*.ts",
-        "!/source/typescript/**/*.test.ts",
+        "/reference_implementation/typescript/.eslintrc.cjs",
+        "/reference_implementation/typescript/.gitignore",
+        "/reference_implementation/typescript/.npmignore",
+        "/reference_implementation/typescript/README.md",
+        "/reference_implementation/typescript/package.json",
+        "/reference_implementation/typescript/src/**/*.ts",
+        "!/reference_implementation/typescript/src/builder/**",
+        "/reference_implementation/typescript/tsconfig.json",
+        "/reference_implementation/typescript/tsconfig.test.json",
+        "/reference_implementation/typescript/vite.config*.ts",
+        "/reference_implementation/typescript/vitest.config*.ts",
+        "!/reference_implementation/typescript/**/*.test.ts",
     ],
 }
 

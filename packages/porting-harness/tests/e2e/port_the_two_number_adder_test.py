@@ -13,13 +13,14 @@ Runs with the rest of the tier under `just test-e2e`.
 """
 
 import json
-import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import pytest
 from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
+from agent_harness_sandbox.build_agent_image import build_agent_image
 from porting_harness.run_porting_harness import run_porting_harness
+from python_on_whales import docker
 
 TARGET_LANGUAGE = {"typescript": "python", "python": "typescript"}
 
@@ -58,7 +59,30 @@ class Port:
 
 
 @pytest.fixture(scope="module")
-def ported(tmp_path_factory, two_number_adder: Path):
+def workspace_image(fixtures: Path):
+    """The fixture baked onto the agent image, one tag per direction."""
+    agent_image = build_agent_image(agent=ClaudeAgent(), debug=False)
+
+    def build(source_language: str) -> str:
+        tag = f"porting-harness-e2e-workspace:{source_language}"
+        docker.build(
+            fixtures,
+            file=fixtures / "workspace" / "Dockerfile",
+            tags=tag,
+            build_args={
+                "AGENT_IMAGE": agent_image,
+                "SOURCE_LANGUAGE": source_language,
+                "TARGET_LANGUAGE": TARGET_LANGUAGE[source_language],
+            },
+            progress=False,
+        )
+        return tag
+
+    return build
+
+
+@pytest.fixture(scope="module")
+def ported(tmp_path_factory, workspace_image):
     """Port the fixture once per direction and hand the same result to every test."""
     sessions: dict[str, Port] = {}
 
@@ -68,15 +92,6 @@ def ported(tmp_path_factory, two_number_adder: Path):
 
         target_language = TARGET_LANGUAGE[source_language]
         root = tmp_path_factory.mktemp(f"{source_language}_to_{target_language}_")
-        reference_implementation = root / "reference_implementation"
-        shutil.copytree(
-            two_number_adder / "source" / source_language,
-            reference_implementation / "source",
-        )
-        shutil.copytree(
-            two_number_adder / "tests" / target_language,
-            reference_implementation / "tests" / target_language,
-        )
 
         transcripts = root / "transcripts"
         transcripts.mkdir()
@@ -89,7 +104,7 @@ def ported(tmp_path_factory, two_number_adder: Path):
         try:
             session.raw = run_porting_harness(
                 agent=ClaudeAgent(),
-                reference_implementation=reference_implementation,
+                image=workspace_image(source_language),
                 target_language=target_language,
                 output_directory=session.directory,
                 debug=False,

@@ -4,14 +4,12 @@ import pytest
 
 from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
 from agent_harness_sandbox.agents.PiAgent import PiAgent
+from agent_harness_sandbox.build_agent_image import build_agent_image
 from agent_harness_sandbox.errors import AgentHarnessSandboxError
 from agent_harness_sandbox.run_agent_harness_sandbox import run_agent_harness_sandbox
 
-BUILDS = [
-    "agent-harness-sandbox-base:latest",
-    "agent-harness-sandbox-claude:latest",
-    "agent-harness-sandbox-proxy:latest",
-]
+CLAUDE_IMAGE = "agent-harness-sandbox-claude:latest"
+PI_IMAGE = "agent-harness-sandbox-pi:latest"
 
 
 @pytest.fixture
@@ -31,6 +29,7 @@ def options(transcripts, proxy_log, claude_home):
     def build(**overrides):
         return {
             "agent": ClaudeAgent(host_home=claude_home),
+            "image": CLAUDE_IMAGE,
             "inputs": {},
             "outputs": {},
             "envs": {},
@@ -130,15 +129,20 @@ def describe_run_agent_harness_sandbox():
 
 
 def describe_a_second_agent():
-    def it_runs_pis_image_with_pis_credentials(docker, pi_home, docker_calls, options, builds):
+    def it_runs_pis_image_with_pis_credentials(docker, pi_home, docker_calls, options):
         run_agent_harness_sandbox(
-            "1+1", **options(agent=PiAgent(provider="openrouter", host_home=pi_home), effort="minimal", model="m")
+            "1+1",
+            **options(
+                agent=PiAgent(provider="openrouter", host_home=pi_home),
+                image=PI_IMAGE,
+                effort="minimal",
+                model="m",
+            ),
         )
         [call] = docker_calls
-        assert call["tag"] == "agent-harness-sandbox-pi:latest"
+        assert call["tag"] == PI_IMAGE
         assert call["cmd"][:2] == ["pi", "-p"]
         assert call["files"]["/home/node/.pi/agent"] == ["auth.json", "models.json"]
-        assert builds[1] == "agent-harness-sandbox-pi:latest"
 
     def it_binds_the_transcripts_where_pi_writes_them(
         docker, pi_home, docker_calls, options, transcripts
@@ -159,17 +163,28 @@ def describe_a_second_agent():
 
 
 def describe_image_freshness():
-    def it_rebuilds_the_sandbox_and_the_proxy_on_every_run(docker, claude_home, options, builds):
+    def it_rebuilds_the_sandbox_on_every_build(docker, claude_home, builds):
         """A static tag makes the build the only step that can notice an edited context.
 
         Skip it and docker serves last week's Dockerfile under today's name, while
         the run record beside it names the commit that was checked out this morning.
         """
-        run_agent_harness_sandbox("1+1", **options())
-        run_agent_harness_sandbox("1+1", **options())
-        assert builds == BUILDS * 2
+        agent = ClaudeAgent(host_home=claude_home)
+        assert build_agent_image(agent=agent, debug=False) == CLAUDE_IMAGE
+        build_agent_image(agent=agent, debug=False)
+        assert builds == ["agent-harness-sandbox-base:latest", CLAUDE_IMAGE] * 2
 
-    def it_runs_the_image_it_built(docker, claude_home, docker_calls, options, builds):
+    def it_builds_pis_layer_on_the_same_base(docker, pi_home, builds):
+        build_agent_image(agent=PiAgent(provider="openrouter", host_home=pi_home), debug=False)
+        assert builds == ["agent-harness-sandbox-base:latest", PI_IMAGE]
+
+    def it_rebuilds_the_proxy_on_every_run(docker, claude_home, options, builds):
         run_agent_harness_sandbox("1+1", **options())
+        run_agent_harness_sandbox("1+1", **options())
+        assert builds == ["agent-harness-sandbox-proxy:latest"] * 2
+
+    def it_runs_the_image_the_caller_named(docker, claude_home, docker_calls, options):
+        """A caller's own layer on the agent image is what runs, not the agent image."""
+        run_agent_harness_sandbox("1+1", **options(image="a-caller-layer:abc"))
         [call] = docker_calls
-        assert call["tag"] in builds
+        assert call["tag"] == "a-caller-layer:abc"

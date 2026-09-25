@@ -8,8 +8,7 @@ from execute_test_suite.coverage_result import CoverageResult
 from execute_test_suite.execute_test_suite import execute_test_suite
 from execute_test_suite.suite_result import SuiteResult
 
-DERIVATIONS_DIRECTORY = Path("/cache/ports/gbnf-experiment/derivations")
-DERIVATION_CACHE_KEY = "390bf534c55d496b"
+TEST_SUITES_DIRECTORY = Path("/tmp/scratch/tests")
 TARGET = Path("/data/run/ported_implementation")
 
 
@@ -44,8 +43,7 @@ def call(**overrides):
         **{
             "language": "python",
             "target": TARGET,
-            "derivations_directory": DERIVATIONS_DIRECTORY,
-            "derivation_cache_key": DERIVATION_CACHE_KEY,
+            "test_suites_directory": TEST_SUITES_DIRECTORY,
             **overrides,
         }
     )
@@ -58,8 +56,7 @@ def describe_execute_test_suite():
         call()
         locate_test_suite_function.assert_called_once_with(
             "python",
-            derivations_directory=DERIVATIONS_DIRECTORY,
-            derivation_cache_key=DERIVATION_CACHE_KEY,
+            test_suites_directory=TEST_SUITES_DIRECTORY,
         )
 
     def it_runs_python_ports_through_pytest(

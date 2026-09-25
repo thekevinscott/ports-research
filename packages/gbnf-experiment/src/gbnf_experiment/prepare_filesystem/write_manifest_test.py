@@ -25,7 +25,7 @@ CALL = {
     "timestamp": datetime(2026, 9, 6, 14, 25, 30, tzinfo=UTC),
     "condition": CONDITION,
     "included": INCLUDED,
-    "image_tag": "agent-harness-sandbox-claude:latest",
+    "image": "gbnf-workspace:0123456789abcdef",
     "gbnf_commit": "13f1aca",
 }
 
@@ -124,9 +124,9 @@ def describe_write_manifest():
         assert manifest()["sandbox"] == {"image_id": IMAGE_ID}
 
     def it_inspects_the_tag_it_was_given(written, docker_module):
-        written(image_tag="agent-harness-sandbox-pi:latest")
+        written(image="gbnf-workspace:fedcba9876543210")
         docker_module.image.inspect.assert_called_once_with(
-            "agent-harness-sandbox-pi:latest"
+            "gbnf-workspace:fedcba9876543210"
         )
 
     def it_records_one_commit_for_the_whole_harness(manifest):

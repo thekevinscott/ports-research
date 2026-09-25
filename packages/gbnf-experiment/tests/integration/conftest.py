@@ -26,37 +26,24 @@ def volume_source(volumes, target):
     return Path(source)
 
 
-def write_prepared_output(directory: Path) -> None:
-    """What the real gbnf-prepare container emits into /prepared-output."""
+def prepared_listing() -> list[str]:
+    """What the real prepare stage writes to /prepared.list: every file, relative."""
+    listing = []
     for language in ("typescript", "python"):
-        source = directory / "source" / language
-        source.mkdir(parents=True)
-        (source / MANIFESTS[language]).write_text("{}")
-        code = source / SOURCE_DIRECTORIES[language]
-        code.mkdir()
-        (code / IMPLEMENTATIONS[language]).write_text(f"{language} source")
-        (code / COLOCATED_TESTS[language]).write_text(f"{language} tests")
+        source = f"reference_implementation/{language}"
+        listing.append(f"{source}/{MANIFESTS[language]}")
+        code = f"{source}/{SOURCE_DIRECTORIES[language]}"
+        listing.append(f"{code}/{IMPLEMENTATIONS[language]}")
+        listing.append(f"{code}/{COLOCATED_TESTS[language]}")
         if language == "typescript":
-            for name in DEV_HARNESS:
-                path = source / name
-                path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_text("dev harness")
-
-        tests = directory / "tests" / language
-        (tests / "iteration").mkdir(parents=True)
-        (tests / "validation").mkdir(parents=True)
-        (tests / "iteration" / f"grammars_test.{language}").write_text(
-            f"{language} iteration cases"
-        )
-        (tests / "validation" / f"validate_test.{language}").write_text(
-            f"{language} validation cases"
-        )
-
-    grammars = directory / "tests" / "python" / "iteration" / "grammars"
-    grammars.mkdir()
+            listing.extend(f"{source}/{name}" for name in DEV_HARNESS)
+        tests = f"tests/{language}"
+        listing.append(f"{tests}/iteration/grammars_test.{language}")
+        listing.append(f"{tests}/validation/validate_test.{language}")
     for name in GRAMMAR_FIXTURES:
-        (grammars / f"{name}.gbnf").write_text("root ::= 'x'")
-        (grammars / f"{name}.json").write_text('["x"]')
+        listing.append(f"tests/python/iteration/grammars/{name}.gbnf")
+        listing.append(f"tests/python/iteration/grammars/{name}.json")
+    return sorted(listing)
 
 
 @pytest.fixture
@@ -66,36 +53,54 @@ def data_directory(tmp_path):
         yield directory
 
 
-@pytest.fixture(autouse=True)
-def prepared_directory(tmp_path):
-    """The prepared corpus cache, redirected out of the user's real ~/.cache.
-
-    Autouse: the cache no longer sits under data_directory, so redirecting that
-    alone would leave any test that prepares writing into the host's cache.
-    """
-    directory = tmp_path / "cache" / "prepared"
-    with patch.object(settings, "prepared_directory", directory):
-        yield directory
+@pytest.fixture
+def workspace_builds() -> dict:
+    """Every workspace tag built this test, with the build args it was built from."""
+    return {}
 
 
 @pytest.fixture
-def prepare_docker():
-    """The gbnf-prepare container, faked at the docker boundary."""
+def prepare_build_docker():
+    """The prepare stage's build, faked at the docker boundary."""
     with patch(
-        "gbnf_experiment.prepare_filesystem.prepare_reference_implementation.docker",
-        autospec=True,
+        "gbnf_experiment.prepare_filesystem.build_prepare_image.docker", autospec=True
+    ) as m:
+        yield m
+
+
+@pytest.fixture
+def prepare_docker(prepare_build_docker):
+    """The prepare stage's listing, faked at the docker boundary."""
+    with patch(
+        "gbnf_experiment.prepare_filesystem.list_prepared_files.docker", autospec=True
+    ) as m:
+        m.run.return_value = "\n".join(prepared_listing()) + "\n"
+        yield m
+
+
+@pytest.fixture
+def agent_image_docker():
+    """agent-harness-sandbox's image builds, faked at the docker boundary."""
+    with patch("agent_harness_sandbox.build_agent_image.docker", autospec=True) as m:
+        yield m
+
+
+@pytest.fixture
+def workspace_docker(workspace_builds, prepare_docker, agent_image_docker):
+    """The final workspace build, faked at the docker boundary and recorded by tag."""
+    with patch(
+        "gbnf_experiment.prepare_filesystem.build_workspace_image.docker", autospec=True
     ) as m:
 
-        def fake_run(tag, user=None, volumes=None, remove=None):
-            write_prepared_output(volume_source(volumes, "/prepared-output"))
-            return "prepared"
+        def fake_build(context, tags, build_args, **_):
+            workspace_builds[tags] = build_args
 
-        m.run.side_effect = fake_run
+        m.build.side_effect = fake_build
         yield m
 
 
 @pytest.fixture(autouse=True)
-def sandbox_image_id():
+def sandbox_image_docker():
     """The manifest's image-id lookup, faked at the docker boundary.
 
     Autouse because every test that runs the experiment reaches the daemon
@@ -105,7 +110,12 @@ def sandbox_image_id():
     """
     with patch("gbnf_experiment.prepare_filesystem.write_manifest.docker", autospec=True) as m:
         m.image.inspect.return_value.id = SANDBOX_IMAGE_ID
-        yield SANDBOX_IMAGE_ID
+        yield m
+
+
+@pytest.fixture
+def sandbox_image_id(sandbox_image_docker):
+    return SANDBOX_IMAGE_ID
 
 
 @pytest.fixture
@@ -156,11 +166,15 @@ def lockdown_docker():
 
 
 @pytest.fixture
-def porting_docker(porting_calls, claude_home, lockdown_docker, port_result):
+def porting_docker(
+    porting_calls, workspace_builds, workspace_docker, claude_home, lockdown_docker, port_result
+):
     """The porting sandbox, faked at the docker boundary.
 
     Standing in for the model: instead of running claude, it writes a
-    plausible ported implementation into the bound output directory.
+    plausible ported implementation into the bound output directory. The
+    container tree is what the image it was handed was built with, plus
+    whatever was mounted under /workspace.
     """
     with patch("agent_harness_sandbox.run_agent_harness_sandbox.docker", autospec=True) as m:
         m.image.exists.return_value = True
@@ -170,17 +184,24 @@ def porting_docker(porting_calls, claude_home, lockdown_docker, port_result):
             credentials = volume_source(volumes, CLAUDE_CONFIG_TARGET)
             porting_calls.append(
                 {
+                    "image": tag,
                     "prompt": cmd[-1],
                     "command": list(cmd),
                     "volumes": volumes,
                     "envs": envs,
                     "credentials": (credentials / ".credentials.json").read_text(),
                     "container_tree": sorted(
-                        f"{target}/{path.relative_to(source)}"
-                        for source, target, _ in volumes
-                        if str(target).startswith("/workspace")
-                        for path in Path(source).rglob("*")
-                        if path.is_file()
+                        [
+                            f"/workspace/{name}"
+                            for name in workspace_builds[tag]["FILES"].splitlines()
+                        ]
+                        + [
+                            f"{target}/{path.relative_to(source)}"
+                            for source, target, _ in volumes
+                            if str(target).startswith("/workspace")
+                            for path in Path(source).rglob("*")
+                            if path.is_file()
+                        ]
                     ),
                 }
             )

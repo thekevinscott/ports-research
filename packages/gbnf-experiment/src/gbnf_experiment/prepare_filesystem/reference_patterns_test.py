@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from gbnf_experiment.prepare_filesystem.reference_patterns import reference_patterns
@@ -26,63 +24,58 @@ SUITES = {
 }
 
 
-def write(directory: Path, names: tuple[str, ...]) -> None:
-    for name in names:
-        path = directory / name
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(name)
+def under(root: str, names) -> set[str]:
+    return {f"{root}/{name}" for name in names}
 
 
 @pytest.fixture
-def prepared(tmp_path):
+def prepared() -> list[str]:
+    """The prepare stage's listing: every file under /prepared, relative."""
+    listing: set[str] = set()
     for language in ("typescript", "python"):
-        write(
-            tmp_path / "source" / language,
+        listing |= under(
+            f"reference_implementation/{language}",
             (MANIFEST[language], IMPLEMENTATION[language], *COLOCATED_TESTS[language]),
         )
-        write(tmp_path / "tests" / language, SUITES[language])
-    write(tmp_path / "source" / "python", CACHE_ARTEFACTS)
-    write(tmp_path / "source" / "typescript", DEV_HARNESS)
-    return tmp_path
+        listing |= under(f"tests/{language}", SUITES[language])
+    listing |= under("reference_implementation/python", CACHE_ARTEFACTS)
+    listing |= under("reference_implementation/typescript", DEV_HARNESS)
+    return sorted(listing)
 
 
-def selected(prepared: Path, language: str, **flags) -> list[str]:
+def selected(prepared: list[str], language: str, **flags) -> list[str]:
     patterns = reference_patterns(
         language,
         **{"include_typescript_tests": False, "include_python_tests": False, **flags},
     )
-    return [path.as_posix() for path in select_files(source=prepared, patterns=patterns)]
-
-
-def under(root: str, names) -> set[str]:
-    return {f"{root}/{name}" for name in names}
+    return [path.as_posix() for path in select_files(paths=prepared, patterns=patterns)]
 
 
 def describe_reference_patterns():
     @pytest.mark.parametrize("language", ["typescript", "python"])
     def it_keeps_the_implementation_and_its_manifest(prepared, language):
         assert selected(prepared, language) == sorted(
-            under(f"source/{language}", [MANIFEST[language], IMPLEMENTATION[language]])
+            under(f"reference_implementation/{language}", [MANIFEST[language], IMPLEMENTATION[language]])
         )
 
     @pytest.mark.parametrize("language", ["typescript", "python"])
     def it_withholds_the_colocated_tests_at_every_depth(prepared, language):
-        assert not under(f"source/{language}", COLOCATED_TESTS[language]) & set(
+        assert not under(f"reference_implementation/{language}", COLOCATED_TESTS[language]) & set(
             selected(prepared, language)
         )
 
     @pytest.mark.parametrize("language", ["typescript", "python"])
     def it_never_reaches_the_other_language(prepared, language):
         other = "python" if language == "typescript" else "typescript"
-        assert not any(path.startswith(f"source/{other}/") for path in selected(prepared, language))
+        assert not any(path.startswith(f"reference_implementation/{other}/") for path in selected(prepared, language))
 
     def it_leaves_the_compiled_tests_behind(prepared):
         """A .pyc decompiles back to its source."""
-        assert not under("source/python", CACHE_ARTEFACTS) & set(selected(prepared, "python"))
+        assert not under("reference_implementation/python", CACHE_ARTEFACTS) & set(selected(prepared, "python"))
 
     def it_hides_the_typescript_dev_harness(prepared):
         """dev/ is browser and node demo apps, not the library under port."""
-        assert not under("source/typescript", DEV_HARNESS) & set(
+        assert not under("reference_implementation/typescript", DEV_HARNESS) & set(
             selected(prepared, "typescript")
         )
 
@@ -108,13 +101,13 @@ def describe_reference_patterns():
             )
 
         def it_keeps_a_suite_file_the_colocated_rule_would_drop(prepared):
-            """The `_test.py` exclusion is scoped to source/, not the suite."""
+            """The `_test.py` exclusion is scoped to reference_implementation/, not the suite."""
             assert "tests/python/iteration/grammars_test.py" in selected(
                 prepared, "typescript", include_python_tests=True
             )
 
         def it_leaves_the_source_selection_unchanged(prepared):
             with_suite = selected(prepared, "typescript", include_typescript_tests=True)
-            assert [p for p in with_suite if p.startswith("source/")] == selected(
+            assert [p for p in with_suite if p.startswith("reference_implementation/")] == selected(
                 prepared, "typescript"
             )

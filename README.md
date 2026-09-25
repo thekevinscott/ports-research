@@ -16,25 +16,33 @@ Three packages, each configuring the one above it.
 
 - `packages/agent-harness-sandbox` — a sandboxed agent. Its `-v` mounts are
   configurable, its network access is restricted, and it is hardened reasonably
-  well. Library only, no CLI: `run_agent_harness_sandbox` builds the images in
-  `sandbox/` and runs the agent's CLI (`ClaudeAgent`, `claude -p`; `PiAgent`
-  exists but is not wired up) inside a container behind an egress proxy.
+  well. Library only, no CLI: `build_agent_image` builds the images in
+  `sandbox/` and returns the agent's tag; `run_agent_harness_sandbox` runs the
+  agent's CLI (`ClaudeAgent`, `claude -p`; `PiAgent` exists but is not wired
+  up) in whatever image it is handed, inside a container behind an egress
+  proxy.
 - `packages/porting-harness` — configures agent-harness-sandbox, provides a
-  prompt (`src/porting_harness/prompt.txt`) and a layout. Reference, tests and
-  output are synced locally: direct bind mounts, not copies. Library only:
-  `run_porting_harness` expects `source/` and `tests/` under the reference
-  directory, mounts each read-only, and binds the output directory writable.
+  prompt (`src/porting_harness/prompt.txt`) and a layout. Library only:
+  `run_porting_harness` takes an image whose `/workspace` already holds the
+  reference (and any test suites), mounts nothing in, and binds the output
+  directory writable at `/workspace/ported_implementation`. `select_files`
+  filters a listing of paths by a gitignore-syntax pattern list.
 - `packages/gbnf-experiment` — configures porting-harness specifically for
-  gbnf. Runs necessary pre-work such as generating the test suite (the
-  gbnf-prepare image in `docker/gbnf-prepare`, cached under
-  `~/.cache/ports/gbnf-experiment/prepared/`). Otherwise minimal. CLI
-  `run-gbnf-experiment`; each invocation writes one run directory under `data/`.
+  gbnf. Owns the multistage workspace image in `docker/gbnf-workspace`: the
+  `prepare` stage clones gbnf at the pin, patches it, installs, runs test-writer
+  and writes a listing of every file it produced; the host reads that listing,
+  selects with `select_files`, and builds the final stage `FROM` the agent
+  image with the selected files, and only those, copied to `/workspace`. No
+  evaluation happens inside the container. CLI `run-gbnf-experiment`; each
+  invocation writes one run directory under `data/`.
 
 ## Reference provenance
 
-The gbnf-prepare Dockerfile clones `github.com/thekevinscott/gbnf`, checks out
-the pin in `gbnf_experiment/config.py` (`13f1aca`, the merge of gbnf PR #81)
-and applies `patches/`.
+The workspace Dockerfile's `prepare` stage clones
+`github.com/thekevinscott/gbnf`, checks out the pin in
+`gbnf_experiment/config.py` (`13f1aca`, the merge of gbnf PR #81) and applies
+`patches/`. The manifest names the workspace image by id and lists every path
+the agent could see under `reference_implementation.included`.
 
 Runs banked before the bundle removal record `derivation_cache_key =
 390bf534c55d496b` in their manifests; the key after that was
@@ -45,15 +53,17 @@ the old tree accumulated after derivation. Manifests are left as banked.
 
 Renaming the container to gbnf-prepare moved the key again, to
 `771a734d60ecbae5`. Only names changed; the corpus the container emits is the
-same.
+same. The host-side cache and its key went away with the workspace image;
+manifests from that period carry the key, later ones carry the image id.
 
 ## Supporting packages
 
 - `packages/execute-test-suite` — CLI `execute-test-suite --language
   <python|typescript|javascript> --target <dir>`. Runs gbnf's derived test
   suite against one ported implementation on the host, prints one line of JSON
-  with pass, fail, error and skip counts, and exits 0 on success. Needs the
-  prepared corpus cache, which a gbnf-experiment run builds. Calls no model.
+  with pass, fail, error and skip counts, and exits 0 on success. Copies the
+  generated suites out of gbnf-experiment's prepare image into a scratch
+  directory for the run. Calls no model.
 - `packages/generate-embedding` — CLI `generate-embedding <file> --model
   <name>`. Embeds one code file through an OpenAI-compatible `/v1/embeddings`
   endpoint (`GENERATE_EMBEDDING_BASE_URL`, optional `GENERATE_EMBEDDING_API_KEY`)
@@ -103,8 +113,7 @@ package. The core packages chain through editable path deps: porting-harness
 -> agent-harness-sandbox, gbnf-experiment -> porting-harness,
 execute-test-suite -> gbnf-experiment. gbnf-experiment reads
 `GBNF_EXPERIMENT_*` env vars (pydantic-settings; among them `DATA_DIRECTORY`,
-`PREPARED_DIRECTORY`, `GBNF_COMMIT`, `IMAGE_TAG`) and `XDG_CACHE_HOME` for
-the cache root.
+`GBNF_COMMIT`, `PREPARE_IMAGE_TAG`, `WORKSPACE_IMAGE_REPOSITORY`).
 
 Auth: no API key env var. `ClaudeAgent` copies the host's
 `~/.claude/.credentials.json` into the sandbox, so the host needs a logged-in

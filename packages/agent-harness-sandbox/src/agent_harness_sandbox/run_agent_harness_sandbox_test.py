@@ -43,6 +43,7 @@ def transcripts(tmp_path):
 def options(agent, transcripts):
     return {
         "agent": agent,
+        "image": "a-workspace:latest",
         "inputs": {},
         "outputs": {},
         "envs": {},
@@ -71,19 +72,7 @@ def lockdown():
 
 
 @pytest.fixture
-def sandbox_dir():
-    with (
-        patch("agent_harness_sandbox.run_agent_harness_sandbox.SANDBOX_DIR", Path("/sandbox")),
-        patch(
-            "agent_harness_sandbox.run_agent_harness_sandbox.BASE_DOCKERFILE",
-            Path("/sandbox/Dockerfile"),
-        ),
-    ):
-        yield Path("/sandbox")
-
-
-@pytest.fixture
-def run(docker, lockdown, sandbox_dir, options):
+def run(docker, lockdown, options):
     def call(**overrides):
         return run_agent_harness_sandbox("hi", **{**options, **overrides})
 
@@ -103,7 +92,7 @@ def describe_signature():
     def it_takes_its_options_by_keyword_only(agent):
         with pytest.raises(TypeError):
             run_agent_harness_sandbox(
-                "hi", agent, {}, {}, {}, False, "/workspace", "/t", "/p.log", "high", "m"
+                "hi", agent, "a-workspace:latest", {}, {}, {}, False, "/workspace", "/t", "/p.log", "high", "m"
             )
 
 
@@ -111,10 +100,15 @@ def describe_run():
     def it_returns_the_container_output(run):
         assert run() == "output"
 
-    def it_runs_the_agents_own_image_and_command(run, docker):
+    def it_runs_the_image_it_was_given_with_the_agents_command(run, docker):
         run()
-        assert docker.run.call_args.args == ("an-agent:latest", ["an-agent"])
+        assert docker.run.call_args.args == ("a-workspace:latest", ["an-agent"])
         assert docker.run.call_args.kwargs["remove"] is True
+
+    def it_builds_nothing(run, docker):
+        """The caller builds, so an image derived from the agent's can go on top."""
+        run()
+        docker.build.assert_not_called()
 
     def it_casts_home_to_a_string_workdir(run, docker):
         run(home=Path("/elsewhere"))
@@ -125,42 +119,6 @@ def describe_command():
     def it_asks_the_agent_for_the_argv(run, agent):
         run(effort="low", model="claude-opus-5")
         agent.command.assert_called_once_with("hi", effort="low", model="claude-opus-5")
-
-
-def describe_build():
-    def it_builds_every_run(run, docker):
-        """A static tag makes the build the only thing that can notice an edited context."""
-        run()
-        run()
-        assert docker.build.call_count == 4
-
-    def it_never_asks_whether_the_image_is_already_there(run, docker):
-        run()
-        docker.image.exists.assert_not_called()
-
-    def it_builds_and_runs_the_same_image(run, docker):
-        run()
-        assert docker.build.call_args.kwargs["tags"] == docker.run.call_args.args[0]
-
-    def it_builds_the_base_before_the_agent_layer(run, docker):
-        run()
-        assert [call.kwargs["tags"] for call in docker.build.call_args_list] == [
-            "agent-harness-sandbox-base:latest",
-            "an-agent:latest",
-        ]
-
-    def it_builds_the_shipped_context_quietly(run, docker, sandbox_dir):
-        run()
-        assert [call.args for call in docker.build.call_args_list] == [(sandbox_dir,), (sandbox_dir,)]
-        assert [call.kwargs["file"] for call in docker.build.call_args_list] == [
-            Path("/sandbox/Dockerfile"),
-            Path("/sandbox/Dockerfile.an-agent"),
-        ]
-        assert [call.kwargs["progress"] for call in docker.build.call_args_list] == [False, False]
-
-    def it_streams_build_output_in_debug(run, docker):
-        run(debug=True)
-        assert docker.build.call_args.kwargs["progress"] == "tty"
 
 
 def describe_auth():
