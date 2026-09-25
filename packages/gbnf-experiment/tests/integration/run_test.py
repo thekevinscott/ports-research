@@ -12,6 +12,31 @@ from gbnf_experiment.cli import cli
 from gbnf_experiment.config import prepare_cache_key, settings
 from porting_harness.run_porting_harness import PROMPT_PATH
 
+from conftest import GRAMMAR_FIXTURES
+
+TYPESCRIPT_REFERENCE = [
+    "/workspace/reference_implementation/typescript/package.json",
+    "/workspace/reference_implementation/typescript/src/index.ts",
+]
+PYTHON_REFERENCE = [
+    "/workspace/reference_implementation/python/gbnf/index.py",
+    "/workspace/reference_implementation/python/pyproject.toml",
+]
+TYPESCRIPT_SUITE = [
+    "/workspace/tests/typescript/iteration/grammars_test.typescript",
+    "/workspace/tests/typescript/validation/validate_test.typescript",
+]
+PYTHON_SUITE = [
+    *(
+        f"/workspace/tests/python/iteration/grammars/{name}.{suffix}"
+        for name in GRAMMAR_FIXTURES
+        for suffix in ("gbnf", "json")
+    ),
+    "/workspace/tests/python/iteration/grammars_test.python",
+    "/workspace/tests/python/validation/validate_test.python",
+]
+
+
 CONFIG = {
     "source_language": "typescript",
     "include_typescript_tests": False,
@@ -64,82 +89,52 @@ def describe_gbnf_experiment():
         assert list(prepared_directory.glob("*.staging")) == []
 
     def describe_the_assembled_reference():
-        def it_carries_only_the_source_when_no_suite_is_included(experiment, porting_calls):
+        @pytest.mark.parametrize(
+            ("source_language", "typescript", "python", "expected"),
+            [
+                ("typescript", False, False, TYPESCRIPT_REFERENCE),
+                ("typescript", True, False, [*TYPESCRIPT_REFERENCE, *TYPESCRIPT_SUITE]),
+                ("typescript", False, True, [*TYPESCRIPT_REFERENCE, *PYTHON_SUITE]),
+                (
+                    "typescript",
+                    True,
+                    True,
+                    [*TYPESCRIPT_REFERENCE, *PYTHON_SUITE, *TYPESCRIPT_SUITE],
+                ),
+                ("python", False, False, PYTHON_REFERENCE),
+                ("python", True, False, [*PYTHON_REFERENCE, *TYPESCRIPT_SUITE]),
+                ("python", False, True, [*PYTHON_REFERENCE, *PYTHON_SUITE]),
+                ("python", True, True, [*PYTHON_REFERENCE, *PYTHON_SUITE, *TYPESCRIPT_SUITE]),
+            ],
+            ids=[
+                "typescript-none",
+                "typescript-source-suite",
+                "typescript-target-suite",
+                "typescript-both",
+                "python-none",
+                "python-target-suite",
+                "python-source-suite",
+                "python-both",
+            ],
+        )
+        def it_carries_the_source_and_exactly_the_selected_suites(
+            experiment, porting_calls, source_language, typescript, python, expected
+        ):
+            """Colocated tests and dev/ never appear, whatever the flags say."""
+            experiment(
+                source_language=source_language,
+                include_typescript_tests=typescript,
+                include_python_tests=python,
+            )
+            [call] = porting_calls
+            assert call["container_tree"] == expected
+
+        def it_mounts_no_tests_directory_when_neither_suite_is_asked_for(
+            experiment, porting_calls
+        ):
             experiment()
             [call] = porting_calls
-            assert call["container_tree"] == [
-                "/workspace/reference_implementation/package.json",
-                "/workspace/reference_implementation/src/index.ts",
-            ]
-
-        def it_carries_the_python_source_when_porting_the_other_way(
-            experiment, porting_calls
-        ):
-            experiment(source_language="python")
-            [call] = porting_calls
-            assert call["container_tree"] == [
-                "/workspace/reference_implementation/gbnf/index.py",
-                "/workspace/reference_implementation/pyproject.toml",
-            ]
-
-        def it_withholds_the_typescript_colocated_tests_even_when_that_suite_was_included(
-            experiment, porting_calls
-        ):
-            experiment(include_typescript_tests=True)
-            [call] = porting_calls
-            assert (
-                "/workspace/reference_implementation/src/index.test.ts"
-                not in call["container_tree"]
-            )
-
-        def it_withholds_the_python_colocated_tests_even_when_that_suite_was_included(
-            experiment, porting_calls
-        ):
-            experiment(source_language="python", include_python_tests=True)
-            [call] = porting_calls
-            assert (
-                "/workspace/reference_implementation/gbnf/index_test.py"
-                not in call["container_tree"]
-            )
-
-        def it_hides_the_typescript_dev_harness(experiment, porting_calls):
-            """dev/ is browser and node demo apps, not the library under port."""
-            experiment(source_language="typescript", include_typescript_tests=True)
-            [call] = porting_calls
-            assert not any(
-                "/dev/" in path or path.endswith("/dev") for path in call["container_tree"]
-            )
-
-        def it_strips_the_reference_the_other_languages_flag_left_alone(
-            experiment, porting_calls
-        ):
-            experiment(include_python_tests=True)
-            [call] = porting_calls
-            tree = call["container_tree"]
-            assert "/workspace/tests/python/iteration/grammars_test.python" in tree
-            assert "/workspace/reference_implementation/src/index.test.ts" not in tree
-
-        def it_adds_the_python_suite_with_its_grammar_fixtures(experiment, porting_calls):
-            experiment(include_python_tests=True)
-            [call] = porting_calls
-            tree = call["container_tree"]
-            assert "/workspace/tests/python/iteration/grammars_test.python" in tree
-            assert "/workspace/tests/python/iteration/grammars/arithmetic.gbnf" in tree
-            assert not any(path.startswith("/workspace/tests/typescript") for path in tree)
-
-        def it_adds_the_typescript_suite(experiment, porting_calls):
-            experiment(include_typescript_tests=True)
-            [call] = porting_calls
-            tree = call["container_tree"]
-            assert "/workspace/tests/typescript/iteration/grammars_test.typescript" in tree
-            assert not any(path.startswith("/workspace/tests/python") for path in tree)
-
-        def it_adds_both_suites(experiment, porting_calls):
-            experiment(include_typescript_tests=True, include_python_tests=True)
-            [call] = porting_calls
-            tree = call["container_tree"]
-            assert any(path.startswith("/workspace/tests/typescript") for path in tree)
-            assert any(path.startswith("/workspace/tests/python") for path in tree)
+            assert "/workspace/tests" not in [str(target) for _, target, _ in call["volumes"]]
 
         def it_stages_the_assembly_outside_the_run_record(experiment, data_directory):
             """The corpus is rebuildable from the cache, so no run banks a copy."""
@@ -285,14 +280,21 @@ def describe_the_manifest():
     ):
         experiment()
         assert (
-            "src/index.test.ts"
+            "source/typescript/src/index.test.ts"
             not in manifest()["reference_implementation"]["included"]
         )
         [call] = porting_calls
         assert (
-            "/workspace/reference_implementation/src/index.test.ts"
+            "/workspace/reference_implementation/typescript/src/index.test.ts"
             not in call["container_tree"]
         )
+
+    def it_records_the_included_paths_from_the_prepared_root(experiment, manifest):
+        """One list, one root: source and suite paths side by side."""
+        experiment(include_python_tests=True)
+        included = manifest()["reference_implementation"]["included"]
+        assert "source/typescript/src/index.ts" in included
+        assert "tests/python/validation/validate_test.python" in included
 
     def it_records_the_pinned_commit(experiment, manifest):
         experiment()
