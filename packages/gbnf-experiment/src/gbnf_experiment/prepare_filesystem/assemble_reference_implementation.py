@@ -7,20 +7,9 @@ def copy_file(source: Path, target: Path) -> None:
     shutil.copy2(source, target)
 
 
-def assemble_reference_implementation(
-    *,
-    prepared_directory: Path,
-    output_directory: Path,
-    source_language: str,
-    files: list[Path],
-    test_files: list[Path],
-) -> Path:
-    source_directory = prepared_directory / "source" / source_language
-    shutil.rmtree(output_directory, ignore_errors=True)
-    output_directory.mkdir(parents=True)
-    (output_directory / "source").mkdir()
+def assemble_reference_implementation(*, source: Path, output: Path, files: list[Path]) -> Path:
+    shutil.rmtree(output, ignore_errors=True)
+    output.mkdir(parents=True)
     for relative in files:
-        copy_file(source_directory / relative, output_directory / "source" / relative)
-    for relative in test_files:
-        copy_file(prepared_directory / "tests" / relative, output_directory / "tests" / relative)
-    return output_directory
+        copy_file(source / relative, output / relative)
+    return output

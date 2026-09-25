@@ -15,12 +15,12 @@ from porting_harness.run_porting_harness import PROMPT_PATH
 from conftest import GRAMMAR_FIXTURES
 
 TYPESCRIPT_REFERENCE = [
-    "/workspace/reference_implementation/package.json",
-    "/workspace/reference_implementation/src/index.ts",
+    "/workspace/reference_implementation/typescript/package.json",
+    "/workspace/reference_implementation/typescript/src/index.ts",
 ]
 PYTHON_REFERENCE = [
-    "/workspace/reference_implementation/gbnf/index.py",
-    "/workspace/reference_implementation/pyproject.toml",
+    "/workspace/reference_implementation/python/gbnf/index.py",
+    "/workspace/reference_implementation/python/pyproject.toml",
 ]
 TYPESCRIPT_SUITE = [
     "/workspace/tests/typescript/iteration/grammars_test.typescript",
@@ -280,14 +280,21 @@ def describe_the_manifest():
     ):
         experiment()
         assert (
-            "src/index.test.ts"
+            "source/typescript/src/index.test.ts"
             not in manifest()["reference_implementation"]["included"]
         )
         [call] = porting_calls
         assert (
-            "/workspace/reference_implementation/src/index.test.ts"
+            "/workspace/reference_implementation/typescript/src/index.test.ts"
             not in call["container_tree"]
         )
+
+    def it_records_the_included_paths_from_the_prepared_root(experiment, manifest):
+        """One list, one root: source and suite paths side by side."""
+        experiment(include_python_tests=True)
+        included = manifest()["reference_implementation"]["included"]
+        assert "source/typescript/src/index.ts" in included
+        assert "tests/python/validation/validate_test.python" in included
 
     def it_records_the_pinned_commit(experiment, manifest):
         experiment()

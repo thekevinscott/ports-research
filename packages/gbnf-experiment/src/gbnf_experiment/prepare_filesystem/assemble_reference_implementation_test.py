@@ -6,8 +6,8 @@ from gbnf_experiment.prepare_filesystem.assemble_reference_implementation import
     assemble_reference_implementation,
 )
 
-FILES = [Path("package.json"), Path("src/gbnf.ts")]
-TEST_FILES = [Path("python/suite_python"), Path("python/grammars/arithmetic.gbnf")]
+FILES = [Path("source/typescript/package.json"), Path("source/typescript/src/gbnf.ts")]
+SUITE = [Path("tests/python/suite_python"), Path("tests/python/grammars/arithmetic.gbnf")]
 
 
 @pytest.fixture
@@ -34,16 +34,9 @@ def output_directory(tmp_path):
 
 @pytest.fixture
 def assemble(prepared_directory, output_directory):
-    def run(**overrides):
+    def run(files=FILES):
         return assemble_reference_implementation(
-            **{
-                "prepared_directory": prepared_directory,
-                "output_directory": output_directory,
-                "source_language": "typescript",
-                "files": FILES,
-                "test_files": [],
-                **overrides,
-            }
+            source=prepared_directory, output=output_directory, files=files
         )
 
     return run
@@ -61,32 +54,26 @@ def describe_assemble_reference_implementation():
     def it_returns_the_output_directory(assemble, output_directory):
         assert assemble() == output_directory
 
-    def it_copies_exactly_the_named_files_under_source(assemble, output_directory):
+    def it_copies_exactly_the_named_files_at_their_own_paths(assemble, output_directory):
         assemble()
-        assert tree(output_directory) == ["source/package.json", "source/src/gbnf.ts"]
+        assert tree(output_directory) == [path.as_posix() for path in FILES]
 
-    def it_copies_from_the_requested_source_language(assemble, output_directory):
-        assemble(source_language="python")
-        assert (output_directory / "source" / "package.json").read_text() == "python"
+    def it_copies_content_not_just_names(assemble, output_directory):
+        assemble()
+        assert (output_directory / "source/typescript/package.json").read_text() == "typescript"
 
     def it_copies_rather_than_moves(assemble, prepared_directory):
         assemble()
-        assert (prepared_directory / "source" / "typescript" / "src" / "gbnf.ts").is_file()
+        assert (prepared_directory / "source/typescript/src/gbnf.ts").is_file()
 
-    def describe_tests():
-        def it_writes_no_tests_directory_when_no_suite_file_is_named(
-            assemble, output_directory
-        ):
-            """Absent, not empty: the harness mounts tests/ only when it exists."""
-            assemble()
-            assert not (output_directory / "tests").exists()
+    def it_writes_no_directory_nothing_was_named_under(assemble, output_directory):
+        """Absent, not empty: the harness mounts tests/ only when it exists."""
+        assemble()
+        assert not (output_directory / "tests").exists()
 
-        def it_copies_the_named_suite_files_under_tests(assemble, output_directory):
-            assemble(test_files=TEST_FILES)
-            assert tree(output_directory / "tests") == [
-                "python/grammars/arithmetic.gbnf",
-                "python/suite_python",
-            ]
+    def it_writes_nothing_for_an_empty_list(assemble, output_directory):
+        assemble(files=[])
+        assert tree(output_directory) == []
 
     def describe_rebuilding():
         def it_removes_stale_contents(assemble, output_directory):
@@ -95,7 +82,7 @@ def describe_assemble_reference_implementation():
             assemble()
             assert not (output_directory / "stale.txt").exists()
 
-        def it_drops_a_suite_that_is_no_longer_named(assemble, output_directory):
-            assemble(test_files=TEST_FILES)
+        def it_drops_a_file_that_is_no_longer_named(assemble, output_directory):
+            assemble(files=[*FILES, *SUITE])
             assemble()
             assert not (output_directory / "tests").exists()

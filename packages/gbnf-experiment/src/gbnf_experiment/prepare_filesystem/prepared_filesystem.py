@@ -8,7 +8,7 @@ from ..config import settings, prepare_cache_key
 from porting_harness.select_files import select_files
 from .assemble_reference_implementation import assemble_reference_implementation
 from .prepare_reference_implementation import prepare_reference_implementation
-from .reference_patterns import PATTERNS, TEST_PATTERNS
+from .reference_patterns import reference_patterns
 from .run_directory_name import run_directory_name
 from .write_manifest import write_manifest as _write_manifest
 
@@ -36,28 +36,19 @@ class PreparedFilesystem:
         # Scratch, not run record: the container reads this tree read-only for the
         # length of the run, and it is reassembled from the prepared corpus cache.
         self._reference_implementation_staging = TemporaryDirectory()
-        self.reference_implementation_included = select_files(
-            source=self.prepared_directory / "source" / source_language,
-            patterns=PATTERNS[source_language],
-        )
-        self.test_suite_included = select_files(
-            source=self.prepared_directory / "tests",
-            patterns=[
-                TEST_PATTERNS[language]
-                for language, wanted in (
-                    ("typescript", include_typescript_tests),
-                    ("python", include_python_tests),
-                )
-                if wanted
-            ],
+        self.included = select_files(
+            source=self.prepared_directory,
+            patterns=reference_patterns(
+                source_language,
+                include_typescript_tests=include_typescript_tests,
+                include_python_tests=include_python_tests,
+            ),
         )
         self.reference_implementation_directory = assemble_reference_implementation(
-            prepared_directory=self.prepared_directory,
-            output_directory=Path(self._reference_implementation_staging.name)
+            source=self.prepared_directory,
+            output=Path(self._reference_implementation_staging.name)
             / "reference_implementation",
-            source_language=source_language,
-            files=self.reference_implementation_included,
-            test_files=self.test_suite_included,
+            files=self.included,
         )
 
     def __enter__(self):
@@ -79,7 +70,7 @@ class PreparedFilesystem:
             condition={
                 **kwargs,
             },
-            included=[path.as_posix() for path in self.reference_implementation_included],
+            included=[path.as_posix() for path in self.included],
             image_tag=agent.image,
             gbnf_commit=settings.gbnf_commit,
             completed_at=None,
@@ -96,7 +87,7 @@ class PreparedFilesystem:
             condition={
                 **kwargs,
             },
-            included=[path.as_posix() for path in self.reference_implementation_included],
+            included=[path.as_posix() for path in self.included],
             image_tag=agent.image,
             gbnf_commit=settings.gbnf_commit,
             completed_at=datetime.now(UTC),

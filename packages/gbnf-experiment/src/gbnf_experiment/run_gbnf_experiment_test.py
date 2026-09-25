@@ -430,8 +430,8 @@ def describe_the_banked_reference():
     ):
         seen = {}
         assemble_reference_implementation.side_effect = lambda **kwargs: seen.update(
-            existed=kwargs["output_directory"].parent.is_dir()
-        ) or kwargs["output_directory"]
+            existed=kwargs["output"].parent.is_dir()
+        ) or kwargs["output"]
         experiment()
         assert seen["existed"] is True
 
