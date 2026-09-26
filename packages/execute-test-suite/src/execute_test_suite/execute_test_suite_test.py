@@ -69,18 +69,6 @@ def describe_execute_test_suite():
         )
         run_pytest_suite_function.assert_not_called()
 
-    def it_runs_javascript_ports_through_vitest_against_the_typescript_suite(
-        run_pytest_suite_function, run_vitest_suite_function
-    ):
-        call(language="javascript")
-        run_vitest_suite_function.assert_called_once_with(
-            test_suite_directory=TEST_SUITES_DIRECTORY / "typescript",
-            target=TARGET,
-            suite=None,
-            adapt=False,
-            coverage=False,
-        )
-
     def it_forwards_the_suite_to_the_runner(
         run_pytest_suite_function
     ):

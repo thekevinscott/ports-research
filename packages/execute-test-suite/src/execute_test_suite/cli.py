@@ -10,7 +10,7 @@ from .execute_test_suite import execute_test_suite
 @click.command()
 @click.option(
     "--language",
-    type=click.Choice(["python", "typescript", "javascript"]),
+    type=click.Choice(["python", "typescript"]),
     required=True,
 )
 @click.option(

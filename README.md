@@ -52,7 +52,7 @@ same.
 ## Supporting packages
 
 - `packages/execute-test-suite` — CLI `execute-test-suite --language
-  <python|typescript|javascript> --target <dir> --test-suites <dir>`. Runs
+  <python|typescript> --target <dir> --test-suites <dir>`. Runs
   gbnf's derived test suite against one ported implementation on the host,
   prints one line of JSON with pass, fail, error and skip counts, and exits 0
   on success. It does not produce the suites: `--test-suites` points at a

@@ -109,19 +109,6 @@ def describe_execute_test_suite():
             )
             assert report["total"] == 1
 
-    def it_grades_javascript_against_the_same_suite_as_typescript(
-        test_suites_directory, typescript_target
-    ):
-        report = execute_test_suite(
-            language="javascript",
-            target=typescript_target(42),
-            test_suites_directory=test_suites_directory,
-        )
-        assert report["test_suite_directory"] == str(
-            test_suites_directory / "typescript"
-        )
-        assert report["success"] is True
-
     def it_never_writes_into_the_suite(
         test_suites_directory, python_target
     ):

@@ -28,14 +28,9 @@ def execute_test_suite(
 
     `target` is graded, never written to: the suite runs from a scratch directory,
     reading `target` and the suite and writing its report elsewhere.
-
-    A javascript port is graded against the typescript suite: the prepare stage
-    only writes a typescript tree, and its vitest specs run through a TS entry shim.
     """
-    if language == "python":
-        runner, test_suite_directory = run_pytest_suite, test_suites_directory / "python"
-    else:
-        runner, test_suite_directory = run_vitest_suite, test_suites_directory / "typescript"
+    runner = run_pytest_suite if language == "python" else run_vitest_suite
+    test_suite_directory = test_suites_directory / language
     result = runner(
         test_suite_directory=test_suite_directory,
         target=target,
