@@ -33,25 +33,16 @@ def execute_test_suite(
     only writes a typescript tree, and its vitest specs run through a TS entry shim.
     """
     if language == "python":
-        test_suite_directory = test_suites_directory / "python"
-        result = run_pytest_suite(
-            test_suite_directory=test_suite_directory,
-            target=target,
-            suite=suite,
-            adapt=adapt,
-            coverage=coverage,
-        )
-    elif language in ("typescript", "javascript"):
-        test_suite_directory = test_suites_directory / "typescript"
-        result = run_vitest_suite(
-            test_suite_directory=test_suite_directory,
-            target=target,
-            suite=suite,
-            adapt=adapt,
-            coverage=coverage,
-        )
+        runner, test_suite_directory = run_pytest_suite, test_suites_directory / "python"
     else:
-        raise ValueError(f"unsupported language: {language}")
+        runner, test_suite_directory = run_vitest_suite, test_suites_directory / "typescript"
+    result = runner(
+        test_suite_directory=test_suite_directory,
+        target=target,
+        suite=suite,
+        adapt=adapt,
+        coverage=coverage,
+    )
     counts = dataclasses.asdict(result)
     rules_fired = counts.pop("rules_fired")
     counts.pop("coverage")
