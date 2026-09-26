@@ -1,7 +1,6 @@
 import dataclasses
 from pathlib import Path
 
-from .locate_test_suite import locate_test_suite
 from .run_pytest_suite import run_pytest_suite
 from .run_vitest_suite import run_vitest_suite
 
@@ -30,20 +29,21 @@ def execute_test_suite(
     `target` is graded, never written to: the suite runs from a scratch directory,
     reading `target` and the suite and writing its report elsewhere.
 
-    The runner lookup is built here, not at module scope: a module-scope dict would
+    A javascript port is graded against the typescript suite: the prepare stage
+    only writes a typescript tree, and its vitest specs run through a TS entry shim.
+
+    The lookup is built here, not at module scope: a module-scope dict would
     capture `run_pytest_suite`/`run_vitest_suite` once at import time, so patching
     either name later (as every unit test here does) would silently miss it.
     """
-    runners = {
-        "python": run_pytest_suite,
-        "typescript": run_vitest_suite,
-        "javascript": run_vitest_suite,
+    languages = {
+        "python": (run_pytest_suite, "python"),
+        "typescript": (run_vitest_suite, "typescript"),
+        "javascript": (run_vitest_suite, "typescript"),
     }
-    test_suite_directory = locate_test_suite(
-        language,
-        test_suites_directory=test_suites_directory,
-    )
-    result = runners[language](
+    runner, suite_name = languages[language]
+    test_suite_directory = test_suites_directory / suite_name
+    result = runner(
         test_suite_directory=test_suite_directory,
         target=target,
         suite=suite,
