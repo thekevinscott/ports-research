@@ -63,6 +63,30 @@ PRs should be S or, at most, M - for special circumstances".
   one, rebase, open the next. Independent pieces may be open at once when
   their files do not overlap.
 
+## Defending a PR — always
+
+**A PR defends the architecture around the diff, not just the diff.** Kevin,
+2026-09-26, on a helper that predated the PR touching it: "when you submit a
+PR, you are responsible for defending not just the diff, but the larger
+architecture; the code around the diff, the file structure, etc. You should be
+prepared to justify why things are the way they are, or refactor to improve
+them."
+
+- **"It was already there" is never a justification.** Kevin: "Prior
+  archeology, or decisions that are not explicitly marked as originating with
+  me, should be viewed with suspicion and questioned. This function snuck into
+  the codebase and I didn't catch it. If I had I would have excised it then.
+  The fact that it predates this commit is not justification."
+- Before opening a PR, look at every function, file and module the diff
+  touches or calls and ask whether it should exist in that shape. If the
+  answer is no, refactor it in the PR when it stays S, or file the issue and
+  name it in the PR body.
+- A decision is settled only when the record marks it as Kevin's: a quoted
+  directive in this file, a JOURNAL entry, an issue or PR comment from him.
+  Anything else in the tree is an agent's choice and open to challenge.
+- When asked "why is this here?", answer from the current need, not from
+  history. If the only answer is history, that is the answer "it should go".
+
 ## Journal — when something major happens
 
 `JOURNAL.md` at the repo root is the append-only lab record. A run started or
