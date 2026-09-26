@@ -12,12 +12,11 @@ prepare() {
     --testDir ../test \
     --targetDir "/prepared/tests/${language}" \
     --language "${upstream}"
-
-  # After the writer, which prunes files it did not write.
-  cp -r "/scaffolding/${language}/." "/prepared/tests/${language}/"
 }
 
 prepare javascript typescript
 prepare python python
 
 cp -r ../test/iteration/grammars /prepared/tests/python/iteration/grammars
+# After the writer, which prunes files it did not write.
+cp -r /scaffolding/. /prepared/tests/
