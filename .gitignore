@@ -1,5 +1,5 @@
-# Harvested paper corpus — 741MB, reproducible from scripts/harvest
-papers/
+# Harvested paper corpus — 741MB, reproducible from literature/harvest
+literature/papers/
 
 # Upstream clone with a live remote; stays a nested repo
 gbnf-experiment/repo/

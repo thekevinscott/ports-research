@@ -6,27 +6,32 @@ The subject is [gbnf](https://github.com/thekevinscott/gbnf), which has
 hand-written TypeScript and Python implementations sharing one test suite. An
 agent in a sandbox gets one implementation as the reference, with or without
 each language's test suite mounted, and is asked to port it to the other
-language. Scoring is a separate step: `execute-test-suite` runs the full
-derived suite against the port, so the suite is held out only for runs that
-did not mount it.
+language.
 
-## Core packages
+## Layout
+
+Two halves. `porting/` holds the code that produces a port. `analysis/` holds
+the code that reads ports after the fact. Neither imports the other;
+`data/runs/` is the seam, written by the first and read by the second.
+`literature/` is the paper corpus and the tools that harvest it.
+
+## porting/
 
 Three packages, each configuring the one above it.
 
-- `packages/agent-harness-sandbox` — a sandboxed agent. Its `-v` mounts are
+- `porting/agent-harness-sandbox` — a sandboxed agent. Its `-v` mounts are
   configurable, its network access is restricted, and it is hardened reasonably
   well. Library only, no CLI: `build_agent_image` builds the images in
   `sandbox/` and returns the agent's tag; `run_agent_harness_sandbox` runs the
   agent's CLI (`ClaudeAgent`, `claude -p`; `PiAgent` exists but is not wired
   up) in whatever image it is handed, inside a container behind an egress
   proxy.
-- `packages/porting-harness` — configures agent-harness-sandbox, provides a
+- `porting/porting-harness` — configures agent-harness-sandbox, provides a
   prompt (`src/porting_harness/prompt.txt`) and a layout. Reference, tests and
   output are synced locally: direct bind mounts, not copies. Library only:
   `run_porting_harness` expects `source/` and `tests/` under the reference
   directory, mounts each read-only, and binds the output directory writable.
-- `packages/gbnf-experiment` — configures porting-harness specifically for
+- `porting/gbnf-experiment` — configures porting-harness specifically for
   gbnf. Runs necessary pre-work such as generating the test suite (the
   gbnf-prepare image in `docker/gbnf-prepare`, cached under
   `~/.cache/ports/gbnf-experiment/prepared/`). Otherwise minimal. CLI
@@ -49,24 +54,21 @@ Renaming the container to gbnf-prepare moved the key again, to
 `771a734d60ecbae5`. Only names changed; the corpus the container emits is the
 same.
 
-## Supporting packages
+## analysis/
 
-- `packages/execute-test-suite` — CLI `execute-test-suite --language
+`analysis/notebook` is the marimo notebook over `data/runs`; its README has
+the commands. The tools it drives sit beside it. CLI lines are abbreviated;
+`--help` has the full usage.
+
+- `analysis/execute-test-suite` — CLI `execute-test-suite --language
   <python|typescript|javascript> --target <dir>`. Runs gbnf's derived test
   suite against one ported implementation on the host, prints one line of JSON
   with pass, fail, error and skip counts, and exits 0 on success. Needs the
   prepared corpus cache, which a gbnf-experiment run builds. Calls no model.
-- `packages/generate-embedding` — CLI `generate-embedding <file> --model
+- `analysis/generate-embedding` — CLI `generate-embedding <file> --model
   <name>`. Embeds one code file through an OpenAI-compatible `/v1/embeddings`
   endpoint (`GENERATE_EMBEDDING_BASE_URL`, optional `GENERATE_EMBEDDING_API_KEY`)
   and prints the vector as JSON, or writes a float32 `.npy` with `--output`.
-
-## Proposed projects
-
-`proposed-projects/` holds analysis tools built alongside the experiment and
-not yet promoted to `packages/`. CLI lines are abbreviated; `--help` has the
-full usage.
-
 - `measure-complexity-curve` — CLI `measure-complexity-curve --language
   <python|typescript> --target <dir>`. Times a gbnf implementation against
   generated grammars of increasing size and prints a JSON report of the
@@ -78,12 +80,12 @@ full usage.
 
 ## Runs
 
-Each run lands in `packages/gbnf-experiment/data/<timestamp>_<id>/` with
+Each run lands in `data/runs/<timestamp>_<id>/` with
 `manifest.json`, `ported_implementation/`, `transcript/`, `proxy.log`, and
 `result.json` once the run finishes. The manifest records the condition
 (source language, test flags, effort, model), the gbnf commit, the sandbox
 image id and the harness commit. `result.json` is the agent CLI's JSON output
-(usage tokens, turns), not a score. Start a run from `packages/gbnf-experiment`:
+(usage tokens, turns), not a score. Start a run from `porting/gbnf-experiment`:
 
 ```
 uv run run-gbnf-experiment --source-language python --include-python-tests --include-typescript-tests
@@ -115,8 +117,8 @@ Claude Code. The sandbox's egress allowlist is `api.anthropic.com` only.
 runs under: what the sandbox mounts, what it withholds, and what it does not
 cover.
 
-`papers/` at the repo root is a 741MB arXiv corpus, gitignored and rebuildable
-with `scripts/harvest`. The literature survey that reads it is not published
+`literature/papers/` is a 741MB arXiv corpus, gitignored and rebuildable
+with `literature/harvest`. The literature survey that reads it is not published
 with the repo.
 
 Session handoffs, audits and dated analysis batches are kept on disk under
