@@ -24,6 +24,7 @@ Three packages, each configuring the one above it.
   output are synced locally: direct bind mounts, not copies. Library only:
   `run_porting_harness` expects `source/` and `tests/` under the reference
   directory, mounts each read-only, and binds the output directory writable.
+  `select_files` filters a listing of paths by a gitignore-syntax pattern list.
 - `packages/gbnf-experiment` — configures porting-harness specifically for
   gbnf. Runs necessary pre-work such as generating the test suite (the
   gbnf-prepare image in `docker/gbnf-prepare`, cached under

@@ -289,6 +289,15 @@ def describe_the_manifest():
             not in call["container_tree"]
         )
 
+    def it_never_includes_a_symlink(experiment, manifest, porting_calls):
+        """A link names a path the patterns did not; what it points at is listed on its own."""
+        experiment()
+        assert not [
+            path for path in manifest()["reference_implementation"]["included"] if "alias." in path
+        ]
+        [call] = porting_calls
+        assert not [path for path in call["container_tree"] if "alias." in path]
+
     def it_records_the_included_paths_from_the_prepared_root(experiment, manifest):
         """One list, one root: source and suite paths side by side."""
         experiment(include_python_tests=True)

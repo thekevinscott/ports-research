@@ -11,6 +11,7 @@ MANIFESTS = {"typescript": "package.json", "python": "pyproject.toml"}
 SOURCE_DIRECTORIES = {"typescript": "src", "python": "gbnf"}
 IMPLEMENTATIONS = {"typescript": "index.ts", "python": "index.py"}
 COLOCATED_TESTS = {"typescript": "index.test.ts", "python": "index_test.py"}
+LINKS = {"typescript": "alias.ts", "python": "alias.py"}
 DEV_HARNESS = (
     "dev/browser/debug/index.html",
     "dev/browser/debug/package.json",
@@ -36,6 +37,7 @@ def write_prepared_output(directory: Path) -> None:
         code.mkdir()
         (code / IMPLEMENTATIONS[language]).write_text(f"{language} source")
         (code / COLOCATED_TESTS[language]).write_text(f"{language} tests")
+        (code / LINKS[language]).symlink_to(IMPLEMENTATIONS[language])
         if language == "typescript":
             for name in DEV_HARNESS:
                 path = source / name

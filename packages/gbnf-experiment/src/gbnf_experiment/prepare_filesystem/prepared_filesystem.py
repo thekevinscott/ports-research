@@ -12,6 +12,15 @@ from .reference_patterns import reference_patterns
 from .run_directory_name import run_directory_name
 from .write_manifest import write_manifest as _write_manifest
 
+def list_regular_files(root: Path) -> list[Path]:
+    """Every regular file under root, relative. Symlinks name a path the patterns did not."""
+    return sorted(
+        path.relative_to(root)
+        for path in root.rglob("*")
+        if path.is_file() and not path.is_symlink()
+    )
+
+
 class PreparedFilesystem:
     def __init__(
         self,
@@ -37,7 +46,7 @@ class PreparedFilesystem:
         # length of the run, and it is reassembled from the prepared corpus cache.
         self._reference_implementation_staging = TemporaryDirectory()
         self.included = select_files(
-            source=self.prepared_directory,
+            paths=list_regular_files(self.prepared_directory),
             patterns=reference_patterns(
                 source_language,
                 include_typescript_tests=include_typescript_tests,
