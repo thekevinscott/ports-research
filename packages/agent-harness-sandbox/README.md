@@ -1,0 +1,18 @@
+# agent-harness-sandbox
+
+Runs a coding agent's CLI inside a locked-down container.
+
+The caller supplies a prompt, an agent, an image, input directories and
+output directories. Inputs mount read-only, outputs read-write. The container
+drops all capabilities, runs with `no-new-privileges`, and reaches the network
+only through an egress proxy that allows the agent's own endpoints. The proxy
+log and the session transcript land on the host.
+
+Library only, no CLI. `build_agent_image` builds the images in `sandbox/` and
+returns the agent's tag. `run_agent_harness_sandbox` runs the prompt in
+whatever image it is handed. Every option is required; nothing has a default.
+
+`ClaudeAgent` is wired up. `PiAgent` exists but is not.
+
+Knows nothing about porting, gbnf, or what is in the mounted directories.
+Depends on nothing else in this repo.
