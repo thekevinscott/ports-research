@@ -52,11 +52,12 @@ same.
 ## Supporting packages
 
 - `packages/execute-test-suite` — CLI `execute-test-suite --language
-  <python|typescript|javascript> --target <dir>`. Runs gbnf's derived test
-  suite against one ported implementation on the host, prints one line of JSON
-  with pass, fail, error and skip counts, and exits 0 on success. Copies the
-  generated suites out of gbnf-experiment's prepare image into a scratch
-  directory for the run. Calls no model.
+  <python|typescript|javascript> --target <dir> --test-suites <dir>`. Runs
+  gbnf's derived test suite against one ported implementation on the host,
+  prints one line of JSON with pass, fail, error and skip counts, and exits 0
+  on success. It does not produce the suites: `--test-suites` points at a
+  directory holding one suite per language, supplied by a gbnf-experiment run
+  or a manual export from the prepare image. Calls no model.
 - `packages/generate-embedding` — CLI `generate-embedding <file> --model
   <name>`. Embeds one code file through an OpenAI-compatible `/v1/embeddings`
   endpoint (`GENERATE_EMBEDDING_BASE_URL`, optional `GENERATE_EMBEDDING_API_KEY`)
@@ -103,8 +104,8 @@ Docker, uv, pnpm, Node, hyperfine and just. Node runs the
 measure-complexity-curve; hyperfine is measure-complexity-curve's timer.
 Python 3.14 or later. No root workspace: `uv sync` in each
 package. The core packages chain through editable path deps: porting-harness
--> agent-harness-sandbox, gbnf-experiment -> porting-harness,
-execute-test-suite -> gbnf-experiment. gbnf-experiment reads
+-> agent-harness-sandbox, gbnf-experiment -> porting-harness.
+gbnf-experiment reads
 `GBNF_EXPERIMENT_*` env vars (pydantic-settings; among them `DATA_DIRECTORY`,
 `PREPARED_DIRECTORY`, `GBNF_COMMIT`, `IMAGE_TAG`) and `XDG_CACHE_HOME` for
 the cache root.
