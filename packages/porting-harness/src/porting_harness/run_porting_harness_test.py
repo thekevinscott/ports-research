@@ -19,11 +19,20 @@ OPTIONS = (
 
 
 @pytest.fixture
-def run_agent_harness_sandbox():
+def run_agent_harness_sandbox(build_agent_image):
     with patch(
         "porting_harness.run_porting_harness.run_agent_harness_sandbox", autospec=True
     ) as mock:
         mock.return_value = "container output"
+        yield mock
+
+
+@pytest.fixture
+def build_agent_image():
+    with patch(
+        "porting_harness.run_porting_harness.build_agent_image", autospec=True
+    ) as mock:
+        mock.return_value = "an-agent:latest"
         yield mock
 
 
@@ -113,6 +122,7 @@ def describe_run_porting_harness():
 
         assert run_agent_harness_sandbox.call_args.kwargs == {
             "agent": agent,
+            "image": "an-agent:latest",
             "inputs": {
                 reference_implementation
                 / "source": Path("/workspace/reference_implementation"),
@@ -127,6 +137,14 @@ def describe_run_porting_harness():
             "transcripts": tmp_path / "transcript",
             "proxy_log": tmp_path / "proxy.log",
         }
+
+    def it_runs_the_image_it_built_for_the_agent(
+        run_agent_harness_sandbox, build_agent_image, options, agent
+    ):
+        run_porting_harness(**options(debug=True))
+
+        build_agent_image.assert_called_once_with(agent=agent, debug=True)
+        assert run_agent_harness_sandbox.call_args.kwargs["image"] == "an-agent:latest"
 
     def it_leaves_tests_unmounted_when_the_reference_has_none(
         run_agent_harness_sandbox, options, reference_implementation

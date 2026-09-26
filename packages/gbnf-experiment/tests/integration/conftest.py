@@ -156,7 +156,14 @@ def lockdown_docker():
 
 
 @pytest.fixture
-def porting_docker(porting_calls, claude_home, lockdown_docker, port_result):
+def agent_image_docker():
+    """agent-harness-sandbox's image builds, faked at the docker boundary."""
+    with patch("agent_harness_sandbox.build_agent_image.docker", autospec=True) as m:
+        yield m
+
+
+@pytest.fixture
+def porting_docker(porting_calls, claude_home, lockdown_docker, agent_image_docker, port_result):
     """The porting sandbox, faked at the docker boundary.
 
     Standing in for the model: instead of running claude, it writes a
