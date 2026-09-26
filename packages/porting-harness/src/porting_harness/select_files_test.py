@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from porting_harness.select_files import select_files
@@ -28,10 +26,7 @@ def listing():
 @pytest.fixture
 def select(listing):
     def call(*patterns):
-        return [
-            path.as_posix()
-            for path in select_files(paths=listing, patterns=list(patterns))
-        ]
+        return select_files(paths=listing, patterns=list(patterns))
 
     return call
 
@@ -42,20 +37,6 @@ def describe_select_files():
 
     def it_returns_nothing_at_all_without_patterns(select):
         assert select() == []
-
-    def it_returns_paths_as_paths(listing):
-        assert select_files(paths=listing, patterns=["/pyproject.toml"]) == [
-            Path("pyproject.toml")
-        ]
-
-    def it_takes_paths_as_well_as_strings():
-        assert select_files(paths=[Path("a/b.py")], patterns=["*.py"]) == [Path("a/b.py")]
-
-    def it_touches_no_filesystem(tmp_path):
-        """A listing read out of an image names files that exist nowhere on the host."""
-        assert select_files(paths=["nowhere/at/all.py"], patterns=["/nowhere/**"]) == [
-            Path("nowhere/at/all.py")
-        ]
 
     def it_takes_several_named_files(select):
         assert select("/pyproject.toml", "/README.md") == [

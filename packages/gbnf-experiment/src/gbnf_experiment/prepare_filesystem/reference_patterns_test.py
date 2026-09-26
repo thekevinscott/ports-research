@@ -44,7 +44,7 @@ def selected(listing: list[str], language: str, **flags) -> list[str]:
         language,
         **{"include_typescript_tests": False, "include_python_tests": False, **flags},
     )
-    return [path.as_posix() for path in select_files(paths=listing, patterns=patterns)]
+    return select_files(paths=listing, patterns=patterns)
 
 
 def under(root: str, names) -> set[str]:

@@ -12,10 +12,10 @@ from .reference_patterns import reference_patterns
 from .run_directory_name import run_directory_name
 from .write_manifest import write_manifest as _write_manifest
 
-def list_regular_files(root: Path) -> list[Path]:
-    """Every regular file under root, relative. Symlinks name a path the patterns did not."""
+def list_regular_files(root: Path) -> list[str]:
+    """Every regular file under root, relative posix. Symlinks name a path the patterns did not."""
     return sorted(
-        path.relative_to(root)
+        path.relative_to(root).as_posix()
         for path in root.rglob("*")
         if path.is_file() and not path.is_symlink()
     )
@@ -79,7 +79,7 @@ class PreparedFilesystem:
             condition={
                 **kwargs,
             },
-            included=[path.as_posix() for path in self.included],
+            included=self.included,
             image_tag=agent.image,
             gbnf_commit=settings.gbnf_commit,
             completed_at=None,
@@ -96,7 +96,7 @@ class PreparedFilesystem:
             condition={
                 **kwargs,
             },
-            included=[path.as_posix() for path in self.included],
+            included=self.included,
             image_tag=agent.image,
             gbnf_commit=settings.gbnf_commit,
             completed_at=datetime.now(UTC),

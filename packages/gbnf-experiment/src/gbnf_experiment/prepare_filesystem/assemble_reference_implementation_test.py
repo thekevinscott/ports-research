@@ -6,8 +6,8 @@ from gbnf_experiment.prepare_filesystem.assemble_reference_implementation import
     assemble_reference_implementation,
 )
 
-FILES = [Path("source/typescript/package.json"), Path("source/typescript/src/gbnf.ts")]
-SUITE = [Path("tests/python/suite_python"), Path("tests/python/grammars/arithmetic.gbnf")]
+FILES = ["source/typescript/package.json", "source/typescript/src/gbnf.ts"]
+SUITE = ["tests/python/suite_python", "tests/python/grammars/arithmetic.gbnf"]
 
 
 @pytest.fixture
@@ -56,7 +56,7 @@ def describe_assemble_reference_implementation():
 
     def it_copies_exactly_the_named_files_at_their_own_paths(assemble, output_directory):
         assemble()
-        assert tree(output_directory) == [path.as_posix() for path in FILES]
+        assert tree(output_directory) == FILES
 
     def it_copies_content_not_just_names(assemble, output_directory):
         assemble()
