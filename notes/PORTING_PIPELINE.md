@@ -9,71 +9,76 @@ agent-harness-sandbox. Each package knows only about the one below it.
 
 ## gbnf-experiment
 
-Everything gbnf-specific. Steps 1 through 5 happen inside the prepare
-image, at build time. Step 6 happens per run.
+Everything gbnf-specific. The prepare image is built once per condition.
+Build args name the source language and which test suites to generate.
+Steps 1 through 6 happen inside that image, at build time.
 
 1. **Clone gbnf at the pinned commit.**
    "we clone and pin so that we have reproducibility"
 2. **Apply patches.**
    "we apply patches because we don't want to modify the source repo"
+   This also corresponds to removing code we don't want to expose to the
+   porting agent.
 3. **Install node modules and build test-writer.**
-   No why needed. "it's self explanatory"
-4. **Run test-writer once per language.**
-   gbnf's tests are written once, in a language-neutral form. test-writer
-   emits a runnable suite per language.
-5. **Clean the tree.**
-   Remove what the agent must never see. Lay out what remains as
-   `source/<lang>` and `tests/<lang>`. "the gbnf-experiment preparatory
-   image should be responsible for cleaning up the repo, and whatever is
-   left is what gets copied over." Whether the cleanup is written as a
-   whitelist or a blacklist is an implementation detail: "whether that's a
-   whitelist or a blacklist for gbnf-experiment doesn't really matter."
-   What gets removed, and why, is recorded next to the removal.
-6. **Resolve the condition to directories.**
-   A condition is a source language and which test suites to include. It
-   maps to `source/<lang>` plus zero or more `tests/<lang>`. The condition
-   is the only thing that changes between runs, so it is the only thing
-   decided per run. This step is gbnf-experiment's alone: "this is specific
-   to gbnf-experiment, not the other two."
+4. **Run test-writer per flag.**
+   Write to `/reference/tests/<lang>` for each language named by a flag.
+   gbnf's tests are written once, in a language-neutral form; test-writer
+   emits a runnable suite per language. Two suites can be present at once,
+   so tests keep the per-language subfolder.
+5. **Copy the source language into `/reference/source`.**
+   The whitelist is applied here, inside the container, during the copy.
+   Plain shell, no host involvement. "I think that that means the
+   whitelist glob step can happen in the docker container, right?" What
+   is left out, and why, is recorded next to the filter. Whether it is
+   written as a whitelist or a blacklist "doesn't really matter."
+6. **Clean up build litter.** (Optional.) Remove files generated in the
+   course of the above, such as `__pycache__`. Maybe unnecessary.
 
-gbnf-experiment hands those directories to porting-harness. When
-porting-harness returns, gbnf-experiment writes the run directory under
-`data/runs`: manifest, result, transcript, proxy log. `data/runs` is the
-seam between porting and analysis.
+`/reference` is the folder that comes back to the host, whole. It is the
+reference exactly as the agent will see it. Nothing on the host selects,
+stages or caches. gbnf-experiment hands the folder to porting-harness and,
+when the run returns, writes the run directory under `data/runs`:
+manifest, result, transcript, proxy log.
+
+### Tests
+
+The container's output is what the agent sees, so it is what gets tested.
+For each of the eight conditions (two source languages, each test suite
+on or off), build the image and assert that `/reference` holds exactly
+the expected files. "We _will_ want tests on the gbnf-experiment
+container, specifically that the reference folder produced for the 8
+conditions is what we expect."
 
 ## porting-harness
 
 Generic. Knows nothing about gbnf or conditions.
 
-7. **Receive a reference and, optionally, tests.**
-8. **Put the reference in front of the agent as part of an image, not a
-   bind mount.**
-   "Copying over node_modules risks a whole lot of bullshit like if the
-   host system mismatches the docker container system."
-9. **Ask agent-harness-sandbox to run the agent** in that image with the
-   porting prompt, outputs mounted.
-10. **Return the port and the transcript** to the caller.
-
-## agent-harness-sandbox
-
-Knows nothing about porting.
-
-11. **Run one agent in one container.** Inputs read-only, outputs
-    writable, all capabilities dropped, egress only through the proxy.
+7. **Receive a folder containing the reference.**
+   Might be source files alone, might be `source/` and `tests/` (gbnf
+   will be this).
+8. **Receive a prompt.**
+   This (likely) includes information about the code setup on disk.
+9. **Run a post-copy step in agent-harness-sandbox.**
+   This might be an `npm install` or `uv sync` or both. Installing inside
+   the container, rather than copying `node_modules` from the host, is
+   what answers "Copying over node_modules risks a whole lot of bullshit
+   like if the host system mismatches the docker container system."
+10. **Ask agent-harness-sandbox to run the agent** with the prompt, the
+    reference mounted read-only, outputs mounted writable.
+11. **Return the port and the transcript** to the caller.
 
 ## Open
 
-**Who builds the image in step 8.** Either porting-harness, because it
-owns the handoff from reference to agent, or gbnf-experiment, because it
-already has a Dockerfile and would then hand porting-harness an image
-instead of directories. Kevin's call. Until it is made, porting-harness
-takes directories.
+**Egress for the post-copy install.** `npm install` and `uv sync` need
+the network. Either step 9 runs before the proxy lockdown, or the proxy
+allows the registries. A sandbox decision, not yet made.
 
-**Whether step 5 supersedes the 2026-09-17 position.** Kevin, 2026-09-17:
-"The Docker container should receive an array of every single individual
-file. Who is evaluating patterns? There should be no evaluation within the
-Docker container." Step 5 puts the cleanup inside the prepare image, at
-build time, as plain shell. The agent's reading is that the earlier
-concern was pattern-evaluation machinery inside the container, and there
-is none. Not yet confirmed by Kevin. If confirmed, the host-side listing,
-the build-ARG whitelist and the host-side selection go away.
+## Superseded
+
+Kevin, 2026-09-17: "The Docker container should receive an array of every
+single individual file. Who is evaluating patterns? There should be no
+evaluation within the Docker container." Replaced by step 5 on
+2026-09-26: the filter runs in the container, at build time, as plain
+shell. With it go the host-side listing, the build-ARG whitelist, the
+host cache and its key, the staging step, and the plan to bake the
+selected reference into a second image.
