@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
+from agent_harness_sandbox.build_agent_image import build_agent_image
 from agent_harness_sandbox.run_agent_harness_sandbox import run_agent_harness_sandbox
 
 MODEL = "claude-opus-5"
@@ -56,9 +57,11 @@ def sandbox(tmp_path_factory):
             )
         )
         proxy_log = root / "proxy.log"
+        agent = ClaudeAgent()
         output = run_agent_harness_sandbox(
             PROMPT.format(script=f"{PROBE_TARGET}/{SCRIPT}", report=f"{OUTPUT_TARGET}/{REPORT}"),
-            agent=ClaudeAgent(),
+            agent=agent,
+            image=build_agent_image(agent=agent, debug=False),
             inputs={probe: PROBE_TARGET},
             outputs={outputs: OUTPUT_TARGET},
             envs={},
@@ -89,8 +92,10 @@ def options(tmp_path):
     """Every argument one run needs, with the caller's overrides on top."""
 
     def build(**overrides):
+        agent = ClaudeAgent()
         return {
-            "agent": ClaudeAgent(),
+            "agent": agent,
+            "image": build_agent_image(agent=agent, debug=False),
             "inputs": {},
             "outputs": {},
             "envs": {},

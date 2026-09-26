@@ -2,6 +2,10 @@ version = 1
 revision = 3
 requires-python = ">=3.14"
 
+[options]
+exclude-newer = "2026-09-23T00:45:49.123044018Z"
+exclude-newer-span = "P3D"
+
 [[package]]
 name = "agent-harness-sandbox"
 version = "0.1.0"

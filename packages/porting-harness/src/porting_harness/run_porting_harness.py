@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from agent_harness_sandbox.agents.agent import Agent
+from agent_harness_sandbox.build_agent_image import build_agent_image
 from agent_harness_sandbox.run_agent_harness_sandbox import run_agent_harness_sandbox
 
 from .render_prompt import render_prompt
@@ -41,6 +42,7 @@ def run_porting_harness(
     return run_agent_harness_sandbox(
         render_prompt(PROMPT_PATH, target_language),
         agent=agent,
+        image=build_agent_image(agent=agent, debug=debug),
         inputs={
             reference_implementation
             / "source": DOCKER_HOMEBASE / "reference_implementation",

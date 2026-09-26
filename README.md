@@ -16,9 +16,11 @@ Three packages, each configuring the one above it.
 
 - `packages/agent-harness-sandbox` — a sandboxed agent. Its `-v` mounts are
   configurable, its network access is restricted, and it is hardened reasonably
-  well. Library only, no CLI: `run_agent_harness_sandbox` builds the images in
-  `sandbox/` and runs the agent's CLI (`ClaudeAgent`, `claude -p`; `PiAgent`
-  exists but is not wired up) inside a container behind an egress proxy.
+  well. Library only, no CLI: `build_agent_image` builds the images in
+  `sandbox/` and returns the agent's tag; `run_agent_harness_sandbox` runs the
+  agent's CLI (`ClaudeAgent`, `claude -p`; `PiAgent` exists but is not wired
+  up) in whatever image it is handed, inside a container behind an egress
+  proxy.
 - `packages/porting-harness` — configures agent-harness-sandbox, provides a
   prompt (`src/porting_harness/prompt.txt`) and a layout. Reference, tests and
   output are synced locally: direct bind mounts, not copies. Library only:
