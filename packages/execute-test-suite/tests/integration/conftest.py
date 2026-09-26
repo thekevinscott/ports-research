@@ -1,5 +1,4 @@
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
@@ -174,18 +173,3 @@ def typescript_named_target(tmp_path):
         "export function GBNF(): number { return 42; }\n"
     )
     return directory
-
-
-@pytest.fixture
-def exported_suites():
-    """The prepare image's suites, faked at the CLI's export: writes the synthetic
-    suites where the real export would copy them out of the container."""
-
-    def export(*, into: Path, debug: bool) -> Path:
-        write_python_suite(into / "tests")
-        write_typescript_suite(into / "tests")
-        return into / "tests"
-
-    with patch("execute_test_suite.cli.export_prepared_tests", autospec=True) as m:
-        m.side_effect = export
-        yield m
