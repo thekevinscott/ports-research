@@ -67,9 +67,6 @@ same.
 not yet promoted to `packages/`. CLI lines are abbreviated; `--help` has the
 full usage.
 
-- `contamination-probe` — CLI `perturb-reference-tree`. Renames the library
-  and every public symbol in a reference tree, reshuffles its layout, and
-  writes the perturbed copy plus a `rename-manifest.json`. It runs no port.
 - `measure-complexity-curve` — CLI `measure-complexity-curve --language
   <python|typescript> --target <dir>`. Times a gbnf implementation against
   generated grammars of increasing size and prints a JSON report of the
