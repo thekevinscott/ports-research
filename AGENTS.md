@@ -43,6 +43,26 @@ locally again. Only on Github via PRs."
 - The only exception is an explicit, specific instruction from Kevin to merge a
   named PR. That instruction is always his to initiate, and it is rare.
 
+## Pull request size — always
+
+**Every PR is S. M only for special circumstances, and the PR body says what
+they are.** Kevin, 2026-09-25, on a 63-file PR: "I can't review this"; "all
+PRs should be S or, at most, M - for special circumstances".
+
+- S: one concern, roughly under 200 lines changed, a diff a reviewer holds in
+  their head at once. M: roughly under 500, with the reason it could not be
+  smaller in the body. Larger is never opened.
+- **Decompose into issues, not into arbitrary chunks.** Kevin: "A PR should be
+  a unit of work that delivers value on its own, it shouldn't be arbitrarily
+  split." Each piece leaves `main` working and better than before. File one
+  issue per piece before starting, in the order they land.
+- Judge the size from the plan, before the work starts. A plan that looks like
+  M gets split first. A branch that outgrows its size while being built is
+  split before a PR is opened, not after.
+- PRs never stack (see Merging), so dependent pieces land in sequence: land
+  one, rebase, open the next. Independent pieces may be open at once when
+  their files do not overlap.
+
 ## Journal — when something major happens
 
 `JOURNAL.md` at the repo root is the append-only lab record. A run started or
