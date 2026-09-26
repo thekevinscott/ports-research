@@ -24,7 +24,6 @@ RUN git config --system --add safe.directory /repository
 RUN pnpm install --frozen-lockfile
 RUN pnpm --dir packages/test-writer build
 
-RUN cd packages/test-writer && node -e "import('pyodide').then(async ({ loadPyodide }) => { const pyodide = await loadPyodide(); await pyodide.loadPackage('micropip'); await pyodide.pyimport('micropip').install(['black==26.5.1']); })"
 
 # After the build steps above, so the runtime host uid finds nothing already there root-owned.
 ENV HOME=/tmp/prepare-home \
