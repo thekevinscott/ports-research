@@ -31,25 +31,27 @@ def execute_test_suite(
 
     A javascript port is graded against the typescript suite: the prepare stage
     only writes a typescript tree, and its vitest specs run through a TS entry shim.
-
-    The lookup is built here, not at module scope: a module-scope dict would
-    capture `run_pytest_suite`/`run_vitest_suite` once at import time, so patching
-    either name later (as every unit test here does) would silently miss it.
     """
-    languages = {
-        "python": (run_pytest_suite, "python"),
-        "typescript": (run_vitest_suite, "typescript"),
-        "javascript": (run_vitest_suite, "typescript"),
-    }
-    runner, suite_name = languages[language]
-    test_suite_directory = test_suites_directory / suite_name
-    result = runner(
-        test_suite_directory=test_suite_directory,
-        target=target,
-        suite=suite,
-        adapt=adapt,
-        coverage=coverage,
-    )
+    if language == "python":
+        test_suite_directory = test_suites_directory / "python"
+        result = run_pytest_suite(
+            test_suite_directory=test_suite_directory,
+            target=target,
+            suite=suite,
+            adapt=adapt,
+            coverage=coverage,
+        )
+    elif language in ("typescript", "javascript"):
+        test_suite_directory = test_suites_directory / "typescript"
+        result = run_vitest_suite(
+            test_suite_directory=test_suite_directory,
+            target=target,
+            suite=suite,
+            adapt=adapt,
+            coverage=coverage,
+        )
+    else:
+        raise ValueError(f"unsupported language: {language}")
     counts = dataclasses.asdict(result)
     rules_fired = counts.pop("rules_fired")
     counts.pop("coverage")
