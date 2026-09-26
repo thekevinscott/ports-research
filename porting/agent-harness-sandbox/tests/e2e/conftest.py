@@ -10,7 +10,7 @@ from agent_harness_sandbox.run_agent_harness_sandbox import run_agent_harness_sa
 MODEL = "claude-opus-5"
 EFFORT = "low"
 HOME = "/workspace"
-PROBE_TARGET = f"{HOME}/probe"
+PROBE_TARGET = "/input"
 OUTPUT_TARGET = f"{HOME}/out"
 SCRIPT = "probe.sh"
 REPORT = "report.txt"
@@ -62,7 +62,7 @@ def sandbox(tmp_path_factory):
             PROMPT.format(script=f"{PROBE_TARGET}/{SCRIPT}", report=f"{OUTPUT_TARGET}/{REPORT}"),
             agent=agent,
             image=build_agent_image(agent=agent, debug=False),
-            inputs={probe: PROBE_TARGET},
+            input_folder=probe,
             outputs={outputs: OUTPUT_TARGET},
             envs={},
             debug=False,
@@ -93,10 +93,12 @@ def options(tmp_path):
 
     def build(**overrides):
         agent = ClaudeAgent()
+        input_folder = tmp_path / "input"
+        input_folder.mkdir(exist_ok=True)
         return {
             "agent": agent,
             "image": build_agent_image(agent=agent, debug=False),
-            "inputs": {},
+            "input_folder": input_folder,
             "outputs": {},
             "envs": {},
             "debug": False,
