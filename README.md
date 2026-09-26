@@ -52,8 +52,9 @@ same.
 - `packages/execute-test-suite` — CLI `execute-test-suite --language
   <python|typescript|javascript> --target <dir>`. Runs gbnf's derived test
   suite against one ported implementation on the host, prints one line of JSON
-  with pass, fail, error and skip counts, and exits 0 on success. Needs the
-  prepared corpus cache, which a gbnf-experiment run builds. Calls no model.
+  with pass, fail, error and skip counts, and exits 0 on success. Copies the
+  generated suites out of gbnf-experiment's prepare image into a scratch
+  directory for the run. Calls no model.
 - `packages/generate-embedding` — CLI `generate-embedding <file> --model
   <name>`. Embeds one code file through an OpenAI-compatible `/v1/embeddings`
   endpoint (`GENERATE_EMBEDDING_BASE_URL`, optional `GENERATE_EMBEDDING_API_KEY`)
