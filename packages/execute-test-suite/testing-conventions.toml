@@ -31,4 +31,4 @@ reason = "pytest plugin copied whole into the graded interpreter's scratch dir; 
 [[python.exempt]]
 path = "tests/integration/conftest.py"
 rules = ["no-first-party-patch"]
-reason = "settings.prepared_directory is first-party, patched at its own binding because the CLI has no parameter for the derivation cache location; every CLI-level test redirects it so the suite never touches the user's real ~/.cache"
+reason = "export_prepared_tests is first-party but reaches docker; patched at the CLI's binding because the CLI has no parameter for where the suites come from, so no CLI-level test builds the prepare image"

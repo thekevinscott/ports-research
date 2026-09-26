@@ -2,8 +2,6 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from gbnf_experiment.config import prepare_cache_key as DERIVATION_CACHE_KEY
-from gbnf_experiment.config import settings
 
 
 PYTHON_TEST = (
@@ -87,16 +85,11 @@ def write_typescript_suite(tests_directory: Path) -> None:
 
 
 @pytest.fixture
-def derivation_cache_key() -> str:
-    return DERIVATION_CACHE_KEY
-
-
-@pytest.fixture
-def derivations_directory(tmp_path):
-    directory = tmp_path / "derivations"
-    tests_directory = directory / DERIVATION_CACHE_KEY / "tests"
-    write_python_suite(tests_directory)
-    write_typescript_suite(tests_directory)
+def test_suites_directory(tmp_path):
+    """The `tests/` tree the prepare stage writes: one suite per language."""
+    directory = tmp_path / "tests"
+    write_python_suite(directory)
+    write_typescript_suite(directory)
     return directory
 
 
@@ -184,12 +177,15 @@ def typescript_named_target(tmp_path):
 
 
 @pytest.fixture
-def settings_derivations_directory(derivations_directory):
-    """Redirects the CLI's derivation cache lookup at this fixture's synthetic cache.
+def exported_suites():
+    """The prepare image's suites, faked at the CLI's export: writes the synthetic
+    suites where the real export would copy them out of the container."""
 
-    `settings.prepared_directory` is first-party and the CLI takes no parameter for
-    it, so this is patched at its own binding rather than threaded through — the same
-    carve-out gbnf-experiment's own tests/integration/conftest.py takes for the same field.
-    """
-    with patch.object(settings, "prepared_directory", derivations_directory):
-        yield
+    def export(*, into: Path, debug: bool) -> Path:
+        write_python_suite(into / "tests")
+        write_typescript_suite(into / "tests")
+        return into / "tests"
+
+    with patch("execute_test_suite.cli.export_prepared_tests", autospec=True) as m:
+        m.side_effect = export
+        yield m

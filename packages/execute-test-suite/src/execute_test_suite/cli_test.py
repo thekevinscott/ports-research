@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
-from gbnf_experiment.config import prepare_cache_key, settings
 
 from execute_test_suite.cli import cli
 
@@ -21,7 +20,14 @@ REPORT = {
 
 
 @pytest.fixture
-def execute_test_suite_function():
+def export_prepared_tests_function():
+    with patch("execute_test_suite.cli.export_prepared_tests", autospec=True) as m:
+        m.side_effect = lambda *, into, debug: into / "tests"
+        yield m
+
+
+@pytest.fixture
+def execute_test_suite_function(export_prepared_tests_function):
     with patch("execute_test_suite.cli.execute_test_suite", autospec=True) as m:
         m.return_value = REPORT
         yield m
@@ -79,19 +85,33 @@ def describe_cli():
         assert execute_test_suite_function.call_args.kwargs["language"] == "python"
         assert execute_test_suite_function.call_args.kwargs["target"] == target
 
-    def it_forwards_the_real_prepare_cache_key_and_directory(
-        execute_test_suite_function, target
+    def it_grades_against_the_suites_exported_from_the_prepare_image(
+        execute_test_suite_function, export_prepared_tests_function, target
     ):
         invoke(target)
 
+        exported = export_prepared_tests_function.call_args.kwargs
+        assert exported["debug"] is False
         assert (
-            execute_test_suite_function.call_args.kwargs["derivation_cache_key"]
-            == prepare_cache_key
+            execute_test_suite_function.call_args.kwargs["test_suites_directory"]
+            == exported["into"] / "tests"
         )
-        assert (
-            execute_test_suite_function.call_args.kwargs["derivations_directory"]
-            == settings.prepared_directory
-        )
+
+    def it_throws_the_exported_suites_away_afterwards(
+        execute_test_suite_function, export_prepared_tests_function, target
+    ):
+        invoke(target)
+        assert not export_prepared_tests_function.call_args.kwargs["into"].exists()
+
+    def it_exports_before_it_grades(
+        execute_test_suite_function, export_prepared_tests_function, target
+    ):
+        seen = {}
+        execute_test_suite_function.side_effect = lambda **kwargs: seen.update(
+            existed=kwargs["test_suites_directory"].parent.is_dir()
+        ) or REPORT
+        invoke(target)
+        assert seen["existed"] is True
 
     def it_forwards_no_suite_by_default(execute_test_suite_function, target):
         invoke(target)

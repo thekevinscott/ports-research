@@ -10,8 +10,7 @@ def execute_test_suite(
     *,
     language: str,
     target: Path,
-    derivations_directory: Path,
-    derivation_cache_key: str,
+    test_suites_directory: Path,
     suite: str | None = None,
     adapt: bool = False,
     coverage: bool = False,
@@ -29,7 +28,7 @@ def execute_test_suite(
     a `coverage` section. `branch_pct` is null for a source that never branches.
 
     `target` is graded, never written to: the suite runs from a scratch directory,
-    reading `target` and the derivation cache and writing its report elsewhere.
+    reading `target` and the suite and writing its report elsewhere.
 
     The runner lookup is built here, not at module scope: a module-scope dict would
     capture `run_pytest_suite`/`run_vitest_suite` once at import time, so patching
@@ -42,8 +41,7 @@ def execute_test_suite(
     }
     test_suite_directory = locate_test_suite(
         language,
-        derivations_directory=derivations_directory,
-        derivation_cache_key=derivation_cache_key,
+        test_suites_directory=test_suites_directory,
     )
     result = runners[language](
         test_suite_directory=test_suite_directory,
