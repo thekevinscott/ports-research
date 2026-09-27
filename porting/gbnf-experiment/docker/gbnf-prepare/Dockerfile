@@ -22,30 +22,29 @@ RUN git apply /tmp/patches/*.patch
 RUN pnpm install --frozen-lockfile
 RUN pnpm --dir packages/test-writer build
 
+# 4. Run test-writer for both languages into /tmp/tests/<lang>. The shared
+# markdown cases resolve `../test/...` against the working directory, so
+# generation runs from inside the javascript package. gbnf calls its typescript
+# package "javascript".
+WORKDIR /repository/packages/gbnf/javascript
+RUN node --no-warnings ../../test-writer/dist/test-writer.mjs \
+      --testDir ../test --targetDir /tmp/tests/python --language python
+RUN cp -r ../test/iteration/grammars /tmp/tests/python/iteration/grammars
+RUN node --no-warnings ../../test-writer/dist/test-writer.mjs \
+      --testDir ../test --targetDir /tmp/tests/typescript --language javascript
+COPY scaffolding/ /scaffolding/
+RUN cp -r /scaffolding/typescript/. /tmp/tests/typescript/
+
+# Everything above is shared by all eight images; only the copies below vary.
 ARG SOURCE_LANGUAGE
 ARG INCLUDE_PYTHON_TESTS=false
 ARG INCLUDE_TYPESCRIPT_TESTS=false
 
-# 4. Run test-writer per flag. The shared markdown cases resolve `../test/...`
-# against the working directory, so generation runs from inside the javascript
-# package. gbnf calls its typescript package "javascript".
-WORKDIR /repository/packages/gbnf/javascript
-COPY scaffolding/ /scaffolding/
 RUN if [ "${INCLUDE_PYTHON_TESTS}" = "true" ]; then \
-      mkdir -p /reference/tests/python \
-      && node --no-warnings /repository/packages/test-writer/dist/test-writer.mjs \
-           --testDir /repository/packages/gbnf/test \
-           --targetDir /reference/tests/python \
-           --language python \
-      && cp -r /repository/packages/gbnf/test/iteration/grammars /reference/tests/python/iteration/grammars; \
+      mkdir -p /reference/tests && cp -r /tmp/tests/python /reference/tests/python; \
     fi
 RUN if [ "${INCLUDE_TYPESCRIPT_TESTS}" = "true" ]; then \
-      mkdir -p /reference/tests/typescript \
-      && node --no-warnings /repository/packages/test-writer/dist/test-writer.mjs \
-           --testDir /repository/packages/gbnf/test \
-           --targetDir /reference/tests/typescript \
-           --language javascript \
-      && cp -r /scaffolding/typescript/. /reference/tests/typescript/; \
+      mkdir -p /reference/tests && cp -r /tmp/tests/typescript /reference/tests/typescript; \
     fi
 
 # 5. Copy the source language into /reference/source, filtered during the copy.

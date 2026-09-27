@@ -39,10 +39,11 @@ repo." What each one does, and the rule for adding one, is in
 
 ## 4. Generate the flagged suites
 
-The Dockerfile runs the test writer once per flagged language, into
-`/reference/tests/<language>`. The suites are defined generically as markdown
-under `packages/gbnf/test/`; the writer renders them per language. A language
-whose flag is off is never generated.
+The Dockerfile runs the test writer for both languages, into
+`/tmp/tests/<language>`, before the condition build args are declared, so every
+condition shares those layers. The suites are defined generically as markdown
+under `packages/gbnf/test/`; the writer renders them per language. The flags
+decide only which suites are copied on to `/reference/tests/<language>`.
 
 Generation runs with the working directory inside `packages/gbnf/javascript`,
 because the markdown cases resolve `../test/...` against it.
