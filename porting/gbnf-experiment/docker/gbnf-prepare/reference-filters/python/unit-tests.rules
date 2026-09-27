@@ -1,3 +1,3 @@
-# The colocated unit tests. Prepended to source.rules when INCLUDE_UNIT_TESTS
+# The colocated unit tests. Prepended to source.rules when include_unit_tests
 # is true, so this include wins over the exclusion there.
 + /gbnf/**_test.py

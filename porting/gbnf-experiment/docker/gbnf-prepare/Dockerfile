@@ -31,22 +31,29 @@ RUN pnpm --filter gbnf test:integration:write
 # Generate integration tests for python
 RUN cd packages/gbnf/python && make write_integration_tests && cd -
 
-# Everything above is shared by all sixteen images; only the copies below vary.
+# Everything above is shared by every condition; only the copies below vary.
+# The rules text is composed on the host by
+# gbnf_experiment.prepare_filesystem.assemble_whitelist and passed in whole,
+# so the image never sees a flag. TARGET_RULES empty means no target folder.
 ARG SOURCE_LANGUAGE
-ARG INCLUDE_UNIT_TESTS=false
-ARG INCLUDE_SOURCE_INTEGRATION_TESTS=false
-ARG INCLUDE_TARGET_INTEGRATION_TESTS=false
+ARG SOURCE_RULES
+ARG TARGET_LANGUAGE
+ARG TARGET_RULES=""
 
-COPY reference-filters/ /reference-filters/
-
-# 5. Set up whitelist rules
-RUN cd /reference-filters/${SOURCE_LANGUAGE} \
-    && { [ "${INCLUDE_UNIT_TESTS}" != true ] || cat unit-tests.rules; \
-        cat source.rules; } > /tmp/source.rules
-
-# 6. Copy whitelist to target
-RUN mkdir -p /shared/source && \
-    rsync -a --prune-empty-dirs \
-        --filter="merge /tmp/source.rules" \
+# 5. /shared/source/<lang>: the source package in its upstream layout,
+#    filtered by the whitelist.
+RUN printf '%s\n' "${SOURCE_RULES}" > /tmp/source.rules && \
+    mkdir -p /shared/source && \
+    rsync -a --prune-empty-dirs --filter="merge /tmp/source.rules" \
         /repository/packages/gbnf/${SOURCE_LANGUAGE}/ \
         /shared/source/${SOURCE_LANGUAGE}/
+
+# 6. /shared/target/<lang>: the other language's generated integration suite
+#    and the files upstream runs it with, no source. Only when asked for.
+RUN [ -z "${TARGET_RULES}" ] || { \
+        printf '%s\n' "${TARGET_RULES}" > /tmp/target.rules && \
+        mkdir -p /shared/target && \
+        rsync -a --prune-empty-dirs --filter="merge /tmp/target.rules" \
+            /repository/packages/gbnf/${TARGET_LANGUAGE}/ \
+            /shared/target/${TARGET_LANGUAGE}/; \
+    }
