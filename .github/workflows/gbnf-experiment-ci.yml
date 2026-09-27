@@ -1,0 +1,51 @@
+name: gbnf-experiment CI
+
+# This file is deliberately not a trigger: see AGENTS.md "CI workflows".
+# Integration holds the daemon back but still walks the full prepare/port/grade
+# path, so it is the slowest lane here.
+on:
+  pull_request:
+    paths:
+      - 'porting/gbnf-experiment/**'
+      - '!porting/gbnf-experiment/README.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install just
+        uses: extractions/setup-just@v2
+
+      - name: Run unit tests
+        run: just test-unit
+        working-directory: porting/gbnf-experiment
+
+  integration:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install just
+        uses: extractions/setup-just@v2
+
+      - name: Run integration tests
+        run: just test-integration
+        working-directory: porting/gbnf-experiment
