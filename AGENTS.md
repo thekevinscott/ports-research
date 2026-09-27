@@ -89,10 +89,11 @@ them."
 
 ## Journal — when something major happens
 
-`JOURNAL.md` at the repo root is the append-only lab record. A run started or
-finished, a finding, a decision, a tool landed: one entry each, UTC timestamp
-in the heading, newest at the bottom. Never edit an earlier entry; add a new
-one that corrects it.
+`journal/` at the repo root is the append-only lab record. A run started or
+finished, a finding, a decision, a tool landed: one entry each, as its own
+markdown file named `YYYY-MM-DDTHH-MMZ-<slug>.md`, opening with a `#` heading
+carrying the UTC timestamp and title. Never edit an earlier entry; add a new
+file that corrects it.
 
 ## Handoff — at every stopping point
 
@@ -113,7 +114,7 @@ on disk here instead of in `/tmp`.
   on Kevin.
 - The main thread writes it. It is coordination paperwork, not delegated work.
 
-The handoff is the resume document. `JOURNAL.md` is the lab record. A finding
+The handoff is the resume document. `journal/` is the lab record. A finding
 goes in both; a branch name and a next command go only in the handoff.
 
 ## Running tests — always
