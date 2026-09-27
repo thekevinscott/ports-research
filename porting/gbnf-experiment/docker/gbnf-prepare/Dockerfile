@@ -21,6 +21,8 @@ RUN git apply /tmp/patches/*.patch
 # 3. Install node modules and build test-writer.
 RUN pnpm install --frozen-lockfile
 RUN pnpm --dir packages/test-writer build
+# pnpm skipped the write-tests bin at install time because test-writer's dist did not exist yet.
+RUN pnpm install --frozen-lockfile --offline
 
 # 4. Run test-writer
 
