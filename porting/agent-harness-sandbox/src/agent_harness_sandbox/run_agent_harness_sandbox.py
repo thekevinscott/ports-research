@@ -13,7 +13,7 @@ def run_agent_harness_sandbox(
     *,
     agent: Agent,
     image: str,
-    inputs: dict[str | Path, str | Path],
+    input_folder: str | Path,
     outputs: dict[str | Path, str | Path],
     envs: dict[str, str],
     debug: bool,
@@ -33,6 +33,9 @@ def run_agent_harness_sandbox(
     run record never names.
     """
     command = agent.command(prompt, effort=effort, model=model)
+    input_folder = Path(input_folder)
+    if input_folder.exists() and not input_folder.is_dir():
+        raise AgentHarnessSandboxError(f"{input_folder} is not a directory")
 
     with (
         lockdown(agent.allow, debug=debug, log_path=proxy_log) as jail,
@@ -42,7 +45,7 @@ def run_agent_harness_sandbox(
         volumes = [(staged, agent.home, "rw")]
         for path, target, mode in [
             (transcripts, agent.transcripts, "rw"),
-            *((source, target, "ro") for source, target in inputs.items()),
+            (input_folder, "/input", "ro"),
             *((source, target, "rw") for source, target in outputs.items()),
         ]:
             source = Path(path)

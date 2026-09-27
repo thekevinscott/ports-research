@@ -40,11 +40,13 @@ def transcripts(tmp_path):
 
 
 @pytest.fixture
-def options(agent, transcripts):
+def options(agent, transcripts, tmp_path):
+    input_folder = tmp_path / "input"
+    input_folder.mkdir()
     return {
         "agent": agent,
         "image": "a-workspace:latest",
-        "inputs": {},
+        "input_folder": input_folder,
         "outputs": {},
         "envs": {},
         "debug": False,
@@ -153,15 +155,11 @@ def describe_volumes():
             "rw",
         )
 
-    def it_mounts_each_input_read_only(run, docker, tmp_path):
-        """The caller's tree is the reference; a run that could edit it would rewrite history."""
+    def it_mounts_the_single_input_folder_read_only_at_a_fixed_path(run, docker, tmp_path):
         data = tmp_path / "data"
         data.mkdir()
-        more = tmp_path / "more"
-        more.mkdir()
-        run(inputs={data: "/work/in", more: "/work/more"})
-        assert volumes(docker)["/work/in"] == (str(data.resolve()), "ro")
-        assert volumes(docker)["/work/more"] == (str(more.resolve()), "ro")
+        run(input_folder=data)
+        assert volumes(docker)["/input"] == (str(data.resolve()), "ro")
 
     def it_mounts_each_output_writable(run, docker, tmp_path):
         out = tmp_path / "out"
@@ -169,20 +167,19 @@ def describe_volumes():
         run(outputs={out: "/work/out"})
         assert volumes(docker)["/work/out"] == (str(out.resolve()), "rw")
 
-    def it_mounts_nothing_else_when_the_caller_asks_for_nothing(run, docker):
+    def it_mounts_only_credentials_transcripts_and_input_when_there_are_no_outputs(run, docker):
         run()
-        assert len(docker.run.call_args.kwargs["volumes"]) == 2
-
-    def it_casts_a_path_target_to_a_string(run, docker, tmp_path):
-        data = tmp_path / "data"
-        data.mkdir()
-        run(inputs={data: Path("/work/in")})
-        assert "/work/in" in volumes(docker)
+        assert len(docker.run.call_args.kwargs["volumes"]) == 3
 
     def it_refuses_a_source_that_is_not_there(run, tmp_path):
-        """docker answers a missing source by creating it root-owned, which nobody wants."""
         with pytest.raises(SandboxError, match="does not exist"):
-            run(inputs={tmp_path / "gone": "/work/in"})
+            run(input_folder=tmp_path / "gone")
+
+    def it_refuses_an_input_that_is_not_a_folder(run, tmp_path):
+        data = tmp_path / "file"
+        data.touch()
+        with pytest.raises(SandboxError, match="not a directory"):
+            run(input_folder=data)
 
 
 def describe_lockdown():

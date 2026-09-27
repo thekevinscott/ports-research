@@ -2,8 +2,9 @@
 
 Runs a coding agent's CLI inside a locked-down container.
 
-The caller supplies a prompt, an agent, an image, input directories and
-output directories. Inputs mount read-only, outputs read-write. The container
+The caller supplies a prompt, an agent, an image, one input folder and
+output directories. The input mounts read-only at `/input`; outputs mount
+read-write. The container
 drops all capabilities, runs with `no-new-privileges`, and reaches the network
 only through an egress proxy that allows the agent's own endpoints. The proxy
 log and the session transcript land on the host.
