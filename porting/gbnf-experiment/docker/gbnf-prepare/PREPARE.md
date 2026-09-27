@@ -57,9 +57,10 @@ regardless of flags." The suites are defined once as markdown under
 only which suites are copied on to `/reference/tests/<language>`.
 
 At the pin the python Makefile names the suites it wants and skips
-`grammars.md`. Kevin, 2026-09-27: "I want python to use grammars.md." Patches
-0001 and 0003 make that so: the python template, and a Makefile that writes
-every suite and puts the grammar fixtures beside the generated test.
+`grammars.md`. Kevin, 2026-09-27: "I want python to use grammars.md." Patch 0001
+gives it the python template; the template reads the grammar fixtures from a
+`grammars/` directory beside the test file. The Makefile change that writes
+every suite and places those fixtures is not carried as a patch.
 
 ## 5. Assemble `/reference`
 
