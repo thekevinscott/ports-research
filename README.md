@@ -104,7 +104,7 @@ package. The core packages chain through editable path deps: porting-harness
 -> agent-harness-sandbox, gbnf-experiment -> porting-harness,
 execute-test-suite -> gbnf-experiment. gbnf-experiment reads
 `GBNF_EXPERIMENT_*` env vars (pydantic-settings; among them `DATA_DIRECTORY`,
-`PREPARED_DIRECTORY`, `GBNF_COMMIT`, `IMAGE_TAG`) and `XDG_CACHE_HOME` for
+`PREPARED_DIRECTORY`, `GBNF_COMMIT`, `IMAGE_NAME`) and `XDG_CACHE_HOME` for
 the cache root.
 
 Auth: no API key env var. `ClaudeAgent` copies the host's

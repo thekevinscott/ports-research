@@ -1,16 +1,15 @@
 from datetime import UTC, datetime
-import hashlib
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Tuple
+
 from agent_harness_sandbox.agents.agent import Agent
-from ..config import settings, prepare_cache_key
-from porting_harness.select_files import select_files
-from .assemble_reference_implementation import assemble_reference_implementation
+
+from ..config import settings
+from .included_files import included_files
 from .prepare_reference_implementation import prepare_reference_implementation
-from .reference_patterns import reference_patterns
 from .run_directory_name import run_directory_name
 from .write_manifest import write_manifest as _write_manifest
+
 
 class PreparedFilesystem:
     def __init__(
@@ -22,46 +21,33 @@ class PreparedFilesystem:
         debug: bool,
     ):
         self.timestamp = datetime.now(UTC)
-        self.prepared_directory = settings.prepared_directory / prepare_cache_key
-        if not self.prepared_directory.exists():
-            prepare_reference_implementation(
-                output_directory=self.prepared_directory, 
-                debug=debug,
-            )
         self.run_directory = settings.data_directory / run_directory_name(self.timestamp)
         self.ported_implementation_directory = self.run_directory / "ported_implementation"
         self.ported_implementation_directory.mkdir(parents=True)
         self.transcript_directory = self.run_directory / "transcript"
         self.transcript_directory.mkdir()
         # Scratch, not run record: the container reads this tree read-only for the
-        # length of the run, and it is reassembled from the prepared corpus cache.
-        self._reference_implementation_staging = TemporaryDirectory()
-        self.included = select_files(
-            source=self.prepared_directory,
-            patterns=reference_patterns(
-                source_language,
-                include_typescript_tests=include_typescript_tests,
-                include_python_tests=include_python_tests,
-            ),
+        # length of the run, and it is rebuildable from the pinned commit.
+        self._reference_staging = TemporaryDirectory()
+        self.reference_implementation_directory = prepare_reference_implementation(
+            output_directory=Path(self._reference_staging.name),
+            source_language=source_language,
+            include_python_tests=include_python_tests,
+            include_typescript_tests=include_typescript_tests,
+            debug=debug,
         )
-        self.reference_implementation_directory = assemble_reference_implementation(
-            source=self.prepared_directory,
-            output=Path(self._reference_implementation_staging.name)
-            / "reference_implementation",
-            files=self.included,
-        )
+        self.included = included_files(self.reference_implementation_directory)
 
     def __enter__(self):
         return self
 
     def __exit__(self, *exception):
-        self._reference_implementation_staging.cleanup()
+        self._reference_staging.cleanup()
         return False
 
     @property
     def proxy_log(self):
         return self.run_directory / "proxy.log"
-
 
     def write_manifest(self, agent: Agent, **kwargs):
         _write_manifest(

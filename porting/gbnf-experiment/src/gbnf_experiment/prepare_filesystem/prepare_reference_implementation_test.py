@@ -4,8 +4,15 @@ from unittest.mock import patch
 import pytest
 
 from gbnf_experiment.prepare_filesystem.prepare_reference_implementation import (
+    prepare_image_tag,
     prepare_reference_implementation,
 )
+
+CONDITION = {
+    "source_language": "typescript",
+    "include_python_tests": False,
+    "include_typescript_tests": False,
+}
 
 
 @pytest.fixture
@@ -15,7 +22,7 @@ def settings(tmp_path):
         autospec=True,
     ) as m:
         m.prepare_docker_directory = tmp_path / "docker" / "gbnf-prepare"
-        m.image_tag = "image:tag"
+        m.image_name = "gbnf-prepare"
         m.gbnf_commit = "abc123"
         yield m
 
@@ -27,91 +34,124 @@ def docker():
         autospec=True,
     ) as m:
 
-        def fake_run(tag, user=None, volumes=None, remove=None):
-            [staging_directory] = [
-                source for source, target, _ in volumes if target == "/prepared-output"
-            ]
-            (Path(staging_directory) / "prepared.txt").write_text("output")
-            return "container output"
+        def fake_copy(source, destination):
+            _, path = source
+            reference = Path(destination) / Path(path).name
+            reference.mkdir(parents=True)
+            (reference / "source").mkdir()
+            (reference / "source" / "index.ts").write_text("export {};")
 
-        m.run.side_effect = fake_run
+        m.copy.side_effect = fake_copy
         yield m
 
 
 @pytest.fixture
 def output_directory(tmp_path):
-    return tmp_path / "prepared" / "key"
+    return tmp_path / "staging"
+
+
+def describe_prepare_image_tag():
+    def it_names_the_source_language(settings):
+        assert prepare_image_tag(**CONDITION) == (
+            "gbnf-prepare:source-typescript_python-tests-off_typescript-tests-off"
+        )
+
+    def it_gives_every_condition_its_own_tag(settings):
+        tags = {
+            prepare_image_tag(
+                source_language=source_language,
+                include_python_tests=python,
+                include_typescript_tests=typescript,
+            )
+            for source_language in ("typescript", "python")
+            for python in (False, True)
+            for typescript in (False, True)
+        }
+        assert len(tags) == 8
 
 
 def describe_prepare_reference_implementation():
-    def it_returns_the_output_directory(docker, settings, output_directory):
-        assert prepare_reference_implementation(output_directory=output_directory, debug=False) == output_directory
+    def it_returns_the_copied_out_reference(docker, settings, output_directory):
+        reference = prepare_reference_implementation(
+            output_directory=output_directory, debug=False, **CONDITION
+        )
+        assert reference == output_directory / "reference"
+        assert (reference / "source" / "index.ts").read_text() == "export {};"
 
-    def it_renames_the_staging_directory_into_place(docker, settings, output_directory):
-        prepare_reference_implementation(output_directory=output_directory, debug=False)
-        assert (output_directory / "prepared.txt").read_text() == "output"
+    def it_never_starts_the_image(docker, settings, output_directory):
+        """A container that only ever exists cannot write to what it is read from."""
+        prepare_reference_implementation(
+            output_directory=output_directory, debug=False, **CONDITION
+        )
+        docker.run.assert_not_called()
+        docker.create.assert_called_once()
 
-    def it_leaves_no_staging_directory_behind(docker, settings, output_directory):
-        prepare_reference_implementation(output_directory=output_directory, debug=False)
-        assert not output_directory.with_name(output_directory.name + ".staging").exists()
+    def it_removes_the_container_it_read_from(docker, settings, output_directory):
+        prepare_reference_implementation(
+            output_directory=output_directory, debug=False, **CONDITION
+        )
+        docker.create.return_value.remove.assert_called_once()
 
-    def it_removes_the_container_when_the_preparation_finishes(
-        docker, settings, output_directory
-    ):
-        prepare_reference_implementation(output_directory=output_directory, debug=False)
-        assert docker.run.call_args.kwargs["remove"] is True
+    def it_removes_the_container_when_the_copy_fails(docker, settings, output_directory):
+        docker.copy.side_effect = RuntimeError("no such path")
 
-    def it_generates_into_a_staging_directory(docker, settings, output_directory):
-        prepare_reference_implementation(output_directory=output_directory, debug=False)
-        [staged] = [
-            source
-            for source, target, _ in docker.run.call_args.kwargs["volumes"]
-            if target == "/prepared-output"
-        ]
-        assert staged.endswith(".staging")
+        with pytest.raises(RuntimeError, match="no such path"):
+            prepare_reference_implementation(
+                output_directory=output_directory, debug=False, **CONDITION
+            )
 
-    def it_mounts_the_staging_directory_writable(docker, settings, output_directory):
-        prepare_reference_implementation(output_directory=output_directory, debug=False)
-        [mode] = [
-            mode
-            for _, target, mode in docker.run.call_args.kwargs["volumes"]
-            if target == "/prepared-output"
-        ]
-        assert mode == "rw"
+        docker.create.return_value.remove.assert_called_once()
 
-    def it_discards_a_stale_staging_directory(docker, settings, output_directory):
-        staging_directory = output_directory.with_name(output_directory.name + ".staging")
-        staging_directory.mkdir(parents=True)
-        (staging_directory / "half-written.txt").write_text("interrupted")
-
-        prepare_reference_implementation(output_directory=output_directory, debug=False)
-
-        assert not (output_directory / "half-written.txt").exists()
-
-    def it_leaves_no_output_directory_when_the_container_fails(
-        docker, settings, output_directory
-    ):
-        docker.run.side_effect = RuntimeError("container failed")
-
-        with pytest.raises(RuntimeError, match="container failed"):
-            prepare_reference_implementation(output_directory=output_directory, debug=False)
-
-        assert not output_directory.exists()
+    def it_copies_the_whole_reference_folder(docker, settings, output_directory):
+        prepare_reference_implementation(
+            output_directory=output_directory, debug=False, **CONDITION
+        )
+        source, destination = docker.copy.call_args.args
+        assert source == (docker.create.return_value, "/reference")
+        assert destination == output_directory
 
     def describe_build():
         def it_builds_the_prepare_image(docker, settings, output_directory):
-            prepare_reference_implementation(output_directory=output_directory, debug=False)
+            prepare_reference_implementation(
+                output_directory=output_directory, debug=False, **CONDITION
+            )
             assert docker.build.call_args.args[0] == settings.prepare_docker_directory
-            assert docker.build.call_args.kwargs["tags"] == "image:tag"
 
-        def it_passes_the_pinned_commit_as_a_build_arg(docker, settings, output_directory):
-            prepare_reference_implementation(output_directory=output_directory, debug=False)
-            assert docker.build.call_args.kwargs["build_args"] == {"GBNF_COMMIT": "abc123"}
+        def it_tags_the_image_for_the_condition(docker, settings, output_directory):
+            prepare_reference_implementation(
+                output_directory=output_directory,
+                debug=False,
+                source_language="python",
+                include_python_tests=True,
+                include_typescript_tests=False,
+            )
+            assert docker.build.call_args.kwargs["tags"] == (
+                "gbnf-prepare:source-python_python-tests-on_typescript-tests-off"
+            )
+
+        def it_passes_the_condition_as_build_args(docker, settings, output_directory):
+            prepare_reference_implementation(
+                output_directory=output_directory,
+                debug=False,
+                source_language="python",
+                include_python_tests=False,
+                include_typescript_tests=True,
+            )
+            assert docker.build.call_args.kwargs["build_args"] == {
+                "GBNF_COMMIT": "abc123",
+                "SOURCE_LANGUAGE": "python",
+                "INCLUDE_PYTHON_TESTS": "false",
+                "INCLUDE_TYPESCRIPT_TESTS": "true",
+            }
 
         def it_hides_build_output_unless_debugging(docker, settings, output_directory):
-            prepare_reference_implementation(output_directory=output_directory, debug=False)
+            prepare_reference_implementation(
+                output_directory=output_directory, debug=False, **CONDITION
+            )
             assert docker.build.call_args.kwargs["progress"] is False
 
         def it_streams_build_output_in_debug(docker, settings, output_directory):
-            prepare_reference_implementation(output_directory=output_directory, debug=True)
+            prepare_reference_implementation(
+                output_directory=output_directory, debug=True, **CONDITION
+            )
             assert docker.build.call_args.kwargs["progress"] == "tty"

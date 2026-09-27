@@ -27,28 +27,27 @@ def settings(tmp_path):
     with patch(
         "gbnf_experiment.prepare_filesystem.prepared_filesystem.settings", autospec=True
     ) as m:
-        m.prepared_directory = tmp_path / "cache" / "prepared"
         m.data_directory = tmp_path / "data"
         m.gbnf_commit = "13f1aca"
         yield m
 
 
 @pytest.fixture
-def prepare_reference_implementation():
+def reference(tmp_path):
+    """What the prepare image copied out, standing in for a real build."""
+    directory = tmp_path / "reference"
+    (directory / "source").mkdir(parents=True)
+    (directory / "source" / "index.ts").write_text("export {};")
+    return directory
+
+
+@pytest.fixture
+def prepare_reference_implementation(reference):
     with patch(
         "gbnf_experiment.prepare_filesystem.prepared_filesystem.prepare_reference_implementation",
         autospec=True,
     ) as m:
-        yield m
-
-
-@pytest.fixture
-def assemble_reference_implementation(tmp_path):
-    with patch(
-        "gbnf_experiment.prepare_filesystem.prepared_filesystem.assemble_reference_implementation",
-        autospec=True,
-    ) as m:
-        m.return_value = tmp_path / "reference_implementation"
+        m.return_value = reference
         yield m
 
 
@@ -79,7 +78,6 @@ def docker_module():
 def filesystem(
     settings,
     prepare_reference_implementation,
-    assemble_reference_implementation,
     subprocess_module,
     docker_module,
 ):
@@ -170,3 +168,23 @@ def describe_the_manifest_on_failure():
         filesystem.write_manifest(AGENT, **CONDITION)
         filesystem.write_result('{"is_error": true}', AGENT, error="exit 1", **CONDITION)
         assert (filesystem.run_directory / "result.json").read_text() == '{"is_error": true}'
+
+
+def describe_the_reference_the_run_was_handed():
+    def it_is_the_folder_the_prepare_image_produced(filesystem, reference):
+        assert filesystem.reference_implementation_directory == reference
+
+    def it_asks_the_image_for_the_condition_it_was_given(
+        filesystem, prepare_reference_implementation
+    ):
+        asked = prepare_reference_implementation.call_args.kwargs
+        assert asked["source_language"] == "typescript"
+        assert asked["include_typescript_tests"] is False
+        assert asked["include_python_tests"] is False
+
+    def it_records_what_the_image_put_there(filesystem):
+        """The host selects nothing, so the manifest is a read of the folder."""
+        filesystem.write_manifest(AGENT, **CONDITION)
+        assert manifest(filesystem)["reference_implementation"]["included"] == [
+            "source/index.ts"
+        ]

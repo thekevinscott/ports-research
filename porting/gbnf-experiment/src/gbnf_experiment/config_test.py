@@ -40,7 +40,6 @@ def docker_directory(tmp_path):
     directory = tmp_path / "gbnf-prepare"
     (directory / "patches").mkdir(parents=True)
     (directory / "Dockerfile").write_text("FROM node:22.19.0-slim")
-    (directory / "prepare.sh").write_text("#!/bin/sh")
     (directory / "patches" / "0001.patch").write_text("diff")
     return directory
 
@@ -49,8 +48,10 @@ def describe_settings():
     def it_pins_the_gbnf_commit():
         assert Settings().gbnf_commit == "13f1aca495d11e160fffd68c4ba299a2415909d8"
 
-    def it_defaults_the_image_tag():
-        assert Settings().image_tag == "gbnf-prepare:latest"
+    def it_names_the_prepare_image_without_a_tag():
+        """The tag carries the condition, so the settings only hold the name."""
+        assert Settings().image_name == "gbnf-prepare"
+        assert not hasattr(Settings(), "image_tag")
 
     def it_defaults_the_data_directory_to_the_repo_data_runs():
         assert Settings().data_directory == REPO_ROOT / "data" / "runs"

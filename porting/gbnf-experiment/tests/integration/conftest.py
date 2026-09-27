@@ -6,16 +6,13 @@ import pytest
 
 from gbnf_experiment.config import settings
 
-GRAMMAR_FIXTURES = ("arithmetic", "json", "simple")
 MANIFESTS = {"typescript": "package.json", "python": "pyproject.toml"}
 SOURCE_DIRECTORIES = {"typescript": "src", "python": "gbnf"}
 IMPLEMENTATIONS = {"typescript": "index.ts", "python": "index.py"}
-COLOCATED_TESTS = {"typescript": "index.test.ts", "python": "index_test.py"}
-DEV_HARNESS = (
-    "dev/browser/debug/index.html",
-    "dev/browser/debug/package.json",
-    "dev/node/src/commands/parse.ts",
-)
+SUITE_FLAGS = {
+    "python": "INCLUDE_PYTHON_TESTS",
+    "typescript": "INCLUDE_TYPESCRIPT_TESTS",
+}
 SANDBOX_IMAGE_ID = "sha256:fake-sandbox-image"
 CLAUDE_CONFIG_TARGET = "/home/node/.claude"
 FAKE_CREDENTIALS = '{"fake": "integration-suite"}'
@@ -26,37 +23,25 @@ def volume_source(volumes, target):
     return Path(source)
 
 
-def write_prepared_output(directory: Path) -> None:
-    """What the real gbnf-prepare container emits into /prepared-output."""
-    for language in ("typescript", "python"):
-        source = directory / "source" / language
-        source.mkdir(parents=True)
-        (source / MANIFESTS[language]).write_text("{}")
-        code = source / SOURCE_DIRECTORIES[language]
-        code.mkdir()
-        (code / IMPLEMENTATIONS[language]).write_text(f"{language} source")
-        (code / COLOCATED_TESTS[language]).write_text(f"{language} tests")
-        if language == "typescript":
-            for name in DEV_HARNESS:
-                path = source / name
-                path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_text("dev harness")
+def write_reference(directory: Path, build_args: dict) -> None:
+    """What the real gbnf-prepare image leaves at /reference for one condition.
 
-        tests = directory / "tests" / language
-        (tests / "iteration").mkdir(parents=True)
-        (tests / "validation").mkdir(parents=True)
-        (tests / "iteration" / f"grammars_test.{language}").write_text(
-            f"{language} iteration cases"
-        )
-        (tests / "validation" / f"validate_test.{language}").write_text(
-            f"{language} validation cases"
-        )
+    Already filtered and already narrowed to the flagged suites: the image is
+    what decides that, so a fake that emitted more would be testing a selection
+    step the host no longer has.
+    """
+    language = build_args["SOURCE_LANGUAGE"]
+    source = directory / "source" / SOURCE_DIRECTORIES[language]
+    source.mkdir(parents=True)
+    (source / IMPLEMENTATIONS[language]).write_text(f"{language} source")
+    (directory / "source" / MANIFESTS[language]).write_text("{}")
 
-    grammars = directory / "tests" / "python" / "iteration" / "grammars"
-    grammars.mkdir()
-    for name in GRAMMAR_FIXTURES:
-        (grammars / f"{name}.gbnf").write_text("root ::= 'x'")
-        (grammars / f"{name}.json").write_text('["x"]')
+    for suite, flag in SUITE_FLAGS.items():
+        if build_args[flag] != "true":
+            continue
+        tests = directory / "tests" / suite
+        tests.mkdir(parents=True)
+        (tests / f"validate_test.{suite}").write_text(f"{suite} validation cases")
 
 
 @pytest.fixture
@@ -66,31 +51,26 @@ def data_directory(tmp_path):
         yield directory
 
 
-@pytest.fixture(autouse=True)
-def prepared_directory(tmp_path):
-    """The prepared corpus cache, redirected out of the user's real ~/.cache.
-
-    Autouse: the cache no longer sits under data_directory, so redirecting that
-    alone would leave any test that prepares writing into the host's cache.
-    """
-    directory = tmp_path / "cache" / "prepared"
-    with patch.object(settings, "prepared_directory", directory):
-        yield directory
-
-
 @pytest.fixture
 def prepare_docker():
-    """The gbnf-prepare container, faked at the docker boundary."""
+    """The gbnf-prepare image, faked at the docker boundary.
+
+    The condition is read back off the build args, because that is the only
+    thing the host tells the image about the run.
+    """
     with patch(
         "gbnf_experiment.prepare_filesystem.prepare_reference_implementation.docker",
         autospec=True,
     ) as m:
 
-        def fake_run(tag, user=None, volumes=None, remove=None):
-            write_prepared_output(volume_source(volumes, "/prepared-output"))
-            return "prepared"
+        def fake_copy(source, destination):
+            _, path = source
+            write_reference(
+                Path(destination) / Path(path).name,
+                m.build.call_args.kwargs["build_args"],
+            )
 
-        m.run.side_effect = fake_run
+        m.copy.side_effect = fake_copy
         yield m
 
 
@@ -116,6 +96,15 @@ def claude_home(tmp_path):
     (home / ".credentials.json").write_text(FAKE_CREDENTIALS)
     with patch("agent_harness_sandbox.agents.ClaudeAgent.CLAUDE_HOME", home):
         yield home
+
+
+@pytest.fixture
+def manifest(data_directory):
+    def read() -> dict:
+        [run_directory] = data_directory.iterdir()
+        return json.loads((run_directory / "manifest.json").read_text())
+
+    return read
 
 
 @pytest.fixture

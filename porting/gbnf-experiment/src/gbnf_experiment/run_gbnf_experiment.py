@@ -1,6 +1,4 @@
-import hashlib
 from pathlib import Path
-import json
 
 from agent_harness_sandbox.agents.agent import Agent
 from porting_harness.run_porting_harness import run_porting_harness

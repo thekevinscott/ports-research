@@ -20,7 +20,8 @@ class Settings(BaseSettings):
     docker_directory: Path = PACKAGE_ROOT / "docker"
     # The merge of GBNF PR #81: nearest upstream ancestor of the v0 clone's local commits.
     gbnf_commit: str = "13f1aca495d11e160fffd68c4ba299a2415909d8"
-    image_tag: str = "gbnf-prepare:latest"
+    # A name, not a tag: the tag carries the condition the image was built for.
+    image_name: str = "gbnf-prepare"
 
     @property
     def prepare_docker_directory(self) -> Path:

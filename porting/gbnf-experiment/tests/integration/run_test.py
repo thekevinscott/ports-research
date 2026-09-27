@@ -9,32 +9,19 @@ from python_on_whales.exceptions import DockerException
 from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
 from gbnf_experiment import run_gbnf_experiment
 from gbnf_experiment.cli import cli
-from gbnf_experiment.config import prepare_cache_key, settings
+from gbnf_experiment.config import settings
 from porting_harness.run_porting_harness import PROMPT_PATH
 
-from conftest import GRAMMAR_FIXTURES
-
 TYPESCRIPT_REFERENCE = [
-    "/workspace/reference_implementation/typescript/package.json",
-    "/workspace/reference_implementation/typescript/src/index.ts",
+    "/workspace/reference_implementation/package.json",
+    "/workspace/reference_implementation/src/index.ts",
 ]
 PYTHON_REFERENCE = [
-    "/workspace/reference_implementation/python/gbnf/index.py",
-    "/workspace/reference_implementation/python/pyproject.toml",
+    "/workspace/reference_implementation/gbnf/index.py",
+    "/workspace/reference_implementation/pyproject.toml",
 ]
-TYPESCRIPT_SUITE = [
-    "/workspace/tests/typescript/iteration/grammars_test.typescript",
-    "/workspace/tests/typescript/validation/validate_test.typescript",
-]
-PYTHON_SUITE = [
-    *(
-        f"/workspace/tests/python/iteration/grammars/{name}.{suffix}"
-        for name in GRAMMAR_FIXTURES
-        for suffix in ("gbnf", "json")
-    ),
-    "/workspace/tests/python/iteration/grammars_test.python",
-    "/workspace/tests/python/validation/validate_test.python",
-]
+TYPESCRIPT_SUITE = ["/workspace/tests/typescript/validate_test.typescript"]
+PYTHON_SUITE = ["/workspace/tests/python/validate_test.python"]
 
 
 CONFIG = {
@@ -56,37 +43,18 @@ def experiment(data_directory, prepare_docker, porting_docker, claude_home):
     return run
 
 
-@pytest.fixture
-def manifest(data_directory):
-    def read() -> dict:
-        [run_directory] = data_directory.iterdir()
-        return json.loads((run_directory / "manifest.json").read_text())
-
-    return read
-
-
 def describe_gbnf_experiment():
-    def it_caches_the_prepared_corpus_under_the_content_key(
-        experiment, prepared_directory
-    ):
-        experiment()
-        assert (prepared_directory / prepare_cache_key).is_dir()
-
-    def it_caches_the_prepared_corpus_outside_the_data_tree(
-        experiment, data_directory, prepared_directory
-    ):
-        """The cache is rebuildable, so it is not part of the run record."""
-        experiment()
-        assert data_directory not in prepared_directory.parents
-
-    def it_prepares_once_across_conditions(experiment, prepare_docker):
+    def it_builds_one_prepare_image_per_condition(experiment, prepare_docker):
+        """The condition is a build arg, so two conditions are two images."""
         experiment()
         experiment(include_python_tests=True)
-        prepare_docker.run.assert_called_once()
+        tags = [call.kwargs["tags"] for call in prepare_docker.build.call_args_list]
+        assert len(tags) == 2
+        assert len(set(tags)) == 2
 
-    def it_leaves_no_staging_directory_behind(experiment, prepared_directory):
+    def it_never_starts_the_prepare_image(experiment, prepare_docker):
         experiment()
-        assert list(prepared_directory.glob("*.staging")) == []
+        prepare_docker.run.assert_not_called()
 
     def describe_the_assembled_reference():
         @pytest.mark.parametrize(
@@ -120,14 +88,14 @@ def describe_gbnf_experiment():
         def it_carries_the_source_and_exactly_the_selected_suites(
             experiment, porting_calls, source_language, typescript, python, expected
         ):
-            """Colocated tests and dev/ never appear, whatever the flags say."""
+            """Whatever the image put at /reference is what the container sees."""
             experiment(
                 source_language=source_language,
                 include_typescript_tests=typescript,
                 include_python_tests=python,
             )
             [call] = porting_calls
-            assert call["container_tree"] == expected
+            assert call["container_tree"] == sorted(expected)
 
         def it_mounts_no_tests_directory_when_neither_suite_is_asked_for(
             experiment, porting_calls
@@ -275,26 +243,14 @@ def describe_the_manifest():
             "model": "claude-sonnet-4-5",
         }
 
-    def it_withholds_the_colocated_test_from_the_record_and_the_tree(
-        experiment, manifest, porting_calls
-    ):
-        experiment()
-        assert (
-            "source/typescript/src/index.test.ts"
-            not in manifest()["reference_implementation"]["included"]
-        )
-        [call] = porting_calls
-        assert (
-            "/workspace/reference_implementation/typescript/src/index.test.ts"
-            not in call["container_tree"]
-        )
-
-    def it_records_the_included_paths_from_the_prepared_root(experiment, manifest):
+    def it_records_the_paths_the_image_put_in_the_reference(experiment, manifest):
         """One list, one root: source and suite paths side by side."""
         experiment(include_python_tests=True)
-        included = manifest()["reference_implementation"]["included"]
-        assert "source/typescript/src/index.ts" in included
-        assert "tests/python/validation/validate_test.python" in included
+        assert manifest()["reference_implementation"]["included"] == [
+            "source/package.json",
+            "source/src/index.ts",
+            "tests/python/validate_test.python",
+        ]
 
     def it_records_the_pinned_commit(experiment, manifest):
         experiment()
@@ -374,9 +330,9 @@ def describe_a_run_that_dies():
 
 
 def staged_reference(call):
-    """Where assembly put the corpus, read back off the mount the container got.
+    """Where /reference landed, read back off the mount the container got.
 
-    Assembly writes source/ and tests/ under one root; the harness binds those
+    The image writes source/ and tests/ under one root; the harness binds those
     at /workspace/reference_implementation and /workspace/tests.
     """
     [source] = [
@@ -388,12 +344,12 @@ def staged_reference(call):
 
 
 def describe_the_staged_reference_corpus():
-    def it_binds_a_staged_copy_not_the_prepared_cache(
-        experiment, porting_calls, prepared_directory
+    def it_binds_a_throwaway_copy_not_the_run_record(
+        experiment, porting_calls, data_directory
     ):
         experiment()
         [call] = porting_calls
-        assert prepared_directory not in staged_reference(call).parents
+        assert data_directory not in staged_reference(call).parents
 
     def it_binds_the_source_and_test_trees_from_one_staging_root(
         experiment, porting_calls
