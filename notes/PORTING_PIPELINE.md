@@ -10,8 +10,9 @@ agent-harness-sandbox. Each package knows only about the one below it.
 ## gbnf-experiment
 
 Everything gbnf-specific. The prepare image is built once per condition.
-Build args name the source language and which test suites to generate.
-Steps 1 through 6 happen inside that image, at build time.
+Build args name the source language and which generated test suites to
+copy into `/reference`. Steps 1 through 6 happen inside that image, at
+build time.
 
 1. **Clone gbnf at the pinned commit.**
    "we clone and pin so that we have reproducibility"
@@ -20,11 +21,18 @@ Steps 1 through 6 happen inside that image, at build time.
    This also corresponds to removing code we don't want to expose to the
    porting agent.
 3. **Install node modules and build test-writer.**
-4. **Run test-writer per flag.**
-   Write to `/reference/tests/<lang>` for each language named by a flag.
-   gbnf's tests are written once, in a language-neutral form; test-writer
-   emits a runnable suite per language. Two suites can be present at once,
-   so tests keep the per-language subfolder.
+4. **Run test-writer for both languages, then copy the flagged suites.**
+   Kevin, 2026-09-27: "Tests write regardless of flags and should write to
+   /tmp/tests/{lang}." "It's later in the script that we copy them based
+   on the flags." So test-writer writes `/tmp/tests/<lang>` for every
+   language, before the condition build args are declared, and each flag
+   copies its suite to `/reference/tests/<lang>`. gbnf's tests are written
+   once, in a language-neutral form; test-writer emits a runnable suite per
+   language. Two suites can be present at once, so tests keep the
+   per-language subfolder.
+   Corrected 2026-09-27. The first version of this step said "per flag"
+   and wrote to `/reference/tests/<lang>` directly; Kevin: "NOPE not what
+   I asked for."
 5. **Copy the source language into `/reference/source`.**
    The whitelist is applied here, inside the container, during the copy.
    Plain shell, no host involvement. "I think that that means the
