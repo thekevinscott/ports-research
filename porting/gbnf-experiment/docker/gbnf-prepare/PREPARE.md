@@ -73,8 +73,10 @@ only which suites the copies below let through.
 
 At the pin the python Makefile names the suites it wants and skips
 `grammars.md`. Kevin, 2026-09-27: "I want python to use grammars.md." Patches
-0001 and 0003 make that so: the python template, and a Makefile that writes
-every suite and puts the grammar fixtures beside the generated test.
+0001, 0002 and 0004 make that so: a test-writer that can render a javascript
+cases block for python, the python template, and a Makefile that writes every
+suite. The grammars are inlined into the generated test the way the typescript
+suite has them, so no fixture files travel with it.
 
 ## 5. Assemble `/reference/source/<lang>`
 

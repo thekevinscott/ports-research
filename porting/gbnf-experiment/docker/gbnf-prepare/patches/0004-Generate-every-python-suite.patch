@@ -1,18 +1,18 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: thekevinbot <248217931+thekevinbot@users.noreply.github.com>
-Date: Sun, 27 Sep 2026 11:36:35 +0000
-Subject: [PATCH] Generate every python suite and place the grammar fixtures
- beside it
+Date: Sun, 27 Sep 2026 12:00:00 +0000
+Subject: [PATCH 4/4] Generate every python suite
 
+The suite list predates grammars.md having a python template. Drop it so write_integration_tests generates whatever the test directory holds, as the javascript side does.
 ---
- packages/gbnf/python/Makefile | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ packages/gbnf/python/Makefile | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/packages/gbnf/python/Makefile b/packages/gbnf/python/Makefile
-index 6210a46..f33897b 100644
+index 6210a46..1c38652 100644
 --- a/packages/gbnf/python/Makefile
 +++ b/packages/gbnf/python/Makefile
-@@ -25,11 +25,10 @@ write_integration_tests:
+@@ -25,8 +25,6 @@ write_integration_tests:
  	@echo "Writing integration tests..."
  	@$(MAKE) -s build_test_writer
  	@node --no-warnings ../../test-writer/dist/test-writer.mjs \
@@ -21,7 +21,3 @@ index 6210a46..f33897b 100644
  		--testDir ../test \
  		--targetDir ./tests/generated \
  		--language python
-+	@cp -r ../test/iteration/grammars ./tests/generated/iteration/grammars
- 
- test_integration:
- 	@$(MAKE) -s write_integration_tests

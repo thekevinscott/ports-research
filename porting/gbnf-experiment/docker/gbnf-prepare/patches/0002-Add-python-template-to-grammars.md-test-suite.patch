@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thekevinbot <248217931+thekevinbot@users.noreply.github.com>
+Date: Sun, 27 Sep 2026 12:00:00 +0000
+Subject: [PATCH 2/4] Add python template to grammars.md test suite
+
+---
+ packages/gbnf/test/iteration/grammars.md | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/packages/gbnf/test/iteration/grammars.md b/packages/gbnf/test/iteration/grammars.md
+index 4c1cc7d..785d7ee 100644
+--- a/packages/gbnf/test/iteration/grammars.md
++++ b/packages/gbnf/test/iteration/grammars.md
+@@ -1,6 +1,10 @@
+ ```python
+ import pytest
+ from gbnf import GBNF
++
++
++def unescape(s):
++    return s.replace("\\n", "\n").replace("\\t", "\t")
+ ```
+ 
+ ```javascript
+@@ -98,3 +102,10 @@ test.for($cases_three as [
+ });
+ ```
+ 
++```python
++@pytest.mark.parametrize(("key", "test_case", "grammar"), $cases_three)
++def test_it_parses_a_known_valid_grammar(key, test_case, grammar):
++    state = GBNF(unescape(grammar))
++    for char in unescape(test_case):
++        state = state.add(char)
++```
