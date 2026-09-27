@@ -22,23 +22,23 @@ RUN git apply /tmp/patches/*.patch
 RUN pnpm install --frozen-lockfile
 RUN pnpm --dir packages/test-writer build
 
-# 4. Run test-writer for both languages into /tmp/tests/<lang>. The shared
-# markdown cases resolve `../test/...` against the working directory, so
-# generation runs from inside the javascript package. gbnf calls its typescript
-# package "javascript".
-WORKDIR /repository/packages/gbnf/javascript
-RUN node --no-warnings ../../test-writer/dist/test-writer.mjs \
-      --testDir ../test --targetDir /tmp/tests/python --language python
-RUN cp -r ../test/iteration/grammars /tmp/tests/python/iteration/grammars
-RUN node --no-warnings ../../test-writer/dist/test-writer.mjs \
-      --testDir ../test --targetDir /tmp/tests/typescript --language javascript
-COPY scaffolding/ /scaffolding/
-RUN cp -r /scaffolding/typescript/. /tmp/tests/typescript/
+# 4. Run test-writer
+
+# Generate integration tests for typescript
+RUN pnpm --filter gbnf exec write-tests --testDir ../test --targetDir ./integration-tests/generated --language javascript
+# Generate integration tests for python
+RUN cd packages/gbnf/python && make write_integration_tests && cd -
 
 # Everything above is shared by all eight images; only the copies below vary.
 ARG SOURCE_LANGUAGE
 ARG INCLUDE_PYTHON_TESTS=false
 ARG INCLUDE_TYPESCRIPT_TESTS=false
+
+
+### BELOW THIS LINE NEEDS UPDATING
+
+
+
 
 RUN if [ "${INCLUDE_PYTHON_TESTS}" = "true" ]; then \
       mkdir -p /reference/tests && cp -r /tmp/tests/python /reference/tests/python; \
