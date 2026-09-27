@@ -84,13 +84,14 @@ fail and we can see how they fail."
 ## 5. Assemble `/shared/source/<lang>`
 
 The source package, copied with `rsync` and the `SOURCE_RULES` build arg as
-its filter. The rule files are in [reference-filters/<lang>/](reference-filters/):
+its filter. The rule files are in `assemble_whitelist/reference-filters/<lang>/`, beside the
+function that composes them:
 `source.rules` is the whitelist and withholds tests; the host prepends
 `unit-tests.rules` or `integration-tests.rules` for the flags that are on, and
 since first match wins, their includes beat the exclusion. `rsync` was chosen
 over `git archive` with `export-ignore` because `export-ignore` is a blacklist
 written into the repo's own attributes, and this is a whitelist that belongs
-beside the Dockerfile. The reasons for each exclusion are recorded in the
+to the experiment. The reasons for each exclusion are recorded in the
 rules files:
 
 - `dev/` is browser and node demo apps, not the library;
