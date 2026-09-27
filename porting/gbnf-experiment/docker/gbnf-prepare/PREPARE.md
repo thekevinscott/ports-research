@@ -56,11 +56,10 @@ regardless of flags." The suites are defined once as markdown under
 `packages/gbnf/test/`; test-writer renders them per language. The flags decide
 only which suites are copied on to `/reference/tests/<language>`.
 
-The python Makefile names the suites it wants (`validation iteration/iteration`)
-and so skips `grammars.md`. Kevin, 2026-09-27: "I want python to use
-grammars.md." What that takes is open: the suite list, the python template
-(patch 0001), and the grammar fixtures beside the generated test, as a patch to
-the Makefile or as a change upstream.
+At the pin the python Makefile names the suites it wants and skips
+`grammars.md`. Kevin, 2026-09-27: "I want python to use grammars.md." Patches
+0001 and 0003 make that so: the python template, and a Makefile that writes
+every suite and puts the grammar fixtures beside the generated test.
 
 ## 5. Assemble `/reference`
 
