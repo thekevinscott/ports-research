@@ -17,6 +17,7 @@ DEV_HARNESS = (
     "dev/node/src/commands/parse.ts",
 )
 SANDBOX_IMAGE_ID = "sha256:fake-sandbox-image"
+RULE_FILES = ("source", "unit-tests", "integration-tests", "harness")
 CLAUDE_CONFIG_TARGET = "/home/node/.claude"
 FAKE_CREDENTIALS = '{"fake": "integration-suite"}'
 
@@ -92,6 +93,19 @@ def prepare_docker():
 
         m.run.side_effect = fake_run
         yield m
+
+
+@pytest.fixture(autouse=True)
+def whitelist_rules(tmp_path):
+    """Stub rsync rule files, one line each, so this tier checks that the right
+    rules reach the build and never depends on what the real files say."""
+    filters = tmp_path / "reference-filters"
+    for language in ("python", "javascript"):
+        (filters / language).mkdir(parents=True)
+        for name in RULE_FILES:
+            (filters / language / f"{name}.rules").write_text(f"# {language} {name}\n")
+    with patch("gbnf_experiment.prepare_filesystem.assemble_whitelist.assemble_whitelist.FILTERS", filters):
+        yield filters
 
 
 @pytest.fixture(autouse=True)

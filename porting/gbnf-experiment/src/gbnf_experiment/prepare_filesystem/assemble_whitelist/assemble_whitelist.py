@@ -42,8 +42,9 @@ def assemble_whitelist(
     include_unit_tests: bool,
     include_source_integration_tests: bool,
     include_target_integration_tests: bool,
-    filters: Path = FILTERS,
+    filters: Path | None = None,
 ) -> Whitelist:
+    filters = filters or FILTERS
     source_names = (
         (["unit-tests"] if include_unit_tests else [])
         + (["integration-tests"] if include_source_integration_tests else [])
