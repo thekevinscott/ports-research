@@ -5,7 +5,7 @@ This is how `gbnf` (the repo under test) gets prepared to be fed to an agent.
 The image is built once per experimental condition. Three build args carry the
 condition in: `SOURCE_LANGUAGE` (`python` or `typescript`),
 `INCLUDE_PYTHON_TESTS` and `INCLUDE_TYPESCRIPT_TESTS` (`true` or `false`). Eight
-combinations, eight images, eight tags. Everything up to `pnpm install` is
+combinations, eight images, eight tags. Everything through test generation is
 condition-independent and shared between them.
 
 The whole of the output is `/reference`, and the host copies that folder out
@@ -35,18 +35,32 @@ repo." What each one does, and the rule for adding one, is in
 
 ## 3. Build
 
-`pnpm install`, then `pnpm --dir packages/test-writer build`.
+`pnpm install`, then `pnpm --dir packages/test-writer build`, then
+`pnpm install` again. pnpm skips a bin whose file is missing, and test-writer's
+`write-tests` bin does not exist until it is built, so the first install never
+linked it.
 
-## 4. Generate the flagged suites
+## 4. Generate both suites
 
-The Dockerfile runs the test writer for both languages, into
-`/tmp/tests/<language>`, before the condition build args are declared, so every
-condition shares those layers. The suites are defined generically as markdown
-under `packages/gbnf/test/`; the writer renders them per language. The flags
-decide only which suites are copied on to `/reference/tests/<language>`.
+Each language's suite is generated the way gbnf itself generates it, into the
+place gbnf puts it:
 
-Generation runs with the working directory inside `packages/gbnf/javascript`,
-because the markdown cases resolve `../test/...` against it.
+- typescript: `pnpm --filter gbnf test:integration:write`, which writes
+  `packages/gbnf/javascript/integration-tests/generated/`;
+- python: `make write_integration_tests` in `packages/gbnf/python`, which writes
+  `packages/gbnf/python/tests/generated/`.
+
+Both run regardless of the flags, before the condition build args are declared,
+so every condition shares those layers. Kevin, 2026-09-27: "Tests write
+regardless of flags." The suites are defined once as markdown under
+`packages/gbnf/test/`; test-writer renders them per language. The flags decide
+only which suites are copied on to `/reference/tests/<language>`.
+
+The python Makefile names the suites it wants (`validation iteration/iteration`)
+and so skips `grammars.md`. Kevin, 2026-09-27: "I want python to use
+grammars.md." What that takes is open: the suite list, the python template
+(patch 0001), and the grammar fixtures beside the generated test, as a patch to
+the Makefile or as a change upstream.
 
 ## 5. Assemble `/reference`
 
