@@ -1,5 +1,5 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: gbnf-prepare <gbnf-prepare@localhost>
+From: thekevinbot <248217931+thekevinbot@users.noreply.github.com>
 Date: Sun, 27 Sep 2026 11:36:35 +0000
 Subject: [PATCH] Generate every python suite and place the grammar fixtures
  beside it
