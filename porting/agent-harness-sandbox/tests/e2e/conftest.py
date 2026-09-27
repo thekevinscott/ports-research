@@ -46,7 +46,7 @@ def sandbox(tmp_path_factory):
     directory, so the whole exchange goes through the package's own entry point.
     """
 
-    def run(probes: dict[str, str]) -> Session:
+    def run(probes: dict[str, str], setup: list[str] | None = None) -> Session:
         root = tmp_path_factory.mktemp("sandbox")
         probe, outputs, transcripts = root / "probe", root / "out", root / "transcripts"
         for directory in (probe, outputs, transcripts):
@@ -65,6 +65,7 @@ def sandbox(tmp_path_factory):
             input=probe,
             outputs={outputs: OUTPUT_TARGET},
             envs={},
+            setup=setup,
             debug=False,
             home=HOME,
             transcripts=transcripts,
@@ -101,6 +102,7 @@ def options(tmp_path):
             "input": caller_input,
             "outputs": {},
             "envs": {},
+            "setup": None,
             "debug": False,
             "home": HOME,
             "transcripts": tmp_path,

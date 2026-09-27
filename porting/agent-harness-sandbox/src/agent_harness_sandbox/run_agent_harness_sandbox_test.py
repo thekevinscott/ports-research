@@ -49,6 +49,7 @@ def options(agent, transcripts, tmp_path):
         "input": caller_input,
         "outputs": {},
         "envs": {},
+        "setup": None,
         "debug": False,
         "home": "/workspace",
         "transcripts": transcripts,
@@ -61,14 +62,15 @@ def options(agent, transcripts, tmp_path):
 @pytest.fixture
 def docker():
     with patch("agent_harness_sandbox.run_agent_harness_sandbox.docker", autospec=True) as m:
-        m.run.return_value = "output"
+        m.run.return_value = "container"
+        m.execute.return_value = "output"
         yield m
 
 
 @pytest.fixture
 def lockdown():
     with patch("agent_harness_sandbox.run_agent_harness_sandbox.lockdown", autospec=True) as m:
-        jail = Mock(network="jail-net", envs={"HTTPS_PROXY": "http://proxy:8888"})
+        jail = Mock(network="jail-net", egress="egress-net", envs={"HTTPS_PROXY": "http://proxy:8888"})
         m.return_value.__enter__.return_value = jail
         yield m
 
@@ -116,13 +118,28 @@ def describe_signature():
 
 
 def describe_run():
-    def it_returns_the_container_output(run):
+    def it_returns_the_agents_output(run):
         assert run() == "output"
 
-    def it_runs_the_image_it_was_given_with_the_agents_command(run, docker):
+    def it_starts_the_image_it_was_given_holding_open(run, docker):
+        """The agent is exec'd in, so a setup step can run in the same container first."""
         run()
-        assert docker.run.call_args.args == ("a-workspace:latest", ["an-agent"])
-        assert docker.run.call_args.kwargs["remove"] is True
+        assert docker.run.call_args.args == ("a-workspace:latest", ["sleep", "infinity"])
+        assert docker.run.call_args.kwargs["detach"] is True
+
+    def it_execs_the_agents_command_in_that_container(run, docker):
+        run()
+        assert docker.execute.call_args.args == ("container", ["an-agent"])
+
+    def it_removes_the_container_afterwards(run, docker):
+        run()
+        docker.container.remove.assert_called_once_with("container", force=True)
+
+    def it_removes_the_container_when_the_agent_fails(run, docker):
+        docker.execute.side_effect = RuntimeError("exit 1")
+        with pytest.raises(RuntimeError):
+            run()
+        docker.container.remove.assert_called_once_with("container", force=True)
 
     def it_builds_nothing(run, docker):
         """The caller builds, so an image derived from the agent's can go on top."""
@@ -132,6 +149,7 @@ def describe_run():
     def it_casts_home_to_a_string_workdir(run, docker):
         run(home=Path("/elsewhere"))
         assert docker.run.call_args.kwargs["workdir"] == "/elsewhere"
+        assert docker.execute.call_args.kwargs["workdir"] == "/elsewhere"
 
 
 def describe_command():
@@ -231,13 +249,17 @@ def describe_lockdown():
         run()
         assert lockdown.call_args.args[0] == ("api.example.com",)
 
-    def it_hands_the_container_the_proxy_env(run, docker):
+    def it_hands_the_agent_the_proxy_env(run, docker):
         run()
-        assert docker.run.call_args.kwargs["envs"]["HTTPS_PROXY"] == "http://proxy:8888"
+        assert docker.execute.call_args.kwargs["envs"]["HTTPS_PROXY"] == "http://proxy:8888"
 
     def it_lets_a_caller_env_win_over_the_proxys(run, docker):
         run(envs={"HTTPS_PROXY": "http://elsewhere"})
-        assert docker.run.call_args.kwargs["envs"]["HTTPS_PROXY"] == "http://elsewhere"
+        assert docker.execute.call_args.kwargs["envs"]["HTTPS_PROXY"] == "http://elsewhere"
+
+    def it_hands_the_container_itself_only_the_callers_env(run, docker):
+        run(envs={"A": "1"})
+        assert docker.run.call_args.kwargs["envs"] == {"A": "1"}
 
     def it_forwards_the_proxy_log_path(run, lockdown):
         run(proxy_log="/tmp/proxy.log")
@@ -246,6 +268,47 @@ def describe_lockdown():
     def it_forwards_the_debug_flag(run, lockdown):
         run(debug=True)
         assert lockdown.call_args.kwargs["debug"] is True
+
+
+def describe_setup():
+    SETUP = ["pnpm", "install"]
+
+    def it_runs_nothing_before_the_agent_by_default(run, docker):
+        run()
+        assert docker.execute.call_count == 1
+        docker.network.connect.assert_not_called()
+
+    def it_runs_the_setup_command_in_the_same_container_before_the_agent(run, docker):
+        run(setup=SETUP)
+        assert [c.args for c in docker.execute.call_args_list] == [
+            ("container", SETUP),
+            ("container", ["an-agent"]),
+        ]
+
+    def it_opens_the_egress_network_for_setup_and_closes_it_before_the_agent(run, docker):
+        """The install reaches its registry directly; the agent still sees only its allowlist."""
+        run(setup=SETUP)
+        steps = [c for c in docker.mock_calls if c[0] in ("network.connect", "network.disconnect", "execute")]
+        assert [(name, args[:2]) for name, args, _ in steps] == [
+            ("network.connect", ("egress-net", "container")),
+            ("execute", ("container", SETUP)),
+            ("network.disconnect", ("egress-net", "container")),
+            ("execute", ("container", ["an-agent"])),
+        ]
+
+    def it_withholds_the_proxy_env_from_setup(run, docker):
+        run(setup=SETUP, envs={"A": "1"})
+        assert docker.execute.call_args_list[0].kwargs["envs"] == {"A": "1"}
+
+    def it_runs_setup_in_the_home_directory(run, docker):
+        run(setup=SETUP, home="/workspace")
+        assert docker.execute.call_args_list[0].kwargs["workdir"] == "/workspace"
+
+    def it_removes_the_container_when_setup_fails(run, docker):
+        docker.execute.side_effect = RuntimeError("exit 1")
+        with pytest.raises(RuntimeError):
+            run(setup=SETUP)
+        docker.container.remove.assert_called_once_with("container", force=True)
 
 
 def describe_hardening():

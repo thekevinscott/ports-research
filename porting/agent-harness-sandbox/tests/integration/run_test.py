@@ -36,6 +36,7 @@ def options(transcripts, proxy_log, claude_home, tmp_path):
             "input": caller_input,
             "outputs": {},
             "envs": {},
+            "setup": None,
             "debug": False,
             "home": "/workspace",
             "transcripts": transcripts,
@@ -130,13 +131,19 @@ def describe_run_agent_harness_sandbox():
         assert by_target["/home/node/.claude/projects"] == str(transcripts.resolve())
 
     def it_runs_on_a_locked_down_network_behind_the_proxy(
-        docker, claude_home, docker_calls, options
+        docker, claude_home, docker_calls, execs, options
     ):
         run_agent_harness_sandbox("1+1", **options())
         [call] = docker_calls
         [network] = call["networks"]
         assert network.startswith("agent-harness-sandbox-jail-")
-        assert call["envs"]["HTTPS_PROXY"].startswith("http://agent-harness-sandbox-proxy-")
+        [agent] = execs
+        assert agent["envs"]["HTTPS_PROXY"].startswith("http://agent-harness-sandbox-proxy-")
+
+    def it_removes_the_container_when_the_run_is_over(docker, claude_home, options):
+        run_agent_harness_sandbox("1+1", **options())
+        docker_container = __import__("python_on_whales").docker.container
+        docker_container.remove.assert_any_call("sandbox-container", force=True)
 
     def it_writes_the_proxy_log_to_the_host(docker, claude_home, options, proxy_log):
         run_agent_harness_sandbox("1+1", **options())
@@ -165,7 +172,7 @@ def describe_run_agent_harness_sandbox():
 
 
 def describe_a_second_agent():
-    def it_runs_pis_image_with_pis_credentials(docker, pi_home, docker_calls, options):
+    def it_runs_pis_image_with_pis_credentials(docker, pi_home, docker_calls, execs, options):
         run_agent_harness_sandbox(
             "1+1",
             **options(
@@ -177,7 +184,8 @@ def describe_a_second_agent():
         )
         [call] = docker_calls
         assert call["tag"] == PI_IMAGE
-        assert call["cmd"][:2] == ["pi", "-p"]
+        [agent] = execs
+        assert agent["cmd"][:2] == ["pi", "-p"]
         assert call["files"]["/home/node/.pi/agent"] == ["auth.json", "models.json"]
 
     def it_binds_the_transcripts_where_pi_writes_them(
@@ -196,6 +204,35 @@ def describe_a_second_agent():
             run_agent_harness_sandbox(
                 "1+1", **options(agent=PiAgent(provider="openrouter", host_home=pi_home), effort="minimal", model="m")
             )
+
+
+def describe_setup():
+    SETUP = ["pnpm", "install", "--frozen-lockfile"]
+
+    def it_runs_the_setup_command_in_the_agents_container_first(
+        docker, claude_home, execs, options
+    ):
+        run_agent_harness_sandbox("1+1", **options(setup=SETUP))
+        assert [e["container"] for e in execs] == ["sandbox-container"] * 2
+        assert [e["cmd"][:1] for e in execs] == [["pnpm"], ["claude"]]
+
+    def it_lends_setup_the_egress_network_and_takes_it_back_for_the_agent(
+        docker, claude_home, execs, options
+    ):
+        run_agent_harness_sandbox("1+1", **options(setup=SETUP))
+        setup, agent = execs
+        [egress] = setup["networks"]
+        assert egress.startswith("agent-harness-sandbox-egress-")
+        assert agent["networks"] == []
+
+    def it_withholds_the_proxy_from_setup(docker, claude_home, execs, options):
+        run_agent_harness_sandbox("1+1", **options(setup=SETUP, envs={"CI": "1"}))
+        setup, _ = execs
+        assert setup["envs"] == {"CI": "1"}
+
+    def it_runs_setup_where_the_agent_will_run(docker, claude_home, execs, options):
+        run_agent_harness_sandbox("1+1", **options(setup=SETUP, home="/workspace"))
+        assert [e["workdir"] for e in execs] == ["/workspace", "/workspace"]
 
 
 def describe_image_freshness():

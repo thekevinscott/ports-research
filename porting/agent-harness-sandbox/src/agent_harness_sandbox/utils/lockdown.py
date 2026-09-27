@@ -13,8 +13,9 @@ from ..config import PROXY_DIR, PROXY_IMAGE, PROXY_PORT
 class Lockdown:
     """The network a sandboxed container joins, and what the proxy refused it."""
 
-    def __init__(self, network: str, envs: dict[str, str]):
+    def __init__(self, network: str, egress: str, envs: dict[str, str]):
         self.network = network
+        self.egress = egress
         self.envs = envs
         self.log = ""
 
@@ -39,6 +40,7 @@ def lockdown(
     url = f"http://{proxy_name}:{PROXY_PORT}"
     jail = Lockdown(
         network=f"agent-harness-sandbox-jail-{run_id}",
+        egress=f"agent-harness-sandbox-egress-{run_id}",
         envs={
             "HTTP_PROXY": url,
             "HTTPS_PROXY": url,
@@ -47,8 +49,6 @@ def lockdown(
             "NO_PROXY": "localhost,127.0.0.1",
         },
     )
-    egress = f"agent-harness-sandbox-egress-{run_id}"
-
     proxy = None
     networks = []
     try:
@@ -59,8 +59,8 @@ def lockdown(
             [*docker.network.docker_cmd, "network", "create", "--internal", jail.network]
         )
         networks.append(jail.network)
-        docker.network.create(egress)
-        networks.append(egress)
+        docker.network.create(jail.egress)
+        networks.append(jail.egress)
 
         with TemporaryDirectory() as staging:
             allowlist = Path(staging) / "filter"
@@ -70,7 +70,7 @@ def lockdown(
                 PROXY_IMAGE,
                 detach=True,
                 name=proxy_name,
-                networks=[egress],
+                networks=[jail.egress],
                 volumes=[(str(allowlist), "/etc/tinyproxy/filter", "ro")],
                 cap_drop=["ALL"],
                 security_options=["no-new-privileges"],
