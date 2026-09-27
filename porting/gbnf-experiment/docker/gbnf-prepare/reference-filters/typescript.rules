@@ -1,0 +1,34 @@
+# rsync filter rules for /reference/source when the source language is
+# typescript. Rooted at packages/gbnf/javascript. First match wins, so the
+# exclusions lead.
+#
+# A whitelist: anything not named below never reaches the agent. Adding a file
+# to the corpus means adding a line here.
+
+# Colocated tests are withheld under every condition. The only tests the agent
+# sees are the suites the --include-*-tests flags select.
+- *.test.ts
+
+# dev/ is browser and node demo apps, not the library.
+- /dev/
+
+# src/builder/ is a grammar-authoring DSL with no counterpart to port.
+- /src/builder/
+
+# pnpm install ran in this tree; its symlink farm is not corpus.
+- node_modules/
+
++ */
+
++ /.eslintrc.cjs
++ /.gitignore
++ /.npmignore
++ /README.md
++ /package.json
++ /tsconfig.json
++ /tsconfig.test.json
++ /vite.config*.ts
++ /vitest.config*.ts
++ /src/**.ts
+
+- *

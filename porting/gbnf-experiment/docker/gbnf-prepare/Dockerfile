@@ -1,41 +1,63 @@
+# Numbered steps follow the porting pipeline note (PR #71), gbnf-experiment half.
 FROM node:22.19.0-slim@sha256:4a4884e8a44826194dff92ba316264f392056cbe243dcc9fd3551e71cea02b90
 
 RUN apt-get update
-RUN apt-get install -y --no-install-recommends git ca-certificates
+RUN apt-get install -y --no-install-recommends git ca-certificates rsync
 RUN npm install -g pnpm@9.4.0
 
 ARG GBNF_COMMIT
 
 WORKDIR /repository
-# The pin, not the branch tip, is what makes the prepared corpus reproducible,
-# so fetch it by SHA: the layer then busts when the pin moves.
+# 1. Clone gbnf at the pinned commit.
 RUN git init -q .
 RUN git remote add origin https://github.com/thekevinscott/gbnf
 RUN git fetch --depth 1 origin ${GBNF_COMMIT}
 RUN git checkout ${GBNF_COMMIT}
 
+# 2. Apply patches.
 COPY patches/ /tmp/patches/
 RUN git apply /tmp/patches/*.patch
-# prepare.sh archives HEAD, which only sees the patches once they are committed.
-RUN git -c user.name=gbnf-prepare -c user.email=gbnf-prepare@localhost commit -q -am "Apply patches"
 
-RUN git config --system --add safe.directory /repository
-
+# 3. Install node modules and build test-writer.
 RUN pnpm install --frozen-lockfile
 RUN pnpm --dir packages/test-writer build
 
+ARG SOURCE_LANGUAGE
+ARG INCLUDE_PYTHON_TESTS=false
+ARG INCLUDE_TYPESCRIPT_TESTS=false
 
-# After the build steps above, so the runtime host uid finds nothing already there root-owned.
-ENV HOME=/tmp/prepare-home \
-    XDG_DATA_HOME=/tmp/prepare-home/.local/share \
-    XDG_CACHE_HOME=/tmp/prepare-home/.cache
-
+# 4. Run test-writer per flag. The shared markdown cases resolve `../test/...`
+# against the working directory, so generation runs from inside the javascript
+# package. gbnf calls its typescript package "javascript".
 WORKDIR /repository/packages/gbnf/javascript
-
 COPY scaffolding/ /scaffolding/
-COPY prepare.sh /prepare.sh
-RUN /bin/sh /prepare.sh
+RUN if [ "${INCLUDE_PYTHON_TESTS}" = "true" ]; then \
+      mkdir -p /reference/tests/python \
+      && node --no-warnings /repository/packages/test-writer/dist/test-writer.mjs \
+           --testDir /repository/packages/gbnf/test \
+           --targetDir /reference/tests/python \
+           --language python \
+      && cp -r /repository/packages/gbnf/test/iteration/grammars /reference/tests/python/iteration/grammars; \
+    fi
+RUN if [ "${INCLUDE_TYPESCRIPT_TESTS}" = "true" ]; then \
+      mkdir -p /reference/tests/typescript \
+      && node --no-warnings /repository/packages/test-writer/dist/test-writer.mjs \
+           --testDir /repository/packages/gbnf/test \
+           --targetDir /reference/tests/typescript \
+           --language javascript \
+      && cp -r /scaffolding/typescript/. /reference/tests/typescript/; \
+    fi
 
-# cp, not cp -a: the run-time user is the host uid and cannot preserve the
-# build-time root ownership.
-CMD ["/bin/sh", "-c", "cp -r /prepared/. /prepared-output/"]
+# 5. Copy the source language into /reference/source, filtered during the copy.
+COPY reference-filters/ /reference-filters/
+RUN case "${SOURCE_LANGUAGE}" in \
+      python) upstream=python ;; \
+      typescript) upstream=javascript ;; \
+      *) echo "SOURCE_LANGUAGE must be python or typescript" >&2; exit 1 ;; \
+    esac \
+    && mkdir -p /reference/source \
+    && rsync -a --prune-empty-dirs \
+         --filter="merge /reference-filters/${SOURCE_LANGUAGE}.rules" \
+         "/repository/packages/gbnf/${upstream}/" /reference/source/
+# 6. (clean up build litter) has nothing to do: only what steps 4 and 5 place
+# reaches /reference.

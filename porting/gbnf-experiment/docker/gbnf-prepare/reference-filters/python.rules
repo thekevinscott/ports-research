@@ -1,0 +1,22 @@
+# rsync filter rules for /reference/source when the source language is python.
+# Rooted at packages/gbnf/python. First match wins, so the exclusions lead.
+#
+# A whitelist: anything not named below never reaches the agent. Adding a file
+# to the corpus means adding a line here.
+
+# Colocated tests are withheld under every condition. The only tests the agent
+# sees are the suites the --include-*-tests flags select.
+- *_test.py
+
++ */
+
++ /.gitignore
++ /MANIFEST.in
++ /Makefile
++ /README.md
++ /pyproject.toml
++ /requirements.txt
++ /uv.lock
++ /gbnf/**.py
+
+- *
