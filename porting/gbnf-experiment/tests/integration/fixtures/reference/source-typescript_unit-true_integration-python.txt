@@ -68,7 +68,6 @@ source/typescript/vitest.config.integration.ts
 source/typescript/vitest.config.unit.ts
 target/python/Makefile
 target/python/pyproject.toml
-target/python/tests/generated/iteration/grammars_test.py
 target/python/tests/generated/iteration/iteration_test.py
 target/python/tests/generated/iteration/iteration_with_additional_strings_test.py
 target/python/tests/generated/iteration/iteration_with_an_initial_string_test.py

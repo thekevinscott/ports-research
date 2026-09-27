@@ -61,7 +61,6 @@ source/python/gbnf/utils/is_point_in_range_test.py
 source/python/gbnf/utils/validate_non_empty.py
 source/python/pyproject.toml
 source/python/requirements.txt
-source/python/tests/generated/iteration/grammars_test.py
 source/python/tests/generated/iteration/iteration_test.py
 source/python/tests/generated/iteration/iteration_with_additional_strings_test.py
 source/python/tests/generated/iteration/iteration_with_an_initial_string_test.py
