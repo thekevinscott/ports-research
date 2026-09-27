@@ -25,7 +25,7 @@ RUN pnpm --dir packages/test-writer build
 # 4. Run test-writer
 
 # Generate integration tests for typescript
-RUN pnpm --filter gbnf exec write-tests --testDir ../test --targetDir ./integration-tests/generated --language javascript
+RUN pnpm --filter gbnf test:integration:write
 # Generate integration tests for python
 RUN cd packages/gbnf/python && make write_integration_tests && cd -
 
