@@ -2,7 +2,7 @@
 FROM node:22.19.0-slim@sha256:4a4884e8a44826194dff92ba316264f392056cbe243dcc9fd3551e71cea02b90
 
 RUN apt-get update
-RUN apt-get install -y --no-install-recommends git ca-certificates rsync
+RUN apt-get install -y --no-install-recommends git ca-certificates rsync make
 RUN npm install -g pnpm@9.4.0
 
 ARG GBNF_COMMIT
