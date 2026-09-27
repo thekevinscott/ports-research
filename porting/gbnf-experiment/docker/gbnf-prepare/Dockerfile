@@ -31,34 +31,40 @@ RUN pnpm --filter gbnf test:integration:write
 # Generate integration tests for python
 RUN cd packages/gbnf/python && make write_integration_tests && cd -
 
-# Everything above is shared by all eight images; only the copies below vary.
+# Everything above is shared by all sixteen images; only the copies below vary.
 ARG SOURCE_LANGUAGE
+ARG INCLUDE_UNIT_TESTS=false
 ARG INCLUDE_PYTHON_TESTS=false
 ARG INCLUDE_TYPESCRIPT_TESTS=false
 
-
-### BELOW THIS LINE NEEDS UPDATING
-
-
-
-
-RUN if [ "${INCLUDE_PYTHON_TESTS}" = "true" ]; then \
-      mkdir -p /reference/tests && cp -r /tmp/tests/python /reference/tests/python; \
-    fi
-RUN if [ "${INCLUDE_TYPESCRIPT_TESTS}" = "true" ]; then \
-      mkdir -p /reference/tests && cp -r /tmp/tests/typescript /reference/tests/typescript; \
-    fi
-
-# 5. Copy the source language into /reference/source, filtered during the copy.
 COPY reference-filters/ /reference-filters/
+
+# 5. /reference/source/<lang>: the source package in its upstream layout,
+#    filtered on the way in. The flags prepend the rules that let its colocated
+#    unit tests and its generated integration suite through.
 RUN case "${SOURCE_LANGUAGE}" in \
-      python) upstream=python ;; \
-      typescript) upstream=javascript ;; \
+      python) upstream=python; integration="${INCLUDE_PYTHON_TESTS}" ;; \
+      typescript) upstream=javascript; integration="${INCLUDE_TYPESCRIPT_TESTS}" ;; \
       *) echo "SOURCE_LANGUAGE must be python or typescript" >&2; exit 1 ;; \
     esac \
-    && mkdir -p /reference/source \
-    && rsync -a --prune-empty-dirs \
-         --filter="merge /reference-filters/${SOURCE_LANGUAGE}.rules" \
-         "/repository/packages/gbnf/${upstream}/" /reference/source/
-# 6. (clean up build litter) has nothing to do: only what steps 4 and 5 place
-# reaches /reference.
+ && cd "/reference-filters/${SOURCE_LANGUAGE}" \
+ && { [ "${INCLUDE_UNIT_TESTS}" != "true" ] || cat unit-tests.rules; \
+      [ "${integration}" != "true" ] || cat integration-tests.rules; \
+      cat source.rules; } > /tmp/source.rules \
+ && mkdir -p "/reference/source/${SOURCE_LANGUAGE}" \
+ && rsync -a --prune-empty-dirs --filter="merge /tmp/source.rules" \
+      "/repository/packages/gbnf/${upstream}/" "/reference/source/${SOURCE_LANGUAGE}/"
+
+# 6. /reference/target/<lang>: the other language's generated integration suite
+#    in its upstream layout, with the files upstream runs it with and no source.
+RUN case "${SOURCE_LANGUAGE}" in \
+      python) target=typescript; upstream=javascript; integration="${INCLUDE_TYPESCRIPT_TESTS}" ;; \
+      typescript) target=python; upstream=python; integration="${INCLUDE_PYTHON_TESTS}" ;; \
+    esac \
+ && if [ "${integration}" = "true" ]; then \
+      cat "/reference-filters/${target}/integration-tests.rules" \
+          "/reference-filters/${target}/harness.rules" > /tmp/target.rules \
+      && mkdir -p "/reference/target/${target}" \
+      && rsync -a --prune-empty-dirs --filter="merge /tmp/target.rules" \
+           "/repository/packages/gbnf/${upstream}/" "/reference/target/${target}/"; \
+    fi

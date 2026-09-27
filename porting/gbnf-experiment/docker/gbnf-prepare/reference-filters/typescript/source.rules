@@ -1,13 +1,10 @@
-# rsync filter rules for /reference/source when the source language is
-# typescript. Rooted at packages/gbnf/javascript. First match wins, so the
-# exclusions lead.
-#
-# A whitelist: anything not named below never reaches the agent. Adding a file
-# to the corpus means adding a line here.
+# rsync rules for the typescript package, rooted at packages/gbnf/javascript.
+# First match wins, so the exclusions lead. A whitelist: anything not named
+# here never reaches the agent. Adding a file to the corpus means adding a line.
 
-# Colocated tests are withheld under every condition. The only tests the agent
-# sees are the suites the --include-*-tests flags select.
+# Tests are withheld unless a flag prepends the rules that include them.
 - *.test.ts
+- /integration-tests/
 
 # dev/ is browser and node demo apps, not the library.
 - /dev/

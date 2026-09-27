@@ -1,0 +1,2 @@
+# The generated integration suite, where `pnpm test:integration:write` put it.
++ /integration-tests/***

@@ -1,4 +1,4 @@
-"""What the prepare image puts at /reference, for all eight conditions.
+"""What the prepare image puts at /reference, for all sixteen conditions.
 
 Kevin, 2026-09-26: "We _will_ want tests on the gbnf-experiment container,
 specifically that the reference folder produced for the 8 conditions is what we
@@ -19,15 +19,21 @@ from gbnf_experiment.config import settings
 DOCKER_DIRECTORY = Path(__file__).parents[2] / "docker" / "gbnf-prepare"
 FIXTURES = Path(__file__).parent / "fixtures" / "reference"
 
+INTEGRATION_SUITES = {
+    "none": (False, False),
+    "python": (True, False),
+    "typescript": (False, True),
+    "both": (True, True),
+}
 CONDITIONS = {
-    "source-typescript_tests-none": ("typescript", False, False),
-    "source-typescript_tests-python": ("typescript", True, False),
-    "source-typescript_tests-typescript": ("typescript", False, True),
-    "source-typescript_tests-both": ("typescript", True, True),
-    "source-python_tests-none": ("python", False, False),
-    "source-python_tests-python": ("python", True, False),
-    "source-python_tests-typescript": ("python", False, True),
-    "source-python_tests-both": ("python", True, True),
+    f"source-{source_language}_unit-{str(unit).lower()}_integration-{integration}": (
+        source_language,
+        unit,
+        *INTEGRATION_SUITES[integration],
+    )
+    for source_language in ("typescript", "python")
+    for unit in (False, True)
+    for integration in INTEGRATION_SUITES
 }
 
 
@@ -37,7 +43,7 @@ def expected_listing(condition: str) -> list[str]:
 
 def build_reference(condition: str, destination: Path) -> list[str]:
     """Build the image for one condition and list what it left at /reference."""
-    source_language, include_python_tests, include_typescript_tests = CONDITIONS[condition]
+    source_language, unit, python, typescript = CONDITIONS[condition]
     tag = f"gbnf-prepare:test-{condition}"
     docker.build(
         DOCKER_DIRECTORY,
@@ -45,8 +51,9 @@ def build_reference(condition: str, destination: Path) -> list[str]:
         build_args={
             "GBNF_COMMIT": settings.gbnf_commit,
             "SOURCE_LANGUAGE": source_language,
-            "INCLUDE_PYTHON_TESTS": str(include_python_tests).lower(),
-            "INCLUDE_TYPESCRIPT_TESTS": str(include_typescript_tests).lower(),
+            "INCLUDE_UNIT_TESTS": str(unit).lower(),
+            "INCLUDE_PYTHON_TESTS": str(python).lower(),
+            "INCLUDE_TYPESCRIPT_TESTS": str(typescript).lower(),
         },
         progress=False,
     )
