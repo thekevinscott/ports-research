@@ -3,8 +3,10 @@
 Runs a coding agent's CLI inside a locked-down container.
 
 The caller supplies a prompt, an agent, an image, one input folder and
-output directories. The input mounts read-only at `/input`; outputs mount
-read-write. The container
+output directories. The input folder is copied and the copy mounts writable at
+`/input`, then is thrown away when the run ends: the agent can install and
+scratch there, and nothing it writes reaches the caller's folder. Outputs mount
+read-write and are the caller's own directories. The container
 drops all capabilities, runs with `no-new-privileges`, and reaches the network
 only through an egress proxy that allows the agent's own endpoints. The proxy
 log and the session transcript land on the host.

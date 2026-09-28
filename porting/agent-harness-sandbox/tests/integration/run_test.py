@@ -48,6 +48,21 @@ def options(transcripts, proxy_log, claude_home, tmp_path):
     return build
 
 
+@pytest.fixture
+def writes_into_the_input_mount(docker):
+    """A stand-in for the agent installing dependencies and scratching under /input."""
+    record = docker.side_effect
+
+    def run(tag, cmd=None, **options):
+        if not options.get("detach"):
+            [source] = [s for s, target, _ in options["volumes"] if target == "/input"]
+            (Path(source) / "node_modules").mkdir()
+            (Path(source) / "d.txt").write_text("changed in the container")
+        return record(tag, cmd, **options)
+
+    docker.side_effect = run
+
+
 def describe_run_agent_harness_sandbox():
     def it_returns_the_container_output(docker, claude_home, options):
         assert run_agent_harness_sandbox("1+1", **options()) == "container output"
@@ -67,22 +82,40 @@ def describe_run_agent_harness_sandbox():
         src, _, _ = call["volumes"][0]
         assert not Path(src).exists()
 
-    def it_binds_the_caller_directories_themselves(
+    def it_binds_the_output_directories_themselves(
         tmp_path, docker, claude_home, docker_calls, options
     ):
-        """A copy would hide an edit the caller made mid-run and lose one made in the container."""
+        """A copy would lose what the container wrote there."""
+        out_dir = tmp_path / "out"
+        out_dir.mkdir()
+        run_agent_harness_sandbox("p", **options(outputs={out_dir: "/work/out"}))
+        [call] = docker_calls
+        mounted = {target: (src, mode) for src, target, mode in call["volumes"]}
+        assert mounted["/work/out"] == (str(out_dir.resolve()), "rw")
+
+    def it_mounts_a_writable_copy_of_the_input_folder(
+        tmp_path, docker, claude_home, docker_calls, options
+    ):
         in_dir = tmp_path / "in"
         in_dir.mkdir()
         (in_dir / "d.txt").write_text("x")
-        out_dir = tmp_path / "out"
-        out_dir.mkdir()
-        run_agent_harness_sandbox(
-            "p", **options(input_folder=in_dir, outputs={out_dir: "/work/out"})
-        )
+        run_agent_harness_sandbox("p", **options(input_folder=in_dir))
         [call] = docker_calls
         mounted = {target: (src, mode) for src, target, mode in call["volumes"]}
-        assert mounted["/input"] == (str(in_dir.resolve()), "ro")
-        assert mounted["/work/out"] == (str(out_dir.resolve()), "rw")
+        src, mode = mounted["/input"]
+        assert src != str(in_dir.resolve())
+        assert mode == "rw"
+        assert call["files"]["/input"] == ["d.txt"]
+
+    def it_leaves_the_callers_input_folder_untouched_by_the_container(
+        tmp_path, docker, claude_home, options, writes_into_the_input_mount
+    ):
+        in_dir = tmp_path / "in"
+        in_dir.mkdir()
+        (in_dir / "d.txt").write_text("x")
+        before = {p.name: p.read_text() for p in sorted(in_dir.iterdir())}
+        run_agent_harness_sandbox("p", **options(input_folder=in_dir))
+        assert {p.name: p.read_text() for p in sorted(in_dir.iterdir())} == before
 
     def it_refuses_an_input_that_is_not_there(tmp_path, docker, claude_home, options):
         with pytest.raises(AgentHarnessSandboxError, match="does not exist"):

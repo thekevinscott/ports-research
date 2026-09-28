@@ -1,4 +1,5 @@
 from pathlib import Path
+from shutil import copytree
 from tempfile import TemporaryDirectory
 
 from python_on_whales import docker
@@ -29,23 +30,32 @@ def run_agent_harness_sandbox(
     either that tag itself or a caller's own layer on top of it. Nothing is
     built here.
 
+    input_folder is copied into the container at /input, writable and thrown away
+    when the run ends: the agent can install and scratch there, and nothing it
+    writes reaches the caller's folder.
+
     Every option is required: a default is a value the caller never chose and the
     run record never names.
     """
     command = agent.command(prompt, effort=effort, model=model)
     input_folder = Path(input_folder)
-    if input_folder.exists() and not input_folder.is_dir():
+    if not input_folder.exists():
+        raise AgentHarnessSandboxError(f"{input_folder} does not exist")
+    if not input_folder.is_dir():
         raise AgentHarnessSandboxError(f"{input_folder} is not a directory")
 
     with (
         lockdown(agent.allow, debug=debug, log_path=proxy_log) as jail,
         TemporaryDirectory() as staged,
+        TemporaryDirectory() as staging,
     ):
         agent.stage_auth(Path(staged))
+        staged_input = Path(staging) / "input"
+        copytree(input_folder, staged_input, symlinks=True)
         volumes = [(staged, agent.home, "rw")]
         for path, target, mode in [
             (transcripts, agent.transcripts, "rw"),
-            (input_folder, "/input", "ro"),
+            (staged_input, "/input", "rw"),
             *((source, target, "rw") for source, target in outputs.items()),
         ]:
             source = Path(path)

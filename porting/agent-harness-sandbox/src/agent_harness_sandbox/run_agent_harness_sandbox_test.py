@@ -85,6 +85,23 @@ def volumes(docker) -> dict[str, tuple[str, str]]:
     return {target: (source, mode) for source, target, mode in docker.run.call_args.kwargs["volumes"]}
 
 
+@pytest.fixture
+def mounted(docker) -> dict[str, dict[str, str]]:
+    """What each volume source holds while the fake run is in flight, before the copies go."""
+    seen: dict[str, dict[str, str]] = {}
+
+    def capture(*_args, **kwargs):
+        for source, target, _ in kwargs["volumes"]:
+            root = Path(source)
+            seen[str(target)] = {
+                str(p.relative_to(root)): p.read_text() for p in sorted(root.rglob("*")) if p.is_file()
+            }
+        return "output"
+
+    docker.run.side_effect = capture
+    return seen
+
+
 def describe_signature():
     def it_requires_every_option(options):
         for option in sorted(options):
@@ -155,11 +172,40 @@ def describe_volumes():
             "rw",
         )
 
-    def it_mounts_the_single_input_folder_read_only_at_a_fixed_path(run, docker, tmp_path):
+    def it_mounts_a_writable_copy_of_the_input_folder_at_a_fixed_path(run, docker, tmp_path):
+        data = tmp_path / "data"
+        data.mkdir()
+        (data / "a.txt").write_text("x")
+        run(input_folder=data)
+        source, mode = volumes(docker)["/input"]
+        assert source != str(data.resolve())
+        assert mode == "rw"
+
+    def it_copies_the_input_folders_files_into_what_it_mounts(run, docker, tmp_path, mounted):
+        data = tmp_path / "data"
+        (data / "nested").mkdir(parents=True)
+        (data / "nested" / "a.txt").write_text("x")
+        run(input_folder=data)
+        assert mounted["/input"] == {"nested/a.txt": "x"}
+
+    def it_discards_the_input_copy_after_the_run(run, docker, tmp_path):
         data = tmp_path / "data"
         data.mkdir()
         run(input_folder=data)
-        assert volumes(docker)["/input"] == (str(data.resolve()), "ro")
+        assert not Path(volumes(docker)["/input"][0]).exists()
+
+    def it_keeps_container_writes_out_of_the_callers_input_folder(run, docker, tmp_path):
+        data = tmp_path / "data"
+        data.mkdir()
+
+        def write_into_the_mount(*_args, **kwargs):
+            source = dict((target, src) for src, target, _ in kwargs["volumes"])["/input"]
+            (Path(source) / "installed.txt").write_text("from the container")
+            return "output"
+
+        docker.run.side_effect = write_into_the_mount
+        run(input_folder=data)
+        assert sorted(p.name for p in data.iterdir()) == []
 
     def it_mounts_each_output_writable(run, docker, tmp_path):
         out = tmp_path / "out"
