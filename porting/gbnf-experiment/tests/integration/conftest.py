@@ -6,16 +6,10 @@ import pytest
 
 from gbnf_experiment.config import settings
 
-MANIFESTS = {"typescript": "package.json", "python": "pyproject.toml"}
-SOURCE_DIRECTORIES = {"typescript": "src", "python": "gbnf"}
-IMPLEMENTATIONS = {"typescript": "index.ts", "python": "index.py"}
-SUITE_FLAGS = {
-    "python": "INCLUDE_PYTHON_TESTS",
-    "typescript": "INCLUDE_TYPESCRIPT_TESTS",
-}
 SANDBOX_IMAGE_ID = "sha256:fake-sandbox-image"
 CLAUDE_CONFIG_TARGET = "/home/node/.claude"
 FAKE_CREDENTIALS = '{"fake": "integration-suite"}'
+CONTAINER_TREES = ("/input", "/workspace")
 
 
 def volume_source(volumes, target):
@@ -23,55 +17,11 @@ def volume_source(volumes, target):
     return Path(source)
 
 
-def write_reference(directory: Path, build_args: dict) -> None:
-    """What the real gbnf-prepare image leaves at /reference for one condition.
-
-    Already filtered and already narrowed to the flagged suites: the image is
-    what decides that, so a fake that emitted more would be testing a selection
-    step the host no longer has.
-    """
-    language = build_args["SOURCE_LANGUAGE"]
-    source = directory / "source" / SOURCE_DIRECTORIES[language]
-    source.mkdir(parents=True)
-    (source / IMPLEMENTATIONS[language]).write_text(f"{language} source")
-    (directory / "source" / MANIFESTS[language]).write_text("{}")
-
-    for suite, flag in SUITE_FLAGS.items():
-        if build_args[flag] != "true":
-            continue
-        tests = directory / "tests" / suite
-        tests.mkdir(parents=True)
-        (tests / f"validate_test.{suite}").write_text(f"{suite} validation cases")
-
-
 @pytest.fixture
 def data_directory(tmp_path):
     directory = tmp_path / "data"
     with patch.object(settings, "data_directory", directory):
         yield directory
-
-
-@pytest.fixture
-def prepare_docker():
-    """The gbnf-prepare image, faked at the docker boundary.
-
-    The condition is read back off the build args, because that is the only
-    thing the host tells the image about the run.
-    """
-    with patch(
-        "gbnf_experiment.prepare_filesystem.prepare_reference_implementation.docker",
-        autospec=True,
-    ) as m:
-
-        def fake_copy(source, destination):
-            _, path = source
-            write_reference(
-                Path(destination) / Path(path).name,
-                m.build.call_args.kwargs["build_args"],
-            )
-
-        m.copy.side_effect = fake_copy
-        yield m
 
 
 @pytest.fixture(autouse=True)
@@ -174,7 +124,7 @@ def porting_docker(porting_calls, claude_home, lockdown_docker, agent_image_dock
                     "container_tree": sorted(
                         f"{target}/{path.relative_to(source)}"
                         for source, target, _ in volumes
-                        if str(target).startswith("/workspace")
+                        if str(target).startswith(CONTAINER_TREES)
                         for path in Path(source).rglob("*")
                         if path.is_file()
                     ),

@@ -6,7 +6,7 @@ reason = "re-export barrel; run_gbnf_experiment is tested in its own module"
 [[python.exempt]]
 path = "tests/integration/conftest.py"
 rules = ["no-first-party-patch", "no-constant-patch"]
-reason = "docker and the agent's host home are external boundaries (container runtime, host home) patched at their first-party use-site bindings; five bindings, because docker is imported per module: the prepare image, the porting run, the manifest's image-id lookup, and the network jail's own client and CLI runner; settings.data_directory is redirected so the suite never writes to the real data/ tree"
+reason = "docker and the agent's host home are external boundaries (container runtime, host home) patched at their first-party use-site bindings; four bindings, because docker is imported per module: the porting run, the agent image build, the manifest's image-id lookup, and the network jail's own client and CLI runner. The prepare image is not patched: it is the subject of this tier, built for real. settings.data_directory is redirected so the suite never writes to the real data/ tree"
 
 [[python.exempt]]
 path = "gbnf_experiment/cli_test.py"
