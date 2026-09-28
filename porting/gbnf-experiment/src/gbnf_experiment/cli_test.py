@@ -43,8 +43,9 @@ def describe_cli():
         gbnf_experiment.assert_called_once_with(
             agent=claude_agent.return_value,
             source_language="typescript",
-            include_typescript_tests=False,
-            include_python_tests=False,
+            include_unit_tests=False,
+            include_source_integration_tests=False,
+            include_target_integration_tests=False,
             debug=False,
             effort="high",
             model="claude-opus-5",
@@ -65,12 +66,17 @@ def describe_cli():
         assert result.exit_code != 0
         gbnf_experiment.assert_not_called()
 
-    def it_forwards_the_test_inclusion_flags(gbnf_experiment):
-        CliRunner().invoke(
-            cli, [*SOURCE_LANGUAGE, "--include-typescript-tests", "--include-python-tests"]
-        )
-        assert gbnf_experiment.call_args.kwargs["include_typescript_tests"] is True
-        assert gbnf_experiment.call_args.kwargs["include_python_tests"] is True
+    @pytest.mark.parametrize(
+        ("option", "keyword"),
+        [
+            ("--include-unit-tests", "include_unit_tests"),
+            ("--include-source-integration-tests", "include_source_integration_tests"),
+            ("--include-target-integration-tests", "include_target_integration_tests"),
+        ],
+    )
+    def it_forwards_each_suite_flag(gbnf_experiment, option, keyword):
+        CliRunner().invoke(cli, [*SOURCE_LANGUAGE, option])
+        assert gbnf_experiment.call_args.kwargs[keyword] is True
 
     def it_forwards_debug(gbnf_experiment):
         CliRunner().invoke(cli, [*SOURCE_LANGUAGE, "--debug"])

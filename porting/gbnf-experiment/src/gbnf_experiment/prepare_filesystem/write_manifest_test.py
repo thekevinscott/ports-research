@@ -12,17 +12,20 @@ IMAGE_ID = "sha256:" + "b" * 64
 HEAD = "c" * 40
 
 CONDITION = {
-    "name": "source-typescript_python-tests_effort-high_model-claude-opus-5",
+    "name": "source-typescript_unit-tests_effort-high_model-claude-opus-5",
     "source_language": "typescript",
     "target_language": "python",
-    "include_typescript_tests": False,
-    "include_python_tests": True,
+    "include_unit_tests": True,
+    "include_source_integration_tests": False,
+    "include_target_integration_tests": False,
     "effort": "high",
     "model": "claude-opus-5",
 }
-INCLUDED = ["package.json", "src/gbnf.ts"]
+PROMPT = "Port the typescript implementation under /input/javascript to python"
+INCLUDED = ["javascript/package.json", "javascript/src/gbnf.ts"]
 CALL = {
     "timestamp": datetime(2026, 9, 6, 14, 25, 30, tzinfo=UTC),
+    "prompt": PROMPT,
     "condition": CONDITION,
     "included": INCLUDED,
     "image_tag": "agent-harness-sandbox-claude:latest",
@@ -88,10 +91,11 @@ def describe_write_manifest():
     def it_returns_nothing(run_directory, subprocess_module, docker_module):
         assert write_manifest(run_directory, **CALL) is None
 
-    def it_writes_the_four_sections_beside_the_timestamps(manifest):
+    def it_writes_the_five_sections_beside_the_timestamps(manifest):
         assert list(manifest()) == [
             "timestamp",
             "completed_at",
+            "prompt",
             "condition",
             "derivation",
             "reference_implementation",
@@ -109,6 +113,10 @@ def describe_write_manifest():
     def it_records_the_condition_it_was_given(manifest):
         assert manifest()["condition"] == CONDITION
 
+    def it_records_the_prompt_it_was_given(manifest):
+        """The wording is part of the treatment, so it is banked verbatim."""
+        assert manifest()["prompt"] == PROMPT
+
     def it_records_the_error_it_was_given(manifest):
         assert manifest(error="the container died")["error"] == "the container died"
 
@@ -116,9 +124,7 @@ def describe_write_manifest():
         assert manifest()["derivation"] == {"gbnf_commit": "13f1aca"}
 
     def it_names_every_included_path(manifest):
-        assert manifest()["reference_implementation"] == {
-            "included": ["package.json", "src/gbnf.ts"]
-        }
+        assert manifest()["reference_implementation"] == {"included": INCLUDED}
 
     def it_identifies_the_sandbox_by_image_id_not_by_tag(manifest):
         assert manifest()["sandbox"] == {"image_id": IMAGE_ID}

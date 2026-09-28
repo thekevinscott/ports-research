@@ -21,20 +21,20 @@ def settings(tmp_path):
 
 
 CORPUS = {
-    "source/package.json": "{}",
-    "source/src/index.js": "export const parse = () => {};\n",
-    "tests/python/grammars/arithmetic.gbnf": "root ::= 'x'\n",
+    "javascript/package.json": "{}",
+    "javascript/src/index.js": "export const parse = () => {};\n",
+    "python/tests/generated/arithmetic_test.py": "def test_arithmetic(): ...\n",
 }
 
 
 @pytest.fixture
 def prepare_reference_implementation(tmp_path):
-    """The prepare image, faked: it hands back a /reference copied out of itself."""
+    """The prepare image, faked: it hands back a /shared copied out of itself."""
     with patch(
         "gbnf_experiment.prepare_filesystem.prepared_filesystem.prepare_reference_implementation",
         autospec=True,
     ) as m:
-        corpus = tmp_path / "corpus" / "reference"
+        corpus = tmp_path / "corpus" / "shared"
         for name, text in CORPUS.items():
             path = corpus / name
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -44,6 +44,16 @@ def prepare_reference_implementation(tmp_path):
 
 
 RESULT_JSON = '{"num_turns": 12, "total_cost_usd": 3.21, "is_error": false}'
+
+
+PROMPT = "port /input/javascript to python"
+
+
+@pytest.fixture
+def render_prompt():
+    with patch("gbnf_experiment.run_gbnf_experiment.render_prompt", autospec=True) as m:
+        m.return_value = PROMPT
+        yield m
 
 
 @pytest.fixture
@@ -80,8 +90,9 @@ AGENT = Mock(name="agent")
 CONFIG = {
     "agent": AGENT,
     "source_language": "typescript",
-    "include_typescript_tests": False,
-    "include_python_tests": False,
+    "include_unit_tests": False,
+    "include_source_integration_tests": False,
+    "include_target_integration_tests": False,
     "debug": False,
     "effort": "high",
     "model": "claude-opus-5",
@@ -92,6 +103,7 @@ CONFIG = {
 def experiment(
     settings,
     prepare_reference_implementation,
+    render_prompt,
     run_directory_name,
     write_manifest,
 ):
@@ -104,7 +116,14 @@ def experiment(
 def describe_the_signature():
     @pytest.mark.parametrize(
         "omitted",
-        ["agent", "source_language", "include_typescript_tests", "include_python_tests", "debug"],
+        [
+            "agent",
+            "source_language",
+            "include_unit_tests",
+            "include_source_integration_tests",
+            "include_target_integration_tests",
+            "debug",
+        ],
     )
     def it_requires_every_option(omitted):
         supplied = {name: value for name, value in CONFIG.items() if name != omitted}
@@ -123,12 +142,24 @@ def describe_run():
         run_porting_harness,
     ):
         """One image per condition: the corpus rule lives in the container."""
-        experiment(source_language="python", include_typescript_tests=True)
+        experiment(source_language="python", include_unit_tests=True)
         prepare_reference_implementation.assert_called_once()
         asked = prepare_reference_implementation.call_args.kwargs
         assert asked["source_language"] == "python"
-        assert asked["include_typescript_tests"] is True
-        assert asked["include_python_tests"] is False
+        assert asked["include_unit_tests"] is True
+        assert asked["include_source_integration_tests"] is False
+        assert asked["include_target_integration_tests"] is False
+
+    def it_asks_the_image_for_the_directory_the_language_lives_in(
+        experiment,
+        prepare_reference_implementation,
+        run_porting_harness,
+    ):
+        """typescript is the experiment's word for it; upstream calls it javascript."""
+        experiment(source_language="typescript")
+        assert prepare_reference_implementation.call_args.kwargs["source_language"] == (
+            "javascript"
+        )
 
     def it_prepares_once_per_run(
         experiment,
@@ -137,7 +168,7 @@ def describe_run():
     ):
         """No cache to hit: the condition is baked into the image it asks for."""
         experiment()
-        experiment(include_python_tests=True)
+        experiment(include_unit_tests=True)
         assert prepare_reference_implementation.call_count == 2
 
     def it_stages_the_reference_outside_the_run_directory(
@@ -158,7 +189,7 @@ def describe_run():
         run_porting_harness,
     ):
         experiment()
-        assert run_porting_harness.call_args.kwargs["reference_implementation"] is (
+        assert run_porting_harness.call_args.kwargs["reference"] is (
             prepare_reference_implementation.return_value
         )
         assert run_porting_harness.call_args.kwargs["output_directory"] == (
@@ -190,22 +221,31 @@ def describe_run():
         assert prepare_reference_implementation.call_args.kwargs["debug"] is True
         assert run_porting_harness.call_args.kwargs["debug"] is True
 
-    def it_names_the_direction_and_leaves_the_wording_to_the_harness(
+    def it_sends_the_prompt_it_rendered_for_the_direction(
         experiment,
         prepare_reference_implementation,
+        render_prompt,
         run_porting_harness,
     ):
+        """The harness adds no words, so the caller hands it the whole prompt."""
         experiment(source_language="python")
-        assert run_porting_harness.call_args.kwargs["target_language"] == "typescript"
-        assert "prompt" not in run_porting_harness.call_args.kwargs
+        assert run_porting_harness.call_args.kwargs["prompt"] == PROMPT
+        assert render_prompt.call_args.kwargs == {
+            "source_language": "python",
+            "target_language": "typescript",
+        }
 
     def it_targets_python_when_porting_from_typescript(
         experiment,
         prepare_reference_implementation,
+        render_prompt,
         run_porting_harness,
     ):
         experiment(source_language="typescript")
-        assert run_porting_harness.call_args.kwargs["target_language"] == "python"
+        assert render_prompt.call_args.kwargs == {
+            "source_language": "typescript",
+            "target_language": "python",
+        }
 
 
 def describe_the_run_directory():
@@ -224,7 +264,7 @@ def describe_the_run_directory():
         run_porting_harness,
         run_directory_name,
     ):
-        experiment(include_python_tests=True)
+        experiment(include_unit_tests=True)
         assert run_directory_name.call_args.args[1:] == ()
         assert run_directory_name.call_args.kwargs == {}
 
@@ -311,19 +351,32 @@ def describe_the_manifest():
     ):
         experiment(
             source_language="python",
-            include_typescript_tests=True,
+            include_target_integration_tests=True,
             effort="low",
             model="claude-sonnet-4-5",
         )
         assert write_manifest.call_args.kwargs["condition"] == {
-            "name": "source-python_typescript-tests_effort-low_model-claude-sonnet-4-5",
+            "name": (
+                "source-python_target-integration-tests_effort-low"
+                "_model-claude-sonnet-4-5"
+            ),
             "source_language": "python",
             "target_language": "typescript",
-            "include_typescript_tests": True,
-            "include_python_tests": False,
+            "include_unit_tests": False,
+            "include_source_integration_tests": False,
+            "include_target_integration_tests": True,
             "effort": "low",
             "model": "claude-sonnet-4-5",
         }
+
+    def it_records_the_prompt_that_was_sent(
+        experiment,
+        prepare_reference_implementation,
+        run_porting_harness,
+        write_manifest,
+    ):
+        experiment(source_language="typescript")
+        assert write_manifest.call_args.kwargs["prompt"] == PROMPT
 
     def it_records_the_pinned_commit(
         experiment,

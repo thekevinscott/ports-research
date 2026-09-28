@@ -16,8 +16,9 @@ class PreparedFilesystem:
         self,
         *,
         source_language: str,
-        include_typescript_tests: bool,
-        include_python_tests: bool,
+        include_unit_tests: bool,
+        include_source_integration_tests: bool,
+        include_target_integration_tests: bool,
         debug: bool,
     ):
         self.timestamp = datetime.now(UTC)
@@ -29,14 +30,15 @@ class PreparedFilesystem:
         # Scratch, not run record: the container reads this tree read-only for the
         # length of the run, and it is rebuildable from the pinned commit.
         self._reference_staging = TemporaryDirectory()
-        self.reference_implementation_directory = prepare_reference_implementation(
+        self.reference_directory = prepare_reference_implementation(
             output_directory=Path(self._reference_staging.name),
             source_language=source_language,
-            include_python_tests=include_python_tests,
-            include_typescript_tests=include_typescript_tests,
+            include_unit_tests=include_unit_tests,
+            include_source_integration_tests=include_source_integration_tests,
+            include_target_integration_tests=include_target_integration_tests,
             debug=debug,
         )
-        self.included = included_files(self.reference_implementation_directory)
+        self.included = included_files(self.reference_directory)
 
     def __enter__(self):
         return self
@@ -49,10 +51,11 @@ class PreparedFilesystem:
     def proxy_log(self):
         return self.run_directory / "proxy.log"
 
-    def write_manifest(self, agent: Agent, **kwargs):
+    def write_manifest(self, agent: Agent, *, prompt: str, **kwargs):
         _write_manifest(
             self.run_directory,
             timestamp=self.timestamp,
+            prompt=prompt,
             condition={
                 **kwargs,
             },
@@ -63,13 +66,20 @@ class PreparedFilesystem:
         )
 
     def write_result(
-        self, result: str | None, agent: Agent, error: str | None = None, **kwargs
+        self,
+        result: str | None,
+        agent: Agent,
+        *,
+        prompt: str,
+        error: str | None = None,
+        **kwargs,
     ):
         if result:
             (self.run_directory / "result.json").write_text(result)
         _write_manifest(
             self.run_directory,
             timestamp=self.timestamp,
+            prompt=prompt,
             condition={
                 **kwargs,
             },

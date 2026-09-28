@@ -12,8 +12,9 @@ DEFAULT_MODEL = "claude-opus-5"
     type=click.Choice(["typescript", "python"]),
     required=True,
 )
-@click.option("--include-typescript-tests", is_flag=True, default=False)
-@click.option("--include-python-tests", is_flag=True, default=False)
+@click.option("--include-unit-tests", is_flag=True, default=False)
+@click.option("--include-source-integration-tests", is_flag=True, default=False)
+@click.option("--include-target-integration-tests", is_flag=True, default=False)
 @click.option("--debug", is_flag=True, default=False)
 @click.option("--agent", "agent_name", type=click.Choice(['pi', 'claude']), default="claude")
 # Both free text: effort levels are per-agent, and claude errors on an unknown model instead of warning and running the default.
@@ -21,8 +22,9 @@ DEFAULT_MODEL = "claude-opus-5"
 @click.option("--model", default=DEFAULT_MODEL, show_default=True)
 def cli(
     source_language: str,
-    include_typescript_tests: bool,
-    include_python_tests: bool,
+    include_unit_tests: bool,
+    include_source_integration_tests: bool,
+    include_target_integration_tests: bool,
     debug: bool,
     agent_name: str,
     effort: str,
@@ -37,8 +39,9 @@ def cli(
         run_directory = run_gbnf_experiment(
             agent=agent,
             source_language=source_language,
-            include_typescript_tests=include_typescript_tests,
-            include_python_tests=include_python_tests,
+            include_unit_tests=include_unit_tests,
+            include_source_integration_tests=include_source_integration_tests,
+            include_target_integration_tests=include_target_integration_tests,
             debug=debug,
             effort=effort,
             model=model,

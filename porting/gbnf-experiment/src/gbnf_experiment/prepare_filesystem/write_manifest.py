@@ -15,6 +15,7 @@ def write_manifest(
     run_directory: Path,
     *,
     timestamp: datetime,
+    prompt: str,
     condition: dict,
     included: list[str],
     image_tag: str,
@@ -29,6 +30,7 @@ def write_manifest(
         if completed_at
         else None,
         **({"error": error} if error is not None else {}),
+        "prompt": prompt,
         "condition": condition,
         "derivation": {
             "gbnf_commit": gbnf_commit,
