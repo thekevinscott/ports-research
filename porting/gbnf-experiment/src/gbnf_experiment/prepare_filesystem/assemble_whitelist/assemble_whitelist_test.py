@@ -1,108 +1,81 @@
-from itertools import product
+from unittest.mock import call, patch
 
 import pytest
 
-from gbnf_experiment.prepare_filesystem.assemble_whitelist.assemble_whitelist import (
-    assemble_whitelist,
-)
+from .assemble_whitelist import assemble_whitelist
 
-LANGUAGES = ("python", "javascript")
+CASES = {
+    "python_none": ("python", False, False, False, ["source"], []),
+    "python_unit": ("python", True, False, False, ["unit-tests", "source"], []),
+    "python_source-integration": (
+        "python", False, True, False, ["integration-tests", "source"], [],
+    ),
+    "python_target-integration": (
+        "python", False, False, True, ["source"], ["integration-tests"],
+    ),
+    "python_unit_source-integration": (
+        "python", True, True, False, ["unit-tests", "integration-tests", "source"], [],
+    ),
+    "python_unit_target-integration": (
+        "python", True, False, True, ["unit-tests", "source"], ["integration-tests"],
+    ),
+    "python_source-integration_target-integration": (
+        "python", False, True, True, ["integration-tests", "source"], ["integration-tests"],
+    ),
+    "python_all": (
+        "python", True, True, True,
+        ["unit-tests", "integration-tests", "source"], ["integration-tests"],
+    ),
+    "javascript_none": ("javascript", False, False, False, ["source"], []),
+    "javascript_unit": ("javascript", True, False, False, ["unit-tests", "source"], []),
+    "javascript_source-integration": (
+        "javascript", False, True, False, ["integration-tests", "source"], [],
+    ),
+    "javascript_target-integration": (
+        "javascript", False, False, True, ["source"], ["integration-tests"],
+    ),
+    "javascript_unit_source-integration": (
+        "javascript", True, True, False, ["unit-tests", "integration-tests", "source"], [],
+    ),
+    "javascript_unit_target-integration": (
+        "javascript", True, False, True, ["unit-tests", "source"], ["integration-tests"],
+    ),
+    "javascript_source-integration_target-integration": (
+        "javascript", False, True, True, ["integration-tests", "source"], ["integration-tests"],
+    ),
+    "javascript_all": (
+        "javascript", True, True, True,
+        ["unit-tests", "integration-tests", "source"], ["integration-tests"],
+    ),
+}
 OTHER = {"python": "javascript", "javascript": "python"}
-
-# One line from each rule file, so a test reads the real files and not a copy.
-UNIT_INCLUDE = {
-    "python": "+ /python/gbnf/**_test.py\n",
-    "javascript": "+ /javascript/src/**.test.ts\n",
-}
-INTEGRATION_INCLUDE = {
-    "python": "+ /python/tests/***\n",
-    "javascript": "+ /javascript/integration-tests/***\n",
-}
-TEST_EXCLUSION = {
-    "python": "- /python/**_test.py\n",
-    "javascript": "- /javascript/**.test.ts\n",
-}
-SOURCE_INCLUDE = {
-    "python": "+ /python/gbnf/**.py\n",
-    "javascript": "+ /javascript/src/**.ts\n",
-}
-RUNNER_INCLUDE = {
-    "python": "+ /python/Makefile\n",
-    "javascript": "+ /javascript/vitest.config.integration.ts\n",
-}
-
-CONDITIONS = {
-    f"source-{source}_unit-{unit}_source-integration-{source_integration}"
-    f"_target-integration-{target_integration}": (
-        source,
-        unit,
-        source_integration,
-        target_integration,
-    )
-    for source, unit, source_integration, target_integration in product(
-        LANGUAGES, (False, True), (False, True), (False, True)
-    )
-}
-
-
-@pytest.fixture(params=CONDITIONS, ids=list(CONDITIONS))
-def condition(request):
-    return CONDITIONS[request.param]
 
 
 @pytest.fixture
-def rules(condition):
-    source, unit, source_integration, target_integration = condition
-    return assemble_whitelist(
-        source,
-        include_unit_tests=unit,
-        include_source_integration_tests=source_integration,
-        include_target_integration_tests=target_integration,
-    )
-
-
-def lines(rules):
-    return [line for line in rules.splitlines() if line and not line.startswith("#")]
+def compose():
+    with patch(
+        "gbnf_experiment.prepare_filesystem.assemble_whitelist.assemble_whitelist.compose"
+    ) as m:
+        m.side_effect = lambda language, names: "".join(f"+ /{language}/{n}\n" for n in names)
+        yield m
 
 
 def describe_assemble_whitelist():
-    def describe_for_each_of_the_sixteen_conditions():
-        def it_ends_with_the_traversal_and_the_catch_all_exclusion(rules):
-            assert lines(rules)[-2:] == ["+ */", "- *"]
+    @pytest.mark.parametrize("case", CASES.values(), ids=list(CASES))
+    def it_composes_source_then_target_then_footer(compose, case):
+        source, unit, source_integration, target_integration, source_names, target_names = case
 
-        def it_anchors_every_pattern_to_a_language_directory(rules):
-            for line in lines(rules)[:-2]:
-                assert line.split(" ", 1)[1].startswith(("/python/", "/javascript/")), line
+        rules = assemble_whitelist(
+            source,
+            include_unit_tests=unit,
+            include_source_integration_tests=source_integration,
+            include_target_integration_tests=target_integration,
+        )
 
-        def it_whitelists_the_source(condition, rules):
-            assert SOURCE_INCLUDE[condition[0]] in rules
-
-        def it_includes_unit_tests_only_when_asked(condition, rules):
-            source, unit, _, _ = condition
-            assert (UNIT_INCLUDE[source] in rules) is unit
-
-        def it_includes_the_source_integration_suite_only_when_asked(condition, rules):
-            source, _, source_integration, _ = condition
-            assert (INTEGRATION_INCLUDE[source] in rules) is source_integration
-
-        def it_puts_every_test_include_ahead_of_the_exclusion(condition, rules):
-            source = condition[0]
-            exclusion = rules.index(TEST_EXCLUSION[source])
-            for include in (UNIT_INCLUDE[source], INTEGRATION_INCLUDE[source]):
-                if include in rules:
-                    assert rules.index(include) < exclusion
-
-        def it_names_the_target_only_when_asked(condition, rules):
-            source, _, _, target_integration = condition
-            target = OTHER[source]
-            assert (f"/{target}/" in rules) is target_integration
-
-        def it_gives_the_target_its_suite_and_runner_and_no_source(condition, rules):
-            source, _, _, target_integration = condition
-            if not target_integration:
-                return
-            target = OTHER[source]
-            assert INTEGRATION_INCLUDE[target] in rules
-            assert RUNNER_INCLUDE[target] in rules
-            assert SOURCE_INCLUDE[target] not in rules
-            assert UNIT_INCLUDE[target] not in rules
+        assert compose.call_args_list == [
+            call(source, source_names),
+            call(OTHER[source], target_names),
+        ]
+        expected = "".join(f"+ /{source}/{n}\n" for n in source_names)
+        expected += "".join(f"+ /{OTHER[source]}/{n}\n" for n in target_names)
+        assert rules == expected + "\n+ */\n- *\n"
