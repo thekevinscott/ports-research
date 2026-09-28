@@ -3,12 +3,12 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from porting_harness.run_porting_harness import PROMPT_PATH, run_porting_harness
+from .run_porting_harness import PROMPT_PATH, run_porting_harness
 
 OPTIONS = (
     "agent",
-    "reference_implementation",
-    "target_language",
+    "prompt",
+    "input",
     "output_directory",
     "debug",
     "effort",
@@ -37,19 +37,9 @@ def build_agent_image():
 
 
 @pytest.fixture
-def render_prompt():
-    with patch(
-        "porting_harness.run_porting_harness.render_prompt", autospec=True
-    ) as mock:
-        mock.return_value = "Port it to python.\n"
-        yield mock
-
-
-@pytest.fixture
-def reference_implementation(tmp_path):
-    directory = tmp_path / "reference_implementation"
-    (directory / "source").mkdir(parents=True)
-    (directory / "tests").mkdir()
+def input_directory(tmp_path):
+    directory = tmp_path / "input"
+    directory.mkdir()
     return directory
 
 
@@ -64,12 +54,21 @@ def agent():
 
 
 @pytest.fixture
-def options(agent, reference_implementation, output_directory, tmp_path):
+def render_prompt():
+    with patch(
+        "porting_harness.run_porting_harness.render_prompt", autospec=True
+    ) as mock:
+        mock.return_value = "the rendered prompt"
+        yield mock
+
+
+@pytest.fixture
+def options(agent, input_directory, output_directory, tmp_path):
     def build(**overrides):
         return {
             "agent": agent,
-            "reference_implementation": reference_implementation,
-            "target_language": "python",
+            "prompt": "Port /input/python to typescript.\n",
+            "input": input_directory,
             "output_directory": output_directory,
             "debug": False,
             "effort": "high",
@@ -110,11 +109,11 @@ def describe_run_porting_harness():
 
         assert output_directory.is_dir()
 
-    def it_wires_the_mounts_and_home_into_the_sandbox(
+    def it_wires_the_input_the_output_and_home_into_the_sandbox(
         run_agent_harness_sandbox,
         options,
         agent,
-        reference_implementation,
+        input_directory,
         output_directory,
         tmp_path,
     ):
@@ -123,12 +122,8 @@ def describe_run_porting_harness():
         assert run_agent_harness_sandbox.call_args.kwargs == {
             "agent": agent,
             "image": "an-agent:latest",
-            "inputs": {
-                reference_implementation
-                / "source": Path("/workspace/reference_implementation"),
-                reference_implementation / "tests": Path("/workspace/tests"),
-            },
-            "outputs": {output_directory: Path("/workspace/ported_implementation")},
+            "input": input_directory,
+            "outputs": {output_directory: Path("/target")},
             "envs": {},
             "debug": False,
             "home": Path("/workspace"),
@@ -138,6 +133,14 @@ def describe_run_porting_harness():
             "proxy_log": tmp_path / "proxy.log",
         }
 
+    def it_hands_the_input_over_as_the_one_input_folder(
+        run_agent_harness_sandbox, options, input_directory
+    ):
+        """One mount. What is inside it, and what it means, is the caller's prompt."""
+        run_porting_harness(**options())
+
+        assert run_agent_harness_sandbox.call_args.kwargs["input"] == input_directory
+
     def it_runs_the_image_it_built_for_the_agent(
         run_agent_harness_sandbox, build_agent_image, options, agent
     ):
@@ -145,17 +148,6 @@ def describe_run_porting_harness():
 
         build_agent_image.assert_called_once_with(agent=agent, debug=True)
         assert run_agent_harness_sandbox.call_args.kwargs["image"] == "an-agent:latest"
-
-    def it_leaves_tests_unmounted_when_the_reference_has_none(
-        run_agent_harness_sandbox, options, reference_implementation
-    ):
-        """An empty read-only /workspace/tests is where the v1 EROFS behaviour came from."""
-        (reference_implementation / "tests").rmdir()
-        run_porting_harness(**options())
-
-        assert list(run_agent_harness_sandbox.call_args.kwargs["inputs"].values()) == [
-            Path("/workspace/reference_implementation")
-        ]
 
     def it_binds_the_directory_the_caller_named(
         run_agent_harness_sandbox, options, output_directory
@@ -202,25 +194,12 @@ def describe_run_porting_harness():
 
         assert run_agent_harness_sandbox.call_args.kwargs["proxy_log"] == proxy_log
 
-    def it_sends_its_own_prompt_and_returns_the_output(
+    def it_sends_the_rendered_system_prompt_and_returns_the_output(
         run_agent_harness_sandbox, render_prompt, options
     ):
-        """The caller names a direction; the wording is the harness's."""
-        claude_output = run_porting_harness(**options())
+        """The harness frames the task; the caller's prompt goes in the template's slot."""
+        claude_output = run_porting_harness(**options(prompt="Port it.\n"))
 
-        render_prompt.assert_called_once_with(PROMPT_PATH, "python")
-        assert run_agent_harness_sandbox.call_args.args == (render_prompt.return_value,)
+        render_prompt.assert_called_once_with(PROMPT_PATH, "Port it.\n")
+        assert run_agent_harness_sandbox.call_args.args == ("the rendered prompt",)
         assert claude_output == "container output"
-
-    def it_renders_the_direction_the_caller_asked_for(
-        run_agent_harness_sandbox, render_prompt, options
-    ):
-        run_porting_harness(**options(target_language="typescript"))
-
-        render_prompt.assert_called_once_with(PROMPT_PATH, "typescript")
-
-
-def describe_the_packaged_prompt():
-    def it_ships_a_template_with_the_target_language_left_open():
-        """The prompt is this package's contribution, so it ships inside it."""
-        assert "{target_language}" in PROMPT_PATH.read_text()

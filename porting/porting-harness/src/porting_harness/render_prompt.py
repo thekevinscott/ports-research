@@ -1,11 +1,11 @@
 from pathlib import Path
 
 
-def render_prompt(prompt_path: Path, target_language: str) -> str:
-    """The prompt template with the run's target language substituted in.
+def render_prompt(prompt_path: Path, upstream: str) -> str:
+    """The harness's system prompt with the caller's upstream prompt in its slot.
 
-    Pure, so a template digest plus the arm's target language reconstructs the
-    exact string the container was handed. One template renders to a different
-    prompt in each arm.
+    Pure, so the template digest plus the upstream text reconstructs the exact
+    string the container was handed. Only the template is formatted, so braces
+    in the upstream text pass through untouched.
     """
-    return prompt_path.read_text().format(target_language=target_language)
+    return prompt_path.read_text().format(upstream=upstream)

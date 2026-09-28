@@ -6,8 +6,9 @@ Runs with the rest of the tier under `just test-e2e`.
 - Never re-run a failing test to chase green. A red one is a finding to report.
 - One session per direction; the module-scoped cache enforces that. Do not make it
   function-scoped.
-- The prompt is the harness's own — a caller cannot supply one, so there is nothing
-  here to keep in step with it.
+- PROMPT below is this test's upstream prompt, describing the tree this test lays
+  out. The harness appends it to its own system prompt. It stands in for an
+  experiment's prompt and proves nothing about one.
 - Every assertion here is about the harness — what it returns and what it banks on the
   host. Whether the port is any good is an experiment result, graded elsewhere.
 """
@@ -24,6 +25,10 @@ from porting_harness.run_porting_harness import run_porting_harness
 TARGET_LANGUAGE = {"typescript": "python", "python": "typescript"}
 
 MODEL = "claude-opus-5"
+PROMPT = (
+    "The library to port is in /input/source. Port it to {target_language}.\n"
+    "The suite for the port is in /input/tests. Run it and iterate until green.\n"
+)
 
 
 @dataclass
@@ -68,14 +73,12 @@ def ported(tmp_path_factory, two_number_adder: Path):
 
         target_language = TARGET_LANGUAGE[source_language]
         root = tmp_path_factory.mktemp(f"{source_language}_to_{target_language}_")
-        reference_implementation = root / "reference_implementation"
+        input_directory = root / "input"
         shutil.copytree(
-            two_number_adder / "source" / source_language,
-            reference_implementation / "source",
+            two_number_adder / "source" / source_language, input_directory / "source"
         )
         shutil.copytree(
-            two_number_adder / "tests" / target_language,
-            reference_implementation / "tests" / target_language,
+            two_number_adder / "tests" / target_language, input_directory / "tests"
         )
 
         transcripts = root / "transcripts"
@@ -89,8 +92,8 @@ def ported(tmp_path_factory, two_number_adder: Path):
         try:
             session.raw = run_porting_harness(
                 agent=ClaudeAgent(),
-                reference_implementation=reference_implementation,
-                target_language=target_language,
+                prompt=PROMPT.format(target_language=target_language),
+                input=input_directory,
                 output_directory=session.directory,
                 debug=False,
                 effort="high",

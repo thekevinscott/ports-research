@@ -1,2 +1,9 @@
-Port reference_implementation/ to {target_language} in ported_implementation/.
-Run tests/ and iterate until green.
+You are porting software from one language to another. 
+
+The reference is mounted at `/input`.
+
+Write the port to `/target`.
+
+The library itself may specify additional porting instructions below:
+
+{upstream}

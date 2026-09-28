@@ -2,7 +2,7 @@ import pytest
 
 from porting_harness.render_prompt import render_prompt
 
-TEMPLATE = "Port reference_implementation/ to {target_language}.\n"
+TEMPLATE = "Write the port to /target.\n\n{upstream}\n"
 
 
 @pytest.fixture
@@ -13,23 +13,23 @@ def prompt_path(tmp_path):
 
 
 def describe_render_prompt():
-    def it_substitutes_the_target_language(prompt_path):
-        assert render_prompt(prompt_path, "python") == (
-            "Port reference_implementation/ to python.\n"
+    def it_puts_the_upstream_prompt_in_the_slot(prompt_path):
+        assert render_prompt(prompt_path, "Port /input/source to rust.") == (
+            "Write the port to /target.\n\n"
+            "Port /input/source to rust.\n"
         )
 
-    def it_renders_each_direction_differently(prompt_path):
-        assert render_prompt(prompt_path, "python") != render_prompt(
-            prompt_path, "typescript"
-        )
+    def it_leaves_no_slot_behind(prompt_path):
+        assert "{upstream}" not in render_prompt(prompt_path, "Port it.")
 
-    def it_leaves_a_template_without_the_placeholder_alone(tmp_path):
-        path = tmp_path / "prompt.txt"
-        path.write_text("Port the reference implementation.\n")
-        assert render_prompt(path, "python") == "Port the reference implementation.\n"
+    def describe_when_the_upstream_prompt_contains_braces():
+        def it_passes_them_through_untouched(prompt_path):
+            rendered = render_prompt(prompt_path, "Match {a: 1} and {{b}}.")
 
-    def it_raises_on_a_placeholder_it_cannot_fill(tmp_path):
-        path = tmp_path / "prompt.txt"
-        path.write_text("Port to {target}.\n")
-        with pytest.raises(KeyError):
-            render_prompt(path, "python")
+            assert "Match {a: 1} and {{b}}." in rendered
+
+    def describe_when_there_is_no_upstream_prompt():
+        def it_renders_the_system_prompt_alone(prompt_path):
+            assert render_prompt(prompt_path, "") == (
+                "Write the port to /target.\n\n\n"
+            )
