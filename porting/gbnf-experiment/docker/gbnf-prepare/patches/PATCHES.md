@@ -7,3 +7,7 @@ A patch is added when the experiment needs gbnf to be something it is not at the
 ## 0001-Drop-the-builder-re-exports-from-the-javascript-index
 
 `src/builder/` is a grammar-authoring DSL with no counterpart to port, so the whitelist withholds it. `src/index.ts` re-exported it, and a reference that re-exports a directory it does not contain fails to typecheck. The patch removes the two re-exports. Before this, a regex edited the copy per run.
+
+## 0003-Drop-the-builder-from-the-javascript-manifest
+
+`packages/gbnf/javascript/package.json` is whitelisted so the agent can see how the suite imports the package, but at the pin it still advertised the withheld `src/builder/`: a `./builder` entry in `exports` pointing at `dist/builder/index.js` and `dist/builder/index.umd.cjs`, and three `path-exists ./dist/builder/*` assertions in the wireit `build:check` command. The whitelisted tree must not reference what the whitelist withholds, so the patch removes both. Same class as 0001.
