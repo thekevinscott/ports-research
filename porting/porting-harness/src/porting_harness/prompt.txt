@@ -1,2 +1,0 @@
-Port reference_implementation/ to {target_language} in ported_implementation/.
-Run tests/ and iterate until green.
