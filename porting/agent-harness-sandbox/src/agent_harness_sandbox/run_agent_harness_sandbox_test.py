@@ -41,12 +41,12 @@ def transcripts(tmp_path):
 
 @pytest.fixture
 def options(agent, transcripts, tmp_path):
-    input_folder = tmp_path / "input"
-    input_folder.mkdir()
+    caller_input = tmp_path / "input"
+    caller_input.mkdir()
     return {
         "agent": agent,
         "image": "a-workspace:latest",
-        "input_folder": input_folder,
+        "input": caller_input,
         "outputs": {},
         "envs": {},
         "debug": False,
@@ -83,6 +83,23 @@ def run(docker, lockdown, options):
 
 def volumes(docker) -> dict[str, tuple[str, str]]:
     return {target: (source, mode) for source, target, mode in docker.run.call_args.kwargs["volumes"]}
+
+
+@pytest.fixture
+def mounted(docker) -> dict[str, dict[str, str]]:
+    """What each volume source holds while the fake run is in flight, before the copies go."""
+    seen: dict[str, dict[str, str]] = {}
+
+    def capture(*_args, **kwargs):
+        for source, target, _ in kwargs["volumes"]:
+            root = Path(source)
+            seen[str(target)] = {
+                str(p.relative_to(root)): p.read_text() for p in sorted(root.rglob("*")) if p.is_file()
+            }
+        return "output"
+
+    docker.run.side_effect = capture
+    return seen
 
 
 def describe_signature():
@@ -155,11 +172,40 @@ def describe_volumes():
             "rw",
         )
 
-    def it_mounts_the_single_input_folder_read_only_at_a_fixed_path(run, docker, tmp_path):
+    def it_mounts_a_writable_copy_of_the_input_folder_at_a_fixed_path(run, docker, tmp_path):
         data = tmp_path / "data"
         data.mkdir()
-        run(input_folder=data)
-        assert volumes(docker)["/input"] == (str(data.resolve()), "ro")
+        (data / "a.txt").write_text("x")
+        run(input=data)
+        source, mode = volumes(docker)["/input"]
+        assert source != str(data.resolve())
+        assert mode == "rw"
+
+    def it_copies_the_input_folders_files_into_what_it_mounts(run, docker, tmp_path, mounted):
+        data = tmp_path / "data"
+        (data / "nested").mkdir(parents=True)
+        (data / "nested" / "a.txt").write_text("x")
+        run(input=data)
+        assert mounted["/input"] == {"nested/a.txt": "x"}
+
+    def it_discards_the_input_copy_after_the_run(run, docker, tmp_path):
+        data = tmp_path / "data"
+        data.mkdir()
+        run(input=data)
+        assert not Path(volumes(docker)["/input"][0]).exists()
+
+    def it_keeps_container_writes_out_of_the_callers_input_folder(run, docker, tmp_path):
+        data = tmp_path / "data"
+        data.mkdir()
+
+        def write_into_the_mount(*_args, **kwargs):
+            source = dict((target, src) for src, target, _ in kwargs["volumes"])["/input"]
+            (Path(source) / "installed.txt").write_text("from the container")
+            return "output"
+
+        docker.run.side_effect = write_into_the_mount
+        run(input=data)
+        assert sorted(p.name for p in data.iterdir()) == []
 
     def it_mounts_each_output_writable(run, docker, tmp_path):
         out = tmp_path / "out"
@@ -173,13 +219,7 @@ def describe_volumes():
 
     def it_refuses_a_source_that_is_not_there(run, tmp_path):
         with pytest.raises(SandboxError, match="does not exist"):
-            run(input_folder=tmp_path / "gone")
-
-    def it_refuses_an_input_that_is_not_a_folder(run, tmp_path):
-        data = tmp_path / "file"
-        data.touch()
-        with pytest.raises(SandboxError, match="not a directory"):
-            run(input_folder=data)
+            run(transcripts=tmp_path / "gone")
 
 
 def describe_lockdown():

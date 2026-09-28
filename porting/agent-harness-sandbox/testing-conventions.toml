@@ -14,24 +14,19 @@ rules = ["colocated-test"]
 reason = "literal constants; a colocated test could only restate them"
 
 [[python.exempt]]
-path = "agent_harness_sandbox/agent.py"
+path = "agent_harness_sandbox/agents/agent.py"
 rules = ["colocated-test"]
 reason = "a typing.Protocol declares no behaviour; a colocated test could only restate the signatures"
 
 [[python.exempt]]
-path = "agent_harness_sandbox/ClaudeAgent_test.py"
+path = "agent_harness_sandbox/agents/ClaudeAgent_test.py"
 rules = ["unmocked-collaborator"]
 reason = "AgentHarnessSandboxError is imported only to assert the raise; a mocked exception type cannot be caught"
 
 [[python.exempt]]
-path = "agent_harness_sandbox/PiAgent_test.py"
+path = "agent_harness_sandbox/agents/PiAgent_test.py"
 rules = ["unmocked-collaborator"]
 reason = "AgentHarnessSandboxError is imported only to assert the raise; a mocked exception type cannot be caught"
-
-[[python.exempt]]
-path = "agent_harness_sandbox/resolve_agent_test.py"
-rules = ["unmocked-collaborator"]
-reason = "the agents are the lookup table's payload, so a mocked one would leave nothing to resolve, and AgentHarnessSandboxError is imported only to assert the raise"
 
 [[python.exempt]]
 path = "agent_harness_sandbox/run_agent_harness_sandbox_test.py"
