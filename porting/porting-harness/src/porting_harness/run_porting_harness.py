@@ -4,7 +4,7 @@ from agent_harness_sandbox.agents.agent import Agent
 from agent_harness_sandbox.build_agent_image import build_agent_image
 from agent_harness_sandbox.run_agent_harness_sandbox import run_agent_harness_sandbox
 
-from .render_prompt import render_prompt
+from .prompt import Prompt
 
 DOCKER_HOMEBASE = Path("/workspace")
 TARGET = Path("/target")
@@ -39,7 +39,7 @@ def run_porting_harness(
     """
     output_directory.mkdir(parents=True, exist_ok=True)
     return run_agent_harness_sandbox(
-        render_prompt(PROMPT_PATH, prompt),
+        str(Prompt(PROMPT_PATH, upstream=prompt)),
         agent=agent,
         image=build_agent_image(agent=agent, debug=debug),
         input=input,
