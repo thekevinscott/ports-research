@@ -68,7 +68,7 @@ linked it.
 Each language's suite is generated the way gbnf itself generates it, into the
 place gbnf puts it:
 
-- typescript: `pnpm --filter gbnf test:integration:write`, which writes
+- javascript: `pnpm --filter gbnf test:integration:write`, which writes
   `packages/gbnf/javascript/integration-tests/generated/`;
 - python: `make write_integration_tests` in `packages/gbnf/python`, which writes
   `packages/gbnf/python/tests/generated/`.
@@ -80,7 +80,7 @@ write regardless of flags." The suites are defined once as markdown under
 only which suites the copies below let through.
 
 At the pin the python Makefile names the suites it wants and skips
-`grammars.md`, so python gets five suites where typescript gets six. That is
+`grammars.md`, so python gets five suites where javascript gets six. That is
 left as it is. Kevin, 2026-09-27: "I'd prefer that we build it up after we see
 it in action. Let them fail. Let's see them fail, and let's fix them when they
 fail and we can see how they fail."

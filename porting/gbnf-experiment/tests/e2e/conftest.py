@@ -43,7 +43,7 @@ def completed_run(experiment_data: Path, prepared_cache: Path) -> Path:
     and every e2e assertion is made against what it leaves on disk.
     """
     result = subprocess.run(
-        ["uv", "run", "run-gbnf-experiment", "--source-language", "typescript"],
+        ["uv", "run", "run-gbnf-experiment", "--source-language", "javascript"],
         cwd=PACKAGE_ROOT,
         env={
             **os.environ,

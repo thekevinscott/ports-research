@@ -97,8 +97,8 @@ AGENT = Mock(name="agent")
 
 CONFIG = {
     "agent": AGENT,
-    "source_language": "typescript",
-    "include_typescript_tests": False,
+    "source_language": "javascript",
+    "include_javascript_tests": False,
     "include_python_tests": False,
     "debug": False,
     "effort": "high",
@@ -122,7 +122,7 @@ def experiment(
 def describe_the_signature():
     @pytest.mark.parametrize(
         "omitted",
-        ["agent", "source_language", "include_typescript_tests", "include_python_tests", "debug"],
+        ["agent", "source_language", "include_javascript_tests", "include_python_tests", "debug"],
     )
     def it_requires_every_option(omitted):
         supplied = {name: value for name, value in CONFIG.items() if name != omitted}
@@ -131,7 +131,7 @@ def describe_the_signature():
 
     def it_takes_no_positional_argument():
         with pytest.raises(TypeError, match="positional"):
-            run_gbnf_experiment("typescript", **CONFIG)
+            run_gbnf_experiment("javascript", **CONFIG)
 
 
 def describe_run():
@@ -211,16 +211,16 @@ def describe_run():
         run_porting_harness,
     ):
         experiment(source_language="python")
-        assert run_porting_harness.call_args.kwargs["target_language"] == "typescript"
+        assert run_porting_harness.call_args.kwargs["target_language"] == "javascript"
         assert "prompt" not in run_porting_harness.call_args.kwargs
 
-    def it_targets_python_when_porting_from_typescript(
+    def it_targets_python_when_porting_from_javascript(
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
         run_porting_harness,
     ):
-        experiment(source_language="typescript")
+        experiment(source_language="javascript")
         assert run_porting_harness.call_args.kwargs["target_language"] == "python"
 
 
@@ -337,15 +337,15 @@ def describe_the_manifest():
     ):
         experiment(
             source_language="python",
-            include_typescript_tests=True,
+            include_javascript_tests=True,
             effort="low",
             model="claude-sonnet-4-5",
         )
         assert write_manifest.call_args.kwargs["condition"] == {
-            "name": "source-python_typescript-tests_effort-low_model-claude-sonnet-4-5",
+            "name": "source-python_javascript-tests_effort-low_model-claude-sonnet-4-5",
             "source_language": "python",
-            "target_language": "typescript",
-            "include_typescript_tests": True,
+            "target_language": "javascript",
+            "include_javascript_tests": True,
             "include_python_tests": False,
             "effort": "low",
             "model": "claude-sonnet-4-5",

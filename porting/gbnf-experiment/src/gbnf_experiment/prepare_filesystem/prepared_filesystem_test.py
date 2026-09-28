@@ -14,8 +14,8 @@ AGENT = Mock(name="agent")
 AGENT.image = "agent-harness-sandbox-claude:latest"
 
 CONDITION = {
-    "source_language": "typescript",
-    "include_typescript_tests": False,
+    "source_language": "javascript",
+    "include_javascript_tests": False,
     "include_python_tests": False,
     "effort": "high",
     "model": "claude-opus-5",
@@ -84,8 +84,8 @@ def filesystem(
     docker_module,
 ):
     with PreparedFilesystem(
-        source_language="typescript",
-        include_typescript_tests=False,
+        source_language="javascript",
+        include_javascript_tests=False,
         include_python_tests=False,
         debug=False,
     ) as prepared:

@@ -1,14 +1,14 @@
 def condition_name(
     *,
     source_language: str,
-    include_typescript_tests: bool,
+    include_javascript_tests: bool,
     include_python_tests: bool,
     effort: str,
     model: str,
 ) -> str:
     parts = [f"source-{source_language}"]
-    if include_typescript_tests:
-        parts.append("typescript-tests")
+    if include_javascript_tests:
+        parts.append("javascript-tests")
     if include_python_tests:
         parts.append("python-tests")
     parts.append(f"effort-{effort}")

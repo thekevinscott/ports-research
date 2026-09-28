@@ -1,4 +1,4 @@
-# rsync rules for the typescript package, rooted at packages/gbnf and anchored
+# rsync rules for the javascript package, rooted at packages/gbnf and anchored
 # to /javascript so nothing here matches the other language's tree. First match
 # wins, so the exclusions lead. A whitelist: anything not named here never
 # reaches the agent. Adding a file to the corpus means adding a line. The

@@ -12,10 +12,10 @@ IMAGE_ID = "sha256:" + "b" * 64
 HEAD = "c" * 40
 
 CONDITION = {
-    "name": "source-typescript_python-tests_effort-high_model-claude-opus-5",
-    "source_language": "typescript",
+    "name": "source-javascript_python-tests_effort-high_model-claude-opus-5",
+    "source_language": "javascript",
     "target_language": "python",
-    "include_typescript_tests": False,
+    "include_javascript_tests": False,
     "include_python_tests": True,
     "effort": "high",
     "model": "claude-opus-5",

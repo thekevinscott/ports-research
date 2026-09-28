@@ -14,17 +14,17 @@ from porting_harness.run_porting_harness import PROMPT_PATH
 
 from conftest import GRAMMAR_FIXTURES
 
-TYPESCRIPT_REFERENCE = [
-    "/workspace/reference_implementation/typescript/package.json",
-    "/workspace/reference_implementation/typescript/src/index.ts",
+JAVASCRIPT_REFERENCE = [
+    "/workspace/reference_implementation/javascript/package.json",
+    "/workspace/reference_implementation/javascript/src/index.ts",
 ]
 PYTHON_REFERENCE = [
     "/workspace/reference_implementation/python/gbnf/index.py",
     "/workspace/reference_implementation/python/pyproject.toml",
 ]
-TYPESCRIPT_SUITE = [
-    "/workspace/tests/typescript/iteration/grammars_test.typescript",
-    "/workspace/tests/typescript/validation/validate_test.typescript",
+JAVASCRIPT_SUITE = [
+    "/workspace/tests/javascript/iteration/grammars_test.javascript",
+    "/workspace/tests/javascript/validation/validate_test.javascript",
 ]
 PYTHON_SUITE = [
     *(
@@ -38,8 +38,8 @@ PYTHON_SUITE = [
 
 
 CONFIG = {
-    "source_language": "typescript",
-    "include_typescript_tests": False,
+    "source_language": "javascript",
+    "include_javascript_tests": False,
     "include_python_tests": False,
     "debug": False,
     "effort": "high",
@@ -90,27 +90,27 @@ def describe_gbnf_experiment():
 
     def describe_the_assembled_reference():
         @pytest.mark.parametrize(
-            ("source_language", "typescript", "python", "expected"),
+            ("source_language", "javascript", "python", "expected"),
             [
-                ("typescript", False, False, TYPESCRIPT_REFERENCE),
-                ("typescript", True, False, [*TYPESCRIPT_REFERENCE, *TYPESCRIPT_SUITE]),
-                ("typescript", False, True, [*TYPESCRIPT_REFERENCE, *PYTHON_SUITE]),
+                ("javascript", False, False, JAVASCRIPT_REFERENCE),
+                ("javascript", True, False, [*JAVASCRIPT_REFERENCE, *JAVASCRIPT_SUITE]),
+                ("javascript", False, True, [*JAVASCRIPT_REFERENCE, *PYTHON_SUITE]),
                 (
-                    "typescript",
+                    "javascript",
                     True,
                     True,
-                    [*TYPESCRIPT_REFERENCE, *PYTHON_SUITE, *TYPESCRIPT_SUITE],
+                    [*JAVASCRIPT_REFERENCE, *PYTHON_SUITE, *JAVASCRIPT_SUITE],
                 ),
                 ("python", False, False, PYTHON_REFERENCE),
-                ("python", True, False, [*PYTHON_REFERENCE, *TYPESCRIPT_SUITE]),
+                ("python", True, False, [*PYTHON_REFERENCE, *JAVASCRIPT_SUITE]),
                 ("python", False, True, [*PYTHON_REFERENCE, *PYTHON_SUITE]),
-                ("python", True, True, [*PYTHON_REFERENCE, *PYTHON_SUITE, *TYPESCRIPT_SUITE]),
+                ("python", True, True, [*PYTHON_REFERENCE, *PYTHON_SUITE, *JAVASCRIPT_SUITE]),
             ],
             ids=[
-                "typescript-none",
-                "typescript-source-suite",
-                "typescript-target-suite",
-                "typescript-both",
+                "javascript-none",
+                "javascript-source-suite",
+                "javascript-target-suite",
+                "javascript-both",
                 "python-none",
                 "python-target-suite",
                 "python-source-suite",
@@ -118,12 +118,12 @@ def describe_gbnf_experiment():
             ],
         )
         def it_carries_the_source_and_exactly_the_selected_suites(
-            experiment, porting_calls, source_language, typescript, python, expected
+            experiment, porting_calls, source_language, javascript, python, expected
         ):
             """Colocated tests and dev/ never appear, whatever the flags say."""
             experiment(
                 source_language=source_language,
-                include_typescript_tests=typescript,
+                include_javascript_tests=javascript,
                 include_python_tests=python,
             )
             [call] = porting_calls
@@ -158,7 +158,7 @@ def describe_gbnf_experiment():
         def it_sends_the_prompt_rendered_for_the_target_language(
             experiment, porting_calls
         ):
-            experiment(source_language="typescript")
+            experiment(source_language="javascript")
             [call] = porting_calls
             assert call["prompt"] == PROMPT_PATH.read_text().format(
                 target_language="python"
@@ -167,7 +167,7 @@ def describe_gbnf_experiment():
         def it_renders_the_reverse_direction(experiment, porting_calls):
             experiment(source_language="python")
             [call] = porting_calls
-            assert "typescript" in call["prompt"]
+            assert "javascript" in call["prompt"]
             assert "{target_language}" not in call["prompt"]
 
         def it_collects_the_port_into_the_run_directory(experiment, data_directory):
@@ -201,7 +201,7 @@ def describe_the_run_directory():
         assert len(list(data_directory.iterdir())) == 2
 
     def it_gives_two_conditions_two_directories(experiment, data_directory):
-        experiment(source_language="typescript")
+        experiment(source_language="javascript")
         experiment(source_language="python")
         assert len(list(data_directory.iterdir())) == 2
 
@@ -261,15 +261,15 @@ def describe_the_manifest():
     def it_records_the_condition_that_ran(experiment, manifest):
         experiment(
             source_language="python",
-            include_typescript_tests=True,
+            include_javascript_tests=True,
             effort="low",
             model="claude-sonnet-4-5",
         )
         assert manifest()["condition"] == {
-            "name": "source-python_typescript-tests_effort-low_model-claude-sonnet-4-5",
+            "name": "source-python_javascript-tests_effort-low_model-claude-sonnet-4-5",
             "source_language": "python",
-            "target_language": "typescript",
-            "include_typescript_tests": True,
+            "target_language": "javascript",
+            "include_javascript_tests": True,
             "include_python_tests": False,
             "effort": "low",
             "model": "claude-sonnet-4-5",
@@ -280,12 +280,12 @@ def describe_the_manifest():
     ):
         experiment()
         assert (
-            "source/typescript/src/index.test.ts"
+            "source/javascript/src/index.test.ts"
             not in manifest()["reference_implementation"]["included"]
         )
         [call] = porting_calls
         assert (
-            "/workspace/reference_implementation/typescript/src/index.test.ts"
+            "/workspace/reference_implementation/javascript/src/index.test.ts"
             not in call["container_tree"]
         )
 
@@ -293,7 +293,7 @@ def describe_the_manifest():
         """One list, one root: source and suite paths side by side."""
         experiment(include_python_tests=True)
         included = manifest()["reference_implementation"]["included"]
-        assert "source/typescript/src/index.ts" in included
+        assert "source/javascript/src/index.ts" in included
         assert "tests/python/validation/validate_test.python" in included
 
     def it_records_the_pinned_commit(experiment, manifest):
@@ -413,7 +413,7 @@ def describe_the_staged_reference_corpus():
 
 def describe_the_rendered_prompt():
     def it_sends_the_target_language_not_the_template(experiment, porting_calls):
-        experiment(source_language="typescript")
+        experiment(source_language="javascript")
         [call] = porting_calls
         assert "python" in call["prompt"]
         assert "{" not in call["prompt"]
@@ -454,6 +454,6 @@ def describe_cli():
     def it_prints_where_the_run_landed(
         data_directory, prepare_docker, porting_docker
     ):
-        result = CliRunner().invoke(cli, ["--source-language", "typescript"])
+        result = CliRunner().invoke(cli, ["--source-language", "javascript"])
         [run_directory] = data_directory.iterdir()
         assert f"Run directory: {run_directory}" in result.output
