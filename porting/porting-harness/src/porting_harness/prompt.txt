@@ -1,0 +1,4 @@
+You are porting a software library from one language to another.
+The reference is mounted at /input. Write the port to /workspace/ported_implementation.
+
+{upstream}

@@ -3,12 +3,12 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from .run_porting_harness import run_porting_harness
+from .run_porting_harness import PROMPT_PATH, run_porting_harness
 
 OPTIONS = (
     "agent",
     "prompt",
-    "reference",
+    "input",
     "output_directory",
     "debug",
     "effort",
@@ -37,8 +37,8 @@ def build_agent_image():
 
 
 @pytest.fixture
-def reference(tmp_path):
-    directory = tmp_path / "reference"
+def input_directory(tmp_path):
+    directory = tmp_path / "input"
     directory.mkdir()
     return directory
 
@@ -54,12 +54,21 @@ def agent():
 
 
 @pytest.fixture
-def options(agent, reference, output_directory, tmp_path):
+def render_prompt():
+    with patch(
+        "porting_harness.run_porting_harness.render_prompt", autospec=True
+    ) as mock:
+        mock.return_value = "the rendered prompt"
+        yield mock
+
+
+@pytest.fixture
+def options(agent, input_directory, output_directory, tmp_path):
     def build(**overrides):
         return {
             "agent": agent,
             "prompt": "Port /input/python to typescript.\n",
-            "reference": reference,
+            "input": input_directory,
             "output_directory": output_directory,
             "debug": False,
             "effort": "high",
@@ -100,11 +109,11 @@ def describe_run_porting_harness():
 
         assert output_directory.is_dir()
 
-    def it_wires_the_reference_the_output_and_home_into_the_sandbox(
+    def it_wires_the_input_the_output_and_home_into_the_sandbox(
         run_agent_harness_sandbox,
         options,
         agent,
-        reference,
+        input_directory,
         output_directory,
         tmp_path,
     ):
@@ -113,7 +122,7 @@ def describe_run_porting_harness():
         assert run_agent_harness_sandbox.call_args.kwargs == {
             "agent": agent,
             "image": "an-agent:latest",
-            "input_folder": reference,
+            "input_folder": input_directory,
             "outputs": {output_directory: Path("/workspace/ported_implementation")},
             "envs": {},
             "debug": False,
@@ -124,13 +133,13 @@ def describe_run_porting_harness():
             "proxy_log": tmp_path / "proxy.log",
         }
 
-    def it_hands_the_reference_over_as_the_one_input_folder(
-        run_agent_harness_sandbox, options, reference
+    def it_hands_the_input_over_as_the_one_input_folder(
+        run_agent_harness_sandbox, options, input_directory
     ):
         """One mount. What is inside it, and what it means, is the caller's prompt."""
         run_porting_harness(**options())
 
-        assert run_agent_harness_sandbox.call_args.kwargs["input_folder"] == reference
+        assert run_agent_harness_sandbox.call_args.kwargs["input_folder"] == input_directory
 
     def it_runs_the_image_it_built_for_the_agent(
         run_agent_harness_sandbox, build_agent_image, options, agent
@@ -185,11 +194,12 @@ def describe_run_porting_harness():
 
         assert run_agent_harness_sandbox.call_args.kwargs["proxy_log"] == proxy_log
 
-    def it_sends_the_caller_s_prompt_verbatim_and_returns_the_output(
-        run_agent_harness_sandbox, options
+    def it_sends_the_rendered_system_prompt_and_returns_the_output(
+        run_agent_harness_sandbox, render_prompt, options
     ):
-        """The caller describes the tree it built; the harness adds no words of its own."""
+        """The harness frames the task; the caller's prompt goes in the template's slot."""
         claude_output = run_porting_harness(**options(prompt="Port it.\n"))
 
-        assert run_agent_harness_sandbox.call_args.args == ("Port it.\n",)
+        render_prompt.assert_called_once_with(PROMPT_PATH, "Port it.\n")
+        assert run_agent_harness_sandbox.call_args.args == ("the rendered prompt",)
         assert claude_output == "container output"

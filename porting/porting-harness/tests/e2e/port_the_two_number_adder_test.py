@@ -6,8 +6,9 @@ Runs with the rest of the tier under `just test-e2e`.
 - Never re-run a failing test to chase green. A red one is a finding to report.
 - One session per direction; the module-scoped cache enforces that. Do not make it
   function-scoped.
-- The prompt is this test's own, PROMPT below, describing the tree this test lays
-  out. It stands in for an experiment's prompt and proves nothing about one.
+- PROMPT below is this test's upstream prompt, describing the tree this test lays
+  out. The harness appends it to its own system prompt. It stands in for an
+  experiment's prompt and proves nothing about one.
 - Every assertion here is about the harness — what it returns and what it banks on the
   host. Whether the port is any good is an experiment result, graded elsewhere.
 """
@@ -25,8 +26,8 @@ TARGET_LANGUAGE = {"typescript": "python", "python": "typescript"}
 
 MODEL = "claude-opus-5"
 PROMPT = (
-    "Port /input/source to {target_language} in /workspace/ported_implementation.\n"
-    "Run the tests in /input/tests and iterate until green.\n"
+    "The library to port is in /input/source. Port it to {target_language}.\n"
+    "The suite for the port is in /input/tests. Run it and iterate until green.\n"
 )
 
 
@@ -72,9 +73,13 @@ def ported(tmp_path_factory, two_number_adder: Path):
 
         target_language = TARGET_LANGUAGE[source_language]
         root = tmp_path_factory.mktemp(f"{source_language}_to_{target_language}_")
-        reference = root / "reference"
-        shutil.copytree(two_number_adder / "source" / source_language, reference / "source")
-        shutil.copytree(two_number_adder / "tests" / target_language, reference / "tests")
+        input_directory = root / "input"
+        shutil.copytree(
+            two_number_adder / "source" / source_language, input_directory / "source"
+        )
+        shutil.copytree(
+            two_number_adder / "tests" / target_language, input_directory / "tests"
+        )
 
         transcripts = root / "transcripts"
         transcripts.mkdir()
@@ -88,7 +93,7 @@ def ported(tmp_path_factory, two_number_adder: Path):
             session.raw = run_porting_harness(
                 agent=ClaudeAgent(),
                 prompt=PROMPT.format(target_language=target_language),
-                reference=reference,
+                input=input_directory,
                 output_directory=session.directory,
                 debug=False,
                 effort="high",
