@@ -5,7 +5,9 @@ from unittest.mock import DEFAULT, Mock, patch
 
 import pytest
 
-from gbnf_experiment.run_gbnf_experiment import run_gbnf_experiment
+from porting_harness.prompt import Prompt
+
+from gbnf_experiment.run_gbnf_experiment import PROMPT_PATH, run_gbnf_experiment
 
 
 RUN_DIRECTORY_NAME = "20260906T142530Z_00000000"
@@ -169,7 +171,7 @@ def describe_run():
         run_porting_harness,
     ):
         experiment()
-        assert run_porting_harness.call_args.kwargs["reference_implementation"] is (
+        assert run_porting_harness.call_args.kwargs["input"] is (
             assemble_reference_implementation.return_value
         )
         assert run_porting_harness.call_args.kwargs["output_directory"] == (
@@ -204,15 +206,16 @@ def describe_run():
         assert prepare_reference_implementation.call_args.kwargs["debug"] is True
         assert run_porting_harness.call_args.kwargs["debug"] is True
 
-    def it_names_the_direction_and_leaves_the_wording_to_the_harness(
+    def it_names_the_direction_in_the_prompt_it_sends(
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
         run_porting_harness,
     ):
         experiment(source_language="python")
-        assert run_porting_harness.call_args.kwargs["target_language"] == "javascript"
-        assert "prompt" not in run_porting_harness.call_args.kwargs
+        assert run_porting_harness.call_args.kwargs["prompt"] == (
+            str(Prompt(PROMPT_PATH, target_language="javascript"))
+        )
 
     def it_targets_python_when_porting_from_javascript(
         experiment,
@@ -221,7 +224,20 @@ def describe_run():
         run_porting_harness,
     ):
         experiment(source_language="javascript")
-        assert run_porting_harness.call_args.kwargs["target_language"] == "python"
+        assert run_porting_harness.call_args.kwargs["prompt"] == (
+            str(Prompt(PROMPT_PATH, target_language="python"))
+        )
+
+    def it_leaves_no_placeholder_in_the_prompt(
+        experiment,
+        prepare_reference_implementation,
+        assemble_reference_implementation,
+        run_porting_harness,
+    ):
+        experiment()
+        prompt = run_porting_harness.call_args.kwargs["prompt"]
+        assert "{" not in prompt
+        assert "}" not in prompt
 
 
 def describe_the_run_directory():

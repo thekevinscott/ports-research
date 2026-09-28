@@ -3,11 +3,15 @@ from pathlib import Path
 import json
 
 from agent_harness_sandbox.agents.agent import Agent
+from porting_harness.prompt import Prompt
 from porting_harness.run_porting_harness import run_porting_harness
 from .condition_name import condition_name
 from .prepare_filesystem import PreparedFilesystem
 
 TARGET_LANGUAGES = {"javascript": "python", "python": "javascript"}
+# The library half of the prompt. porting-harness frames the task and names
+# /input and /target; only this package knows how it laid the folder out.
+PROMPT_PATH = Path(__file__).parent / "prompt.txt"
 
 
 def run_gbnf_experiment(
@@ -43,8 +47,8 @@ def run_gbnf_experiment(
         try:
             result = run_porting_harness(
                 agent=agent,
-                reference_implementation=prepared_filesystem.reference_implementation_directory,
-                target_language=target,
+                prompt=str(Prompt(PROMPT_PATH, target_language=target)),
+                input=prepared_filesystem.reference_implementation_directory,
                 output_directory=prepared_filesystem.ported_implementation_directory,
                 debug=debug,
                 **kwargs,

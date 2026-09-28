@@ -1,0 +1,2 @@
+Port the implementation under /input/source to {target_language}.
+Where /input/tests holds a suite, run it against your port and iterate until green.
