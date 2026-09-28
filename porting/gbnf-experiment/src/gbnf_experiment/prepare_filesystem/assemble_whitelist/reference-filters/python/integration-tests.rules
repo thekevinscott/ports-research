@@ -1,0 +1,6 @@
+# The generated integration suite, where `make write_integration_tests` put it,
+# and what upstream runs it with. Duplicates of source.rules lines are harmless.
++ /python/tests/***
++ /python/Makefile
++ /python/pyproject.toml
++ /python/uv.lock

@@ -1,6 +1,6 @@
-From c094acc35cafd605b26ff06c87a2ab072cb2b548 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: thekevinbot <248217931+thekevinbot@users.noreply.github.com>
-Date: Thu, 24 Sep 2026 16:41:45 -0400
+Date: Sun, 27 Sep 2026 12:00:00 +0000
 Subject: [PATCH] Drop the builder re-exports from the javascript index
 
 ---
@@ -21,6 +21,3 @@ index 42bf767..51c9025 100644
 -export {
 -  type ToStringArgs,
 -} from './builder/types.js';
--- 
-2.43.0
-

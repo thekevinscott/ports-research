@@ -17,3 +17,4 @@ reason = "click's CliRunner is the harness driving the unit"
 path = "gbnf_experiment/transcript_usage_test.py"
 rules = ["unmocked-collaborator"]
 reason = "the unit is a read of jsonl files; tmp_path is the input, not a collaborator"
+
