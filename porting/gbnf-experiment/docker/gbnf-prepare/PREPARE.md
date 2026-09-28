@@ -102,5 +102,10 @@ files:
 - `dev/` is browser and node demo apps, not the library;
 - `src/builder/` is a grammar-authoring DSL with no counterpart to port.
 
-The composition is unit-tested for all sixteen conditions in
-`assemble_whitelist_test.py`, against the real rule files.
+`assemble_whitelist_test.py` checks which rule files are composed, in what
+order, for all sixteen conditions. `layout_test.py` runs the composed rules
+through real `rsync`, with the flags this Dockerfile uses, over
+`fixtures/tree-at-pin.txt` (every file under `packages/gbnf` at the pin once
+both suites are generated) and asserts the listing equals
+`fixtures/shared/<condition>.txt`. Those sixteen listings are what `/shared`
+holds per condition; three were checked against real builds.

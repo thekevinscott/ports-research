@@ -17,3 +17,8 @@ reason = "click's CliRunner is the harness driving the unit"
 path = "gbnf_experiment/transcript_usage_test.py"
 rules = ["unmocked-collaborator"]
 reason = "the unit is a read of jsonl files; tmp_path is the input, not a collaborator"
+
+[[python.exempt]]
+path = "gbnf_experiment/prepare_filesystem/assemble_whitelist/layout_test.py"
+rules = ["unmocked-collaborator"]
+reason = "rsync is the oracle: the rule files mean whatever rsync says they mean, so the layout is asserted by running it"
