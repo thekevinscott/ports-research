@@ -125,6 +125,7 @@ def describe_run_porting_harness():
             "input": input_directory,
             "outputs": {output_directory: Path("/target")},
             "envs": {},
+            "setup": None,
             "debug": False,
             "home": Path("/workspace"),
             "effort": "high",
@@ -140,6 +141,12 @@ def describe_run_porting_harness():
         run_porting_harness(**options())
 
         assert run_agent_harness_sandbox.call_args.kwargs["input"] == input_directory
+
+    def it_asks_the_sandbox_for_no_setup_step(run_agent_harness_sandbox, options):
+        """Whether the port's dependencies get installed before the agent is still Kevin's call."""
+        run_porting_harness(**options())
+
+        assert run_agent_harness_sandbox.call_args.kwargs["setup"] is None
 
     def it_runs_the_image_it_built_for_the_agent(
         run_agent_harness_sandbox, build_agent_image, options, agent

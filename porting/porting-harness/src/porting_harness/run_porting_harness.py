@@ -45,6 +45,7 @@ def run_porting_harness(
         input=input,
         outputs={output_directory: TARGET},
         envs={},
+        setup=None,
         debug=debug,
         home=DOCKER_HOMEBASE,
         effort=effort,
