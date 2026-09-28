@@ -214,7 +214,7 @@ def describe_run():
     ):
         experiment(source_language="python")
         assert run_porting_harness.call_args.kwargs["prompt"] == (
-            str(Prompt(PROMPT_PATH, target_language="javascript"))
+            str(Prompt(PROMPT_PATH, target_language="javascript", suites_information=""))
         )
 
     def it_targets_python_when_porting_from_javascript(
@@ -225,8 +225,26 @@ def describe_run():
     ):
         experiment(source_language="javascript")
         assert run_porting_harness.call_args.kwargs["prompt"] == (
-            str(Prompt(PROMPT_PATH, target_language="python"))
+            str(Prompt(PROMPT_PATH, target_language="python", suites_information=""))
         )
+
+    def it_names_the_suites_the_condition_mounted(
+        experiment,
+        prepare_reference_implementation,
+        assemble_reference_implementation,
+        run_porting_harness,
+    ):
+        experiment(include_python_tests=True)
+        assert "/input/tests/python" in run_porting_harness.call_args.kwargs["prompt"]
+
+    def it_names_no_suite_when_the_condition_mounted_none(
+        experiment,
+        prepare_reference_implementation,
+        assemble_reference_implementation,
+        run_porting_harness,
+    ):
+        experiment()
+        assert "/input/tests" not in run_porting_harness.call_args.kwargs["prompt"]
 
     def it_leaves_no_placeholder_in_the_prompt(
         experiment,

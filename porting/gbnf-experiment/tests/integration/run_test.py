@@ -17,9 +17,13 @@ from conftest import GRAMMAR_FIXTURES
 
 # Spelled out rather than imported: a reworded prompt has to move the expected
 # text here too, or the two sides drift together and prove nothing.
-UPSTREAM_PROMPT = (
+UPSTREAM_PROMPT = "Port the implementation under /input/source to {target_language}.\n"
+UPSTREAM_PROMPT_WITH_PYTHON_SUITE = (
     "Port the implementation under /input/source to {target_language}.\n"
-    "Where /input/tests holds a suite, run it against your port and iterate until green."
+    "\n"
+    "The following test suites are mounted alongside the source:\n"
+    "\n"
+    "- /input/tests/python, written in python.\n"
 )
 
 JAVASCRIPT_REFERENCE = [
@@ -179,6 +183,16 @@ def describe_gbnf_experiment():
             [call] = porting_calls
             assert call["prompt"] == str(
                 Prompt(PROMPT_PATH, upstream=UPSTREAM_PROMPT.format(target_language="javascript"))
+            )
+
+        def it_names_the_suites_the_condition_mounted(experiment, porting_calls):
+            experiment(source_language="javascript", include_python_tests=True)
+            [call] = porting_calls
+            assert call["prompt"] == str(
+                Prompt(
+                    PROMPT_PATH,
+                    upstream=UPSTREAM_PROMPT_WITH_PYTHON_SUITE.format(target_language="python"),
+                )
             )
 
         def it_collects_the_port_into_the_run_directory(experiment, data_directory):

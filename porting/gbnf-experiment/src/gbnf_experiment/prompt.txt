@@ -1,3 +1,2 @@
 Port the implementation under /input/source to {target_language}.
-
-{tests_information}
+{suites_information}

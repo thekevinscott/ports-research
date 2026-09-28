@@ -7,6 +7,7 @@ from porting_harness.prompt import Prompt
 from porting_harness.run_porting_harness import run_porting_harness
 from .condition_name import condition_name
 from .prepare_filesystem import PreparedFilesystem
+from .suites_information import suites_information
 
 TARGET_LANGUAGES = {"javascript": "python", "python": "javascript"}
 # The library half of the prompt. porting-harness frames the task and names
@@ -47,7 +48,16 @@ def run_gbnf_experiment(
         try:
             result = run_porting_harness(
                 agent=agent,
-                prompt=str(Prompt(PROMPT_PATH, target_language=target, test_information='There is an integration test suite in /input/tests written in Python.')),
+                prompt=str(
+                    Prompt(
+                        PROMPT_PATH,
+                        target_language=target,
+                        suites_information=suites_information(
+                            include_javascript_tests=include_javascript_tests,
+                            include_python_tests=include_python_tests,
+                        ),
+                    )
+                ),
                 input=prepared_filesystem.reference_implementation_directory,
                 output_directory=prepared_filesystem.ported_implementation_directory,
                 debug=debug,
