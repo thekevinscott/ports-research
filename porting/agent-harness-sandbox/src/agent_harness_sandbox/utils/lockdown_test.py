@@ -91,6 +91,12 @@ def describe_lockdown():
                 [egress] = docker.network.create.call_args.args
             assert "egress" in egress
 
+        def it_names_the_egress_network_on_the_jail(jail, docker):
+            """A caller can lend it to a container for one step and take it back."""
+            with jail() as net:
+                [egress] = docker.network.create.call_args.args
+            assert net.egress == egress
+
         def it_puts_the_proxy_on_both(jail, docker):
             with jail() as net:
                 assert docker.run.call_args.kwargs["networks"] == [
