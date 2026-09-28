@@ -41,12 +41,12 @@ def transcripts(tmp_path):
 
 @pytest.fixture
 def options(agent, transcripts, tmp_path):
-    input_folder = tmp_path / "input"
-    input_folder.mkdir()
+    caller_input = tmp_path / "input"
+    caller_input.mkdir()
     return {
         "agent": agent,
         "image": "a-workspace:latest",
-        "input_folder": input_folder,
+        "input": caller_input,
         "outputs": {},
         "envs": {},
         "debug": False,
@@ -176,7 +176,7 @@ def describe_volumes():
         data = tmp_path / "data"
         data.mkdir()
         (data / "a.txt").write_text("x")
-        run(input_folder=data)
+        run(input=data)
         source, mode = volumes(docker)["/input"]
         assert source != str(data.resolve())
         assert mode == "rw"
@@ -185,13 +185,13 @@ def describe_volumes():
         data = tmp_path / "data"
         (data / "nested").mkdir(parents=True)
         (data / "nested" / "a.txt").write_text("x")
-        run(input_folder=data)
+        run(input=data)
         assert mounted["/input"] == {"nested/a.txt": "x"}
 
     def it_discards_the_input_copy_after_the_run(run, docker, tmp_path):
         data = tmp_path / "data"
         data.mkdir()
-        run(input_folder=data)
+        run(input=data)
         assert not Path(volumes(docker)["/input"][0]).exists()
 
     def it_keeps_container_writes_out_of_the_callers_input_folder(run, docker, tmp_path):
@@ -204,7 +204,7 @@ def describe_volumes():
             return "output"
 
         docker.run.side_effect = write_into_the_mount
-        run(input_folder=data)
+        run(input=data)
         assert sorted(p.name for p in data.iterdir()) == []
 
     def it_mounts_each_output_writable(run, docker, tmp_path):
@@ -219,13 +219,13 @@ def describe_volumes():
 
     def it_refuses_a_source_that_is_not_there(run, tmp_path):
         with pytest.raises(SandboxError, match="does not exist"):
-            run(input_folder=tmp_path / "gone")
+            run(input=tmp_path / "gone")
 
     def it_refuses_an_input_that_is_not_a_folder(run, tmp_path):
         data = tmp_path / "file"
         data.touch()
         with pytest.raises(SandboxError, match="not a directory"):
-            run(input_folder=data)
+            run(input=data)
 
 
 def describe_lockdown():

@@ -62,7 +62,7 @@ def sandbox(tmp_path_factory):
             PROMPT.format(script=f"{PROBE_TARGET}/{SCRIPT}", report=f"{OUTPUT_TARGET}/{REPORT}"),
             agent=agent,
             image=build_agent_image(agent=agent, debug=False),
-            input_folder=probe,
+            input=probe,
             outputs={outputs: OUTPUT_TARGET},
             envs={},
             debug=False,
@@ -93,12 +93,12 @@ def options(tmp_path):
 
     def build(**overrides):
         agent = ClaudeAgent()
-        input_folder = tmp_path / "input"
-        input_folder.mkdir(exist_ok=True)
+        caller_input = tmp_path / "input"
+        caller_input.mkdir(exist_ok=True)
         return {
             "agent": agent,
             "image": build_agent_image(agent=agent, debug=False),
-            "input_folder": input_folder,
+            "input": caller_input,
             "outputs": {},
             "envs": {},
             "debug": False,

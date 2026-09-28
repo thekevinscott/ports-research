@@ -14,7 +14,7 @@ def run_agent_harness_sandbox(
     *,
     agent: Agent,
     image: str,
-    input_folder: str | Path,
+    input: str | Path,
     outputs: dict[str | Path, str | Path],
     envs: dict[str, str],
     debug: bool,
@@ -30,19 +30,19 @@ def run_agent_harness_sandbox(
     either that tag itself or a caller's own layer on top of it. Nothing is
     built here.
 
-    input_folder is copied into the container at /input, writable and thrown away
-    when the run ends: the agent can install and scratch there, and nothing it
-    writes reaches the caller's folder.
+    input is the caller's folder. It is copied into the container at /input,
+    writable and thrown away when the run ends: the agent can install and scratch
+    there, and nothing it writes reaches the caller's folder.
 
     Every option is required: a default is a value the caller never chose and the
     run record never names.
     """
     command = agent.command(prompt, effort=effort, model=model)
-    input_folder = Path(input_folder)
-    if not input_folder.exists():
-        raise AgentHarnessSandboxError(f"{input_folder} does not exist")
-    if not input_folder.is_dir():
-        raise AgentHarnessSandboxError(f"{input_folder} is not a directory")
+    caller_input = Path(input)
+    if not caller_input.exists():
+        raise AgentHarnessSandboxError(f"{caller_input} does not exist")
+    if not caller_input.is_dir():
+        raise AgentHarnessSandboxError(f"{caller_input} is not a directory")
 
     with (
         lockdown(agent.allow, debug=debug, log_path=proxy_log) as jail,
@@ -51,7 +51,7 @@ def run_agent_harness_sandbox(
     ):
         agent.stage_auth(Path(staged))
         staged_input = Path(staging) / "input"
-        copytree(input_folder, staged_input, symlinks=True)
+        copytree(caller_input, staged_input, symlinks=True)
         volumes = [(staged, agent.home, "rw")]
         for path, target, mode in [
             (transcripts, agent.transcripts, "rw"),

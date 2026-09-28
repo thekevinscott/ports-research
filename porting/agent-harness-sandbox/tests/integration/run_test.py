@@ -26,14 +26,14 @@ def proxy_log(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def options(transcripts, proxy_log, claude_home, tmp_path):
-    input_folder = tmp_path / "input"
-    input_folder.mkdir()
+    caller_input = tmp_path / "input"
+    caller_input.mkdir()
 
     def build(**overrides):
         return {
             "agent": ClaudeAgent(host_home=claude_home),
             "image": CLAUDE_IMAGE,
-            "input_folder": input_folder,
+            "input": caller_input,
             "outputs": {},
             "envs": {},
             "debug": False,
@@ -99,7 +99,7 @@ def describe_run_agent_harness_sandbox():
         in_dir = tmp_path / "in"
         in_dir.mkdir()
         (in_dir / "d.txt").write_text("x")
-        run_agent_harness_sandbox("p", **options(input_folder=in_dir))
+        run_agent_harness_sandbox("p", **options(input=in_dir))
         [call] = docker_calls
         mounted = {target: (src, mode) for src, target, mode in call["volumes"]}
         src, mode = mounted["/input"]
@@ -114,12 +114,12 @@ def describe_run_agent_harness_sandbox():
         in_dir.mkdir()
         (in_dir / "d.txt").write_text("x")
         before = {p.name: p.read_text() for p in sorted(in_dir.iterdir())}
-        run_agent_harness_sandbox("p", **options(input_folder=in_dir))
+        run_agent_harness_sandbox("p", **options(input=in_dir))
         assert {p.name: p.read_text() for p in sorted(in_dir.iterdir())} == before
 
     def it_refuses_an_input_that_is_not_there(tmp_path, docker, claude_home, options):
         with pytest.raises(AgentHarnessSandboxError, match="does not exist"):
-            run_agent_harness_sandbox("p", **options(input_folder=tmp_path / "gone"))
+            run_agent_harness_sandbox("p", **options(input=tmp_path / "gone"))
 
     def it_binds_the_transcripts_directory_the_caller_named(
         docker, claude_home, docker_calls, options, transcripts
