@@ -47,7 +47,7 @@ def run_gbnf_experiment(
         try:
             result = run_porting_harness(
                 agent=agent,
-                prompt=str(Prompt(PROMPT_PATH, target_language=target)),
+                prompt=str(Prompt(PROMPT_PATH, target_language=target, test_information='There is an integration test suite in /input/tests written in Python.')),
                 input=prepared_filesystem.reference_implementation_directory,
                 output_directory=prepared_filesystem.ported_implementation_directory,
                 debug=debug,
