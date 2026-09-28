@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thekevinbot <248217931+thekevinbot@users.noreply.github.com>
+Date: Mon, 28 Sep 2026 12:00:00 +0000
+Subject: [PATCH] Drop the builder from the javascript manifest
+
+---
+ packages/gbnf/javascript/package.json | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/packages/gbnf/javascript/package.json b/packages/gbnf/javascript/package.json
+index 7869ee5..548b0a0 100644
+--- a/packages/gbnf/javascript/package.json
++++ b/packages/gbnf/javascript/package.json
+@@ -17,10 +17,6 @@
+     ".": {
+       "import": "./dist/index.js",
+       "require": "./dist/index.umd.cjs"
+-    },
+-    "./builder": {
+-      "import": "./dist/builder/index.js",
+-      "require": "./dist/builder/index.umd.cjs"
+     }
+   },
+   "scripts": {
+@@ -71,7 +67,7 @@
+       "command": "chokidar \"./src\" -c \"pnpm build\""
+     },
+     "build:check": {
+-      "command": "path-exists ./dist/index.js && path-exists ./dist/index.umd.cjs && path-exists ./dist/index.d.ts && path-exists ./dist/builder/index.js && path-exists ./dist/builder/index.umd.cjs && path-exists ./dist/builder/index.d.ts && path-exists ./LICENSE"
++      "command": "path-exists ./dist/index.js && path-exists ./dist/index.umd.cjs && path-exists ./dist/index.d.ts && path-exists ./LICENSE"
+     },
+     "build:esm": {
+       "command": "vite build -c ./vite.config.esm.ts"
+
