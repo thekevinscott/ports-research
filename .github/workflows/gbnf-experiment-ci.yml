@@ -17,35 +17,8 @@ permissions:
   contents: read
 
 jobs:
-  unit:
-    name: Unit tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-
-      - name: Install just
-        uses: extractions/setup-just@v2
-
-      - name: Run unit tests
-        run: just test-unit
-        working-directory: porting/gbnf-experiment
-
-  integration:
-    name: Integration tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-
-      - name: Install just
-        uses: extractions/setup-just@v2
-
-      - name: Run integration tests
-        run: just test-integration
-        working-directory: porting/gbnf-experiment
+  ci:
+    uses: ./.github/workflows/package-ci.yml
+    with:
+      package: porting/gbnf-experiment
+      integration-timeout-minutes: 30

@@ -17,45 +17,9 @@ permissions:
   contents: read
 
 jobs:
-  unit:
-    name: Unit tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-
-      - name: Install just
-        uses: extractions/setup-just@v2
-
-      - name: Run unit tests
-        run: just test-unit
-        working-directory: analysis/execute-test-suite
-
-  integration:
-    name: Integration tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-
-      - name: Install just
-        uses: extractions/setup-just@v2
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 12
-
-      - name: Install node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - name: Run integration tests
-        run: just test-integration
-        working-directory: analysis/execute-test-suite
+  ci:
+    uses: ./.github/workflows/package-ci.yml
+    with:
+      package: analysis/execute-test-suite
+      node: true
+      integration-timeout-minutes: 30

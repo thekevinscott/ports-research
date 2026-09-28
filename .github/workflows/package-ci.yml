@@ -1,0 +1,74 @@
+name: Package CI
+
+# Reusable lane body. Each package's own `<package>-ci.yml` supplies the paths
+# trigger and calls this; nothing here decides which package runs.
+on:
+  workflow_call:
+    inputs:
+      package:
+        description: Path to the package, e.g. analysis/measure-ast
+        required: true
+        type: string
+      integration:
+        description: Whether the package has a tests/integration tier
+        default: true
+        type: boolean
+      node:
+        description: Whether integration shells out to node and pnpm
+        default: false
+        type: boolean
+      integration-timeout-minutes:
+        description: Timeout for the integration job
+        # GitHub's own default; a lane overrides it only to tighten it.
+        default: 360
+        type: number
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install just
+        uses: extractions/setup-just@v2
+
+      - name: Run unit tests
+        run: just test-unit
+        working-directory: ${{ inputs.package }}
+
+  integration:
+    name: Integration tests
+    if: inputs.integration
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.integration-timeout-minutes }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install just
+        uses: extractions/setup-just@v2
+
+      - name: Install pnpm
+        if: inputs.node
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
+      - name: Install node
+        if: inputs.node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Run integration tests
+        run: just test-integration
+        working-directory: ${{ inputs.package }}
