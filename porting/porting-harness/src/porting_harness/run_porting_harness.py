@@ -25,7 +25,7 @@ def run_porting_harness(
 ) -> str:
     """Run prompt against input in the sandbox, collecting the port in output_directory.
 
-    input is one folder, mounted read-only at /input. prompt is the caller's
+    input is one folder; the sandbox mounts a throwaway writable copy at /input. prompt is the caller's
     upstream prompt: the caller laid the folder out and is the only one who can
     say what is the source, what is a suite, what to port to. It is appended to
     the harness's own system prompt, which frames the task and names the two
