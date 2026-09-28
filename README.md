@@ -5,8 +5,8 @@ An experiment on LLM-driven porting of a codebase between languages.
 The subject is [gbnf](https://github.com/thekevinscott/gbnf), which has
 hand-written TypeScript and Python implementations sharing one test suite. An
 agent in a sandbox gets one implementation as the reference, with or without
-each language's test suite mounted, and is asked to port it to the other
-language.
+its unit tests and either language's integration suite, and is asked to port it
+to the other language.
 
 ## Layout
 
@@ -26,16 +26,16 @@ Three packages, each configuring the one above it.
   agent's CLI (`ClaudeAgent`, `claude -p`; `PiAgent` exists but is not wired
   up) in whatever image it is handed, inside a container behind an egress
   proxy.
-- `porting/porting-harness` — configures agent-harness-sandbox, provides a
-  prompt (`src/porting_harness/prompt.txt`) and a layout. Reference, tests and
+- `porting/porting-harness` — configures agent-harness-sandbox. Input and
   output are synced locally: direct bind mounts, not copies. Library only:
-  `run_porting_harness` expects `source/` and `tests/` under the reference
-  directory, mounts each read-only, and binds the output directory writable.
+  `run_porting_harness` takes one reference folder, mounts it read-only at
+  `/input`, binds the output directory writable, and passes the caller's
+  prompt verbatim. It owns no prompt: whoever laid the folder out describes it.
 - `porting/gbnf-experiment` — configures porting-harness specifically for
   gbnf. Runs necessary pre-work such as generating the test suite (the
-  gbnf-prepare image in `docker/gbnf-prepare`, cached under
-  `~/.cache/ports/gbnf-experiment/prepared/`). Otherwise minimal. CLI
-  `run-gbnf-experiment`; each invocation writes one run directory under `data/`.
+  gbnf-prepare image in `docker/gbnf-prepare`, one image per condition, cached
+  as docker layers). Owns the prompt. CLI `run-gbnf-experiment`; each
+  invocation writes one run directory under `data/`.
 
 ## Reference provenance
 

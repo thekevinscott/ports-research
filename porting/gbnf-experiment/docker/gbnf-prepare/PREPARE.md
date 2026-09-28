@@ -103,10 +103,12 @@ files:
 - `src/builder/` is a grammar-authoring DSL with no counterpart to port.
 
 `assemble_whitelist_test.py` checks which rule files are composed, in what
-order, for all sixteen conditions. `tests/integration/prepare_image_test.py`
-builds this image for each of the sixteen conditions and asserts
-`find /shared` equals `tests/integration/fixtures/shared/<condition>.txt`.
-Those sixteen listings are what `/shared` holds per condition; the clone,
-the patch, the generated suites, the rule files and the build-arg transport
-are all under that one assertion. One clone and install; each further build
-reruns only the copy layer.
+order, for all sixteen conditions. The layout itself is asserted through the
+entry point: `tests/integration/run_test.py` runs the experiment for each of
+the sixteen conditions with the agent container faked and this image real, and
+compares the `/input` tree the container was handed to
+`tests/integration/fixtures/shared/<condition>.txt`. Those sixteen listings are
+what `/shared` holds per condition; the clone, the patch, the generated suites,
+the rule files, the build-arg transport and the host's copy-out and mount are
+all under that one assertion. One clone and install; each further build reruns
+only the copy layer.

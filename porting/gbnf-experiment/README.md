@@ -4,16 +4,29 @@ Configures porting-harness for one library: [gbnf](https://github.com/thekevinsc
 which has TypeScript and Python implementations sharing one test suite.
 
 CLI `run-gbnf-experiment`. Each invocation is one experimental condition: a
-source language, and whether each language's test suite is mounted alongside
-the reference. It
+source language (`--source-language typescript|python`) and three independent
+suite flags, `--include-unit-tests`, `--include-source-integration-tests` and
+`--include-target-integration-tests`. Sixteen conditions. It
 
 - builds the prepare image in `docker/` for that condition, which clones gbnf at
-  the pinned commit, applies `patches/`, generates the flagged test suites and
-  assembles `/reference`;
-- copies `/reference` out of the image into a temporary directory;
-- hands that directory to porting-harness;
+  the pinned commit, applies `patches/`, generates both test suites and
+  assembles `/shared`: the `packages/gbnf` tree in upstream layout,
+  `javascript/` and `python/`, filtered to the whitelist the condition composes;
+- copies `/shared` out of the image into a temporary directory;
+- hands that one directory to porting-harness, which mounts it read-only at
+  `/input`;
 - writes one run directory under `data/` holding the manifest, the result,
   the transcript and the proxy log.
+
+The prompt is this package's, in `src/gbnf_experiment/prompt.txt`. porting-harness
+takes it verbatim and adds no words: the folder's layout is decided here, so the
+description of it belongs here too. `render_prompt` fills in the two languages
+and the two directory names, and the manifest banks the rendered text.
+
+The experiment says typescript; upstream's directory is `javascript`. The CLI,
+the condition name and the manifest keep the experiment's vocabulary, and the
+mapping happens once, at the boundary where the image and the prompt are asked
+for.
 
 Everything gbnf-specific lives here: the pin, the patches, the test generation,
 the file filter. All four are inside the image, so there is one place the corpus
