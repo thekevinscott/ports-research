@@ -45,9 +45,8 @@ We use [thekevinscott/gbnf](https://github.com/thekevinscott/gbnf) at the SHA in
 
 ## 2. Patch
 
-One patch, which drops two re-exports from the javascript index so the
-filtered source typechecks. The python integration tests are generated as the
-pin generates them, unpatched.
+The python integration tests are generated as the pin generates them,
+unpatched.
 
 Kevin, 2026-09-26: "we apply patches because we don't want to modify the source
 repo." What each one does, and the rule for adding one, is in
