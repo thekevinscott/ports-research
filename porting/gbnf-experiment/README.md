@@ -1,10 +1,10 @@
 # gbnf-experiment
 
 Configures porting-harness for one library: [gbnf](https://github.com/thekevinscott/gbnf),
-which has TypeScript and Python implementations sharing one test suite.
+which has javascript and python implementations sharing one test suite.
 
 CLI `run-gbnf-experiment`. Each invocation is one experimental condition: a
-source language (`--source-language typescript|python`) and three independent
+source language (`--source-language javascript|python`) and three independent
 suite flags, `--include-unit-tests`, `--include-source-integration-tests` and
 `--include-target-integration-tests`. Sixteen conditions. It
 
@@ -20,13 +20,9 @@ suite flags, `--include-unit-tests`, `--include-source-integration-tests` and
 
 The prompt is this package's, in `src/gbnf_experiment/prompt.txt`. porting-harness
 takes it verbatim and adds no words: the folder's layout is decided here, so the
-description of it belongs here too. `render_prompt` fills in the two languages
-and the two directory names, and the manifest banks the rendered text.
-
-The experiment says typescript; upstream's directory is `javascript`. The CLI,
-the condition name and the manifest keep the experiment's vocabulary, and the
-mapping happens once, at the boundary where the image and the prompt are asked
-for.
+description of it belongs here too. `render_prompt` fills in the two language
+names, which are also the two directory names, and the manifest banks the
+rendered text.
 
 Everything gbnf-specific lives here: the pin, the patches, the test generation,
 the file filter. All four are inside the image, so there is one place the corpus

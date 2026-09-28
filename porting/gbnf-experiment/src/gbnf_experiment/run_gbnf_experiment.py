@@ -4,9 +4,9 @@ from agent_harness_sandbox.agents.agent import Agent
 from porting_harness.run_porting_harness import run_porting_harness
 from .condition_name import condition_name
 from .prepare_filesystem import PreparedFilesystem
-from .render_prompt import LANGUAGE_DIRECTORIES, render_prompt
+from .render_prompt import render_prompt
 
-TARGET_LANGUAGES = {"typescript": "python", "python": "typescript"}
+TARGET_LANGUAGES = {"javascript": "python", "python": "javascript"}
 
 
 def run_gbnf_experiment(
@@ -20,7 +20,7 @@ def run_gbnf_experiment(
     **kwargs,
 ) -> Path:
     with PreparedFilesystem(
-        source_language=LANGUAGE_DIRECTORIES[source_language],
+        source_language=source_language,
         include_unit_tests=include_unit_tests,
         include_source_integration_tests=include_source_integration_tests,
         include_target_integration_tests=include_target_integration_tests,

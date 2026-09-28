@@ -3,7 +3,7 @@ import pytest
 from gbnf_experiment.condition_name import condition_name
 
 CONFIG = {
-    "source_language": "typescript",
+    "source_language": "javascript",
     "include_unit_tests": False,
     "include_source_integration_tests": False,
     "include_target_integration_tests": False,
@@ -51,7 +51,7 @@ def describe_condition_name():
                 "include_source_integration_tests": source_integration,
                 "include_target_integration_tests": target_integration,
             }
-        ) == f"source-typescript_{suites}effort-high_model-claude-opus-5"
+        ) == f"source-javascript_{suites}effort-high_model-claude-opus-5"
 
     def it_distinguishes_the_source_language():
         assert condition_name(**{**CONFIG, "source_language": "python"}) == (
@@ -60,10 +60,10 @@ def describe_condition_name():
 
     def it_labels_the_effort_arm():
         assert condition_name(**{**CONFIG, "effort": "low"}) == (
-            "source-typescript_effort-low_model-claude-opus-5"
+            "source-javascript_effort-low_model-claude-opus-5"
         )
 
     def it_labels_the_model_arm():
         assert condition_name(**{**CONFIG, "model": "claude-sonnet-4-5"}) == (
-            "source-typescript_effort-high_model-claude-sonnet-4-5"
+            "source-javascript_effort-high_model-claude-sonnet-4-5"
         )

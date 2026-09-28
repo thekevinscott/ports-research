@@ -9,7 +9,7 @@ DEFAULT_MODEL = "claude-opus-5"
 @click.command()
 @click.option(
     "--source-language",
-    type=click.Choice(["typescript", "python"]),
+    type=click.Choice(["javascript", "python"]),
     required=True,
 )
 @click.option("--include-unit-tests", is_flag=True, default=False)

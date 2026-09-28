@@ -89,7 +89,7 @@ AGENT = Mock(name="agent")
 
 CONFIG = {
     "agent": AGENT,
-    "source_language": "typescript",
+    "source_language": "javascript",
     "include_unit_tests": False,
     "include_source_integration_tests": False,
     "include_target_integration_tests": False,
@@ -132,7 +132,7 @@ def describe_the_signature():
 
     def it_takes_no_positional_argument():
         with pytest.raises(TypeError, match="positional"):
-            run_gbnf_experiment("typescript", **CONFIG)
+            run_gbnf_experiment("javascript", **CONFIG)
 
 
 def describe_run():
@@ -155,8 +155,7 @@ def describe_run():
         prepare_reference_implementation,
         run_porting_harness,
     ):
-        """typescript is the experiment's word for it; upstream calls it javascript."""
-        experiment(source_language="typescript")
+        experiment(source_language="javascript")
         assert prepare_reference_implementation.call_args.kwargs["source_language"] == (
             "javascript"
         )
@@ -232,18 +231,18 @@ def describe_run():
         assert run_porting_harness.call_args.kwargs["prompt"] == PROMPT
         assert render_prompt.call_args.kwargs == {
             "source_language": "python",
-            "target_language": "typescript",
+            "target_language": "javascript",
         }
 
-    def it_targets_python_when_porting_from_typescript(
+    def it_targets_python_when_porting_from_javascript(
         experiment,
         prepare_reference_implementation,
         render_prompt,
         run_porting_harness,
     ):
-        experiment(source_language="typescript")
+        experiment(source_language="javascript")
         assert render_prompt.call_args.kwargs == {
-            "source_language": "typescript",
+            "source_language": "javascript",
             "target_language": "python",
         }
 
@@ -361,7 +360,7 @@ def describe_the_manifest():
                 "_model-claude-sonnet-4-5"
             ),
             "source_language": "python",
-            "target_language": "typescript",
+            "target_language": "javascript",
             "include_unit_tests": False,
             "include_source_integration_tests": False,
             "include_target_integration_tests": True,
@@ -375,7 +374,7 @@ def describe_the_manifest():
         run_porting_harness,
         write_manifest,
     ):
-        experiment(source_language="typescript")
+        experiment(source_language="javascript")
         assert write_manifest.call_args.kwargs["prompt"] == PROMPT
 
     def it_records_the_pinned_commit(

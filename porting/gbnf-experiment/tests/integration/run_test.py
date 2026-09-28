@@ -24,15 +24,12 @@ from gbnf_experiment.config import settings
 from gbnf_experiment.render_prompt import render_prompt
 
 FIXTURES = Path(__file__).parent / "fixtures" / "shared"
-# Spelled out rather than imported: a typo in the package's own map has to move
-# the expected fixture name, or the two sides drift together and prove nothing.
-FIXTURE_DIRECTORIES = {"typescript": "javascript", "python": "python"}
 CONDITIONS = list(
-    product(("typescript", "python"), (False, True), (False, True), (False, True))
+    product(("javascript", "python"), (False, True), (False, True), (False, True))
 )
 
 CONFIG = {
-    "source_language": "typescript",
+    "source_language": "javascript",
     "include_unit_tests": False,
     "include_source_integration_tests": False,
     "include_target_integration_tests": False,
@@ -43,9 +40,9 @@ CONFIG = {
 
 
 def fixture_name(source_language, unit, source_integration, target_integration) -> str:
-    """The condition as the fixtures name it: image vocabulary, not the CLI's."""
+    """The condition as the fixtures name it."""
     return (
-        f"{FIXTURE_DIRECTORIES[source_language]}_unit-{unit}"
+        f"{source_language}_unit-{unit}"
         f"_source-integration-{source_integration}"
         f"_target-integration-{target_integration}"
     ).lower()
@@ -126,17 +123,17 @@ def describe_gbnf_experiment():
 
     def describe_the_port():
         def it_sends_the_prompt_this_package_renders(experiment, porting_calls):
-            experiment(source_language="typescript")
+            experiment(source_language="javascript")
             [call] = porting_calls
             assert call["prompt"] == render_prompt(
-                source_language="typescript", target_language="python"
+                source_language="javascript", target_language="python"
             )
 
         def it_renders_the_reverse_direction(experiment, porting_calls):
             experiment(source_language="python")
             [call] = porting_calls
             assert call["prompt"] == render_prompt(
-                source_language="python", target_language="typescript"
+                source_language="python", target_language="javascript"
             )
 
         def it_collects_the_port_into_the_run_directory(experiment, data_directory):
@@ -166,7 +163,7 @@ def describe_the_run_directory():
         assert experiment() != experiment()
 
     def it_gives_two_conditions_two_directories(experiment, data_directory):
-        experiment(source_language="typescript")
+        experiment(source_language="javascript")
         experiment(source_language="python")
         assert len(list(data_directory.iterdir())) == 2
 
@@ -232,7 +229,7 @@ def describe_the_manifest():
         assert manifest()["condition"] == {
             "name": "source-python_unit-tests_effort-low_model-claude-sonnet-4-5",
             "source_language": "python",
-            "target_language": "typescript",
+            "target_language": "javascript",
             "include_unit_tests": True,
             "include_source_integration_tests": False,
             "include_target_integration_tests": False,
@@ -373,6 +370,6 @@ def describe_the_container_view():
 
 def describe_cli():
     def it_prints_where_the_run_landed(data_directory, porting_docker):
-        result = CliRunner().invoke(cli, ["--source-language", "typescript"])
+        result = CliRunner().invoke(cli, ["--source-language", "javascript"])
         [run_directory] = data_directory.iterdir()
         assert f"Run directory: {run_directory}" in result.output

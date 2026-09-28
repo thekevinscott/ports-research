@@ -14,14 +14,14 @@ AGENT = Mock(name="agent")
 AGENT.image = "agent-harness-sandbox-claude:latest"
 
 CONDITION = {
-    "source_language": "typescript",
+    "source_language": "javascript",
     "include_unit_tests": False,
     "include_source_integration_tests": False,
     "include_target_integration_tests": False,
     "effort": "high",
     "model": "claude-opus-5",
 }
-PROMPT = "Port the typescript implementation under /input/javascript"
+PROMPT = "Port the javascript implementation under /input/javascript"
 
 
 @pytest.fixture

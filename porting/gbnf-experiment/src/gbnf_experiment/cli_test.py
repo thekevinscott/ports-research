@@ -8,7 +8,7 @@ from gbnf_experiment.cli import cli
 
 
 RUN_DIRECTORY = Path("/pkg/data/20260906T142530Z_9f2b1c04")
-SOURCE_LANGUAGE = ["--source-language", "typescript"]
+SOURCE_LANGUAGE = ["--source-language", "javascript"]
 
 
 @pytest.fixture
@@ -42,7 +42,7 @@ def describe_cli():
         CliRunner().invoke(cli, SOURCE_LANGUAGE)
         gbnf_experiment.assert_called_once_with(
             agent=claude_agent.return_value,
-            source_language="typescript",
+            source_language="javascript",
             include_unit_tests=False,
             include_source_integration_tests=False,
             include_target_integration_tests=False,

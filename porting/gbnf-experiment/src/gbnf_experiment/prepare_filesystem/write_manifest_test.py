@@ -12,8 +12,8 @@ IMAGE_ID = "sha256:" + "b" * 64
 HEAD = "c" * 40
 
 CONDITION = {
-    "name": "source-typescript_unit-tests_effort-high_model-claude-opus-5",
-    "source_language": "typescript",
+    "name": "source-javascript_unit-tests_effort-high_model-claude-opus-5",
+    "source_language": "javascript",
     "target_language": "python",
     "include_unit_tests": True,
     "include_source_integration_tests": False,
@@ -21,7 +21,7 @@ CONDITION = {
     "effort": "high",
     "model": "claude-opus-5",
 }
-PROMPT = "Port the typescript implementation under /input/javascript to python"
+PROMPT = "Port the javascript implementation under /input/javascript to python"
 INCLUDED = ["javascript/package.json", "javascript/src/gbnf.ts"]
 CALL = {
     "timestamp": datetime(2026, 9, 6, 14, 25, 30, tzinfo=UTC),
