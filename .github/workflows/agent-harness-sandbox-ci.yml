@@ -1,0 +1,21 @@
+name: agent-harness-sandbox CI
+
+# This file is deliberately not a trigger: see AGENTS.md "CI workflows".
+on:
+  pull_request:
+    paths:
+      - 'porting/agent-harness-sandbox/**'
+      - '!porting/agent-harness-sandbox/README.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/package-ci.yml
+    with:
+      package: porting/agent-harness-sandbox

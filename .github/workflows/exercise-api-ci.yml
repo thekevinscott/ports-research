@@ -1,0 +1,21 @@
+name: exercise-api CI
+
+# This file is deliberately not a trigger: see AGENTS.md "CI workflows".
+on:
+  pull_request:
+    paths:
+      - 'analysis/exercise-api/**'
+      - '!analysis/exercise-api/README.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/package-ci.yml
+    with:
+      package: analysis/exercise-api

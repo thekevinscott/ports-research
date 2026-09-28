@@ -1,0 +1,21 @@
+name: measure-embedding CI
+
+# This file is deliberately not a trigger: see AGENTS.md "CI workflows".
+on:
+  pull_request:
+    paths:
+      - 'analysis/measure-embedding/**'
+      - '!analysis/measure-embedding/README.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/package-ci.yml
+    with:
+      package: analysis/measure-embedding

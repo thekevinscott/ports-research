@@ -1,0 +1,21 @@
+name: measure-complexity-curve CI
+
+# This file is deliberately not a trigger: see AGENTS.md "CI workflows".
+on:
+  pull_request:
+    paths:
+      - 'analysis/measure-complexity-curve/**'
+      - '!analysis/measure-complexity-curve/README.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/package-ci.yml
+    with:
+      package: analysis/measure-complexity-curve

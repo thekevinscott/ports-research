@@ -1,0 +1,24 @@
+name: gbnf-experiment CI
+
+# This file is deliberately not a trigger: see AGENTS.md "CI workflows".
+# Integration holds the daemon back but still walks the full prepare/port/grade
+# path, so it is the slowest lane here.
+on:
+  pull_request:
+    paths:
+      - 'porting/gbnf-experiment/**'
+      - '!porting/gbnf-experiment/README.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/package-ci.yml
+    with:
+      package: porting/gbnf-experiment
+      integration-timeout-minutes: 30

@@ -1,0 +1,25 @@
+name: execute-test-suite CI
+
+# This file is deliberately not a trigger: see AGENTS.md "CI workflows".
+# The typescript half of integration shells out to `pnpm dlx vitest`, so this
+# lane needs node and pnpm on top of uv.
+on:
+  pull_request:
+    paths:
+      - 'analysis/execute-test-suite/**'
+      - '!analysis/execute-test-suite/README.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/package-ci.yml
+    with:
+      package: analysis/execute-test-suite
+      node: true
+      integration-timeout-minutes: 30

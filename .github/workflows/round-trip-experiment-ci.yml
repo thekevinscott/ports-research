@@ -1,0 +1,21 @@
+name: round-trip-experiment CI
+
+# This file is deliberately not a trigger: see AGENTS.md "CI workflows".
+on:
+  pull_request:
+    paths:
+      - 'analysis/round-trip-experiment/**'
+      - '!analysis/round-trip-experiment/README.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/package-ci.yml
+    with:
+      package: analysis/round-trip-experiment
