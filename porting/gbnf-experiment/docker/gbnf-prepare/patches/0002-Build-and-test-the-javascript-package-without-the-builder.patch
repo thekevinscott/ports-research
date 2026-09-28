@@ -1,0 +1,57 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thekevinbot <248217931+thekevinbot@users.noreply.github.com>
+Date: Mon, 28 Sep 2026 06:53:47 -0400
+Subject: [PATCH] Build and test the javascript package without the builder
+
+---
+ packages/gbnf/javascript/package.json       | 3 +--
+ packages/gbnf/javascript/vite.config.esm.ts | 2 --
+ packages/gbnf/javascript/vite.config.umd.ts | 1 -
+ 3 files changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/packages/gbnf/javascript/package.json b/packages/gbnf/javascript/package.json
+index 7869ee5..8f4f0ec 100644
+--- a/packages/gbnf/javascript/package.json
++++ b/packages/gbnf/javascript/package.json
+@@ -57,8 +57,7 @@
+     "test:integration": {
+       "command": "vitest --config ./vitest.config.integration.ts run",
+       "dependencies": [
+-        "build",
+-        "test:integration:write"
++        "build"
+       ]
+     },
+     "test:unit:watch": {
+diff --git a/packages/gbnf/javascript/vite.config.esm.ts b/packages/gbnf/javascript/vite.config.esm.ts
+index 6bbf4c9..1b6b7ce 100755
+--- a/packages/gbnf/javascript/vite.config.esm.ts
++++ b/packages/gbnf/javascript/vite.config.esm.ts
+@@ -15,7 +15,6 @@ export default mergeConfig(config, {
+     rollupOptions: {
+       input: {
+         index: 'src/index.ts',
+-        'builder/index': 'src/builder/index.ts',
+       },
+     },
+     sourcemap: true,
+@@ -40,7 +39,6 @@ export default mergeConfig(config, {
+ //     rollupOptions: {
+ //       input: {
+ //         index: 'src/index.ts',
+-//         // 'builder/index': 'src/builder/index.ts',
+ //       },
+ //     },
+ //     sourcemap: true,
+diff --git a/packages/gbnf/javascript/vite.config.umd.ts b/packages/gbnf/javascript/vite.config.umd.ts
+index e4a6e83..1dae996 100755
+--- a/packages/gbnf/javascript/vite.config.umd.ts
++++ b/packages/gbnf/javascript/vite.config.umd.ts
+@@ -14,7 +14,6 @@ export default mergeConfig(config, {
+     rollupOptions: {
+       input: {
+         index: 'src/umd.ts',
+-        'builder/index': 'src/builder/index.ts',
+       },
+     },
+     sourcemap: true,
