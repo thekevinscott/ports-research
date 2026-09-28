@@ -16,7 +16,7 @@
 - /javascript/src/builder/
 
 # pnpm install ran in this tree; its symlink farm is not corpus.
-- /javascript/node_modules/
+- /javascript/**/node_modules/
 
 + /javascript/.eslintrc.cjs
 + /javascript/.gitignore
