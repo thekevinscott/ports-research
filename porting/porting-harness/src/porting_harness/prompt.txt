@@ -1,7 +1,9 @@
 You are porting software from one language to another. 
 
-The reference is mounted at /input.
+The reference is mounted at `/input`.
 
-Write the port to /workspace/ported_implementation.
+Write the port to `/target`.
+
+The library itself may specify additional porting instructions below:
 
 {upstream}
