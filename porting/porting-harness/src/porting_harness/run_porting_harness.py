@@ -7,6 +7,7 @@ from agent_harness_sandbox.run_agent_harness_sandbox import run_agent_harness_sa
 from .render_prompt import render_prompt
 
 DOCKER_HOMEBASE = Path("/workspace")
+TARGET = Path("/target")
 PROMPT_PATH = Path(__file__).parent / "prompt.txt"
 
 
@@ -28,7 +29,8 @@ def run_porting_harness(
     upstream prompt: the caller laid the folder out and is the only one who can
     say what is the source, what is a suite, what to port to. It is appended to
     the harness's own system prompt, which frames the task and names the two
-    paths. output_directory is bound writable and is the port, as the agent
+    container paths: the reference at /input, the port at /target.
+    output_directory is bound writable at /target and is the port, as the agent
     leaves it. transcripts is a host directory the CLI writes the session jsonl
     into and proxy_log a host file the sidecar's log is drained to at teardown.
 
@@ -40,8 +42,8 @@ def run_porting_harness(
         render_prompt(PROMPT_PATH, prompt),
         agent=agent,
         image=build_agent_image(agent=agent, debug=debug),
-        input_folder=input,
-        outputs={output_directory: DOCKER_HOMEBASE / "ported_implementation"},
+        input=input,
+        outputs={output_directory: TARGET},
         envs={},
         debug=debug,
         home=DOCKER_HOMEBASE,

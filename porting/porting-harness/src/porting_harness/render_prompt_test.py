@@ -2,7 +2,7 @@ import pytest
 
 from porting_harness.render_prompt import render_prompt
 
-TEMPLATE = "Write the port to /workspace/ported_implementation.\n\n{upstream}\n"
+TEMPLATE = "Write the port to /target.\n\n{upstream}\n"
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def prompt_path(tmp_path):
 def describe_render_prompt():
     def it_puts_the_upstream_prompt_in_the_slot(prompt_path):
         assert render_prompt(prompt_path, "Port /input/source to rust.") == (
-            "Write the port to /workspace/ported_implementation.\n\n"
+            "Write the port to /target.\n\n"
             "Port /input/source to rust.\n"
         )
 
@@ -31,5 +31,5 @@ def describe_render_prompt():
     def describe_when_there_is_no_upstream_prompt():
         def it_renders_the_system_prompt_alone(prompt_path):
             assert render_prompt(prompt_path, "") == (
-                "Write the port to /workspace/ported_implementation.\n\n\n"
+                "Write the port to /target.\n\n\n"
             )

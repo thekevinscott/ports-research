@@ -122,8 +122,8 @@ def describe_run_porting_harness():
         assert run_agent_harness_sandbox.call_args.kwargs == {
             "agent": agent,
             "image": "an-agent:latest",
-            "input_folder": input_directory,
-            "outputs": {output_directory: Path("/workspace/ported_implementation")},
+            "input": input_directory,
+            "outputs": {output_directory: Path("/target")},
             "envs": {},
             "debug": False,
             "home": Path("/workspace"),
@@ -139,7 +139,7 @@ def describe_run_porting_harness():
         """One mount. What is inside it, and what it means, is the caller's prompt."""
         run_porting_harness(**options())
 
-        assert run_agent_harness_sandbox.call_args.kwargs["input_folder"] == input_directory
+        assert run_agent_harness_sandbox.call_args.kwargs["input"] == input_directory
 
     def it_runs_the_image_it_built_for_the_agent(
         run_agent_harness_sandbox, build_agent_image, options, agent
