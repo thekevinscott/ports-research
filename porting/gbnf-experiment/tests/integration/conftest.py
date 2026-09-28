@@ -173,7 +173,7 @@ def porting_docker(porting_calls, claude_home, lockdown_docker, agent_image_dock
         m.image.exists.return_value = True
 
         def fake_run(tag, cmd, envs=None, volumes=None, **_):
-            output = volume_source(volumes, "/workspace/ported_implementation")
+            output = volume_source(volumes, "/target")
             credentials = volume_source(volumes, CLAUDE_CONFIG_TARGET)
             porting_calls.append(
                 {
@@ -185,7 +185,7 @@ def porting_docker(porting_calls, claude_home, lockdown_docker, agent_image_dock
                     "container_tree": sorted(
                         f"{target}/{path.relative_to(source)}"
                         for source, target, _ in volumes
-                        if str(target).startswith("/workspace")
+                        if str(target) in ("/input", "/target")
                         for path in Path(source).rglob("*")
                         if path.is_file()
                     ),

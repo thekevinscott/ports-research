@@ -10,30 +10,42 @@ from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
 from gbnf_experiment import run_gbnf_experiment
 from gbnf_experiment.cli import cli
 from gbnf_experiment.config import prepare_cache_key, settings
+from porting_harness.prompt import Prompt
 from porting_harness.run_porting_harness import PROMPT_PATH
 
 from conftest import GRAMMAR_FIXTURES
 
+# Spelled out rather than imported: a reworded prompt has to move the expected
+# text here too, or the two sides drift together and prove nothing.
+UPSTREAM_PROMPT = "Port the implementation under /input/source to {target_language}.\n"
+UPSTREAM_PROMPT_WITH_PYTHON_SUITE = (
+    "Port the implementation under /input/source to {target_language}.\n"
+    "\n"
+    "The following test suites are mounted alongside the source:\n"
+    "\n"
+    "- /input/tests/python, written in python.\n"
+)
+
 JAVASCRIPT_REFERENCE = [
-    "/workspace/reference_implementation/javascript/package.json",
-    "/workspace/reference_implementation/javascript/src/index.ts",
+    "/input/source/javascript/package.json",
+    "/input/source/javascript/src/index.ts",
 ]
 PYTHON_REFERENCE = [
-    "/workspace/reference_implementation/python/gbnf/index.py",
-    "/workspace/reference_implementation/python/pyproject.toml",
+    "/input/source/python/gbnf/index.py",
+    "/input/source/python/pyproject.toml",
 ]
 JAVASCRIPT_SUITE = [
-    "/workspace/tests/javascript/iteration/grammars_test.javascript",
-    "/workspace/tests/javascript/validation/validate_test.javascript",
+    "/input/tests/javascript/iteration/grammars_test.javascript",
+    "/input/tests/javascript/validation/validate_test.javascript",
 ]
 PYTHON_SUITE = [
     *(
-        f"/workspace/tests/python/iteration/grammars/{name}.{suffix}"
+        f"/input/tests/python/iteration/grammars/{name}.{suffix}"
         for name in GRAMMAR_FIXTURES
         for suffix in ("gbnf", "json")
     ),
-    "/workspace/tests/python/iteration/grammars_test.python",
-    "/workspace/tests/python/validation/validate_test.python",
+    "/input/tests/python/iteration/grammars_test.python",
+    "/input/tests/python/validation/validate_test.python",
 ]
 
 
@@ -99,12 +111,12 @@ def describe_gbnf_experiment():
                     "javascript",
                     True,
                     True,
-                    [*JAVASCRIPT_REFERENCE, *PYTHON_SUITE, *JAVASCRIPT_SUITE],
+                    [*JAVASCRIPT_REFERENCE, *JAVASCRIPT_SUITE, *PYTHON_SUITE],
                 ),
                 ("python", False, False, PYTHON_REFERENCE),
                 ("python", True, False, [*PYTHON_REFERENCE, *JAVASCRIPT_SUITE]),
                 ("python", False, True, [*PYTHON_REFERENCE, *PYTHON_SUITE]),
-                ("python", True, True, [*PYTHON_REFERENCE, *PYTHON_SUITE, *JAVASCRIPT_SUITE]),
+                ("python", True, True, [*PYTHON_REFERENCE, *JAVASCRIPT_SUITE, *PYTHON_SUITE]),
             ],
             ids=[
                 "javascript-none",
@@ -129,12 +141,14 @@ def describe_gbnf_experiment():
             [call] = porting_calls
             assert call["container_tree"] == expected
 
-        def it_mounts_no_tests_directory_when_neither_suite_is_asked_for(
+        def it_carries_no_tests_directory_when_neither_suite_is_asked_for(
             experiment, porting_calls
         ):
             experiment()
             [call] = porting_calls
-            assert "/workspace/tests" not in [str(target) for _, target, _ in call["volumes"]]
+            assert not any(
+                path.startswith("/input/tests") for path in call["container_tree"]
+            )
 
         def it_stages_the_assembly_outside_the_run_record(experiment, data_directory):
             """The corpus is rebuildable from the cache, so no run banks a copy."""
@@ -155,20 +169,31 @@ def describe_gbnf_experiment():
             )
 
     def describe_the_port():
-        def it_sends_the_prompt_rendered_for_the_target_language(
+        def it_sends_its_own_prompt_inside_the_harness_frame(
             experiment, porting_calls
         ):
             experiment(source_language="javascript")
             [call] = porting_calls
-            assert call["prompt"] == PROMPT_PATH.read_text().format(
-                target_language="python"
+            assert call["prompt"] == str(
+                Prompt(PROMPT_PATH, upstream=UPSTREAM_PROMPT.format(target_language="python"))
             )
 
         def it_renders_the_reverse_direction(experiment, porting_calls):
             experiment(source_language="python")
             [call] = porting_calls
-            assert "javascript" in call["prompt"]
-            assert "{target_language}" not in call["prompt"]
+            assert call["prompt"] == str(
+                Prompt(PROMPT_PATH, upstream=UPSTREAM_PROMPT.format(target_language="javascript"))
+            )
+
+        def it_names_the_suites_the_condition_mounted(experiment, porting_calls):
+            experiment(source_language="javascript", include_python_tests=True)
+            [call] = porting_calls
+            assert call["prompt"] == str(
+                Prompt(
+                    PROMPT_PATH,
+                    upstream=UPSTREAM_PROMPT_WITH_PYTHON_SUITE.format(target_language="python"),
+                )
+            )
 
         def it_collects_the_port_into_the_run_directory(experiment, data_directory):
             experiment()
@@ -226,10 +251,7 @@ def describe_the_clean_slate():
     ):
         experiment()
         [call] = porting_calls
-        assert not any(
-            path.startswith("/workspace/ported_implementation")
-            for path in call["container_tree"]
-        )
+        assert not any(path.startswith("/target") for path in call["container_tree"])
 
     def it_hides_one_run_s_output_from_the_next(
         experiment, porting_calls, data_directory
@@ -239,10 +261,7 @@ def describe_the_clean_slate():
         ports = list(data_directory.glob("*/ported_implementation/ported.py"))
         assert len(ports) == 2
         _, second = porting_calls
-        assert not any(
-            path.startswith("/workspace/ported_implementation")
-            for path in second["container_tree"]
-        )
+        assert not any(path.startswith("/target") for path in second["container_tree"])
 
 
 def describe_the_manifest():
@@ -284,10 +303,7 @@ def describe_the_manifest():
             not in manifest()["reference_implementation"]["included"]
         )
         [call] = porting_calls
-        assert (
-            "/workspace/reference_implementation/javascript/src/index.test.ts"
-            not in call["container_tree"]
-        )
+        assert "/input/source/javascript/src/index.test.ts" not in call["container_tree"]
 
     def it_records_the_included_paths_from_the_prepared_root(experiment, manifest):
         """One list, one root: source and suite paths side by side."""
@@ -376,15 +392,13 @@ def describe_a_run_that_dies():
 def staged_reference(call):
     """Where assembly put the corpus, read back off the mount the container got.
 
-    Assembly writes source/ and tests/ under one root; the harness binds those
-    at /workspace/reference_implementation and /workspace/tests.
+    Assembly writes source/ and tests/ under one root, and that root is the
+    folder the harness binds at /input.
     """
     [source] = [
-        Path(source)
-        for source, target, _ in call["volumes"]
-        if str(target) == "/workspace/reference_implementation"
+        Path(source) for source, target, _ in call["volumes"] if str(target) == "/input"
     ]
-    return source.parent
+    return source
 
 
 def describe_the_staged_reference_corpus():
@@ -395,15 +409,14 @@ def describe_the_staged_reference_corpus():
         [call] = porting_calls
         assert prepared_directory not in staged_reference(call).parents
 
-    def it_binds_the_source_and_test_trees_from_one_staging_root(
+    def it_carries_the_source_and_test_trees_under_one_input_root(
         experiment, porting_calls
     ):
         experiment(include_python_tests=True)
         [call] = porting_calls
-        staged = staged_reference(call)
-        sources = [Path(source) for source, _, _ in call["volumes"]]
-        assert staged / "source" in sources
-        assert staged / "tests" in sources
+        tree = call["container_tree"]
+        assert any(path.startswith("/input/source/") for path in tree)
+        assert any(path.startswith("/input/tests/") for path in tree)
 
     def it_throws_the_staged_corpus_away_when_the_run_ends(experiment, porting_calls):
         experiment()
@@ -425,7 +438,7 @@ def describe_the_container_view():
         experiment(include_python_tests=True)
         [call] = porting_calls
         targets = [target for _, target, _ in call["volumes"]]
-        assert "/workspace/ported_implementation" in targets
+        assert "/target" in targets
 
     def it_stages_the_credentials_the_suite_planted(experiment, porting_calls):
         """A patch that silently missed would bind the real host token instead."""
