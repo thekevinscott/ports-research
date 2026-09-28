@@ -18,42 +18,40 @@ from gbnf_experiment.prepare_filesystem.assemble_whitelist.assemble_whitelist im
 )
 
 FIXTURES = Path(__file__).parent / "fixtures" / "shared"
-CONDITIONS = {
-    f"{source}_unit-{unit}_source-integration-{source_integration}"
-    f"_target-integration-{target_integration}".lower(): (
-        source,
-        unit,
-        source_integration,
-        target_integration,
-    )
-    for source, unit, source_integration, target_integration in product(
-        ("python", "javascript"), (False, True), (False, True), (False, True)
-    )
-}
+CONDITIONS = list(product(("python", "javascript"), (False, True), (False, True), (False, True)))
 
 
-@pytest.fixture(params=CONDITIONS, ids=list(CONDITIONS))
-def shared_listing(request) -> tuple[str, list[str]]:
-    name = request.param
-    source, unit, source_integration, target_integration = CONDITIONS[name]
-    rules = assemble_whitelist(
-        source,
-        include_unit_tests=unit,
-        include_source_integration_tests=source_integration,
-        include_target_integration_tests=target_integration,
+def condition_name(source, unit, source_integration, target_integration) -> str:
+    return (
+        f"{source}_unit-{unit}_source-integration-{source_integration}"
+        f"_target-integration-{target_integration}".lower()
     )
-    tag = f"gbnf-prepare-e2e:{name}"
-    docker.build(
-        settings.prepare_docker_directory,
-        tags=tag,
-        build_args={"GBNF_COMMIT": settings.gbnf_commit, "RULES": rules},
-        progress=False,
-    )
-    output = docker.run(tag, ["find", "/shared", "-type", "f"], remove=True)
-    return name, sorted(line.removeprefix("/shared/") for line in output.splitlines())
 
 
 def describe_the_prepare_image():
-    def it_leaves_the_fixture_listing_in_shared(shared_listing):
-        name, listing = shared_listing
+    @pytest.mark.parametrize(
+        "source, unit, source_integration, target_integration",
+        CONDITIONS,
+        ids=[condition_name(*c) for c in CONDITIONS],
+    )
+    def it_leaves_the_fixture_listing_in_shared(
+        source, unit, source_integration, target_integration
+    ):
+        name = condition_name(source, unit, source_integration, target_integration)
+        rules = assemble_whitelist(
+            source,
+            include_unit_tests=unit,
+            include_source_integration_tests=source_integration,
+            include_target_integration_tests=target_integration,
+        )
+        tag = f"gbnf-prepare-test:{name}"
+        docker.build(
+            settings.prepare_docker_directory,
+            tags=tag,
+            build_args={"GBNF_COMMIT": settings.gbnf_commit, "RULES": rules},
+            progress=False,
+        )
+        output = docker.run(tag, ["find", "/shared", "-type", "f"], remove=True)
+        listing = sorted(line.removeprefix("/shared/") for line in output.splitlines())
+
         assert listing == (FIXTURES / f"{name}.txt").read_text().splitlines()
