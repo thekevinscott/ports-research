@@ -108,4 +108,8 @@ through real `rsync`, with the flags this Dockerfile uses, over
 `fixtures/tree-at-pin.txt` (every file under `packages/gbnf` at the pin once
 both suites are generated) and asserts the listing equals
 `fixtures/shared/<condition>.txt`. Those sixteen listings are what `/shared`
-holds per condition; three were checked against real builds.
+holds per condition. `tests/e2e/prepare_image_test.py` builds this image for
+each of the sixteen conditions and asserts `find /shared` equals the same
+listing, so the clone, the patch, the generated suites and the build-arg
+transport are checked against the same sixteen fixtures. One clone and
+install; each further build reruns only the copy layer.

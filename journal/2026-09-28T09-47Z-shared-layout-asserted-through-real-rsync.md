@@ -26,6 +26,12 @@ python all-off, javascript all-on): identical. Putting `source` ahead of the
 test includes in the composer fails twelve of sixteen, the four all-off
 conditions being unaffected, which is the expected shape.
 
-Not covered: that the Dockerfile's clone, patch and generate steps produce
-the tree in the fixture. That is a real build, and belongs to an e2e test
-driven through the CLI once #82 lands the host wiring.
+Kevin: "I think it _should_ be asserted through docker, no? Otherwise it's
+testing theater?" The host test cannot see the build-arg transport, and that
+is where a slip is likeliest. `tests/e2e/prepare_image_test.py` builds the
+real image per condition and compares `find /shared` to the same sixteen
+fixtures. 16 passed in 19s with warm layers. Replacing the Dockerfile's
+quoted `printf` with an unquoted `echo` collapses the rules to one line and
+fails with 235 extra files under `/shared`, `dev/` included. The host test
+stays as the one-second check that points at the rule file; the e2e is the
+ground truth.
