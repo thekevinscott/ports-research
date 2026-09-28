@@ -3,7 +3,7 @@
 Ports a reference library into another language, using agent-harness-sandbox.
 
 `run_porting_harness` takes a prompt, an input directory and an output
-directory. The input is one folder, mounted read-only at `/input`. The output
+directory. The input is one folder; the sandbox mounts a throwaway writable copy at `/input`. The output
 directory mounts writable at `/target` and is the port as the agent leaves it.
 
 The harness owns a system prompt, `prompt.txt`, that frames the task: the
