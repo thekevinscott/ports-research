@@ -19,6 +19,6 @@ rules = ["unmocked-collaborator"]
 reason = "the unit is a read of jsonl files; tmp_path is the input, not a collaborator"
 
 [[python.exempt]]
-path = "gbnf_experiment/prepare_filesystem/assemble_whitelist/layout_test.py"
-rules = ["unmocked-collaborator"]
-reason = "rsync is the oracle: the rule files mean whatever rsync says they mean, so the layout is asserted by running it"
+path = "tests/integration/prepare_image_test.py"
+rules = ["no-first-party-patch", "unmocked-collaborator"]
+reason = "the prepare image is the subject, not a boundary: it builds it per condition and asserts what /shared holds; no model, nothing billed"

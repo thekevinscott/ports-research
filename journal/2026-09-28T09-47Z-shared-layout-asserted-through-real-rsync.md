@@ -35,3 +35,11 @@ quoted `printf` with an unquoted `echo` collapses the rules to one line and
 fails with 235 extra files under `/shared`, `dev/` included. The host test
 stays as the one-second check that points at the rule file; the e2e is the
 ground truth.
+
+Kevin: "Shouldn't fixtures live in the tests/e2e folder? ... this also seems
+like something worth including in an integration test so it runs in CI."
+Moved to `tests/integration/prepare_image_test.py` with the sixteen listings
+under `tests/integration/fixtures/shared/`. Nothing is billed and no model
+is involved; the container is the subject, not a boundary. With that on CI
+the host rsync test and its tree snapshot were a second copy of the same
+sixteen assertions under a weaker oracle, so both are gone.

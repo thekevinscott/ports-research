@@ -1,9 +1,9 @@
 """What /shared holds in the real prepare image, per condition.
 
-The host-side layout_test proves what the rule files mean to rsync. This
-proves the image agrees: the clone, the patch, both generated suites, and
-the rules arriving intact through the build arg. One clone and install,
-then sixteen builds that rerun only the copy layer.
+The clone, the patch, both generated suites, the rule files and the rules
+arriving intact through the build arg, all at once. The fixtures are the
+listing /shared must hold per condition. One clone and install, then sixteen
+builds that rerun only the copy layer.
 """
 
 from itertools import product
@@ -17,10 +17,7 @@ from gbnf_experiment.prepare_filesystem.assemble_whitelist.assemble_whitelist im
     assemble_whitelist,
 )
 
-FIXTURES = (
-    Path(__file__).resolve().parents[2]
-    / "src/gbnf_experiment/prepare_filesystem/assemble_whitelist/fixtures/shared"
-)
+FIXTURES = Path(__file__).parent / "fixtures" / "shared"
 CONDITIONS = {
     f"{source}_unit-{unit}_source-integration-{source_integration}"
     f"_target-integration-{target_integration}".lower(): (

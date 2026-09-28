@@ -103,13 +103,10 @@ files:
 - `src/builder/` is a grammar-authoring DSL with no counterpart to port.
 
 `assemble_whitelist_test.py` checks which rule files are composed, in what
-order, for all sixteen conditions. `layout_test.py` runs the composed rules
-through real `rsync`, with the flags this Dockerfile uses, over
-`fixtures/<gbnf sha>.txt` (every file under `packages/gbnf` at that commit once
-both suites are generated) and asserts the listing equals
-`fixtures/shared/<condition>.txt`. Those sixteen listings are what `/shared`
-holds per condition. `tests/e2e/prepare_image_test.py` builds this image for
-each of the sixteen conditions and asserts `find /shared` equals the same
-listing, so the clone, the patch, the generated suites and the build-arg
-transport are checked against the same sixteen fixtures. One clone and
-install; each further build reruns only the copy layer.
+order, for all sixteen conditions. `tests/integration/prepare_image_test.py`
+builds this image for each of the sixteen conditions and asserts
+`find /shared` equals `tests/integration/fixtures/shared/<condition>.txt`.
+Those sixteen listings are what `/shared` holds per condition; the clone,
+the patch, the generated suites, the rule files and the build-arg transport
+are all under that one assertion. One clone and install; each further build
+reruns only the copy layer.
