@@ -54,11 +54,9 @@ def agent():
 
 
 @pytest.fixture
-def render_prompt():
-    with patch(
-        "porting_harness.run_porting_harness.render_prompt", autospec=True
-    ) as mock:
-        mock.return_value = "the rendered prompt"
+def prompt_class():
+    with patch("porting_harness.run_porting_harness.Prompt", autospec=True) as mock:
+        mock.return_value.__str__ = Mock(return_value="the rendered prompt")
         yield mock
 
 
@@ -195,11 +193,11 @@ def describe_run_porting_harness():
         assert run_agent_harness_sandbox.call_args.kwargs["proxy_log"] == proxy_log
 
     def it_sends_the_rendered_system_prompt_and_returns_the_output(
-        run_agent_harness_sandbox, render_prompt, options
+        run_agent_harness_sandbox, prompt_class, options
     ):
         """The harness frames the task; the caller's prompt goes in the template's slot."""
         claude_output = run_porting_harness(**options(prompt="Port it.\n"))
 
-        render_prompt.assert_called_once_with(PROMPT_PATH, "Port it.\n")
+        prompt_class.assert_called_once_with(PROMPT_PATH, upstream="Port it.\n")
         assert run_agent_harness_sandbox.call_args.args == ("the rendered prompt",)
         assert claude_output == "container output"
