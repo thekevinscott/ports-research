@@ -1,9 +1,9 @@
 """The composed rules, run through real rsync, against the tree at the pin.
 
 The rule files mean whatever rsync says they mean, so rsync is the oracle,
-not a mock. The tree fixture lists every file under packages/gbnf at the pin
-once both integration suites are generated; the shared fixtures are what the
-image's /shared must hold per condition.
+not a mock. fixtures/<gbnf sha>.txt lists every file under packages/gbnf at
+that commit once both integration suites are generated, node_modules omitted;
+the shared fixtures are what the image's /shared must hold per condition.
 """
 
 import subprocess
@@ -33,14 +33,13 @@ CONDITIONS = {
 }
 
 
-def tree_at_pin() -> tuple[str, list[str]]:
-    header, *paths = FIXTURES.joinpath("tree-at-pin.txt").read_text().splitlines()
-    return header, paths
+def tree_at_pin() -> list[str]:
+    return (FIXTURES / f"{settings.gbnf_commit}.txt").read_text().splitlines()
 
 
 def rsync_layout(rules: str, tmp_path: Path) -> list[str]:
     source = tmp_path / "gbnf"
-    for path in tree_at_pin()[1]:
+    for path in tree_at_pin():
         (source / path).parent.mkdir(parents=True, exist_ok=True)
         (source / path).touch()
     shared = tmp_path / "shared"
@@ -59,9 +58,6 @@ def condition(request):
 
 
 def describe_the_shared_layout():
-    def it_is_the_tree_at_the_pinned_commit():
-        assert settings.gbnf_commit in tree_at_pin()[0]
-
     def it_uses_the_rsync_invocation_the_dockerfile_uses():
         dockerfile = (settings.prepare_docker_directory / "Dockerfile").read_text()
         assert f'{" ".join(RSYNC)} --filter="merge ' in dockerfile

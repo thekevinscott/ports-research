@@ -11,7 +11,7 @@ files are named in what order. That proves nothing about what rsync does
 with them, and order is the whole mechanism: `source.rules` excludes tests,
 and the test includes only win because they come first.
 
-`layout_test.py` closes that gap without docker. `fixtures/tree-at-pin.txt`
+`layout_test.py` closes that gap without docker. `fixtures/<gbnf sha>.txt`
 lists every file under `packages/gbnf` at pin 13f1aca once both integration
 suites are generated (taken from the built image, node_modules omitted). The
 test materialises that tree as empty files, composes the rules for each of

@@ -1,4 +1,3 @@
-# packages/gbnf at 13f1aca495d11e160fffd68c4ba299a2415909d8, after both integration suites were generated. node_modules omitted.
 javascript/dev/browser/basic/index.html
 javascript/dev/browser/basic/index.ts
 javascript/dev/browser/collect-test-cases/api.ts
