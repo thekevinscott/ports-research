@@ -9,7 +9,7 @@ from gbnf_experiment.config import settings
 SANDBOX_IMAGE_ID = "sha256:fake-sandbox-image"
 CLAUDE_CONFIG_TARGET = "/home/node/.claude"
 FAKE_CREDENTIALS = '{"fake": "integration-suite"}'
-CONTAINER_TREES = ("/input", "/workspace")
+CONTAINER_TREES = ("/input", "/target")
 
 
 def volume_source(volumes, target):
@@ -112,7 +112,7 @@ def porting_docker(porting_calls, claude_home, lockdown_docker, agent_image_dock
         m.image.exists.return_value = True
 
         def fake_run(tag, cmd, envs=None, volumes=None, **_):
-            output = volume_source(volumes, "/workspace/ported_implementation")
+            output = volume_source(volumes, "/target")
             credentials = volume_source(volumes, CLAUDE_CONFIG_TARGET)
             porting_calls.append(
                 {

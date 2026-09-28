@@ -22,6 +22,8 @@ from gbnf_experiment import run_gbnf_experiment
 from gbnf_experiment.cli import cli
 from gbnf_experiment.config import settings
 from gbnf_experiment.render_prompt import render_prompt
+from porting_harness.render_prompt import render_prompt as wrap_in_system_prompt
+from porting_harness.run_porting_harness import PROMPT_PATH
 
 FIXTURES = Path(__file__).parent / "fixtures" / "shared"
 CONDITIONS = list(
@@ -123,17 +125,20 @@ def describe_gbnf_experiment():
 
     def describe_the_port():
         def it_sends_the_prompt_this_package_renders(experiment, porting_calls):
+            """The harness frames the task and slots this package's prompt in."""
             experiment(source_language="javascript")
             [call] = porting_calls
-            assert call["prompt"] == render_prompt(
-                source_language="javascript", target_language="python"
+            assert call["prompt"] == wrap_in_system_prompt(
+                PROMPT_PATH,
+                render_prompt(source_language="javascript", target_language="python"),
             )
 
         def it_renders_the_reverse_direction(experiment, porting_calls):
             experiment(source_language="python")
             [call] = porting_calls
-            assert call["prompt"] == render_prompt(
-                source_language="python", target_language="javascript"
+            assert call["prompt"] == wrap_in_system_prompt(
+                PROMPT_PATH,
+                render_prompt(source_language="python", target_language="javascript"),
             )
 
         def it_collects_the_port_into_the_run_directory(experiment, data_directory):
@@ -187,7 +192,7 @@ def describe_the_clean_slate():
         experiment()
         [call] = porting_calls
         assert not any(
-            path.startswith("/workspace/ported_implementation")
+            path.startswith("/target")
             for path in call["container_tree"]
         )
 
@@ -200,7 +205,7 @@ def describe_the_clean_slate():
         assert len(ports) == 2
         _, second = porting_calls
         assert not any(
-            path.startswith("/workspace/ported_implementation")
+            path.startswith("/target")
             for path in second["container_tree"]
         )
 
@@ -238,9 +243,10 @@ def describe_the_manifest():
         }
 
     def it_records_the_prompt_sent(experiment, manifest, porting_calls):
+        """The manifest banks this package's prompt; the frame around it is the harness's."""
         experiment()
         [call] = porting_calls
-        assert manifest()["prompt"] == call["prompt"]
+        assert call["prompt"] == wrap_in_system_prompt(PROMPT_PATH, manifest()["prompt"])
 
     def it_records_the_paths_the_image_put_in_the_reference(experiment, manifest):
         """The host selects nothing, so the manifest is a read of the folder."""
@@ -330,17 +336,30 @@ def describe_the_container_view():
         experiment()
         [call] = porting_calls
         targets = [str(target) for _, target, _ in call["volumes"]]
-        assert "/workspace/ported_implementation" in targets
+        assert "/target" in targets
 
-    def it_binds_the_reference_at_one_read_only_input(experiment, porting_calls):
-        '''Kevin on #77: "tests/ should not be a separate mount."'''
+    def it_binds_the_reference_at_one_input(experiment, porting_calls):
+        '''Kevin on #77: "tests/ should not be a separate mount."
+
+        Writable because the sandbox mounts a throwaway copy, not the run
+        directory; the agent scratches there and nothing reaches the host.
+        '''
         experiment(include_unit_tests=True, include_target_integration_tests=True)
         [call] = porting_calls
         assert [
             (str(target), mode)
             for _, target, mode in call["volumes"]
             if str(target).startswith("/input")
-        ] == [("/input", "ro")]
+        ] == [("/input", "rw")]
+
+    def it_keeps_the_run_s_reference_off_the_container(
+        experiment, porting_calls, data_directory
+    ):
+        """The copy is the protection, so the host folder must not be the source."""
+        experiment()
+        [call] = porting_calls
+        [(source, _, _)] = [v for v in call["volumes"] if str(v[1]) == "/input"]
+        assert data_directory not in Path(source).parents
 
     def it_stages_the_credentials_the_suite_planted(experiment, porting_calls):
         """A patch that silently missed would bind the real host token instead."""

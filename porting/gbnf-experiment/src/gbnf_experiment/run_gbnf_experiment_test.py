@@ -188,7 +188,7 @@ def describe_run():
         run_porting_harness,
     ):
         experiment()
-        assert run_porting_harness.call_args.kwargs["reference"] is (
+        assert run_porting_harness.call_args.kwargs["input"] is (
             prepare_reference_implementation.return_value
         )
         assert run_porting_harness.call_args.kwargs["output_directory"] == (
@@ -226,7 +226,7 @@ def describe_run():
         render_prompt,
         run_porting_harness,
     ):
-        """The harness adds no words, so the caller hands it the whole prompt."""
+        """The harness frames the task; the caller's prompt names the layout."""
         experiment(source_language="python")
         assert run_porting_harness.call_args.kwargs["prompt"] == PROMPT
         assert render_prompt.call_args.kwargs == {

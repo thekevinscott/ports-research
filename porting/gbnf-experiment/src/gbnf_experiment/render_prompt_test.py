@@ -16,7 +16,7 @@ def describe_render_prompt():
             source_language=source_language, target_language=target_language
         )
         assert f"Port the {source_language} implementation under /input/{source_language}" in prompt
-        assert f"to {target_language} in /workspace/ported_implementation" in prompt
+        assert f"to {target_language}." in prompt
         assert f"Where /input/{target_language} holds tests" in prompt
 
     @pytest.mark.parametrize(

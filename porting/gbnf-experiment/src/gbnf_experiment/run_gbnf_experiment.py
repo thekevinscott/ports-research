@@ -48,7 +48,7 @@ def run_gbnf_experiment(
             result = run_porting_harness(
                 agent=agent,
                 prompt=prompt,
-                reference=prepared_filesystem.reference_directory,
+                input=prepared_filesystem.reference_directory,
                 output_directory=prepared_filesystem.ported_implementation_directory,
                 debug=debug,
                 **kwargs,

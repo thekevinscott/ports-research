@@ -29,8 +29,9 @@ Three packages, each configuring the one above it.
 - `porting/porting-harness` — configures agent-harness-sandbox. Input and
   output are synced locally: direct bind mounts, not copies. Library only:
   `run_porting_harness` takes one reference folder, mounts it read-only at
-  `/input`, binds the output directory writable, and passes the caller's
-  prompt verbatim. It owns no prompt: whoever laid the folder out describes it.
+  `/input`, and binds the output directory writable at `/target`. It owns a
+  system prompt naming those two paths, and slots the caller's prompt into it:
+  whoever laid the folder out describes it.
 - `porting/gbnf-experiment` — configures porting-harness specifically for
   gbnf. Runs necessary pre-work such as generating the test suite (the
   gbnf-prepare image in `docker/gbnf-prepare`, one image per condition, cached
@@ -88,7 +89,7 @@ image id and the harness commit. `result.json` is the agent CLI's JSON output
 (usage tokens, turns), not a score. Start a run from `porting/gbnf-experiment`:
 
 ```
-uv run run-gbnf-experiment --source-language python --include-python-tests --include-typescript-tests
+uv run run-gbnf-experiment --source-language python --include-unit-tests --include-target-integration-tests
 ```
 
 Optional flags: `--model` (default `claude-opus-5`), `--effort` (default

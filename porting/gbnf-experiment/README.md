@@ -19,10 +19,11 @@ suite flags, `--include-unit-tests`, `--include-source-integration-tests` and
   the transcript and the proxy log.
 
 The prompt is this package's, in `src/gbnf_experiment/prompt.txt`. porting-harness
-takes it verbatim and adds no words: the folder's layout is decided here, so the
-description of it belongs here too. `render_prompt` fills in the two language
-names, which are also the two directory names, and the manifest banks the
-rendered text.
+slots it into its own system prompt, which frames the task and names the two
+container paths: the reference at `/input`, the port at `/target`. The folder's
+layout is decided here, so the description of it belongs here too. `render_prompt`
+fills in the two language names, which are also the two directory names, and the
+manifest banks the rendered text, unwrapped.
 
 Everything gbnf-specific lives here: the pin, the patches, the test generation,
 the file filter. All four are inside the image, so there is one place the corpus

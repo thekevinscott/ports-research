@@ -1,3 +1,3 @@
 /input holds the gbnf package as upstream lays it out: /input/{source_language} and, when present, /input/{target_language}.
-Port the {source_language} implementation under /input/{source_language} to {target_language} in /workspace/ported_implementation.
+Port the {source_language} implementation under /input/{source_language} to {target_language}.
 Where /input/{target_language} holds tests, run them against your port and iterate until green.

@@ -9,19 +9,22 @@ Sixteen conditions, sixteen image tags.
 
 Kevin on #77: "tests/ should not be a separate mount. agent-harness needs to
 expect a single folder. It will also receive a user prompt describing the
-layout." So the prompt moved into gbnf-experiment. The harness passes it
-verbatim and owns no wording of its own; whoever laid the folder out is the
-only one who can describe it. The rendered text is banked as a top-level
-`prompt` key in the manifest, beside the condition rather than inside it: the
-condition is what was varied, the prompt is what was sent.
+layout." So the prompt moved into gbnf-experiment. The harness keeps a system
+prompt that frames the task and names the two container paths, the reference at
+`/input` and the port at `/target`, and slots this package's prompt in under
+"The library itself may specify additional porting instructions below:";
+whoever laid the folder out is the only one who can describe it. This package's
+prompt therefore names no container path of its own. The rendered text is
+banked, unwrapped, as a top-level `prompt` key in the manifest, beside the
+condition rather than inside it: the condition is what was varied, the prompt
+is what was sent.
 
 The prompt names `/input/javascript` and `/input/python` because that is what
 upstream calls those directories. Kevin, 2026-09-28: "Do _not_ call it source
-and target, instead call it javascript and python." The experiment's own
-vocabulary is still typescript, in the CLI, the condition name and the
-manifest, because the manifests already banked and the analysis notebook read
-it that way. The two vocabularies meet in one map, applied where the image and
-the prompt are asked for.
+and target, instead call it javascript and python." That is now the only
+vocabulary: the CLI flag, the condition name and the manifest all say
+javascript, and the map between two vocabularies is gone. The v1 manifests
+under `analysis/` and `data/runs/` still say typescript and are left alone.
 
 The layout assertion moved behind the entry point. Kevin: "This is really the
 whole shebang and what screwed the v1 of the experiment, so it's important to
