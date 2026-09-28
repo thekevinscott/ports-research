@@ -1,5 +1,4 @@
 from pathlib import Path
-from shutil import copytree
 from tempfile import TemporaryDirectory
 
 from python_on_whales import docker
@@ -7,6 +6,7 @@ from python_on_whales import docker
 from .agents.agent import Agent
 from .errors import AgentHarnessSandboxError
 from .utils.lockdown import lockdown
+from .utils.staged_input import staged_input
 
 
 def run_agent_harness_sandbox(
@@ -38,24 +38,17 @@ def run_agent_harness_sandbox(
     run record never names.
     """
     command = agent.command(prompt, effort=effort, model=model)
-    caller_input = Path(input)
-    if not caller_input.exists():
-        raise AgentHarnessSandboxError(f"{caller_input} does not exist")
-    if not caller_input.is_dir():
-        raise AgentHarnessSandboxError(f"{caller_input} is not a directory")
 
     with (
         lockdown(agent.allow, debug=debug, log_path=proxy_log) as jail,
         TemporaryDirectory() as staged,
-        TemporaryDirectory() as staging,
+        staged_input(input) as input_copy,
     ):
         agent.stage_auth(Path(staged))
-        staged_input = Path(staging) / "input"
-        copytree(caller_input, staged_input, symlinks=True)
         volumes = [(staged, agent.home, "rw")]
         for path, target, mode in [
             (transcripts, agent.transcripts, "rw"),
-            (staged_input, "/input", "rw"),
+            (input_copy, "/input", "rw"),
             *((source, target, "rw") for source, target in outputs.items()),
         ]:
             source = Path(path)

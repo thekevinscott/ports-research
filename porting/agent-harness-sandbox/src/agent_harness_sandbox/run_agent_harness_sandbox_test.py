@@ -219,13 +219,7 @@ def describe_volumes():
 
     def it_refuses_a_source_that_is_not_there(run, tmp_path):
         with pytest.raises(SandboxError, match="does not exist"):
-            run(input=tmp_path / "gone")
-
-    def it_refuses_an_input_that_is_not_a_folder(run, tmp_path):
-        data = tmp_path / "file"
-        data.touch()
-        with pytest.raises(SandboxError, match="not a directory"):
-            run(input=data)
+            run(transcripts=tmp_path / "gone")
 
 
 def describe_lockdown():
