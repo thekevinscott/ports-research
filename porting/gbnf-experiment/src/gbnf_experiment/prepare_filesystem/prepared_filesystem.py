@@ -17,7 +17,7 @@ class PreparedFilesystem:
         self,
         *,
         source_language: str,
-        include_typescript_tests: bool,
+        include_javascript_tests: bool,
         include_python_tests: bool,
         debug: bool,
     ):
@@ -40,7 +40,7 @@ class PreparedFilesystem:
             source=self.prepared_directory,
             patterns=reference_patterns(
                 source_language,
-                include_typescript_tests=include_typescript_tests,
+                include_javascript_tests=include_javascript_tests,
                 include_python_tests=include_python_tests,
             ),
         )

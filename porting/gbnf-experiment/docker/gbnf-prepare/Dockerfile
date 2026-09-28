@@ -26,7 +26,7 @@ RUN pnpm install --frozen-lockfile --offline
 
 # 4. Run test-writer
 
-# Generate integration tests for typescript
+# Generate integration tests for javascript
 RUN pnpm --filter gbnf test:integration:write
 # Generate integration tests for python
 RUN cd packages/gbnf/python && make write_integration_tests && cd -

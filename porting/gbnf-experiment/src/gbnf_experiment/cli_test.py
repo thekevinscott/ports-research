@@ -8,7 +8,7 @@ from gbnf_experiment.cli import cli
 
 
 RUN_DIRECTORY = Path("/pkg/data/20260906T142530Z_9f2b1c04")
-SOURCE_LANGUAGE = ["--source-language", "typescript"]
+SOURCE_LANGUAGE = ["--source-language", "javascript"]
 
 
 @pytest.fixture
@@ -42,8 +42,8 @@ def describe_cli():
         CliRunner().invoke(cli, SOURCE_LANGUAGE)
         gbnf_experiment.assert_called_once_with(
             agent=claude_agent.return_value,
-            source_language="typescript",
-            include_typescript_tests=False,
+            source_language="javascript",
+            include_javascript_tests=False,
             include_python_tests=False,
             debug=False,
             effort="high",
@@ -67,9 +67,9 @@ def describe_cli():
 
     def it_forwards_the_test_inclusion_flags(gbnf_experiment):
         CliRunner().invoke(
-            cli, [*SOURCE_LANGUAGE, "--include-typescript-tests", "--include-python-tests"]
+            cli, [*SOURCE_LANGUAGE, "--include-javascript-tests", "--include-python-tests"]
         )
-        assert gbnf_experiment.call_args.kwargs["include_typescript_tests"] is True
+        assert gbnf_experiment.call_args.kwargs["include_javascript_tests"] is True
         assert gbnf_experiment.call_args.kwargs["include_python_tests"] is True
 
     def it_forwards_debug(gbnf_experiment):

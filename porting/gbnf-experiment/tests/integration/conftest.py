@@ -7,10 +7,10 @@ import pytest
 from gbnf_experiment.config import settings
 
 GRAMMAR_FIXTURES = ("arithmetic", "json", "simple")
-MANIFESTS = {"typescript": "package.json", "python": "pyproject.toml"}
-SOURCE_DIRECTORIES = {"typescript": "src", "python": "gbnf"}
-IMPLEMENTATIONS = {"typescript": "index.ts", "python": "index.py"}
-COLOCATED_TESTS = {"typescript": "index.test.ts", "python": "index_test.py"}
+MANIFESTS = {"javascript": "package.json", "python": "pyproject.toml"}
+SOURCE_DIRECTORIES = {"javascript": "src", "python": "gbnf"}
+IMPLEMENTATIONS = {"javascript": "index.ts", "python": "index.py"}
+COLOCATED_TESTS = {"javascript": "index.test.ts", "python": "index_test.py"}
 DEV_HARNESS = (
     "dev/browser/debug/index.html",
     "dev/browser/debug/package.json",
@@ -28,7 +28,7 @@ def volume_source(volumes, target):
 
 def write_prepared_output(directory: Path) -> None:
     """What the real gbnf-prepare container emits into /prepared-output."""
-    for language in ("typescript", "python"):
+    for language in ("javascript", "python"):
         source = directory / "source" / language
         source.mkdir(parents=True)
         (source / MANIFESTS[language]).write_text("{}")
@@ -36,7 +36,7 @@ def write_prepared_output(directory: Path) -> None:
         code.mkdir()
         (code / IMPLEMENTATIONS[language]).write_text(f"{language} source")
         (code / COLOCATED_TESTS[language]).write_text(f"{language} tests")
-        if language == "typescript":
+        if language == "javascript":
             for name in DEV_HARNESS:
                 path = source / name
                 path.parent.mkdir(parents=True, exist_ok=True)

@@ -20,11 +20,11 @@ def prepared(completed_run: Path, prepared_cache: Path) -> Path:
 
 def describe_the_prepared_corpus():
     def it_prepares_a_source_tree_for_both_languages(prepared: Path):
-        assert (prepared / "source" / "typescript" / "src").is_dir()
+        assert (prepared / "source" / "javascript" / "src").is_dir()
         assert (prepared / "source" / "python" / "gbnf").is_dir()
 
     def it_prepares_a_test_suite_for_both_languages(prepared: Path):
-        assert sorted((prepared / "tests" / "typescript").rglob("*.test.ts"))
+        assert sorted((prepared / "tests" / "javascript").rglob("*.test.ts"))
         assert sorted((prepared / "tests" / "python").rglob("*_test.py"))
 
     def it_ships_grammar_fixtures_beside_the_python_suite(prepared: Path):
@@ -37,8 +37,8 @@ def describe_the_prepared_corpus():
         assert not list(source.rglob("node_modules"))
         assert not [path for path in source.rglob("*") if path.is_symlink()]
 
-    def it_ships_a_runner_config_with_the_typescript_suite(prepared: Path):
-        assert (prepared / "tests" / "typescript" / "vitest.config.unit.ts").is_file()
+    def it_ships_a_runner_config_with_the_javascript_suite(prepared: Path):
+        assert (prepared / "tests" / "javascript" / "vitest.config.unit.ts").is_file()
 
     def it_ships_no_readme_with_either_suite(prepared: Path):
         """Kevin, 2026-09-17: "scaffolding - no we don't need a readme." """

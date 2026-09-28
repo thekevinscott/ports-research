@@ -7,21 +7,21 @@ from porting_harness.run_porting_harness import run_porting_harness
 from .condition_name import condition_name
 from .prepare_filesystem import PreparedFilesystem
 
-TARGET_LANGUAGES = {"typescript": "python", "python": "typescript"}
+TARGET_LANGUAGES = {"javascript": "python", "python": "javascript"}
 
 
 def run_gbnf_experiment(
     *,
     agent: Agent,
     source_language: str,
-    include_typescript_tests: bool,
+    include_javascript_tests: bool,
     include_python_tests: bool,
     debug: bool,
     **kwargs,
 ) -> Path:
     with PreparedFilesystem(
         source_language=source_language,
-        include_typescript_tests=include_typescript_tests,
+        include_javascript_tests=include_javascript_tests,
         include_python_tests=include_python_tests,
         debug=debug,
     ) as prepared_filesystem:
@@ -29,14 +29,14 @@ def run_gbnf_experiment(
         condition = dict(
             name=condition_name(
                 source_language=source_language,
-                include_typescript_tests=include_typescript_tests,
+                include_javascript_tests=include_javascript_tests,
                 include_python_tests=include_python_tests,
                 **kwargs,
             ),
             source_language=source_language,
             target_language=target,
             include_python_tests=include_python_tests,
-            include_typescript_tests=include_typescript_tests,
+            include_javascript_tests=include_javascript_tests,
             **kwargs,
         )
         prepared_filesystem.write_manifest(agent, **condition)

@@ -16,27 +16,27 @@ SOURCE = {
     ],
     # dev/ is browser and node demo apps, not named. src/builder/ is a
     # grammar-authoring DSL with no counterpart to port.
-    "typescript": [
-        "/source/typescript/.eslintrc.cjs",
-        "/source/typescript/.gitignore",
-        "/source/typescript/.npmignore",
-        "/source/typescript/README.md",
-        "/source/typescript/package.json",
-        "/source/typescript/src/**/*.ts",
-        "!/source/typescript/src/builder/**",
-        "/source/typescript/tsconfig.json",
-        "/source/typescript/tsconfig.test.json",
-        "/source/typescript/vite.config*.ts",
-        "/source/typescript/vitest.config*.ts",
-        "!/source/typescript/**/*.test.ts",
+    "javascript": [
+        "/source/javascript/.eslintrc.cjs",
+        "/source/javascript/.gitignore",
+        "/source/javascript/.npmignore",
+        "/source/javascript/README.md",
+        "/source/javascript/package.json",
+        "/source/javascript/src/**/*.ts",
+        "!/source/javascript/src/builder/**",
+        "/source/javascript/tsconfig.json",
+        "/source/javascript/tsconfig.test.json",
+        "/source/javascript/vite.config*.ts",
+        "/source/javascript/vitest.config*.ts",
+        "!/source/javascript/**/*.test.ts",
     ],
 }
 
 
 def reference_patterns(
-    source_language: str, *, include_typescript_tests: bool, include_python_tests: bool
+    source_language: str, *, include_javascript_tests: bool, include_python_tests: bool
 ) -> list[str]:
-    suites = {"typescript": include_typescript_tests, "python": include_python_tests}
+    suites = {"javascript": include_javascript_tests, "python": include_python_tests}
     return [
         *SOURCE[source_language],
         *(f"/tests/{language}/**" for language, wanted in suites.items() if wanted),

@@ -6,14 +6,14 @@ from gbnf_experiment.prepare_filesystem.assemble_reference_implementation import
     assemble_reference_implementation,
 )
 
-FILES = [Path("source/typescript/package.json"), Path("source/typescript/src/gbnf.ts")]
+FILES = [Path("source/javascript/package.json"), Path("source/javascript/src/gbnf.ts")]
 SUITE = [Path("tests/python/suite_python"), Path("tests/python/grammars/arithmetic.gbnf")]
 
 
 @pytest.fixture
 def prepared_directory(tmp_path):
     directory = tmp_path / "prepared"
-    for language in ("typescript", "python"):
+    for language in ("javascript", "python"):
         source = directory / "source" / language
         source.mkdir(parents=True)
         (source / "package.json").write_text(language)
@@ -60,11 +60,11 @@ def describe_assemble_reference_implementation():
 
     def it_copies_content_not_just_names(assemble, output_directory):
         assemble()
-        assert (output_directory / "source/typescript/package.json").read_text() == "typescript"
+        assert (output_directory / "source/javascript/package.json").read_text() == "javascript"
 
     def it_copies_rather_than_moves(assemble, prepared_directory):
         assemble()
-        assert (prepared_directory / "source/typescript/src/gbnf.ts").is_file()
+        assert (prepared_directory / "source/javascript/src/gbnf.ts").is_file()
 
     def it_writes_no_directory_nothing_was_named_under(assemble, output_directory):
         """Absent, not empty: the harness mounts tests/ only when it exists."""
