@@ -6,7 +6,7 @@ from python_on_whales import docker
 from .agents.agent import Agent
 from .errors import AgentHarnessSandboxError
 from .utils.lockdown import lockdown
-from .utils.staged_input import staged_input
+from .utils.scratch_copy import scratch_copy
 
 
 def run_agent_harness_sandbox(
@@ -42,7 +42,7 @@ def run_agent_harness_sandbox(
     with (
         lockdown(agent.allow, debug=debug, log_path=proxy_log) as jail,
         TemporaryDirectory() as staged,
-        staged_input(input) as input_copy,
+        scratch_copy(input) as input_copy,
     ):
         agent.stage_auth(Path(staged))
         volumes = [(staged, agent.home, "rw")]
