@@ -1,11 +1,12 @@
-"""Compose the rsync whitelists the prepare image copies with.
+"""Compose the one rsync whitelist the prepare image copies with.
 
-The rule files live beside this module. rsync takes the first matching rule,
-so the test includes go ahead of the whitelist that withholds tests. The image
-receives the composed text as build args and never sees a flag.
+The rule files live beside this module, one folder per upstream package
+directory, every pattern anchored to that directory. rsync takes the first
+matching rule, so the test includes go ahead of the whitelist that withholds
+tests. A language with no lines gets no files. The image receives the composed
+text as one build arg and never sees a flag or a language.
 """
 
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
@@ -13,23 +14,7 @@ Language = Literal["python", "javascript"]
 
 OTHER: dict[Language, Language] = {"python": "javascript", "javascript": "python"}
 FILTERS = Path(__file__).parent / "reference-filters"
-
-
-@dataclass(frozen=True)
-class Whitelist:
-    source_language: Language
-    source_rules: str
-    target_language: Language
-    target_rules: str
-
-    @property
-    def build_args(self) -> dict[str, str]:
-        return {
-            "SOURCE_LANGUAGE": self.source_language,
-            "SOURCE_RULES": self.source_rules,
-            "TARGET_LANGUAGE": self.target_language,
-            "TARGET_RULES": self.target_rules,
-        }
+FOOTER = "\n+ */\n- *\n"
 
 
 def compose(filters: Path, language: Language, names: list[str]) -> str:
@@ -43,21 +28,16 @@ def assemble_whitelist(
     include_source_integration_tests: bool,
     include_target_integration_tests: bool,
     filters: Path | None = None,
-) -> Whitelist:
+) -> str:
     filters = filters or FILTERS
     source_names = (
         (["unit-tests"] if include_unit_tests else [])
         + (["integration-tests"] if include_source_integration_tests else [])
         + ["source"]
     )
-    target = OTHER[source]
-    return Whitelist(
-        source_language=source,
-        source_rules=compose(filters, source, source_names),
-        target_language=target,
-        target_rules=(
-            compose(filters, target, ["integration-tests", "harness"])
-            if include_target_integration_tests
-            else ""
-        ),
+    target_names = ["integration-tests"] if include_target_integration_tests else []
+    return (
+        compose(filters, source, source_names)
+        + compose(filters, OTHER[source], target_names)
+        + FOOTER
     )

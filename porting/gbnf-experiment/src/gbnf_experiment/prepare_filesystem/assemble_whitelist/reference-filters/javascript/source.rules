@@ -1,31 +1,30 @@
-# rsync rules for the typescript package, rooted at packages/gbnf/javascript.
-# First match wins, so the exclusions lead. A whitelist: anything not named
-# here never reaches the agent. Adding a file to the corpus means adding a line.
+# rsync rules for the typescript package, rooted at packages/gbnf and anchored
+# to /javascript so nothing here matches the other language's tree. First match
+# wins, so the exclusions lead. A whitelist: anything not named here never
+# reaches the agent. Adding a file to the corpus means adding a line. The
+# traversal and the final catch-all exclusion are added once by
+# assemble_whitelist.
 
-# Tests are withheld unless a flag prepends the rules that include them.
-- *.test.ts
-- /integration-tests/
+# Tests are withheld unless a flag puts the rules that include them first.
+- /javascript/**.test.ts
+- /javascript/integration-tests/
 
 # dev/ is browser and node demo apps, not the library.
-- /dev/
+- /javascript/dev/
 
 # src/builder/ is a grammar-authoring DSL with no counterpart to port.
-- /src/builder/
+- /javascript/src/builder/
 
 # pnpm install ran in this tree; its symlink farm is not corpus.
-- node_modules/
+- /javascript/node_modules/
 
-+ */
-
-+ /.eslintrc.cjs
-+ /.gitignore
-+ /.npmignore
-+ /README.md
-+ /package.json
-+ /tsconfig.json
-+ /tsconfig.test.json
-+ /vite.config*.ts
-+ /vitest.config*.ts
-+ /src/**.ts
-
-- *
++ /javascript/.eslintrc.cjs
++ /javascript/.gitignore
++ /javascript/.npmignore
++ /javascript/README.md
++ /javascript/package.json
++ /javascript/tsconfig.json
++ /javascript/tsconfig.test.json
++ /javascript/vite.config*.ts
++ /javascript/vitest.config*.ts
++ /javascript/src/**.ts

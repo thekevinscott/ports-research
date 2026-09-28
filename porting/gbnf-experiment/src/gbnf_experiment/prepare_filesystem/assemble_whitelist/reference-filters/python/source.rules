@@ -1,20 +1,18 @@
-# rsync rules for the python package, rooted at packages/gbnf/python. First
-# match wins, so the exclusions lead. A whitelist: anything not named here
-# never reaches the agent. Adding a file to the corpus means adding a line.
+# rsync rules for the python package, rooted at packages/gbnf and anchored to
+# /python so nothing here matches the other language's tree. First match wins,
+# so the exclusions lead. A whitelist: anything not named here never reaches
+# the agent. Adding a file to the corpus means adding a line. The traversal
+# and the final catch-all exclusion are added once by assemble_whitelist.
 
-# Tests are withheld unless a flag prepends the rules that include them.
-- *_test.py
-- /tests/
+# Tests are withheld unless a flag puts the rules that include them first.
+- /python/**_test.py
+- /python/tests/
 
-+ */
-
-+ /.gitignore
-+ /MANIFEST.in
-+ /Makefile
-+ /README.md
-+ /pyproject.toml
-+ /requirements.txt
-+ /uv.lock
-+ /gbnf/**.py
-
-- *
++ /python/.gitignore
++ /python/MANIFEST.in
++ /python/Makefile
++ /python/README.md
++ /python/pyproject.toml
++ /python/requirements.txt
++ /python/uv.lock
++ /python/gbnf/**.py

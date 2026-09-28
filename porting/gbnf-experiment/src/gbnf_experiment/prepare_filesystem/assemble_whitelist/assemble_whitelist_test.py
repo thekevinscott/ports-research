@@ -10,11 +10,26 @@ LANGUAGES = ("python", "javascript")
 OTHER = {"python": "javascript", "javascript": "python"}
 
 # One line from each rule file, so a test reads the real files and not a copy.
-UNIT_INCLUDE = {"python": "+ /gbnf/**_test.py\n", "javascript": "+ /src/**.test.ts\n"}
-INTEGRATION_INCLUDE = {"python": "+ /tests/***\n", "javascript": "+ /integration-tests/***\n"}
-TEST_EXCLUSION = {"python": "- *_test.py\n", "javascript": "- *.test.ts\n"}
-SOURCE_INCLUDE = {"python": "+ /gbnf/**.py\n", "javascript": "+ /src/**.ts\n"}
-HARNESS_INCLUDE = {"python": "+ /Makefile\n", "javascript": "+ /vitest.config.integration.ts\n"}
+UNIT_INCLUDE = {
+    "python": "+ /python/gbnf/**_test.py\n",
+    "javascript": "+ /javascript/src/**.test.ts\n",
+}
+INTEGRATION_INCLUDE = {
+    "python": "+ /python/tests/***\n",
+    "javascript": "+ /javascript/integration-tests/***\n",
+}
+TEST_EXCLUSION = {
+    "python": "- /python/**_test.py\n",
+    "javascript": "- /javascript/**.test.ts\n",
+}
+SOURCE_INCLUDE = {
+    "python": "+ /python/gbnf/**.py\n",
+    "javascript": "+ /javascript/src/**.ts\n",
+}
+RUNNER_INCLUDE = {
+    "python": "+ /python/Makefile\n",
+    "javascript": "+ /javascript/vitest.config.integration.ts\n",
+}
 
 CONDITIONS = {
     f"source-{source}_unit-{unit}_source-integration-{source_integration}"
@@ -36,7 +51,7 @@ def condition(request):
 
 
 @pytest.fixture
-def whitelist(condition):
+def rules(condition):
     source, unit, source_integration, target_integration = condition
     return assemble_whitelist(
         source,
@@ -46,52 +61,48 @@ def whitelist(condition):
     )
 
 
+def lines(rules):
+    return [line for line in rules.splitlines() if line and not line.startswith("#")]
+
+
 def describe_assemble_whitelist():
     def describe_for_each_of_the_sixteen_conditions():
-        def it_names_the_source_and_the_other_language_as_target(condition, whitelist):
-            source = condition[0]
-            assert whitelist.source_language == source
-            assert whitelist.target_language == OTHER[source]
+        def it_ends_with_the_traversal_and_the_catch_all_exclusion(rules):
+            assert lines(rules)[-2:] == ["+ */", "- *"]
 
-        def it_ends_the_source_rules_with_the_whitelist(condition, whitelist):
-            source = condition[0]
-            assert SOURCE_INCLUDE[source] in whitelist.source_rules
-            assert whitelist.source_rules.endswith("- *\n")
+        def it_anchors_every_pattern_to_a_language_directory(rules):
+            for line in lines(rules)[:-2]:
+                assert line.split(" ", 1)[1].startswith(("/python/", "/javascript/")), line
 
-        def it_includes_unit_tests_only_when_asked(condition, whitelist):
+        def it_whitelists_the_source(condition, rules):
+            assert SOURCE_INCLUDE[condition[0]] in rules
+
+        def it_includes_unit_tests_only_when_asked(condition, rules):
             source, unit, _, _ = condition
-            assert (UNIT_INCLUDE[source] in whitelist.source_rules) is unit
+            assert (UNIT_INCLUDE[source] in rules) is unit
 
-        def it_includes_the_source_integration_suite_only_when_asked(condition, whitelist):
+        def it_includes_the_source_integration_suite_only_when_asked(condition, rules):
             source, _, source_integration, _ = condition
-            assert (INTEGRATION_INCLUDE[source] in whitelist.source_rules) is source_integration
+            assert (INTEGRATION_INCLUDE[source] in rules) is source_integration
 
-        def it_puts_every_test_include_ahead_of_the_exclusion(condition, whitelist):
+        def it_puts_every_test_include_ahead_of_the_exclusion(condition, rules):
             source = condition[0]
-            rules = whitelist.source_rules
             exclusion = rules.index(TEST_EXCLUSION[source])
             for include in (UNIT_INCLUDE[source], INTEGRATION_INCLUDE[source]):
                 if include in rules:
                     assert rules.index(include) < exclusion
 
-        def it_has_target_rules_only_when_asked(condition, whitelist):
-            _, _, _, target_integration = condition
-            assert bool(whitelist.target_rules) is target_integration
+        def it_names_the_target_only_when_asked(condition, rules):
+            source, _, _, target_integration = condition
+            target = OTHER[source]
+            assert (f"/{target}/" in rules) is target_integration
 
-        def it_gives_the_target_its_suite_and_harness_and_no_source(condition, whitelist):
+        def it_gives_the_target_its_suite_and_runner_and_no_source(condition, rules):
             source, _, _, target_integration = condition
             if not target_integration:
                 return
             target = OTHER[source]
-            assert INTEGRATION_INCLUDE[target] in whitelist.target_rules
-            assert HARNESS_INCLUDE[target] in whitelist.target_rules
-            assert SOURCE_INCLUDE[target] not in whitelist.target_rules
-            assert UNIT_INCLUDE[target] not in whitelist.target_rules
-
-        def it_exposes_the_four_build_args(whitelist):
-            assert whitelist.build_args == {
-                "SOURCE_LANGUAGE": whitelist.source_language,
-                "SOURCE_RULES": whitelist.source_rules,
-                "TARGET_LANGUAGE": whitelist.target_language,
-                "TARGET_RULES": whitelist.target_rules,
-            }
+            assert INTEGRATION_INCLUDE[target] in rules
+            assert RUNNER_INCLUDE[target] in rules
+            assert SOURCE_INCLUDE[target] not in rules
+            assert UNIT_INCLUDE[target] not in rules

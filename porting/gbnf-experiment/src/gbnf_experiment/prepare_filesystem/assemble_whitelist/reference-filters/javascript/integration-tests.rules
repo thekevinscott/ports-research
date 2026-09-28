@@ -1,2 +1,5 @@
-# The generated integration suite, where `pnpm test:integration:write` put it.
-+ /integration-tests/***
+# The generated integration suite, where `pnpm test:integration:write` put it,
+# and what upstream runs it with. Duplicates of source.rules lines are harmless.
++ /javascript/integration-tests/***
++ /javascript/package.json
++ /javascript/vitest.config.integration.ts

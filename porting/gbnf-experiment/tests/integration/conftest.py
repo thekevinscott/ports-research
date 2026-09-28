@@ -17,7 +17,7 @@ DEV_HARNESS = (
     "dev/node/src/commands/parse.ts",
 )
 SANDBOX_IMAGE_ID = "sha256:fake-sandbox-image"
-RULE_FILES = ("source", "unit-tests", "integration-tests", "harness")
+RULE_FILES = ("source", "unit-tests", "integration-tests")
 CLAUDE_CONFIG_TARGET = "/home/node/.claude"
 FAKE_CREDENTIALS = '{"fake": "integration-suite"}'
 
@@ -103,7 +103,7 @@ def whitelist_rules(tmp_path):
     for language in ("python", "javascript"):
         (filters / language).mkdir(parents=True)
         for name in RULE_FILES:
-            (filters / language / f"{name}.rules").write_text(f"# {language} {name}\n")
+            (filters / language / f"{name}.rules").write_text(f"+ /{language}/{name}\n")
     with patch("gbnf_experiment.prepare_filesystem.assemble_whitelist.assemble_whitelist.FILTERS", filters):
         yield filters
 

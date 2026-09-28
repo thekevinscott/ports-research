@@ -1,9 +1,0 @@
-# What upstream runs the integration suite with. Appended to
-# integration-tests.rules for /shared/target, which carries no source.
-+ */
-
-+ /Makefile
-+ /pyproject.toml
-+ /uv.lock
-
-- *
