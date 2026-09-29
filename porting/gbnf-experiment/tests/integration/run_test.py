@@ -17,9 +17,13 @@ from conftest import GRAMMAR_FIXTURES
 
 # Spelled out rather than imported: a reworded prompt has to move the expected
 # text here too, or the two sides drift together and prove nothing.
-UPSTREAM_PROMPT = "Port the implementation under /input/source to {target_language}.\n"
+UPSTREAM_PROMPT = (
+    "Port the implementation under /input/source to {target_language}.\n"
+    "Manage the port's dependencies and run its commands with {package_manager}.\n"
+)
 UPSTREAM_PROMPT_WITH_PYTHON_SUITE = (
     "Port the implementation under /input/source to {target_language}.\n"
+    "Manage the port's dependencies and run its commands with {package_manager}.\n"
     "\n"
     "The following test suites are mounted alongside the source:\n"
     "\n"
@@ -175,14 +179,24 @@ def describe_gbnf_experiment():
             experiment(source_language="javascript")
             [call] = porting_calls
             assert call["prompt"] == str(
-                Prompt(PROMPT_PATH, upstream=UPSTREAM_PROMPT.format(target_language="python"))
+                Prompt(
+                    PROMPT_PATH,
+                    upstream=UPSTREAM_PROMPT.format(
+                        target_language="python", package_manager="uv"
+                    ),
+                )
             )
 
         def it_renders_the_reverse_direction(experiment, porting_calls):
             experiment(source_language="python")
             [call] = porting_calls
             assert call["prompt"] == str(
-                Prompt(PROMPT_PATH, upstream=UPSTREAM_PROMPT.format(target_language="javascript"))
+                Prompt(
+                    PROMPT_PATH,
+                    upstream=UPSTREAM_PROMPT.format(
+                        target_language="javascript", package_manager="pnpm"
+                    ),
+                )
             )
 
         def it_names_the_suites_the_condition_mounted(experiment, porting_calls):
@@ -191,7 +205,9 @@ def describe_gbnf_experiment():
             assert call["prompt"] == str(
                 Prompt(
                     PROMPT_PATH,
-                    upstream=UPSTREAM_PROMPT_WITH_PYTHON_SUITE.format(target_language="python"),
+                    upstream=UPSTREAM_PROMPT_WITH_PYTHON_SUITE.format(
+                        target_language="python", package_manager="uv"
+                    ),
                 )
             )
 
@@ -431,6 +447,17 @@ def describe_the_rendered_prompt():
         assert "python" in call["prompt"]
         assert "{" not in call["prompt"]
         assert "}" not in call["prompt"]
+
+    def it_names_the_package_manager_of_the_target_language(experiment, porting_calls):
+        experiment(source_language="javascript")
+        [call] = porting_calls
+        assert "uv" in call["prompt"]
+        assert "pnpm" not in call["prompt"]
+
+    def it_names_the_package_manager_of_the_reverse_direction(experiment, porting_calls):
+        experiment(source_language="python")
+        [call] = porting_calls
+        assert "pnpm" in call["prompt"]
 
 
 def describe_the_container_view():
