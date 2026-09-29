@@ -6,6 +6,7 @@ from agent_harness_sandbox.agents.agent import Agent
 from porting_harness.prompt import Prompt
 from porting_harness.run_porting_harness import run_porting_harness
 from .condition_name import condition_name
+from .copy_reference_into_image import copy_reference_into_image
 from .prepare_filesystem import PreparedFilesystem
 from .suites_information import suites_information
 
@@ -62,6 +63,7 @@ def run_gbnf_experiment(
                     )
                 ),
                 input=prepared_filesystem.reference_implementation_directory,
+                modify_dockerfile=copy_reference_into_image,
                 output_directory=prepared_filesystem.ported_implementation_directory,
                 debug=debug,
                 **kwargs,

@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from gbnf_experiment.config import settings
+from porting_harness.run_porting_harness import INPUT_CONTEXT
 
 GRAMMAR_FIXTURES = ("arithmetic", "json", "simple")
 MANIFESTS = {"javascript": "package.json", "python": "pyproject.toml"}
@@ -156,14 +157,32 @@ def lockdown_docker():
 
 
 @pytest.fixture
-def agent_image_docker():
+def build_contexts() -> list:
+    """The additional contexts each faked image build named, in build order."""
+    return []
+
+
+@pytest.fixture
+def agent_image_docker(build_contexts):
     """agent-harness-sandbox's image builds, faked at the docker boundary."""
     with patch("agent_harness_sandbox.build_agent_image.docker", autospec=True) as m:
+
+        def record_build(_context, tags=None, **options):
+            build_contexts.append(options.get("build_contexts") or {})
+
+        m.build.side_effect = record_build
         yield m
 
 
 @pytest.fixture
-def porting_docker(porting_calls, claude_home, lockdown_docker, agent_image_docker, port_result):
+def porting_docker(
+    porting_calls,
+    claude_home,
+    lockdown_docker,
+    agent_image_docker,
+    build_contexts,
+    port_result,
+):
     """The porting sandbox, faked at the docker boundary.
 
     Standing in for the model: instead of running claude, it writes a
@@ -175,18 +194,24 @@ def porting_docker(porting_calls, claude_home, lockdown_docker, agent_image_dock
         def fake_run(tag, cmd, envs=None, volumes=None, **_):
             output = volume_source(volumes, "/target")
             credentials = volume_source(volumes, CLAUDE_CONFIG_TARGET)
+            # /input is baked into the image, so the build context is where the
+            # tree the container sees comes from.
+            reference = Path(build_contexts[-1][INPUT_CONTEXT])
+            trees = [(reference, "/input")] + [
+                (Path(src), str(target)) for src, target, _ in volumes if str(target) == "/target"
+            ]
             porting_calls.append(
                 {
                     "prompt": cmd[-1],
                     "command": list(cmd),
                     "volumes": volumes,
                     "envs": envs,
+                    "reference": reference,
                     "credentials": (credentials / ".credentials.json").read_text(),
                     "container_tree": sorted(
                         f"{target}/{path.relative_to(source)}"
-                        for source, target, _ in volumes
-                        if str(target) in ("/input", "/target")
-                        for path in Path(source).rglob("*")
+                        for source, target in trees
+                        for path in source.rglob("*")
                         if path.is_file()
                     ),
                 }

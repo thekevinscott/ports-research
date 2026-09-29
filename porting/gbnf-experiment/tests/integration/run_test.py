@@ -405,25 +405,13 @@ def describe_a_run_that_dies():
         assert manifest()["error"]
 
 
-def staged_reference(call):
-    """Where assembly put the corpus, read back off the mount the container got.
-
-    Assembly writes source/ and tests/ under one root, and that root is the
-    folder the harness binds at /input.
-    """
-    [source] = [
-        Path(source) for source, target, _ in call["volumes"] if str(target) == "/input"
-    ]
-    return source
-
-
 def describe_the_staged_reference_corpus():
-    def it_binds_a_staged_copy_not_the_prepared_cache(
+    def it_hands_the_build_a_staged_copy_not_the_prepared_cache(
         experiment, porting_calls, prepared_directory
     ):
         experiment()
         [call] = porting_calls
-        assert prepared_directory not in staged_reference(call).parents
+        assert prepared_directory not in call["reference"].parents
 
     def it_carries_the_source_and_test_trees_under_one_input_root(
         experiment, porting_calls
@@ -437,7 +425,15 @@ def describe_the_staged_reference_corpus():
     def it_throws_the_staged_corpus_away_when_the_run_ends(experiment, porting_calls):
         experiment()
         [call] = porting_calls
-        assert not staged_reference(call).exists()
+        assert not call["reference"].exists()
+
+    def it_reaches_the_container_through_the_image_and_not_a_mount(
+        experiment, porting_calls
+    ):
+        """Installing its dependencies is a build step, and a bind would hide the result."""
+        experiment()
+        [call] = porting_calls
+        assert "/input" not in [str(target) for _, target, _ in call["volumes"]]
 
 
 def describe_the_rendered_prompt():

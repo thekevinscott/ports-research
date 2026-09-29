@@ -7,6 +7,7 @@ import pytest
 
 from porting_harness.prompt import Prompt
 
+from gbnf_experiment.copy_reference_into_image import copy_reference_into_image
 from gbnf_experiment.run_gbnf_experiment import PROMPT_PATH, run_gbnf_experiment
 
 
@@ -176,6 +177,19 @@ def describe_run():
         )
         assert run_porting_harness.call_args.kwargs["output_directory"] == (
             settings.data_directory / RUN_DIRECTORY_NAME / "ported_implementation"
+        )
+
+    def it_has_the_reference_copied_into_the_image_at_build_time(
+        experiment,
+        prepare_reference_implementation,
+        assemble_reference_implementation,
+        run_porting_harness,
+    ):
+        """Nothing is mounted over /input, so the copy is the only way the tree gets there."""
+        experiment()
+        assert (
+            run_porting_harness.call_args.kwargs["modify_dockerfile"]
+            is copy_reference_into_image
         )
 
     def it_ports_at_the_configured_effort(
