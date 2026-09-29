@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from pathlib import Path
 
 from agent_harness_sandbox.agents.agent import Agent
@@ -22,6 +23,7 @@ def run_porting_harness(
     model: str,
     transcripts: Path,
     proxy_log: Path,
+    modify_dockerfile: Callable[[str], str] | None = None,
 ) -> str:
     """Run prompt against input in the sandbox, collecting the port in output_directory.
 
@@ -34,14 +36,17 @@ def run_porting_harness(
     leaves it. transcripts is a host directory the CLI writes the session jsonl
     into and proxy_log a host file the sidecar's log is drained to at teardown.
 
-    Nothing has a default. A run that banks no transcript, no denial log or no
-    model name produces evidence nobody can attribute afterwards.
+    Nothing that the evidence rests on has a default. A run that banks no
+    transcript, no denial log or no model name produces evidence nobody can
+    attribute afterwards. modify_dockerfile is not that: it rewrites the agent
+    Dockerfile's text before the build, and omitting it builds the file as it
+    lies.
     """
     output_directory.mkdir(parents=True, exist_ok=True)
     return run_agent_harness_sandbox(
         str(Prompt(PROMPT_PATH, upstream=prompt)),
         agent=agent,
-        image=build_agent_image(agent=agent, debug=debug),
+        image=build_agent_image(agent=agent, modify_dockerfile=modify_dockerfile, debug=debug),
         input=input,
         outputs={output_directory: TARGET},
         envs={},
