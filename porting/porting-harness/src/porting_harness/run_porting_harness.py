@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from pathlib import Path
 
 from agent_harness_sandbox.agents.agent import Agent
@@ -22,26 +23,15 @@ def run_porting_harness(
     model: str,
     transcripts: Path,
     proxy_log: Path,
+    modify_dockerfile: Callable[[str], str] | None = None,
 ) -> str:
     """Run prompt against input in the sandbox, collecting the port in output_directory.
-
-    input is one folder; the sandbox mounts a throwaway writable copy at /input. prompt is the caller's
-    upstream prompt: the caller laid the folder out and is the only one who can
-    say what is the source, what is a suite, what to port to. It is appended to
-    the harness's own system prompt, which frames the task and names the two
-    container paths: the reference at /input, the port at /target.
-    output_directory is bound writable at /target and is the port, as the agent
-    leaves it. transcripts is a host directory the CLI writes the session jsonl
-    into and proxy_log a host file the sidecar's log is drained to at teardown.
-
-    Nothing has a default. A run that banks no transcript, no denial log or no
-    model name produces evidence nobody can attribute afterwards.
     """
     output_directory.mkdir(parents=True, exist_ok=True)
     return run_agent_harness_sandbox(
         str(Prompt(PROMPT_PATH, upstream=prompt)),
         agent=agent,
-        image=build_agent_image(agent=agent, debug=debug),
+        image=build_agent_image(agent=agent, modify_dockerfile=modify_dockerfile, debug=debug),
         input=input,
         outputs={output_directory: TARGET},
         envs={},

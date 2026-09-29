@@ -144,7 +144,9 @@ def describe_run_porting_harness():
     ):
         run_porting_harness(**options(debug=True))
 
-        build_agent_image.assert_called_once_with(agent=agent, debug=True)
+        build_agent_image.assert_called_once_with(
+            agent=agent, modify_dockerfile=None, debug=True
+        )
         assert run_agent_harness_sandbox.call_args.kwargs["image"] == "an-agent:latest"
 
     def it_binds_the_directory_the_caller_named(
@@ -191,6 +193,24 @@ def describe_run_porting_harness():
         run_porting_harness(**options(proxy_log=proxy_log))
 
         assert run_agent_harness_sandbox.call_args.kwargs["proxy_log"] == proxy_log
+
+    def describe_modify_dockerfile():
+        def it_hands_the_callers_modifier_to_the_image_build(
+            run_agent_harness_sandbox, build_agent_image, options
+        ):
+            def modify(text):
+                return text
+
+            run_porting_harness(**options(modify_dockerfile=modify))
+
+            assert build_agent_image.call_args.kwargs["modify_dockerfile"] is modify
+
+        def it_builds_the_dockerfile_as_it_lies_when_none_is_supplied(
+            run_agent_harness_sandbox, build_agent_image, options
+        ):
+            run_porting_harness(**options())
+
+            assert build_agent_image.call_args.kwargs["modify_dockerfile"] is None
 
     def it_sends_the_rendered_system_prompt_and_returns_the_output(
         run_agent_harness_sandbox, prompt_class, options
