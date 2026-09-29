@@ -6,3 +6,4 @@ BASE_DOCKERFILE = SANDBOX_DIR / "Dockerfile"
 PROXY_IMAGE = "agent-harness-sandbox-proxy:latest"
 PROXY_DIR = SANDBOX_DIR / "proxy"
 PROXY_PORT = 8888
+SETUP_LAYER_SUFFIX = "-setup"

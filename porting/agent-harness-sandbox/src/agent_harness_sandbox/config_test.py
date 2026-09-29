@@ -5,6 +5,7 @@ from .config import (
     PROXY_IMAGE,
     PROXY_PORT,
     SANDBOX_DIR,
+    SETUP_LAYER_SUFFIX,
 )
 
 
@@ -25,3 +26,6 @@ def describe_config():
 
     def it_fixes_the_proxy_port():
         assert PROXY_PORT == 8888
+
+    def it_marks_a_setup_layer_tag_apart_from_its_base():
+        assert SETUP_LAYER_SUFFIX == "-setup"
