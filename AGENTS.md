@@ -22,8 +22,14 @@ gitignored.
 - Branch names use **dashes only**: lowercase letters, digits, and `-`.
   No slashes, no spaces (e.g., `whitelist-assembly`, not `feat/whitelist-assembly`).
 - Do all editing, building, and testing inside `.worktrees/<branch>/`.
-- When the PR merges, remove the worktree: `cd` to the root checkout first, then
-  `git worktree remove .worktrees/<branch>`.
+- **When the PR merges, clean up in this order.** Leaving stale worktrees and
+  branches behind makes it impossible to see what is actually in flight.
+  1. `cd` to the root checkout first. Never skip this — removing a worktree
+     while the shell is inside it breaks the shell unrecoverably.
+  2. `git worktree remove .worktrees/<branch>`
+  3. `git branch -d <branch>`
+  4. `git checkout main`, then `git pull`, so the root checkout matches GitHub
+     before the next piece of work branches off it.
 
 ## Merging — always
 
