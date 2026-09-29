@@ -214,7 +214,14 @@ def describe_run():
     ):
         experiment(source_language="python")
         assert run_porting_harness.call_args.kwargs["prompt"] == (
-            str(Prompt(PROMPT_PATH, target_language="javascript", suites_information=""))
+            str(
+                Prompt(
+                    PROMPT_PATH,
+                    target_language="javascript",
+                    package_manager="pnpm",
+                    suites_information="",
+                )
+            )
         )
 
     def it_targets_python_when_porting_from_javascript(
@@ -225,7 +232,14 @@ def describe_run():
     ):
         experiment(source_language="javascript")
         assert run_porting_harness.call_args.kwargs["prompt"] == (
-            str(Prompt(PROMPT_PATH, target_language="python", suites_information=""))
+            str(
+                Prompt(
+                    PROMPT_PATH,
+                    target_language="python",
+                    package_manager="uv",
+                    suites_information="",
+                )
+            )
         )
 
     def it_names_the_suites_the_condition_mounted(
@@ -245,6 +259,34 @@ def describe_run():
     ):
         experiment()
         assert "/input/tests" not in run_porting_harness.call_args.kwargs["prompt"]
+
+    def describe_the_package_manager_it_names():
+        def it_names_uv_when_the_target_is_python(
+            experiment,
+            prepare_reference_implementation,
+            assemble_reference_implementation,
+            run_porting_harness,
+        ):
+            experiment(source_language="javascript")
+            assert "uv" in run_porting_harness.call_args.kwargs["prompt"]
+
+        def it_names_pnpm_when_the_target_is_javascript(
+            experiment,
+            prepare_reference_implementation,
+            assemble_reference_implementation,
+            run_porting_harness,
+        ):
+            experiment(source_language="python")
+            assert "pnpm" in run_porting_harness.call_args.kwargs["prompt"]
+
+        def it_names_only_the_target_language_manager(
+            experiment,
+            prepare_reference_implementation,
+            assemble_reference_implementation,
+            run_porting_harness,
+        ):
+            experiment(source_language="javascript")
+            assert "pnpm" not in run_porting_harness.call_args.kwargs["prompt"]
 
     def it_leaves_no_placeholder_in_the_prompt(
         experiment,

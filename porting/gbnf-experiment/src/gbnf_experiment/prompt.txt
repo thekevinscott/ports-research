@@ -1,2 +1,3 @@
 Port the implementation under /input/source to {target_language}.
+Manage the port's dependencies and run its commands with {package_manager}.
 {suites_information}

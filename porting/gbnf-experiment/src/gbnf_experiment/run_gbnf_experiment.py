@@ -10,6 +10,8 @@ from .prepare_filesystem import PreparedFilesystem
 from .suites_information import suites_information
 
 TARGET_LANGUAGES = {"javascript": "python", "python": "javascript"}
+# Named in the prompt because the agent has no registry access to discover it.
+PACKAGE_MANAGERS = {"python": "uv", "javascript": "pnpm"}
 # The library half of the prompt. porting-harness frames the task and names
 # /input and /target; only this package knows how it laid the folder out.
 PROMPT_PATH = Path(__file__).parent / "prompt.txt"
@@ -52,6 +54,7 @@ def run_gbnf_experiment(
                     Prompt(
                         PROMPT_PATH,
                         target_language=target,
+                        package_manager=PACKAGE_MANAGERS[target],
                         suites_information=suites_information(
                             include_javascript_tests=include_javascript_tests,
                             include_python_tests=include_python_tests,
