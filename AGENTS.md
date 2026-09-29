@@ -33,6 +33,10 @@ locally again. Only on Github via PRs."
 - Agents open PRs and stop there. Kevin merges through the GitHub UI.
 - Never merge on your own initiative, however green the checks are.
 - Never suggest merging, and never offer to merge as a next step.
+- **Never put merging in a question.** An option in a dialog is a
+  suggestion, and an answer selecting it is not the explicit instruction
+  below. Kevin, 2026-09-29, after a PR was merged this way: "Don't merge";
+  "I need to review". Recommend in prose, then stop.
 - Never push to `main`. Local `main` only ever moves by pulling from GitHub.
 - **Every PR targets `main`. No stacked PRs, ever.** Kevin, 2026-09-17: "do
   not open PRs that merge into other branches!!!! NEVER NEVER NEVER". A PR
@@ -42,6 +46,24 @@ locally again. Only on Github via PRs."
   sequence, not from stacking.
 - The only exception is an explicit, specific instruction from Kevin to merge a
   named PR. That instruction is always his to initiate, and it is rare.
+
+## Design — before writing any code
+
+**Kevin leads design. You execute it.** Kevin, 2026-09-29: "do not
+independently design features without consultation with Kevin, unless
+explicitly asked. Do not proceed on implementation until the design is
+clear. Lean on Kevin to lead unless explicitly told otherwise."
+
+- An unclear design is a question to ask, never a gap to fill by building.
+- **A decision on direction is not a decision on design.** Settling the
+  approach leaves the API, the seams, and what crosses between them his.
+- **Do not over build or over engineer. Do not invent features that were
+  not discussed and not signed off on.** No speculative options, no
+  machinery for a case nobody raised.
+- **Write the plan to disk and have Kevin review it before work starts.**
+  Never checked in — `/tmp/claude/<slug>/` is fine. This binds hardest when
+  subagents do the work: the brief *is* the design, so an unreviewed brief
+  is designing on his behalf and calling it delegation.
 
 ## Pull request size — always
 
