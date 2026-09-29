@@ -32,7 +32,13 @@ def builds() -> list[str]:
 
 
 @pytest.fixture
-def docker(docker_calls, builds):
+def build_contexts() -> list:
+    """The additional contexts each build named, in build order."""
+    return []
+
+
+@pytest.fixture
+def docker(docker_calls, builds, build_contexts):
     """Hold the daemon back and let everything above it run.
 
     The runner and the lockdown share one `python_on_whales.docker`, so the
@@ -50,8 +56,9 @@ def docker(docker_calls, builds):
         network.docker_cmd = ["docker"]
         logs.return_value = ""
 
-        def record_build(_context, tags, **_options):
+        def record_build(_context, tags, **options):
             builds.append(tags)
+            build_contexts.append(options.get("build_contexts"))
 
         build.side_effect = record_build
 

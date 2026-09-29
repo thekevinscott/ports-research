@@ -40,13 +40,10 @@ def transcripts(tmp_path):
 
 
 @pytest.fixture
-def options(agent, transcripts, tmp_path):
-    caller_input = tmp_path / "input"
-    caller_input.mkdir()
+def options(agent, transcripts):
     return {
         "agent": agent,
         "image": "a-workspace:latest",
-        "input": caller_input,
         "outputs": {},
         "envs": {},
         "debug": False,
@@ -85,23 +82,6 @@ def volumes(docker) -> dict[str, tuple[str, str]]:
     return {target: (source, mode) for source, target, mode in docker.run.call_args.kwargs["volumes"]}
 
 
-@pytest.fixture
-def mounted(docker) -> dict[str, dict[str, str]]:
-    """What each volume source holds while the fake run is in flight, before the copies go."""
-    seen: dict[str, dict[str, str]] = {}
-
-    def capture(*_args, **kwargs):
-        for source, target, _ in kwargs["volumes"]:
-            root = Path(source)
-            seen[str(target)] = {
-                str(p.relative_to(root)): p.read_text() for p in sorted(root.rglob("*")) if p.is_file()
-            }
-        return "output"
-
-    docker.run.side_effect = capture
-    return seen
-
-
 def describe_signature():
     def it_requires_every_option(options):
         for option in sorted(options):
@@ -111,7 +91,7 @@ def describe_signature():
     def it_takes_its_options_by_keyword_only(agent):
         with pytest.raises(TypeError):
             run_agent_harness_sandbox(
-                "hi", agent, "a-workspace:latest", {}, {}, {}, False, "/workspace", "/t", "/p.log", "high", "m"
+                "hi", agent, "a-workspace:latest", {}, {}, False, "/workspace", "/t", "/p.log", "high", "m"
             )
 
 
@@ -153,6 +133,11 @@ def describe_auth():
 
 
 def describe_volumes():
+    def it_mounts_nothing_at_the_input_path(run, docker):
+        """The source arrives in the image at build time, and a mount would shadow it."""
+        run()
+        assert "/input" not in volumes(docker)
+
     def it_mounts_the_staged_credentials_at_the_agents_home(run, docker):
         run()
         assert volumes(docker)["/home/node/.an-agent"][1] == "rw"
@@ -172,50 +157,15 @@ def describe_volumes():
             "rw",
         )
 
-    def it_mounts_a_writable_copy_of_the_input_folder_at_a_fixed_path(run, docker, tmp_path):
-        data = tmp_path / "data"
-        data.mkdir()
-        (data / "a.txt").write_text("x")
-        run(input=data)
-        source, mode = volumes(docker)["/input"]
-        assert source != str(data.resolve())
-        assert mode == "rw"
-
-    def it_copies_the_input_folders_files_into_what_it_mounts(run, docker, tmp_path, mounted):
-        data = tmp_path / "data"
-        (data / "nested").mkdir(parents=True)
-        (data / "nested" / "a.txt").write_text("x")
-        run(input=data)
-        assert mounted["/input"] == {"nested/a.txt": "x"}
-
-    def it_discards_the_input_copy_after_the_run(run, docker, tmp_path):
-        data = tmp_path / "data"
-        data.mkdir()
-        run(input=data)
-        assert not Path(volumes(docker)["/input"][0]).exists()
-
-    def it_keeps_container_writes_out_of_the_callers_input_folder(run, docker, tmp_path):
-        data = tmp_path / "data"
-        data.mkdir()
-
-        def write_into_the_mount(*_args, **kwargs):
-            source = dict((target, src) for src, target, _ in kwargs["volumes"])["/input"]
-            (Path(source) / "installed.txt").write_text("from the container")
-            return "output"
-
-        docker.run.side_effect = write_into_the_mount
-        run(input=data)
-        assert sorted(p.name for p in data.iterdir()) == []
-
     def it_mounts_each_output_writable(run, docker, tmp_path):
         out = tmp_path / "out"
         out.mkdir()
         run(outputs={out: "/work/out"})
         assert volumes(docker)["/work/out"] == (str(out.resolve()), "rw")
 
-    def it_mounts_only_credentials_transcripts_and_input_when_there_are_no_outputs(run, docker):
+    def it_mounts_only_the_credentials_and_the_transcripts_when_there_are_no_outputs(run, docker):
         run()
-        assert len(docker.run.call_args.kwargs["volumes"]) == 3
+        assert len(docker.run.call_args.kwargs["volumes"]) == 2
 
     def it_refuses_a_source_that_is_not_there(run, tmp_path):
         with pytest.raises(SandboxError, match="does not exist"):

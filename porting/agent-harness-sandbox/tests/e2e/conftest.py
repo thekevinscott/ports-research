@@ -11,6 +11,7 @@ MODEL = "claude-opus-5"
 EFFORT = "low"
 HOME = "/workspace"
 PROBE_TARGET = "/input"
+PROBE_CONTEXT = "probe"
 OUTPUT_TARGET = f"{HOME}/out"
 SCRIPT = "probe.sh"
 REPORT = "report.txt"
@@ -24,12 +25,18 @@ PROMPT = (
 LINE = 'printf "%s\\t" "{name}"; ({command}) 2>&1 | tr "\\n" " "; echo'
 
 
+def copy_the_probe_into_the_image(text: str) -> str:
+    """Put the probe tree in the image, which is the only way it reaches the run."""
+    return text + f"COPY --from={PROBE_CONTEXT} --chown=node:node . {PROBE_TARGET}/\n"
+
+
 @dataclass(frozen=True)
 class Session:
-    """One finished sandbox run and the three places its evidence landed."""
+    """One finished sandbox run and the places its evidence landed."""
 
     output: str
     report: dict[str, str]
+    probe: Path
     transcripts: Path
     proxy_log: Path
 
@@ -42,8 +49,9 @@ class Session:
 def sandbox(tmp_path_factory):
     """Run one probe script through the sandbox and collect what came back out.
 
-    The script is mounted as an input and its output read back from a bound output
-    directory, so the whole exchange goes through the package's own entry point.
+    The script is copied into the image at build time and its output read back
+    from a bound output directory, so the whole exchange goes through the
+    package's own entry points.
     """
 
     def run(probes: dict[str, str]) -> Session:
@@ -61,8 +69,12 @@ def sandbox(tmp_path_factory):
         output = run_agent_harness_sandbox(
             PROMPT.format(script=f"{PROBE_TARGET}/{SCRIPT}", report=f"{OUTPUT_TARGET}/{REPORT}"),
             agent=agent,
-            image=build_agent_image(agent=agent, debug=False),
-            input=probe,
+            image=build_agent_image(
+                agent=agent,
+                modify_dockerfile=copy_the_probe_into_the_image,
+                build_contexts={PROBE_CONTEXT: probe},
+                debug=False,
+            ),
             outputs={outputs: OUTPUT_TARGET},
             envs={},
             debug=False,
@@ -79,6 +91,7 @@ def sandbox(tmp_path_factory):
         )
         return Session(
             output=output,
+            probe=probe,
             report={name: value.strip() for name, value in fields},
             transcripts=transcripts,
             proxy_log=proxy_log,
@@ -93,12 +106,9 @@ def options(tmp_path):
 
     def build(**overrides):
         agent = ClaudeAgent()
-        caller_input = tmp_path / "input"
-        caller_input.mkdir(exist_ok=True)
         return {
             "agent": agent,
             "image": build_agent_image(agent=agent, debug=False),
-            "input": caller_input,
             "outputs": {},
             "envs": {},
             "debug": False,

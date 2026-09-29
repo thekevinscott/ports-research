@@ -15,7 +15,6 @@ PROBES = {
     "bounding_set": "grep ^CapBnd: /proc/self/status | cut -f2",
     "no_new_privs": "grep ^NoNewPrivs: /proc/self/status | cut -f2",
     "setuid_binaries": "find / -xdev -perm /6000 -type f 2>/dev/null | sort",
-    "input_write": "touch /workspace/probe/scratch 2>/dev/null && echo writable || echo readonly",
 }
 
 
@@ -39,7 +38,3 @@ def describe_the_sandbox_container():
     def it_ships_no_setuid_or_setgid_binaries(posture):
         """The half that survives a caller starting the image without the run flags."""
         assert posture["setuid_binaries"] == ""
-
-    def it_cannot_write_to_a_mounted_input(posture):
-        """The caller's tree is the reference the run is judged against, so the run cannot edit it."""
-        assert posture["input_write"] == "readonly"

@@ -6,7 +6,6 @@ from python_on_whales import docker
 from .agents.agent import Agent
 from .errors import AgentHarnessSandboxError
 from .utils.lockdown import lockdown
-from .utils.scratch_copy import scratch_copy
 
 
 def run_agent_harness_sandbox(
@@ -14,7 +13,6 @@ def run_agent_harness_sandbox(
     *,
     agent: Agent,
     image: str,
-    input: str | Path,
     outputs: dict[str | Path, str | Path],
     envs: dict[str, str],
     debug: bool,
@@ -30,9 +28,11 @@ def run_agent_harness_sandbox(
     either that tag itself or a caller's own layer on top of it. Nothing is
     built here.
 
-    input is the caller's folder. It is copied into the container at /input,
-    writable and thrown away when the run ends: the agent can install and scratch
-    there, and nothing it writes reaches the caller's folder.
+    Whatever the agent works on arrives in that image. Nothing is mounted for it
+    to read: a bind shadows the image's own filesystem at the mount point, so a
+    tree the build installed under one would be invisible. The container is
+    removed when the run ends, so its writes go with it and reach no host
+    directory but the outputs.
 
     Every option is required: a default is a value the caller never chose and the
     run record never names.
@@ -42,13 +42,11 @@ def run_agent_harness_sandbox(
     with (
         lockdown(agent.allow, debug=debug, log_path=proxy_log) as jail,
         TemporaryDirectory() as staged,
-        scratch_copy(input) as input_copy,
     ):
         agent.stage_auth(Path(staged))
         volumes = [(staged, agent.home, "rw")]
         for path, target, mode in [
             (transcripts, agent.transcripts, "rw"),
-            (input_copy, "/input", "rw"),
             *((source, target, "rw") for source, target in outputs.items()),
         ]:
             source = Path(path)

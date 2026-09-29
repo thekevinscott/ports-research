@@ -138,3 +138,22 @@ def describe_modify_dockerfile():
             docker.build.side_effect = lambda *args, **kwargs: paths.append(Path(kwargs["file"]))
             build(modify_dockerfile=lambda text: text + "RUN echo modified\n")
             assert not paths[1].exists()
+
+
+def describe_build_contexts():
+    def describe_when_they_are_supplied():
+        def it_gives_the_agent_layer_the_named_contexts(build, docker):
+            build(build_contexts={"input": Path("/elsewhere/source")})
+            assert docker.build.call_args_list[1].kwargs["build_contexts"] == {
+                "input": Path("/elsewhere/source")
+            }
+
+        def it_leaves_the_base_build_with_the_shipped_context_alone(build, docker):
+            """Only the agent Dockerfile is the caller's to extend."""
+            build(build_contexts={"input": Path("/elsewhere/source")})
+            assert "build_contexts" not in docker.build.call_args_list[0].kwargs
+
+    def describe_when_they_are_not_supplied():
+        def it_names_no_additional_context(build, docker):
+            build()
+            assert docker.build.call_args_list[1].kwargs["build_contexts"] == {}
