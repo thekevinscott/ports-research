@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from .run_porting_harness import PROMPT_PATH, run_porting_harness
+from .run_porting_harness import INPUT_CONTEXT, PROMPT_PATH, run_porting_harness
 
 OPTIONS = (
     "agent",
@@ -107,11 +107,10 @@ def describe_run_porting_harness():
 
         assert output_directory.is_dir()
 
-    def it_wires_the_input_the_output_and_home_into_the_sandbox(
+    def it_wires_the_output_and_home_into_the_sandbox(
         run_agent_harness_sandbox,
         options,
         agent,
-        input_directory,
         output_directory,
         tmp_path,
     ):
@@ -120,7 +119,6 @@ def describe_run_porting_harness():
         assert run_agent_harness_sandbox.call_args.kwargs == {
             "agent": agent,
             "image": "an-agent:latest",
-            "input": input_directory,
             "outputs": {output_directory: Path("/target")},
             "envs": {},
             "debug": False,
@@ -131,21 +129,16 @@ def describe_run_porting_harness():
             "proxy_log": tmp_path / "proxy.log",
         }
 
-    def it_hands_the_input_over_as_the_one_input_folder(
-        run_agent_harness_sandbox, options, input_directory
-    ):
-        """One mount. What is inside it, and what it means, is the caller's prompt."""
-        run_porting_harness(**options())
-
-        assert run_agent_harness_sandbox.call_args.kwargs["input"] == input_directory
-
     def it_runs_the_image_it_built_for_the_agent(
         run_agent_harness_sandbox, build_agent_image, options, agent
     ):
         run_porting_harness(**options(debug=True))
 
         build_agent_image.assert_called_once_with(
-            agent=agent, modify_dockerfile=None, debug=True
+            agent=agent,
+            modify_dockerfile=None,
+            build_contexts={INPUT_CONTEXT: options()["input"]},
+            debug=True,
         )
         assert run_agent_harness_sandbox.call_args.kwargs["image"] == "an-agent:latest"
 
@@ -193,6 +186,23 @@ def describe_run_porting_harness():
         run_porting_harness(**options(proxy_log=proxy_log))
 
         assert run_agent_harness_sandbox.call_args.kwargs["proxy_log"] == proxy_log
+
+    def describe_the_input_folder():
+        def it_hands_the_input_to_the_build_as_the_named_context(
+            run_agent_harness_sandbox, build_agent_image, options, input_directory
+        ):
+            """COPY reaches it from the Dockerfile the caller extends."""
+            run_porting_harness(**options())
+
+            assert build_agent_image.call_args.kwargs["build_contexts"] == {
+                INPUT_CONTEXT: input_directory
+            }
+
+        def it_mounts_the_input_nowhere(run_agent_harness_sandbox, options):
+            """A bind at /input would shadow whatever the build put under it."""
+            run_porting_harness(**options())
+
+            assert "input" not in run_agent_harness_sandbox.call_args.kwargs
 
     def describe_modify_dockerfile():
         def it_hands_the_callers_modifier_to_the_image_build(

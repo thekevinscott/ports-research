@@ -3,8 +3,12 @@
 Ports a reference library into another language, using agent-harness-sandbox.
 
 `run_porting_harness` takes a prompt, an input directory and an output
-directory. The input is one folder; the sandbox mounts a throwaway writable copy at `/input`. The output
-directory mounts writable at `/target` and is the port as the agent leaves it.
+directory. The input is one folder, handed to the image build as the `input`
+build context: `modify_dockerfile` is where the caller copies it to `/input`,
+so its dependencies can be installed while the network is still open. Nothing
+is mounted at `/input` — a bind there would shadow what the build wrote. The
+output directory mounts writable at `/target` and is the port as the agent
+leaves it.
 
 The harness owns a system prompt, `prompt.txt`, that frames the task: the
 reference is at `/input`, the port goes to `/target`. The caller's prompt is

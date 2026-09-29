@@ -20,11 +20,18 @@ from pathlib import Path
 
 import pytest
 from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
-from porting_harness.run_porting_harness import run_porting_harness
+from porting_harness.run_porting_harness import INPUT, INPUT_CONTEXT, run_porting_harness
 
 TARGET_LANGUAGE = {"typescript": "python", "python": "typescript"}
 
 MODEL = "claude-opus-5"
+
+
+def copy_the_input_into_the_image(agent_dockerfile: str) -> str:
+    """The harness mounts nothing at INPUT, so the build is how the tree gets there."""
+    return agent_dockerfile + f"COPY --from={INPUT_CONTEXT} --chown=node:node . {INPUT}/\n"
+
+
 PROMPT = (
     "The library to port is in /input/source. Port it to {target_language}.\n"
     "The suite for the port is in /input/tests. Run it and iterate until green.\n"
@@ -94,6 +101,7 @@ def ported(tmp_path_factory, two_number_adder: Path):
                 agent=ClaudeAgent(),
                 prompt=PROMPT.format(target_language=target_language),
                 input=input_directory,
+                modify_dockerfile=copy_the_input_into_the_image,
                 output_directory=session.directory,
                 debug=False,
                 effort="high",
