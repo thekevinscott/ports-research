@@ -54,8 +54,8 @@ def describe_the_container():
         with pytest.raises(TypeError):
             ClaudeAgent(claude_home)
 
-    def it_points_at_its_own_dockerfile(agent):
-        assert agent.dockerfile.name == "Dockerfile.claude"
+    def it_names_its_own_stage(agent):
+        assert agent.stage == "claude"
 
     def it_puts_its_config_where_claude_looks_for_it(agent):
         assert agent.home == "/home/node/.claude"

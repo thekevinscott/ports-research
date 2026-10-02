@@ -17,7 +17,7 @@ def sandbox_error():
 
 AGENT = {
     "image": "an-agent:latest",
-    "dockerfile": Path("/sandbox/Dockerfile.an-agent"),
+    "stage": "an-agent",
     "home": "/home/node/.an-agent",
     "transcripts": "/home/node/.an-agent/sessions",
     "allow": ("api.example.com",),
