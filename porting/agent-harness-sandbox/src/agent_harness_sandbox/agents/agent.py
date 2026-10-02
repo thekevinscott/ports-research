@@ -4,7 +4,7 @@ from typing import Protocol
 
 class Agent(Protocol):
     image: str
-    dockerfile: Path
+    stage: str
     home: str
     transcripts: str
     allow: tuple[str, ...]

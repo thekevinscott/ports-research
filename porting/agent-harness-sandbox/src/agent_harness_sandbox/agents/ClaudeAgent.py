@@ -1,7 +1,6 @@
 import shutil
 from pathlib import Path
 
-from ..config import SANDBOX_DIR
 from ..errors import AgentHarnessSandboxError
 
 EFFORT_LEVELS = ("low", "medium", "high", "xhigh", "max")
@@ -15,7 +14,7 @@ CLAUDE_HOME = Path.home() / ".claude"
 
 class ClaudeAgent:
     image = "agent-harness-sandbox-claude:latest"
-    dockerfile = SANDBOX_DIR / "Dockerfile.claude"
+    stage = "claude"
     home = "/home/node/.claude"
     transcripts = "/home/node/.claude/projects"
     allow = ("api.anthropic.com",)

@@ -11,8 +11,8 @@ drops all capabilities, runs with `no-new-privileges`, and reaches the network
 only through an egress proxy that allows the agent's own endpoints. The proxy
 log and the session transcript land on the host.
 
-Library only, no CLI. `build_agent_image` builds the images in `sandbox/` and
-returns the agent's tag. `run_agent_harness_sandbox` runs the prompt in
+Library only, no CLI. `build_agent_image` builds the agent's stage of
+`sandbox/Dockerfile` and returns the agent's tag. `run_agent_harness_sandbox` runs the prompt in
 whatever image it is handed. Every option is required; nothing has a default.
 
 `ClaudeAgent` is wired up. `PiAgent` exists but is not.

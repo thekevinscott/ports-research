@@ -208,11 +208,11 @@ def describe_image_freshness():
         agent = ClaudeAgent(host_home=claude_home)
         assert build_agent_image(agent=agent, debug=False) == CLAUDE_IMAGE
         build_agent_image(agent=agent, debug=False)
-        assert builds == ["agent-harness-sandbox-base:latest", CLAUDE_IMAGE] * 2
+        assert builds == [CLAUDE_IMAGE] * 2
 
-    def it_builds_pis_layer_on_the_same_base(docker, pi_home, builds):
+    def it_builds_pis_image_in_one_build(docker, pi_home, builds):
         build_agent_image(agent=PiAgent(provider="openrouter", host_home=pi_home), debug=False)
-        assert builds == ["agent-harness-sandbox-base:latest", PI_IMAGE]
+        assert builds == [PI_IMAGE]
 
     def it_rebuilds_the_proxy_on_every_run(docker, claude_home, options, builds):
         run_agent_harness_sandbox("1+1", **options())

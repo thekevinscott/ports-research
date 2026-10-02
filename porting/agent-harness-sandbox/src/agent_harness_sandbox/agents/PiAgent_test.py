@@ -55,8 +55,8 @@ def describe_the_container():
     def it_names_its_own_image(agent):
         assert agent.image == "agent-harness-sandbox-pi:latest"
 
-    def it_points_at_its_own_dockerfile(agent):
-        assert agent.dockerfile.name == "Dockerfile.pi"
+    def it_names_its_own_stage(agent):
+        assert agent.stage == "pi"
 
     def it_puts_its_config_where_pi_looks_for_it(agent):
         assert agent.home == "/home/node/.pi/agent"

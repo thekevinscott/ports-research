@@ -2,7 +2,6 @@ import os
 import shutil
 from pathlib import Path
 
-from ..config import SANDBOX_DIR
 from ..errors import AgentHarnessSandboxError
 
 EFFORT_LEVELS = ("off", "minimal", "low", "medium", "high", "xhigh")
@@ -32,7 +31,7 @@ def resolve_allow(provider: str) -> tuple[str, ...]:
 
 class PiAgent:
     image = "agent-harness-sandbox-pi:latest"
-    dockerfile = SANDBOX_DIR / "Dockerfile.pi"
+    stage = "pi"
     home = "/home/node/.pi/agent"
     transcripts = "/home/node/.pi/agent/sessions"
 
