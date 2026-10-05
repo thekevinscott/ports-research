@@ -123,27 +123,10 @@ markdown file named `YYYY-MM-DDTHH-MMZ-<slug>.md`, opening with a `#` heading
 carrying the UTC timestamp and title. Never edit an earlier entry; add a new
 file that corrects it.
 
-## Handoff — at every stopping point
+The session handoff is the resume document. `journal/` is the lab record. A
+finding goes in both; a branch name and a next command go only in the handoff.
 
-Every substantial chunk of work ends with a handoff file. A stopping point is
-a push, an opened PR, a finished investigation, a run started or finished, or
-being blocked on Kevin. It is a checkpoint, not the end: write the file, then
-keep going. The pattern is `thekevinscott/dirsql`'s session handoff doc, kept
-on disk here instead of in `/tmp`.
-
-- One file per session: `internal/SESSION_HANDOFF_<YYYY-MM-DD>[-<topic>].md`.
-  `internal/` is gitignored. Never commit, stage, or link to it.
-- Rewrite the same file in place at each checkpoint, then print its path so
-  the freshest copy sits near the bottom of the conversation.
-- Write it standalone. A new session with zero context must be able to resume
-  from it alone: the task and its status (done, in progress, next); branches,
-  worktrees, PRs and issues by number with CI state; decisions and discovered
-  constraints with one-line reasons; the exact next commands; anything waiting
-  on Kevin.
-- The main thread writes it. It is coordination paperwork, not delegated work.
-
-The handoff is the resume document. `journal/` is the lab record. A finding
-goes in both; a branch name and a next command go only in the handoff.
+@docs/internals/session-handoff.md
 
 ## Running tests — always
 
