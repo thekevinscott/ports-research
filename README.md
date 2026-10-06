@@ -121,8 +121,9 @@ cover.
 with `literature/harvest`. The literature survey that reads it is not published
 with the repo.
 
-Session handoffs, audits and dated analysis batches are kept on disk under
-`internal/`, outside the published repo.
+Audits and dated analysis batches are kept on disk under `internal/`, outside
+the published repo. Session handoffs are kept in the session scratchpad or
+`/tmp`, outside the repo tree.
 
 ## Conventions
 
