@@ -129,11 +129,12 @@ A handoff exists so a conversation can restart after the cache has gone cold.
 It is a token-saving mechanism: Kevin reads one file instead of paying to
 rebuild context.
 
-Every turn that ends waiting on Kevin ends by rewriting the handoff and
-printing its path, if anything non-trivial was discussed or done since the
-last one. If you don't know when the next message is coming, assume it comes
-cold. A push, an opened PR, or a finished run is also a checkpoint: write the
-file, then keep going.
+The first reply of every session writes the handoff and prints its path,
+before anything else. Every reply after that ends with the path, and the file
+is current when the path is printed: if anything non-trivial was discussed or
+done since the last write, rewrite it first. If you don't know when the next
+message is coming, assume it comes cold. A push, an opened PR, or a finished
+run is also a checkpoint: write the file, then keep going.
 
 Discussion is work. Decisions that exist nowhere but the conversation are the
 most expensive thing to rebuild.
