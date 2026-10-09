@@ -123,13 +123,23 @@ markdown file named `YYYY-MM-DDTHH-MMZ-<slug>.md`, opening with a `#` heading
 carrying the UTC timestamp and title. Never edit an earlier entry; add a new
 file that corrects it.
 
-## Handoff — at every stopping point
+## Handoff — whenever the next message might come cold
 
-Every substantial chunk of work ends with a handoff file. A stopping point is
-a push, an opened PR, a finished investigation, a run started or finished, or
-being blocked on Kevin. It is a checkpoint, not the end: write the file, then
-keep going. The pattern is `thekevinscott/dirsql`'s session handoff doc, kept
-on disk here instead of in `/tmp`.
+A handoff exists so a conversation can restart after the cache has gone cold.
+It is a token-saving mechanism: Kevin reads one file instead of paying to
+rebuild context.
+
+Every turn that ends waiting on Kevin ends by rewriting the handoff and
+printing its path, if anything non-trivial was discussed or done since the
+last one. If you don't know when the next message is coming, assume it comes
+cold. A push, an opened PR, or a finished run is also a checkpoint: write the
+file, then keep going.
+
+Discussion is work. Decisions that exist nowhere but the conversation are the
+most expensive thing to rebuild.
+
+The pattern is `thekevinscott/dirsql`'s session handoff doc, kept on disk here
+instead of in `/tmp`.
 
 - One file per session: `internal/SESSION_HANDOFF_<YYYY-MM-DD>[-<topic>].md`.
   `internal/` is gitignored. Never commit, stage, or link to it.
