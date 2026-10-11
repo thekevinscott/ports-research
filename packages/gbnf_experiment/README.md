@@ -3,7 +3,7 @@
 Configures porting-harness for one library: [gbnf](https://github.com/thekevinscott/gbnf),
 which has javascript and python implementations sharing one test suite.
 
-CLI `run-gbnf-experiment`. Each invocation is one experimental condition: a
+CLI `run_gbnf_experiment`. Each invocation is one experimental condition: a
 source language, and whether each language's test suite is mounted alongside
 the reference. It
 

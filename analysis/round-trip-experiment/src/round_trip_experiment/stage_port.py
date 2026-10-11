@@ -12,7 +12,7 @@ def stage_port(
     derivations_directory: Path,
     staging_directory: Path,
 ) -> Path:
-    """run-gbnf-experiment reads its reference from the derivation cache and nowhere else,
+    """run_gbnf_experiment reads its reference from the derivation cache and nowhere else,
     so the port is staged as a derivation of its own under a per-run cache root and the
     harness is pointed at that root. The forward reference comes from `git archive` and
     carries no build output; a port does, hence the ignore list.

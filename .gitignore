@@ -2,7 +2,7 @@
 literature/papers/
 
 # Upstream clone with a live remote; stays a nested repo
-gbnf-experiment/repo/
+gbnf_experiment/repo/
 
 # Python
 __pycache__/

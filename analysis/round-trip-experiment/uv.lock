@@ -310,7 +310,7 @@ wheels = [
 [[package]]
 name = "gbnf-experiment"
 version = "0.1.0"
-source = { editable = "../../packages/gbnf-experiment" }
+source = { editable = "../../packages/gbnf_experiment" }
 dependencies = [
     { name = "click" },
     { name = "port-codebase" },
@@ -889,7 +889,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.5.0" },
-    { name = "gbnf-experiment", editable = "../../packages/gbnf-experiment" },
+    { name = "gbnf-experiment", editable = "../../packages/gbnf_experiment" },
     { name = "measure-embedding", editable = "../measure-embedding" },
     { name = "pydantic-settings", specifier = ">=2.15.0" },
     { name = "rapidfuzz", specifier = ">=3.0" },

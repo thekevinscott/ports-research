@@ -1,6 +1,6 @@
 """What a real port leaves behind, read only off disk.
 
-Everything here is an artifact of one `run-gbnf-experiment` invocation against
+Everything here is an artifact of one `run_gbnf_experiment` invocation against
 a temporary data directory. Nothing calls into the package: a run record that
 cannot be checked from the outside is a run record nobody can audit later.
 """

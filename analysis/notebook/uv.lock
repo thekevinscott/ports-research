@@ -73,7 +73,7 @@ requires-dist = [
     { name = "altair", specifier = ">=6.2.2" },
     { name = "cachetta", specifier = ">=0.7.0" },
     { name = "dirsql", specifier = ">=0.4.39" },
-    { name = "gbnf-experiment", editable = "../../packages/gbnf-experiment" },
+    { name = "gbnf-experiment", editable = "../../packages/gbnf_experiment" },
     { name = "marimo", specifier = ">=0.24.0" },
     { name = "measure-embedding", editable = "../measure-embedding" },
     { name = "polars", specifier = ">=1.44.1" },
@@ -255,7 +255,7 @@ wheels = [
 [[package]]
 name = "gbnf-experiment"
 version = "0.1.0"
-source = { editable = "../../packages/gbnf-experiment" }
+source = { editable = "../../packages/gbnf_experiment" }
 dependencies = [
     { name = "click" },
     { name = "port-codebase" },

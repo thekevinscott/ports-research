@@ -1,4 +1,4 @@
-name: gbnf-experiment CI
+name: gbnf_experiment CI
 
 # This file is deliberately not a trigger: see AGENTS.md "CI workflows".
 # Integration holds the daemon back but still walks the full prepare/port/grade
@@ -6,8 +6,8 @@ name: gbnf-experiment CI
 on:
   pull_request:
     paths:
-      - 'packages/gbnf-experiment/**'
-      - '!packages/gbnf-experiment/README.md'
+      - 'packages/gbnf_experiment/**'
+      - '!packages/gbnf_experiment/README.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,5 +20,5 @@ jobs:
   ci:
     uses: ./.github/workflows/package-ci.yml
     with:
-      package: packages/gbnf-experiment
+      package: packages/gbnf_experiment
       integration-timeout-minutes: 30
