@@ -15,13 +15,13 @@ FORWARD_CONDITION = {
     "model": "claude-opus-5",
 }
 ESTIMATE = {"total_tokens": 4697263, "api_calls": 63, "duration_ms": 456517}
-COMMAND = {"argv": ["uv", "run", "run-gbnf-experiment"], "env": {"GBNF_EXPERIMENT_DATA_DIRECTORY": "/reverse"}}
+COMMAND = {"argv": ["uv", "run", "run_gbnf_experiment"], "env": {"GBNF_EXPERIMENT_DATA_DIRECTORY": "/reverse"}}
 RUN = Path("/data/20260909T001426Z_1c28aa33")
 STAGED = Path("/cache/staging/20260909T001426Z_1c28aa33/390bf534c55d496b")
 PLACES = dict(
     derivation_cache_key="390bf534c55d496b",
     derivations_directory=Path("/cache/gbnf-experiment/derivations"),
-    gbnf_experiment_directory=Path("/repo/porting/gbnf-experiment"),
+    gbnf_experiment_directory=Path("/repo/packages/gbnf_experiment"),
     staging_directory=Path("/cache/staging"),
     reverse_directory=Path("/repo/analysis/round-trip-experiment/reverse"),
 )

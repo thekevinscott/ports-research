@@ -9,7 +9,7 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "click>=8.5.0",
-    "gbnf-experiment",
+    "gbnf_experiment",
 ]
 
 [project.scripts]
@@ -20,9 +20,9 @@ requires = ["uv_build>=0.9,<1.0"]
 build-backend = "uv_build"
 
 [tool.uv.sources]
-gbnf-experiment = { path = "../../porting/gbnf-experiment", editable = true }
-porting-harness = { path = "../../porting/porting-harness", editable = true }
-agent-harness-sandbox = { path = "../../porting/agent-harness-sandbox", editable = true }
+gbnf_experiment = { path = "../../packages/gbnf_experiment", editable = true }
+port_codebase = { path = "../../packages/port_codebase", editable = true }
+agent-harness-sandbox = { path = "../../packages/agent-harness-sandbox", editable = true }
 
 [dependency-groups]
 dev = [

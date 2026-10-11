@@ -102,7 +102,7 @@ reverse-port run    --run <forward run dir>
 
 The reverse leg: a banked port goes back through the unmodified harness into the
 language it came from, so it can be measured against the original reference in that
-language. No file under `porting/gbnf-experiment/` is touched; the harness is reused
+language. No file under `packages/gbnf_experiment/` is touched; the harness is reused
 by invocation, with the two roots it reads moved by env var. Every path option takes an
 existing directory and is resolved absolute.
 
@@ -110,7 +110,7 @@ existing directory and is resolved absolute.
   `~/.cache/ports/round-trip-experiment/derivations/<forward run id>/<derivation cache key>/source/<reverse source language>/`,
   build artefacts (`node_modules`, `__pycache__`, `.venv`, `.pytest_cache`, `dist`) left
   out, and symlinks the real derivation cache's `tests/` beside it. `assemble_reference_implementation`
-  cannot tell the staged tree from a derived one. The cache key is gbnf-experiment's own,
+  cannot tell the staged tree from a derived one. The cache key is gbnf_experiment's own,
   imported from its config. Prints one JSON object — `forward` (the forward run id and its
   condition), `condition` (the reverse one), `staged`, `reverse_root`, `argv`, `env`,
   `estimate` — and starts nothing.

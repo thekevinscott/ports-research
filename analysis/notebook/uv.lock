@@ -1,15 +1,15 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.14"
 
 [options]
-exclude-newer = "2026-09-23T21:10:22.054568455Z"
+exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
 exclude-newer-span = "P3D"
 
 [[package]]
 name = "agent-harness-sandbox"
 version = "0.1.0"
-source = { editable = "../../porting/agent-harness-sandbox" }
+source = { editable = "../../packages/agent-harness-sandbox" }
 dependencies = [
     { name = "click" },
     { name = "python-on-whales" },
@@ -73,7 +73,7 @@ requires-dist = [
     { name = "altair", specifier = ">=6.2.2" },
     { name = "cachetta", specifier = ">=0.7.0" },
     { name = "dirsql", specifier = ">=0.4.39" },
-    { name = "gbnf-experiment", editable = "../../porting/gbnf-experiment" },
+    { name = "gbnf-experiment", editable = "../../packages/gbnf_experiment" },
     { name = "marimo", specifier = ">=0.24.0" },
     { name = "measure-embedding", editable = "../measure-embedding" },
     { name = "polars", specifier = ">=1.44.1" },
@@ -137,7 +137,7 @@ name = "cffi"
 version = "2.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pycparser", marker = "implementation_name != 'PyPy'" },
+    { name = "pycparser" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9e/ef/008a1939e372c06329a3fce4279c02f328488f3526744906eeec3da7ad5f/cffi-2.1.1.tar.gz", hash = "sha256:dd31f52ea1086513bb9df30f8fcee9b8918323ae067a3d5b78bc826a000712be", size = 530807, upload-time = "2026-08-03T21:21:18.939Z" }
 wheels = [
@@ -255,10 +255,10 @@ wheels = [
 [[package]]
 name = "gbnf-experiment"
 version = "0.1.0"
-source = { editable = "../../porting/gbnf-experiment" }
+source = { editable = "../../packages/gbnf_experiment" }
 dependencies = [
     { name = "click" },
-    { name = "porting-harness" },
+    { name = "port-codebase" },
     { name = "pydantic-settings" },
     { name = "python-on-whales" },
 ]
@@ -266,7 +266,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.5.0" },
-    { name = "porting-harness", editable = "../../porting/porting-harness" },
+    { name = "port-codebase", editable = "../../packages/port_codebase" },
     { name = "pydantic-settings", specifier = ">=2.15.0" },
     { name = "python-on-whales", specifier = ">=0.81.0" },
 ]
@@ -701,9 +701,9 @@ wheels = [
 ]
 
 [[package]]
-name = "porting-harness"
+name = "port-codebase"
 version = "0.1.0"
-source = { editable = "../../porting/porting-harness" }
+source = { editable = "../../packages/port_codebase" }
 dependencies = [
     { name = "agent-harness-sandbox" },
     { name = "pathspec" },
@@ -711,7 +711,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "agent-harness-sandbox", editable = "../../porting/agent-harness-sandbox" },
+    { name = "agent-harness-sandbox", editable = "../../packages/agent-harness-sandbox" },
     { name = "pathspec", specifier = ">=1.1.1" },
 ]
 

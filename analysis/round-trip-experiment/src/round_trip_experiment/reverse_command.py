@@ -9,7 +9,7 @@ def reverse_command(
     gbnf_experiment_directory: Path,
 ) -> dict:
     """Both roots the harness reads are env-backed, so the reverse leg is a plain
-    run-gbnf-experiment invocation with its two directories moved.
+    run_gbnf_experiment invocation with its two directories moved.
     """
     flags = [
         flag
@@ -21,7 +21,7 @@ def reverse_command(
     ]
     return {
         "argv": [
-            "uv", "run", "--directory", str(gbnf_experiment_directory), "run-gbnf-experiment",
+            "uv", "run", "--directory", str(gbnf_experiment_directory), "run_gbnf_experiment",
             "--source-language", condition["source_language"],
             *flags,
             "--effort", condition["effort"],

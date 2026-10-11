@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[2]
-GBNF_EXPERIMENT_ROOT = PACKAGE_ROOT.parents[1] / "porting" / "gbnf-experiment"
+GBNF_EXPERIMENT_ROOT = PACKAGE_ROOT.parents[1] / "packages" / "gbnf_experiment"
 DERIVATION_KEY = "af673dbe41be73ce"
 UV = shutil.which("uv")
 FORWARD_CONDITION = {
@@ -132,7 +132,7 @@ def describe_stage():
 
     def it_prints_the_run_gbnf_experiment_command(staged_report):
         assert staged_report["argv"] == [
-            "uv", "run", "--directory", str(GBNF_EXPERIMENT_ROOT), "run-gbnf-experiment",
+            "uv", "run", "--directory", str(GBNF_EXPERIMENT_ROOT), "run_gbnf_experiment",
             "--source-language", "typescript",
             "--include-typescript-tests",
             "--include-python-tests",

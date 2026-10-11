@@ -9,7 +9,7 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "click>=8.5.0",
-    "gbnf-experiment",
+    "gbnf_experiment",
     "pydantic-settings>=2.15.0",
     # 0.26.0 corrupts memory under CPython 3.14: SIGBUS mid-walk or SIGSEGV in GC at exit.
     "tree-sitter>=0.25.2,<0.26",
@@ -29,7 +29,7 @@ requires = ["uv_build>=0.9,<1.0"]
 build-backend = "uv_build"
 
 [tool.uv.sources]
-gbnf-experiment = { path = "../../porting/gbnf-experiment", editable = true }
+gbnf_experiment = { path = "../../packages/gbnf_experiment", editable = true }
 measure-embedding = { path = "../measure-embedding", editable = true }
 
 [dependency-groups]
