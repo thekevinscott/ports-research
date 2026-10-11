@@ -34,3 +34,5 @@ node_modules/
 # Session handoffs, audits, dated analysis batches and the literature survey.
 # Kept on disk, out of the published repo. Published notes live in /notes/.
 /internal/
+.env
+/tmp
