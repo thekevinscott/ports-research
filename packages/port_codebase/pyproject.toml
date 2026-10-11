@@ -1,14 +1,14 @@
 [project]
 name = "port_codebase"
 version = "0.1.0"
-description = "Runs one sandboxed porting pass through the agent-harness-sandbox container"
+description = "Ports a reference library into another language, inside a botbox"
 readme = "README.md"
 authors = [
     { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "agent-harness-sandbox",
+    "botbox>=0.0.4",
     "pathspec>=1.1.1",
 ]
 
@@ -19,9 +19,6 @@ build-backend = "uv_build"
 [tool.uv.build-backend]
 # Colocated tests are development code; keep them out of the wheel and sdist.
 source-exclude = ["*_test.py", "**/*_test.py"]
-
-[tool.uv.sources]
-agent-harness-sandbox = { path = "../agent-harness-sandbox", editable = true }
 
 [dependency-groups]
 dev = [

@@ -1,7 +1,7 @@
 [[python.exempt]]
 path = "port_codebase/__init__.py"
 rules = ["colocated-test"]
-reason = "re-export barrel; run_porting_harness is tested in its own module"
+reason = "re-export barrel; port_codebase is tested in its own module"
 
 [[python.exempt]]
 path = "tests/fixtures/two_number_adder/source/python/tests/add_test.py"

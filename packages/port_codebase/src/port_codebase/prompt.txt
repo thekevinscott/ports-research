@@ -1,9 +1,9 @@
-You are porting software from one language to another. 
+You are porting software from one language to another.
 
 The reference is mounted at `/input`.
 
 Write the port to `/target`.
 
-The library itself may specify additional porting instructions below:
+The library itself may specify additional porting instructions below. Paths in them are relative to `/input`.
 
 {upstream}
