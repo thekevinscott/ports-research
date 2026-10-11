@@ -1,0 +1,2 @@
+test-unit:
+    uv run pytest src -x -q

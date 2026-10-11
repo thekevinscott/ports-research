@@ -12,16 +12,18 @@ DEFAULT_MODEL = "claude-opus-5"
     type=click.Choice(["javascript", "python"]),
     required=True,
 )
-@click.option("--include-javascript-tests", is_flag=True, default=False)
-@click.option("--include-python-tests", is_flag=True, default=False)
+@click.option("--include-unit-tests", is_flag=True, default=False)
+@click.option("--include-source-integration-tests", is_flag=True, default=False)
+@click.option("--include-target-integration-tests", is_flag=True, default=False)
 @click.option("--debug", is_flag=True, default=False)
 # Both free text: claude errors on an unknown model or effort instead of warning and running the default.
 @click.option("--effort", default="high", show_default=True)
 @click.option("--model", default=DEFAULT_MODEL, show_default=True)
 def cli(
     source_language: str,
-    include_javascript_tests: bool,
-    include_python_tests: bool,
+    include_unit_tests: bool,
+    include_source_integration_tests: bool,
+    include_target_integration_tests: bool,
     debug: bool,
     effort: str,
     model: str,
@@ -31,8 +33,9 @@ def cli(
         run_directory = run_gbnf_experiment(
             agent=agent,
             source_language=source_language,
-            include_javascript_tests=include_javascript_tests,
-            include_python_tests=include_python_tests,
+            include_unit_tests=include_unit_tests,
+            include_source_integration_tests=include_source_integration_tests,
+            include_target_integration_tests=include_target_integration_tests,
             debug=debug,
         )
         click.echo(f"Run directory: {run_directory}")

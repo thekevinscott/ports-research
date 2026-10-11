@@ -2,9 +2,9 @@ from pathlib import Path
 
 from botbox import Agent, Botbox, RunResult
 
-from .prompt import Prompt
+from prompt import Prompt
 
-PROMPT_PATH = Path(__file__).parent / "prompt.txt"
+PROMPT_PATH = Path(__file__).parent / "prompts" / "prompt.txt"
 DOCKERFILE = Path(__file__).parent / "Dockerfile"
 
 

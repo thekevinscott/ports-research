@@ -8,6 +8,7 @@ on:
     paths:
       - 'packages/gbnf_experiment/**'
       - '!packages/gbnf_experiment/README.md'
+      - 'packages/prompt/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

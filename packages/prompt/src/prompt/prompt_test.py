@@ -1,6 +1,6 @@
 import pytest
 
-from port_codebase.prompt import Prompt
+from prompt import Prompt
 
 TEMPLATE = "Write the port to /target.\n\n{upstream}\n"
 

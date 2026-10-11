@@ -144,6 +144,7 @@ source = { editable = "." }
 dependencies = [
     { name = "botbox" },
     { name = "pathspec" },
+    { name = "prompt" },
 ]
 
 [package.dev-dependencies]
@@ -157,7 +158,22 @@ dev = [
 requires-dist = [
     { name = "botbox", specifier = ">=0.0.4" },
     { name = "pathspec", specifier = ">=1.1.1" },
+    { name = "prompt", editable = "../prompt" },
 ]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "coverage", specifier = ">=7.16.0" },
+    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-describe", specifier = ">=3.2.0" },
+]
+
+[[package]]
+name = "prompt"
+version = "0.1.0"
+source = { editable = "../prompt" }
+
+[package.metadata]
 
 [package.metadata.requires-dev]
 dev = [

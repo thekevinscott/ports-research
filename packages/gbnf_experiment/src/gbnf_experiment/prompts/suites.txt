@@ -1,0 +1,4 @@
+
+The following test suites are included:
+
+{suites}

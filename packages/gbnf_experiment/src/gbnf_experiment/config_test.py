@@ -10,9 +10,11 @@ from gbnf_experiment.config import (
     REPO_ROOT,
     Settings,
     compute_prepare_cache_key,
-    prepare_cache_key,
     settings,
 )
+
+
+RULES = "+ /python/\n"
 
 
 @pytest.fixture
@@ -48,9 +50,6 @@ def docker_directory(tmp_path):
 def describe_settings():
     def it_pins_the_gbnf_commit():
         assert Settings().gbnf_commit == "13f1aca495d11e160fffd68c4ba299a2415909d8"
-
-    def it_defaults_the_image_tag():
-        assert Settings().image_tag == "gbnf-prepare:latest"
 
     def it_defaults_the_data_directory_to_the_repo_data_runs():
         assert Settings().data_directory == REPO_ROOT / "data" / "runs"
@@ -105,43 +104,41 @@ def describe_settings():
 
 def describe_compute_prepare_cache_key():
     def it_is_stable_across_recomputation(docker_directory):
-        first = compute_prepare_cache_key("abc123", docker_directory)
-        second = compute_prepare_cache_key("abc123", docker_directory)
+        first = compute_prepare_cache_key("abc123", docker_directory, RULES)
+        second = compute_prepare_cache_key("abc123", docker_directory, RULES)
         assert first == second
 
     def it_is_a_short_hex_digest(docker_directory):
-        key = compute_prepare_cache_key("abc123", docker_directory)
+        key = compute_prepare_cache_key("abc123", docker_directory, RULES)
         assert len(key) == 16
         assert all(character in "0123456789abcdef" for character in key)
 
     def it_changes_when_the_commit_changes(docker_directory):
         assert compute_prepare_cache_key(
-            "abc123", docker_directory
-        ) != compute_prepare_cache_key("def456", docker_directory)
+            "abc123", docker_directory, RULES
+        ) != compute_prepare_cache_key("def456", docker_directory, RULES)
 
     def it_changes_when_a_docker_file_changes(docker_directory):
-        before = compute_prepare_cache_key("abc123", docker_directory)
+        before = compute_prepare_cache_key("abc123", docker_directory, RULES)
         (docker_directory / "Dockerfile").write_text("FROM node:24-slim")
-        assert compute_prepare_cache_key("abc123", docker_directory) != before
+        assert compute_prepare_cache_key("abc123", docker_directory, RULES) != before
 
     def it_changes_when_a_patch_changes(docker_directory):
-        before = compute_prepare_cache_key("abc123", docker_directory)
+        before = compute_prepare_cache_key("abc123", docker_directory, RULES)
         (docker_directory / "patches" / "0001.patch").write_text("different diff")
-        assert compute_prepare_cache_key("abc123", docker_directory) != before
+        assert compute_prepare_cache_key("abc123", docker_directory, RULES) != before
 
     def it_changes_when_a_file_is_added(docker_directory):
-        before = compute_prepare_cache_key("abc123", docker_directory)
+        before = compute_prepare_cache_key("abc123", docker_directory, RULES)
         (docker_directory / "patches" / "0002.patch").write_text("another")
-        assert compute_prepare_cache_key("abc123", docker_directory) != before
+        assert compute_prepare_cache_key("abc123", docker_directory, RULES) != before
 
     def it_ignores_directory_entries(docker_directory):
-        before = compute_prepare_cache_key("abc123", docker_directory)
+        before = compute_prepare_cache_key("abc123", docker_directory, RULES)
         (docker_directory / "empty").mkdir()
-        assert compute_prepare_cache_key("abc123", docker_directory) == before
+        assert compute_prepare_cache_key("abc123", docker_directory, RULES) == before
 
-
-def describe_the_module_cache_key():
-    def it_keys_the_real_prepare_inputs():
-        assert prepare_cache_key == compute_prepare_cache_key(
-            settings.gbnf_commit, settings.prepare_docker_directory
-        )
+    def it_changes_when_the_rules_change(docker_directory):
+        """One entry per condition: the rules are the only input that varies by condition."""
+        before = compute_prepare_cache_key("abc123", docker_directory, RULES)
+        assert compute_prepare_cache_key("abc123", docker_directory, "+ /javascript/\n") != before

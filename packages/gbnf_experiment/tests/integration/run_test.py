@@ -1,4 +1,5 @@
 import json
+import os
 import re
 from pathlib import Path
 
@@ -10,58 +11,50 @@ from python_on_whales.exceptions import DockerException
 
 from gbnf_experiment import run_gbnf_experiment
 from gbnf_experiment.cli import cli
-from gbnf_experiment.config import prepare_cache_key, settings
+from gbnf_experiment.config import settings
 
-from conftest import FAKE_CREDENTIALS, GRAMMAR_FIXTURES, PROXY_LOG, TRANSCRIPT, TRANSCRIPT_PATH
+from conftest import (
+    FAKE_CREDENTIALS,
+    PROXY_LOG,
+    SHARED,
+    TRANSCRIPT,
+    TRANSCRIPT_PATH,
+    volume_source,
+)
 
 # Spelled out rather than imported: a reworded prompt has to move the expected
 # text here too, or the two sides drift together and prove nothing.
 UPSTREAM_PROMPT = (
-    "Port the implementation under source/ to {target_language}.\n"
+    "Port the implementation under {source_language}/ to {target_language}.\n"
     "Manage the port's dependencies and run its commands with {package_manager}.\n"
 )
-UPSTREAM_PROMPT_WITH_PYTHON_SUITE = (
-    "Port the implementation under source/ to {target_language}.\n"
-    "Manage the port's dependencies and run its commands with {package_manager}.\n"
+UPSTREAM_PROMPT_WITH_EVERY_SUITE = (
+    "Port the implementation under python/ to javascript.\n"
+    "Manage the port's dependencies and run its commands with pnpm.\n"
     "\n"
-    "The following test suites are mounted alongside the source:\n"
+    "The following test suites are included:\n"
     "\n"
-    "- tests/python, written in python.\n"
+    "- python unit tests: python/gbnf/**/*_test.py\n"
+    "- python integration tests: python/tests/generated/\n"
+    "- javascript integration tests: javascript/integration-tests/generated/\n"
 )
-
-JAVASCRIPT_REFERENCE = [
-    "/input/source/javascript/package.json",
-    "/input/source/javascript/src/index.ts",
-]
-PYTHON_REFERENCE = [
-    "/input/source/python/gbnf/index.py",
-    "/input/source/python/pyproject.toml",
-]
-JAVASCRIPT_SUITE = [
-    "/input/tests/javascript/iteration/grammars_test.javascript",
-    "/input/tests/javascript/validation/validate_test.javascript",
-]
-PYTHON_SUITE = [
-    *(
-        f"/input/tests/python/iteration/grammars/{name}.{suffix}"
-        for name in GRAMMAR_FIXTURES
-        for suffix in ("gbnf", "json")
-    ),
-    "/input/tests/python/iteration/grammars_test.python",
-    "/input/tests/python/validation/validate_test.python",
-]
+# One line from each test rule file, as it reaches the image in RULES.
+UNIT_RULE = "+ /python/gbnf/**_test.py"
+SOURCE_INTEGRATION_RULE = "+ /python/tests/***"
+TARGET_INTEGRATION_RULE = "+ /javascript/integration-tests/***"
 
 
 CONFIG = {
-    "source_language": "javascript",
-    "include_javascript_tests": False,
-    "include_python_tests": False,
+    "source_language": "python",
+    "include_unit_tests": False,
+    "include_source_integration_tests": False,
+    "include_target_integration_tests": False,
     "debug": False,
 }
 
 
 @pytest.fixture
-def experiment(data_directory, prepare_docker, porting_docker, claude_home):
+def experiment(data_directory, docker_daemon, claude_home):
     def run(model="claude-opus-5", effort="high", **kwargs):
         agent = ClaudeAgent(model=model, effort=effort, host_home=claude_home)
         return run_gbnf_experiment(**{"agent": agent, **CONFIG, **kwargs})
@@ -78,120 +71,144 @@ def manifest(data_directory):
     return read
 
 
-def describe_gbnf_experiment():
-    def it_caches_the_prepared_corpus_under_the_content_key(
-        experiment, prepared_directory
+def prepare_builds(builds) -> list[dict]:
+    return [build for build in builds if build["context"] == settings.prepare_docker_directory]
+
+
+def describe_the_prepare_image():
+    def it_builds_at_the_pinned_commit(experiment, builds):
+        experiment()
+        [build] = prepare_builds(builds)
+        assert build["build_args"]["GBNF_COMMIT"] == settings.gbnf_commit
+
+    @pytest.mark.parametrize(
+        ("flags", "present"),
+        [
+            ({}, set()),
+            ({"include_unit_tests": True}, {UNIT_RULE}),
+            ({"include_source_integration_tests": True}, {SOURCE_INTEGRATION_RULE}),
+            ({"include_target_integration_tests": True}, {TARGET_INTEGRATION_RULE}),
+            (
+                {
+                    "include_unit_tests": True,
+                    "include_source_integration_tests": True,
+                    "include_target_integration_tests": True,
+                },
+                {UNIT_RULE, SOURCE_INTEGRATION_RULE, TARGET_INTEGRATION_RULE},
+            ),
+        ],
+        ids=["none", "unit", "source-integration", "target-integration", "all"],
+    )
+    def it_builds_with_the_rules_the_condition_composes(experiment, builds, flags, present):
+        experiment(**flags)
+        [build] = prepare_builds(builds)
+        rules = build["build_args"]["RULES"].splitlines()
+        assert "+ /python/gbnf/**.py" in rules
+        assert {
+            rule
+            for rule in (UNIT_RULE, SOURCE_INTEGRATION_RULE, TARGET_INTEGRATION_RULE)
+            if rule in rules
+        } == present
+
+    def it_extracts_shared_into_the_cache_as_the_current_user(
+        experiment, builds, prepare_calls, prepared_directory
     ):
         experiment()
-        assert (prepared_directory / prepare_cache_key).is_dir()
+        [build] = prepare_builds(builds)
+        [call] = prepare_calls
+        assert call["image"] == build["tags"]
+        assert call["command"] == ["cp", "-a", "/shared/.", "/prepared-output/"]
+        assert call["user"] == f"{os.getuid()}:{os.getgid()}"
+        assert prepared_directory in volume_source(call["volumes"], "/prepared-output").parents
 
-    def it_caches_the_prepared_corpus_outside_the_data_tree(
-        experiment, data_directory, prepared_directory
+    def it_prepares_a_condition_once(experiment, prepare_calls):
+        experiment()
+        experiment()
+        assert len(prepare_calls) == 1
+
+    def it_prepares_each_condition_into_its_own_image_and_cache_entry(
+        experiment, builds, prepared_directory
     ):
-        """The cache is rebuildable, so it is not part of the run record."""
         experiment()
-        assert data_directory not in prepared_directory.parents
-
-    def it_prepares_once_across_conditions(experiment, prepare_docker):
-        experiment()
-        experiment(include_python_tests=True)
-        prepare_docker.run.assert_called_once()
+        experiment(include_unit_tests=True)
+        assert len({build["tags"] for build in prepare_builds(builds)}) == 2
+        assert len(list(prepared_directory.iterdir())) == 2
 
     def it_leaves_no_staging_directory_behind(experiment, prepared_directory):
         experiment()
         assert list(prepared_directory.glob("*.staging")) == []
 
-    def describe_the_assembled_reference():
-        @pytest.mark.parametrize(
-            ("source_language", "javascript", "python", "expected"),
-            [
-                ("javascript", False, False, JAVASCRIPT_REFERENCE),
-                ("javascript", True, False, [*JAVASCRIPT_REFERENCE, *JAVASCRIPT_SUITE]),
-                ("javascript", False, True, [*JAVASCRIPT_REFERENCE, *PYTHON_SUITE]),
-                (
-                    "javascript",
-                    True,
-                    True,
-                    [*JAVASCRIPT_REFERENCE, *JAVASCRIPT_SUITE, *PYTHON_SUITE],
-                ),
-                ("python", False, False, PYTHON_REFERENCE),
-                ("python", True, False, [*PYTHON_REFERENCE, *JAVASCRIPT_SUITE]),
-                ("python", False, True, [*PYTHON_REFERENCE, *PYTHON_SUITE]),
-                ("python", True, True, [*PYTHON_REFERENCE, *JAVASCRIPT_SUITE, *PYTHON_SUITE]),
-            ],
-            ids=[
-                "javascript-none",
-                "javascript-source-suite",
-                "javascript-target-suite",
-                "javascript-both",
-                "python-none",
-                "python-target-suite",
-                "python-source-suite",
-                "python-both",
-            ],
+    def it_caches_outside_the_data_tree(experiment, data_directory, prepared_directory):
+        """The cache is rebuildable, so it is not part of the run record."""
+        experiment()
+        assert data_directory not in prepared_directory.parents
+
+
+def describe_the_source():
+    def it_mounts_the_extracted_shared_tree_read_only(
+        experiment, porting_calls, prepared_directory
+    ):
+        experiment()
+        [call] = porting_calls
+        [(source, mode)] = [
+            (Path(source), mode) for source, target, mode in call["volumes"] if target == "/input"
+        ]
+        assert source.parent == prepared_directory
+        assert mode == "ro"
+
+    def it_shows_the_agent_shared_unchanged(experiment, porting_calls):
+        experiment()
+        [call] = porting_calls
+        assert call["container_tree"] == [f"/input/{name}" for name in SHARED]
+
+    def it_records_every_file_the_agent_was_shown(experiment, manifest):
+        experiment()
+        assert manifest()["reference_implementation"]["included"] == list(SHARED)
+
+    def it_stages_no_input_tree_beside_the_runs(experiment, data_directory):
+        """data/ is a flat list of run directories and holds nothing else."""
+        experiment()
+        experiment(include_unit_tests=True)
+        assert all(
+            re.fullmatch(r"\d{8}T\d{6}Z_[0-9a-f]{8}", path.name) and path.is_dir()
+            for path in data_directory.iterdir()
         )
-        def it_carries_the_source_and_exactly_the_selected_suites(
-            experiment, porting_calls, source_language, javascript, python, expected
-        ):
-            """Colocated tests and dev/ never appear, whatever the flags say."""
-            experiment(
-                source_language=source_language,
-                include_javascript_tests=javascript,
-                include_python_tests=python,
-            )
-            [call] = porting_calls
-            assert call["container_tree"] == expected
 
-        def it_carries_no_tests_directory_when_neither_suite_is_asked_for(
-            experiment, porting_calls
-        ):
-            experiment()
-            [call] = porting_calls
-            assert not any(
-                path.startswith("/input/tests") for path in call["container_tree"]
-            )
 
-        def it_stages_the_assembly_outside_the_run_record(experiment, data_directory):
-            """The corpus is rebuildable from the cache, so no run banks a copy."""
-            experiment()
-            experiment(include_python_tests=True)
-            assert all(
-                not (run / "reference_implementation").exists()
-                for run in data_directory.iterdir()
-            )
-
-        def it_stages_no_input_tree_beside_the_runs(experiment, data_directory):
-            """data/ is a flat list of run directories and holds nothing else."""
-            experiment()
-            experiment(include_python_tests=True)
-            assert all(
-                re.fullmatch(r"\d{8}T\d{6}Z_[0-9a-f]{8}", path.name) and path.is_dir()
-                for path in data_directory.iterdir()
-            )
-
-    def describe_the_port():
+def describe_the_port():
         def it_sends_its_own_prompt_inside_the_harness_frame(
             experiment, porting_calls
         ):
             experiment(source_language="javascript")
             [call] = porting_calls
             assert call["prompt"].endswith(
-                "\n\n" + UPSTREAM_PROMPT.format(target_language="python", package_manager="uv") + "\n"
+                "\n\n"
+                + UPSTREAM_PROMPT.format(
+                    source_language="javascript", target_language="python", package_manager="uv"
+                )
+                + "\n"
             )
 
         def it_renders_the_reverse_direction(experiment, porting_calls):
             experiment(source_language="python")
             [call] = porting_calls
             assert call["prompt"].endswith(
-                "\n\n" + UPSTREAM_PROMPT.format(target_language="javascript", package_manager="pnpm") + "\n"
+                "\n\n"
+                + UPSTREAM_PROMPT.format(
+                    source_language="python", target_language="javascript", package_manager="pnpm"
+                )
+                + "\n"
             )
 
-        def it_names_the_suites_the_condition_mounted(experiment, porting_calls):
-            experiment(source_language="javascript", include_python_tests=True)
-            [call] = porting_calls
-            assert call["prompt"].endswith(
-                "\n\n" + UPSTREAM_PROMPT_WITH_PYTHON_SUITE.format(target_language="python", package_manager="uv") + "\n"
+        def it_names_where_each_included_suite_sits(experiment, porting_calls):
+            experiment(
+                source_language="python",
+                include_unit_tests=True,
+                include_source_integration_tests=True,
+                include_target_integration_tests=True,
             )
+            [call] = porting_calls
+            assert call["prompt"].endswith("\n\n" + UPSTREAM_PROMPT_WITH_EVERY_SUITE + "\n")
 
         def it_collects_the_port_into_the_run_directory(experiment, data_directory):
             experiment()
@@ -214,7 +231,7 @@ def describe_the_run_directory():
         assert (run_directory / "ported_implementation").is_dir()
 
     def it_stamps_the_name_with_utc_and_a_random_token(experiment, data_directory):
-        experiment(include_python_tests=True)
+        experiment(include_unit_tests=True)
         [run_directory] = data_directory.iterdir()
         assert re.fullmatch(r"\d{8}T\d{6}Z_[0-9a-f]{8}", run_directory.name)
 
@@ -268,6 +285,7 @@ def describe_the_manifest():
         assert set(manifest()) == {
             "timestamp",
             "completed_at",
+            "exit_code",
             "condition",
             "derivation",
             "reference_implementation",
@@ -278,37 +296,20 @@ def describe_the_manifest():
     def it_records_the_condition_that_ran(experiment, manifest):
         experiment(
             source_language="python",
-            include_javascript_tests=True,
+            include_target_integration_tests=True,
             effort="low",
             model="claude-sonnet-4-5",
         )
         assert manifest()["condition"] == {
-            "name": "source-python_javascript-tests_effort-low_model-claude-sonnet-4-5",
+            "name": "source-python_target-integration-tests_effort-low_model-claude-sonnet-4-5",
             "source_language": "python",
             "target_language": "javascript",
-            "include_javascript_tests": True,
-            "include_python_tests": False,
+            "include_unit_tests": False,
+            "include_source_integration_tests": False,
+            "include_target_integration_tests": True,
             "effort": "low",
             "model": "claude-sonnet-4-5",
         }
-
-    def it_withholds_the_colocated_test_from_the_record_and_the_tree(
-        experiment, manifest, porting_calls
-    ):
-        experiment()
-        assert (
-            "source/javascript/src/index.test.ts"
-            not in manifest()["reference_implementation"]["included"]
-        )
-        [call] = porting_calls
-        assert "/input/source/javascript/src/index.test.ts" not in call["container_tree"]
-
-    def it_records_the_included_paths_from_the_prepared_root(experiment, manifest):
-        """One list, one root: source and suite paths side by side."""
-        experiment(include_python_tests=True)
-        included = manifest()["reference_implementation"]["included"]
-        assert "source/javascript/src/index.ts" in included
-        assert "tests/python/validation/validate_test.python" in included
 
     def it_records_the_pinned_commit(experiment, manifest):
         experiment()
@@ -357,12 +358,30 @@ def describe_a_run_that_exits_non_zero():
         experiment()
         assert "error" not in manifest()
 
+    def it_records_the_exit_code_in_the_manifest(experiment, manifest, dead_port):
+        experiment()
+        assert manifest()["exit_code"] == 1
+
+    def it_banks_the_agent_s_stderr_beside_the_result(
+        experiment, data_directory, dead_port, agent_stderr
+    ):
+        agent_stderr[0] = b"Error: 429\n"
+        experiment()
+        [run_directory] = data_directory.iterdir()
+        assert (run_directory / "stderr.txt").read_text() == "Error: 429\n"
+
 
 def describe_a_run_that_raises():
     @pytest.fixture
-    def failed_build(porting_docker):
-        """The image build fails, so port_codebase raises before any container starts."""
-        docker.build.side_effect = DockerException(["docker", "build"], 1)
+    def failed_build(docker_daemon, builds):
+        """The agent image build fails, so port_codebase raises before any container starts."""
+
+        def fail_unless_prepare(context, **options):
+            builds.append({"context": Path(context), **options})
+            if Path(context) != settings.prepare_docker_directory:
+                raise DockerException(["docker", "build"], 1)
+
+        docker.build.side_effect = fail_unless_prepare
 
     def it_still_raises(experiment, failed_build):
         with pytest.raises(DockerException):
@@ -388,40 +407,10 @@ def describe_a_run_that_raises():
         [run_directory] = data_directory.iterdir()
         assert not (run_directory / "result.json").exists()
 
-
-def staged_reference(call):
-    """Where assembly put the corpus, read back off the mount the container got.
-
-    Assembly writes source/ and tests/ under one root, and that root is the
-    folder the harness binds at /input.
-    """
-    [source] = [
-        Path(source) for source, target, _ in call["volumes"] if str(target) == "/input"
-    ]
-    return source
-
-
-def describe_the_staged_reference_corpus():
-    def it_binds_a_staged_copy_not_the_prepared_cache(
-        experiment, porting_calls, prepared_directory
-    ):
-        experiment()
-        [call] = porting_calls
-        assert prepared_directory not in staged_reference(call).parents
-
-    def it_carries_the_source_and_test_trees_under_one_input_root(
-        experiment, porting_calls
-    ):
-        experiment(include_python_tests=True)
-        [call] = porting_calls
-        tree = call["container_tree"]
-        assert any(path.startswith("/input/source/") for path in tree)
-        assert any(path.startswith("/input/tests/") for path in tree)
-
-    def it_throws_the_staged_corpus_away_when_the_run_ends(experiment, porting_calls):
-        experiment()
-        [call] = porting_calls
-        assert not staged_reference(call).exists()
+    def it_records_no_exit_code(experiment, manifest, failed_build):
+        with pytest.raises(DockerException):
+            experiment()
+        assert "exit_code" not in manifest()
 
 
 def describe_the_rendered_prompt():
@@ -468,8 +457,17 @@ def describe_cli():
         monkeypatch.setenv("HOME", str(home))
 
     def it_prints_where_the_run_landed(
-        home, data_directory, prepare_docker, porting_docker
+        home, data_directory, docker_daemon
     ):
         result = CliRunner().invoke(cli, ["--source-language", "javascript"])
         [run_directory] = data_directory.iterdir()
         assert f"Run directory: {run_directory}" in result.output
+
+    def it_prepares_the_condition_its_flags_name(home, data_directory, docker_daemon, builds):
+        CliRunner().invoke(
+            cli,
+            ["--source-language", "python", "--include-target-integration-tests"],
+        )
+        [build] = prepare_builds(builds)
+        assert TARGET_INTEGRATION_RULE in build["build_args"]["RULES"].splitlines()
+        assert UNIT_RULE not in build["build_args"]["RULES"].splitlines()

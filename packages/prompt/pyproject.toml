@@ -1,0 +1,25 @@
+[project]
+name = "prompt"
+version = "0.1.0"
+description = "A prompt template plus the values its slots take"
+readme = "README.md"
+authors = [
+    { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[build-system]
+requires = ["uv_build>=0.10.11,<0.11.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+# Colocated tests are development code; keep them out of the wheel and sdist.
+source-exclude = ["*_test.py", "**/*_test.py"]
+
+[dependency-groups]
+dev = [
+    "coverage>=7.16.0",
+    "pytest>=9.1.1",
+    "pytest-describe>=3.2.0",
+]

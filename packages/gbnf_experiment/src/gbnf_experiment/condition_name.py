@@ -1,16 +1,10 @@
-def condition_name(
-    *,
-    source_language: str,
-    include_javascript_tests: bool,
-    include_python_tests: bool,
-    effort: str,
-    model: str,
-) -> str:
-    parts = [f"source-{source_language}"]
-    if include_javascript_tests:
-        parts.append("javascript-tests")
-    if include_python_tests:
-        parts.append("python-tests")
-    parts.append(f"effort-{effort}")
-    parts.append(f"model-{model}")
-    return "_".join(parts)
+LABELS = {
+    "include_unit_tests": "unit-tests",
+    "include_source_integration_tests": "source-integration-tests",
+    "include_target_integration_tests": "target-integration-tests",
+}
+
+
+def condition_name(*, source_language: str, effort: str, model: str, **tests: bool) -> str:
+    suites = [label for key, label in LABELS.items() if tests[key]]
+    return "_".join([f"source-{source_language}", *suites, f"effort-{effort}", f"model-{model}"])

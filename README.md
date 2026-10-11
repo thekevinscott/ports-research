@@ -26,8 +26,9 @@ Three packages, each configuring the one above it.
   agent's CLI (`ClaudeAgent`, `claude -p`; `PiAgent` exists but is not wired
   up) in whatever image it is handed, inside a container behind an egress
   proxy.
+- `packages/prompt` — `Prompt`, a prompt template plus the values its slots take; used by port_codebase and gbnf_experiment.
 - `packages/port_codebase` — configures agent-harness-sandbox, provides a
-  prompt (`src/port_codebase/prompt.txt`) and a layout. Reference, tests and
+  prompt (`src/port_codebase/prompts/prompt.txt`) and a layout. Reference, tests and
   output are synced locally: direct bind mounts, not copies. Library only:
   `run_porting_harness` expects `source/` and `tests/` under the reference
   directory, mounts each read-only, and binds the output directory writable.
