@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from gbnf_experiment.prepare_filesystem.reference_patterns import reference_patterns
-from porting_harness.select_files import select_files
+from port_codebase.select_files import select_files
 
 COLOCATED_TESTS = {
     "javascript": ("src/gbnf.test.ts", "src/utils/is-point-in-range.test.ts"),

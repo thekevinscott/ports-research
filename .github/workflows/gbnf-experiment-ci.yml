@@ -6,8 +6,8 @@ name: gbnf-experiment CI
 on:
   pull_request:
     paths:
-      - 'porting/gbnf-experiment/**'
-      - '!porting/gbnf-experiment/README.md'
+      - 'packages/gbnf-experiment/**'
+      - '!packages/gbnf-experiment/README.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,5 +20,5 @@ jobs:
   ci:
     uses: ./.github/workflows/package-ci.yml
     with:
-      package: porting/gbnf-experiment
+      package: packages/gbnf-experiment
       integration-timeout-minutes: 30

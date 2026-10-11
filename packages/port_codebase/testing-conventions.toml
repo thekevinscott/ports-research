@@ -1,5 +1,5 @@
 [[python.exempt]]
-path = "porting_harness/__init__.py"
+path = "port_codebase/__init__.py"
 rules = ["colocated-test"]
 reason = "re-export barrel; run_porting_harness is tested in its own module"
 

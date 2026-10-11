@@ -102,7 +102,7 @@ reverse-port run    --run <forward run dir>
 
 The reverse leg: a banked port goes back through the unmodified harness into the
 language it came from, so it can be measured against the original reference in that
-language. No file under `porting/gbnf-experiment/` is touched; the harness is reused
+language. No file under `packages/gbnf-experiment/` is touched; the harness is reused
 by invocation, with the two roots it reads moved by env var. Every path option takes an
 existing directory and is resolved absolute.
 

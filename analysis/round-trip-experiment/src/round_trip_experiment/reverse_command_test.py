@@ -14,7 +14,7 @@ CONDITION = {
 PLACES = dict(
     staged_derivations_directory=Path("/cache/round-trip-experiment/derivations/20260909T001426Z_1c28aa33"),
     reverse_run_root=Path("/repo/analysis/round-trip-experiment/reverse/20260909T001426Z_1c28aa33"),
-    gbnf_experiment_directory=Path("/repo/porting/gbnf-experiment"),
+    gbnf_experiment_directory=Path("/repo/packages/gbnf-experiment"),
 )
 
 
@@ -26,7 +26,7 @@ def command():
 def describe_reverse_command():
     def it_invokes_run_gbnf_experiment_in_the_gbnf_experiment_package(command):
         assert command["argv"][:5] == [
-            "uv", "run", "--directory", "/repo/porting/gbnf-experiment", "run-gbnf-experiment",
+            "uv", "run", "--directory", "/repo/packages/gbnf-experiment", "run-gbnf-experiment",
         ]
 
     def it_passes_the_reverse_condition_with_both_suites(command):

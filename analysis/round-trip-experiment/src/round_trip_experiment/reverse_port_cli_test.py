@@ -28,7 +28,7 @@ REPORT = {
     },
     "staged": "/cache/staging/20260909T001426Z_1c28aa33/390bf534c55d496b",
     "reverse_root": "/pkg/reverse/20260909T001426Z_1c28aa33",
-    "argv": ["uv", "run", "--directory", "/repo/porting/gbnf-experiment", "run-gbnf-experiment"],
+    "argv": ["uv", "run", "--directory", "/repo/packages/gbnf-experiment", "run-gbnf-experiment"],
     "env": {
         "GBNF_EXPERIMENT_PREPARED_DIRECTORY": "/cache/staging/20260909T001426Z_1c28aa33",
         "GBNF_EXPERIMENT_DATA_DIRECTORY": "/pkg/reverse/20260909T001426Z_1c28aa33",
@@ -96,7 +96,7 @@ def places():
         patch("round_trip_experiment.reverse_port_cli.settings") as own,
         patch(
             "round_trip_experiment.reverse_port_cli.GBNF_EXPERIMENT_ROOT",
-            Path("/repo/porting/gbnf-experiment"),
+            Path("/repo/packages/gbnf-experiment"),
         ),
     ):
         gbnf.prepared_directory = Path("/cache/gbnf-experiment/derivations")
@@ -130,7 +130,7 @@ def describe_stage():
         assert reverse_leg.call_args.kwargs == {
             "derivation_cache_key": "390bf534c55d496b",
             "derivations_directory": Path("/cache/gbnf-experiment/derivations"),
-            "gbnf_experiment_directory": Path("/repo/porting/gbnf-experiment"),
+            "gbnf_experiment_directory": Path("/repo/packages/gbnf-experiment"),
             "staging_directory": Path("/cache/staging"),
             "reverse_directory": Path("/pkg/reverse"),
         }

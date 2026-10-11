@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from porting_harness.select_files import select_files
+from port_codebase.select_files import select_files
 
 TREE = {
     "pyproject.toml": "[project]",

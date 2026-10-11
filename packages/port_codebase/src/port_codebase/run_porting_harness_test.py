@@ -21,7 +21,7 @@ OPTIONS = (
 @pytest.fixture
 def run_agent_harness_sandbox(build_agent_image):
     with patch(
-        "porting_harness.run_porting_harness.run_agent_harness_sandbox", autospec=True
+        "port_codebase.run_porting_harness.run_agent_harness_sandbox", autospec=True
     ) as mock:
         mock.return_value = "container output"
         yield mock
@@ -30,7 +30,7 @@ def run_agent_harness_sandbox(build_agent_image):
 @pytest.fixture
 def build_agent_image():
     with patch(
-        "porting_harness.run_porting_harness.build_agent_image", autospec=True
+        "port_codebase.run_porting_harness.build_agent_image", autospec=True
     ) as mock:
         mock.return_value = "an-agent:latest"
         yield mock
@@ -55,7 +55,7 @@ def agent():
 
 @pytest.fixture
 def prompt_class():
-    with patch("porting_harness.run_porting_harness.Prompt", autospec=True) as mock:
+    with patch("port_codebase.run_porting_harness.Prompt", autospec=True) as mock:
         mock.return_value.__str__ = Mock(return_value="the rendered prompt")
         yield mock
 

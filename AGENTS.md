@@ -160,7 +160,7 @@ goes in both; a branch name and a next command go only in the handoff.
 
 Three recipes per package, and nothing else: `just test-unit` (colocated `_test.py` under `src/`), `just test-integration` (`tests/integration`), `just test-e2e` (`tests/e2e`).
 
-**Never run a bare `uv run pytest`.** There is no pytest config narrowing collection, so a bare run at a package root collects `tests/e2e` — real containers, and in `porting-harness` twenty tests that make billed LLM calls. Name the tier you want.
+**Never run a bare `uv run pytest`.** There is no pytest config narrowing collection, so a bare run at a package root collects `tests/e2e` — real containers, and in `port_codebase` twenty tests that make billed LLM calls. Name the tier you want.
 
 Integration and e2e drive the package's public entry point with inputs and assert on outputs. They never import an internal function or constant, and never build their own `docker.run`.
 

@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[2]
-GBNF_EXPERIMENT_ROOT = PACKAGE_ROOT.parents[1] / "porting" / "gbnf-experiment"
+GBNF_EXPERIMENT_ROOT = PACKAGE_ROOT.parents[1] / "packages" / "gbnf-experiment"
 DERIVATION_KEY = "af673dbe41be73ce"
 UV = shutil.which("uv")
 FORWARD_CONDITION = {

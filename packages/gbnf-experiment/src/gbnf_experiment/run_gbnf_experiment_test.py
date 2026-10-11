@@ -5,7 +5,7 @@ from unittest.mock import DEFAULT, Mock, patch
 
 import pytest
 
-from porting_harness.prompt import Prompt
+from port_codebase.prompt import Prompt
 
 from gbnf_experiment.run_gbnf_experiment import PROMPT_PATH, run_gbnf_experiment
 

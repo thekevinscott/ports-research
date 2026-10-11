@@ -26,5 +26,5 @@ dev = [
 watcher_on_save = "autorun"
 
 [tool.uv.sources]
-gbnf-experiment = { path = "../../porting/gbnf-experiment", editable = true }
+gbnf-experiment = { path = "../../packages/gbnf-experiment", editable = true }
 measure-embedding = { path = "../measure-embedding", editable = true }

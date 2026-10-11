@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from porting_harness.prompt import Prompt
+from port_codebase.prompt import Prompt
 
 SUITES_PATH = Path(__file__).parent / "suites.txt"
 SUITE_PATH = Path(__file__).parent / "suite.txt"

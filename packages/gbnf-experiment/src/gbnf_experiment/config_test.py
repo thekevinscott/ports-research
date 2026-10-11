@@ -92,7 +92,7 @@ def describe_settings():
             assert not hasattr(Settings(), "inputs_directory")
 
         def it_no_longer_owns_the_prompt():
-            """The prompt is porting-harness's; this package only names a direction."""
+            """The prompt is port_codebase's; this package only names a direction."""
             assert not hasattr(Settings(), "prompt_path")
 
     def describe_the_module_instance():

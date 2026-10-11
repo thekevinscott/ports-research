@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 from typing import Tuple
 from agent_harness_sandbox.agents.agent import Agent
 from ..config import settings, prepare_cache_key
-from porting_harness.select_files import select_files
+from port_codebase.select_files import select_files
 from .assemble_reference_implementation import assemble_reference_implementation
 from .prepare_reference_implementation import prepare_reference_implementation
 from .reference_patterns import reference_patterns

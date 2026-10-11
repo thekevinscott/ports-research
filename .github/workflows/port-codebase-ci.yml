@@ -1,12 +1,12 @@
-name: porting-harness CI
+name: port_codebase CI
 
 # This file is deliberately not a trigger: see AGENTS.md "CI workflows".
 # No tests/integration tier; the tier above unit is e2e, which CI never runs.
 on:
   pull_request:
     paths:
-      - 'porting/porting-harness/**'
-      - '!porting/porting-harness/README.md'
+      - 'packages/port_codebase/**'
+      - '!packages/port_codebase/README.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,5 +19,5 @@ jobs:
   ci:
     uses: ./.github/workflows/package-ci.yml
     with:
-      package: porting/porting-harness
+      package: packages/port_codebase
       integration: false

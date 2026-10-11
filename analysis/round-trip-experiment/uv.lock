@@ -1,15 +1,15 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.14"
 
 [options]
-exclude-newer = "2026-09-23T21:10:23.740638833Z"
+exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
 exclude-newer-span = "P3D"
 
 [[package]]
 name = "agent-harness-sandbox"
 version = "0.1.0"
-source = { editable = "../../porting/agent-harness-sandbox" }
+source = { editable = "../../packages/agent-harness-sandbox" }
 dependencies = [
     { name = "click" },
     { name = "python-on-whales" },
@@ -310,10 +310,10 @@ wheels = [
 [[package]]
 name = "gbnf-experiment"
 version = "0.1.0"
-source = { editable = "../../porting/gbnf-experiment" }
+source = { editable = "../../packages/gbnf-experiment" }
 dependencies = [
     { name = "click" },
-    { name = "porting-harness" },
+    { name = "port-codebase" },
     { name = "pydantic-settings" },
     { name = "python-on-whales" },
 ]
@@ -321,7 +321,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.5.0" },
-    { name = "porting-harness", editable = "../../porting/porting-harness" },
+    { name = "port-codebase", editable = "../../packages/port_codebase" },
     { name = "pydantic-settings", specifier = ">=2.15.0" },
     { name = "python-on-whales", specifier = ">=0.81.0" },
 ]
@@ -597,9 +597,9 @@ wheels = [
 ]
 
 [[package]]
-name = "porting-harness"
+name = "port-codebase"
 version = "0.1.0"
-source = { editable = "../../porting/porting-harness" }
+source = { editable = "../../packages/port_codebase" }
 dependencies = [
     { name = "agent-harness-sandbox" },
     { name = "pathspec" },
@@ -607,7 +607,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "agent-harness-sandbox", editable = "../../porting/agent-harness-sandbox" },
+    { name = "agent-harness-sandbox", editable = "../../packages/agent-harness-sandbox" },
     { name = "pathspec", specifier = ">=1.1.1" },
 ]
 
@@ -889,7 +889,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.5.0" },
-    { name = "gbnf-experiment", editable = "../../porting/gbnf-experiment" },
+    { name = "gbnf-experiment", editable = "../../packages/gbnf-experiment" },
     { name = "measure-embedding", editable = "../measure-embedding" },
     { name = "pydantic-settings", specifier = ">=2.15.0" },
     { name = "rapidfuzz", specifier = ">=3.0" },

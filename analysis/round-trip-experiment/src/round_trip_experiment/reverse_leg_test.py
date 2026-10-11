@@ -21,7 +21,7 @@ STAGED = Path("/cache/staging/20260909T001426Z_1c28aa33/390bf534c55d496b")
 PLACES = dict(
     derivation_cache_key="390bf534c55d496b",
     derivations_directory=Path("/cache/gbnf-experiment/derivations"),
-    gbnf_experiment_directory=Path("/repo/porting/gbnf-experiment"),
+    gbnf_experiment_directory=Path("/repo/packages/gbnf-experiment"),
     staging_directory=Path("/cache/staging"),
     reverse_directory=Path("/repo/analysis/round-trip-experiment/reverse"),
 )

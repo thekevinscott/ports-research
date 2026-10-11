@@ -10,8 +10,8 @@ from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
 from gbnf_experiment import run_gbnf_experiment
 from gbnf_experiment.cli import cli
 from gbnf_experiment.config import prepare_cache_key, settings
-from porting_harness.prompt import Prompt
-from porting_harness.run_porting_harness import PROMPT_PATH
+from port_codebase.prompt import Prompt
+from port_codebase.run_porting_harness import PROMPT_PATH
 
 from conftest import GRAMMAR_FIXTURES
 

@@ -29,7 +29,7 @@ requires = ["uv_build>=0.9,<1.0"]
 build-backend = "uv_build"
 
 [tool.uv.sources]
-gbnf-experiment = { path = "../../porting/gbnf-experiment", editable = true }
+gbnf-experiment = { path = "../../packages/gbnf-experiment", editable = true }
 measure-embedding = { path = "../measure-embedding", editable = true }
 
 [dependency-groups]

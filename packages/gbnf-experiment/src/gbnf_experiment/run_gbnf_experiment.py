@@ -3,8 +3,8 @@ from pathlib import Path
 import json
 
 from agent_harness_sandbox.agents.agent import Agent
-from porting_harness.prompt import Prompt
-from porting_harness.run_porting_harness import run_porting_harness
+from port_codebase.prompt import Prompt
+from port_codebase.run_porting_harness import run_porting_harness
 from .condition_name import condition_name
 from .prepare_filesystem import PreparedFilesystem
 from .suites_information import suites_information
@@ -12,7 +12,7 @@ from .suites_information import suites_information
 TARGET_LANGUAGES = {"javascript": "python", "python": "javascript"}
 # Named in the prompt because the agent has no registry access to discover it.
 PACKAGE_MANAGERS = {"python": "uv", "javascript": "pnpm"}
-# The library half of the prompt. porting-harness frames the task and names
+# The library half of the prompt. port_codebase frames the task and names
 # /input and /target; only this package knows how it laid the folder out.
 PROMPT_PATH = Path(__file__).parent / "prompt.txt"
 
