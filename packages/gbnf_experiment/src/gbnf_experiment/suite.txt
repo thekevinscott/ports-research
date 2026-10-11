@@ -1,1 +1,1 @@
-- tests/{language}, written in {language}.
+- {language} {kind} tests: {location}

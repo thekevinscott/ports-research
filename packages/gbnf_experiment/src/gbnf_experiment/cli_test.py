@@ -43,8 +43,9 @@ def describe_cli():
         gbnf_experiment.assert_called_once_with(
             agent=claude_agent.return_value,
             source_language="javascript",
-            include_javascript_tests=False,
-            include_python_tests=False,
+            include_unit_tests=False,
+            include_source_integration_tests=False,
+            include_target_integration_tests=False,
             debug=False,
         )
 
@@ -63,12 +64,26 @@ def describe_cli():
         assert result.exit_code != 0
         gbnf_experiment.assert_not_called()
 
-    def it_forwards_the_test_inclusion_flags(gbnf_experiment):
-        CliRunner().invoke(
-            cli, [*SOURCE_LANGUAGE, "--include-javascript-tests", "--include-python-tests"]
-        )
-        assert gbnf_experiment.call_args.kwargs["include_javascript_tests"] is True
-        assert gbnf_experiment.call_args.kwargs["include_python_tests"] is True
+    @pytest.mark.parametrize(
+        "flag",
+        [
+            "--include-unit-tests",
+            "--include-source-integration-tests",
+            "--include-target-integration-tests",
+        ],
+    )
+    def it_forwards_each_test_inclusion_flag(gbnf_experiment, flag):
+        CliRunner().invoke(cli, [*SOURCE_LANGUAGE, flag])
+        kwargs = gbnf_experiment.call_args.kwargs
+        name = flag.removeprefix("--").replace("-", "_")
+        assert kwargs[name] is True
+        assert [key for key, value in kwargs.items() if value is True] == [name]
+
+    @pytest.mark.parametrize("flag", ["--include-javascript-tests", "--include-python-tests"])
+    def it_rejects_the_per_language_flags(gbnf_experiment, flag):
+        result = CliRunner().invoke(cli, [*SOURCE_LANGUAGE, flag])
+        assert result.exit_code != 0
+        gbnf_experiment.assert_not_called()
 
     def it_forwards_debug(gbnf_experiment):
         CliRunner().invoke(cli, [*SOURCE_LANGUAGE, "--debug"])

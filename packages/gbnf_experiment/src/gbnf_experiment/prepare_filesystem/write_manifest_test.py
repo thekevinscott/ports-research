@@ -12,15 +12,16 @@ IMAGE_ID = "sha256:" + "b" * 64
 HEAD = "c" * 40
 
 CONDITION = {
-    "name": "source-javascript_python-tests_effort-high_model-claude-opus-5",
+    "name": "source-javascript_target-integration-tests_effort-high_model-claude-opus-5",
     "source_language": "javascript",
     "target_language": "python",
-    "include_javascript_tests": False,
-    "include_python_tests": True,
+    "include_unit_tests": False,
+    "include_source_integration_tests": False,
+    "include_target_integration_tests": True,
     "effort": "high",
     "model": "claude-opus-5",
 }
-INCLUDED = ["package.json", "src/gbnf.ts"]
+INCLUDED = ["javascript/package.json", "javascript/src/gbnf.ts"]
 CALL = {
     "timestamp": datetime(2026, 9, 6, 14, 25, 30, tzinfo=UTC),
     "condition": CONDITION,
@@ -112,12 +113,22 @@ def describe_write_manifest():
     def it_records_the_error_it_was_given(manifest):
         assert manifest(error="the container died")["error"] == "the container died"
 
+    def it_records_the_exit_code_it_was_given(manifest):
+        assert manifest(exit_code=1)["exit_code"] == 1
+
+    def it_records_an_exit_code_of_zero(manifest):
+        assert manifest(exit_code=0)["exit_code"] == 0
+
+    def it_carries_no_exit_code_without_one(manifest):
+        """The start of a run, and a run that raised: no agent exit to record."""
+        assert "exit_code" not in manifest()
+
     def it_records_the_pinned_commit(manifest):
         assert manifest()["derivation"] == {"gbnf_commit": "13f1aca"}
 
     def it_names_every_included_path(manifest):
         assert manifest()["reference_implementation"] == {
-            "included": ["package.json", "src/gbnf.ts"]
+            "included": ["javascript/package.json", "javascript/src/gbnf.ts"]
         }
 
     def it_identifies_the_sandbox_by_image_id_not_by_tag(manifest):

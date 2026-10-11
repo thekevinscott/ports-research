@@ -1,4 +1,4 @@
 
-The following test suites are mounted alongside the source:
+The following test suites are included:
 
 {suites}
