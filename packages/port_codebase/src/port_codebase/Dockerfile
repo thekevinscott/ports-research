@@ -11,6 +11,7 @@ RUN uv python install --preview-features python-install-default --default 3.14.3
 RUN uv tool install --python 3.14.3 pytest==9.1.1 --with pytest-describe==3.2.0
 
 RUN npm install -g vitest@2.1.3
+RUN npm install -g pnpm@9.4.0
 ENV NODE_PATH=/usr/local/lib/node_modules
 
 USER node

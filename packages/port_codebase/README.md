@@ -8,6 +8,8 @@ The harness's system prompt, `prompts/prompt.txt`, tells the agent where those t
 
 Does not produce tests and does not grade the result.
 
+The image ships Python 3.14.3, uv 0.12.10, pytest 9.1.1, vitest 2.1.3 and pnpm 9.4.0.
+
 ## Usage
 
 ```python
