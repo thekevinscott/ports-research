@@ -1,10 +1,8 @@
-import hashlib
 from pathlib import Path
-import json
 
-from agent_harness_sandbox.agents.agent import Agent
+from botbox import Agent
+from port_codebase import port_codebase
 from port_codebase.prompt import Prompt
-from port_codebase.run_porting_harness import run_porting_harness
 from .condition_name import condition_name
 from .prepare_filesystem import PreparedFilesystem
 from .suites_information import suites_information
@@ -12,8 +10,8 @@ from .suites_information import suites_information
 TARGET_LANGUAGES = {"javascript": "python", "python": "javascript"}
 # Named in the prompt because the agent has no registry access to discover it.
 PACKAGE_MANAGERS = {"python": "uv", "javascript": "pnpm"}
-# The library half of the prompt. port_codebase frames the task and names
-# /input and /target; only this package knows how it laid the folder out.
+# The library half of the prompt. port_codebase frames the task; only this
+# package knows how it laid the source directory out.
 PROMPT_PATH = Path(__file__).parent / "prompt.txt"
 
 
@@ -24,7 +22,6 @@ def run_gbnf_experiment(
     include_javascript_tests: bool,
     include_python_tests: bool,
     debug: bool,
-    **kwargs,
 ) -> Path:
     with PreparedFilesystem(
         source_language=source_language,
@@ -38,17 +35,19 @@ def run_gbnf_experiment(
                 source_language=source_language,
                 include_javascript_tests=include_javascript_tests,
                 include_python_tests=include_python_tests,
-                **kwargs,
+                effort=agent.effort,
+                model=agent.model,
             ),
             source_language=source_language,
             target_language=target,
             include_python_tests=include_python_tests,
             include_javascript_tests=include_javascript_tests,
-            **kwargs,
+            effort=agent.effort,
+            model=agent.model,
         )
         prepared_filesystem.write_manifest(agent, **condition)
         try:
-            result = run_porting_harness(
+            result = port_codebase(
                 agent=agent,
                 prompt=str(
                     Prompt(
@@ -61,18 +60,16 @@ def run_gbnf_experiment(
                         ),
                     )
                 ),
-                input=prepared_filesystem.reference_implementation_directory,
-                output_directory=prepared_filesystem.ported_implementation_directory,
-                debug=debug,
-                **kwargs,
-                transcripts=prepared_filesystem.transcript_directory,
-                proxy_log=prepared_filesystem.proxy_log
+                source=prepared_filesystem.reference_implementation_directory,
+                output=prepared_filesystem.ported_implementation_directory,
             )
         except Exception as e:
-            # python_on_whales' DockerException carries the container's stdout: on a
-            # non-zero exit that is still the agent's result JSON.
-            stdout = getattr(e, "stdout", None)
-            prepared_filesystem.write_result(stdout, agent, error=str(e), **condition)
+            prepared_filesystem.write_result(None, agent, error=str(e), **condition)
             raise
-        prepared_filesystem.write_result(result, agent, **condition)
+        for path, text in result.transcript.items():
+            destination = prepared_filesystem.transcript_directory / path
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_text(text)
+        prepared_filesystem.proxy_log.write_text(result.proxy)
+        prepared_filesystem.write_result(result.stdout, agent, **condition)
         return prepared_filesystem.run_directory

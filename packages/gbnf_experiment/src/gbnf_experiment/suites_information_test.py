@@ -14,7 +14,7 @@ def describe_suites_information():
                 suites_information(include_javascript_tests=False, include_python_tests=True)
             )
 
-            assert "/input/tests/python" in rendered
+            assert "- tests/python, written in python." in rendered
 
         def it_names_no_other(): 
             rendered = str(
@@ -29,15 +29,15 @@ def describe_suites_information():
                 suites_information(include_javascript_tests=True, include_python_tests=True)
             )
 
-            assert "/input/tests/javascript" in rendered
-            assert "/input/tests/python" in rendered
+            assert "- tests/javascript, written in javascript." in rendered
+            assert "- tests/python, written in python." in rendered
 
         def it_gives_them_a_line_each(): 
             rendered = str(
                 suites_information(include_javascript_tests=True, include_python_tests=True)
             )
 
-            assert "/input/tests/javascript, written in javascript.\n- /input/tests/python" in rendered
+            assert "- tests/javascript, written in javascript.\n- tests/python" in rendered
 
     def describe_the_text_it_renders():
         def it_leaves_no_placeholder_behind():

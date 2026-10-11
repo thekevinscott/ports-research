@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
-from unittest.mock import patch
+import shlex
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -17,7 +18,11 @@ DEV_HARNESS = (
     "dev/node/src/commands/parse.ts",
 )
 SANDBOX_IMAGE_ID = "sha256:fake-sandbox-image"
-CLAUDE_CONFIG_TARGET = "/home/node/.claude"
+AGENT_HOME = "/home/node"
+PROXY_IMAGE = "botbox-proxy:latest"
+TRANSCRIPT_PATH = ".claude/projects/-target/session.jsonl"
+TRANSCRIPT = '{"type": "user"}\n'
+PROXY_LOG = "CONNECT api.anthropic.com:443\n"
 FAKE_CREDENTIALS = '{"fake": "integration-suite"}'
 
 
@@ -114,8 +119,7 @@ def claude_home(tmp_path):
     home = tmp_path / "claude-home"
     home.mkdir()
     (home / ".credentials.json").write_text(FAKE_CREDENTIALS)
-    with patch("agent_harness_sandbox.agents.ClaudeAgent.CLAUDE_HOME", home):
-        yield home
+    return home
 
 
 @pytest.fixture
@@ -131,57 +135,47 @@ def port_result() -> dict:
         "subtype": "success",
         "is_error": False,
         "num_turns": 12,
-        "total_cost_usd": 3.21,
     }
 
 
 @pytest.fixture
-def lockdown_docker():
-    """The network jail's docker client, faked at the docker boundary.
+def exit_code() -> list:
+    """The agent container's exit code, as botbox's docker.wait returns it."""
+    return [0]
 
-    lockdown holds its own docker binding and shells out to the CLI for
-    `network create --internal`, so faking run_agent_harness_sandbox's binding leaves it
-    building the proxy image, running a real tinyproxy container and creating
-    and removing two real networks on every run. First-party lockdown still
-    runs, so `jail.envs` and `jail.network` are the real thing.
+
+@pytest.fixture
+def porting_docker(porting_calls, port_result, exit_code):
+    """botbox's daemon, faked where python_on_whales defines it.
+
+    Standing in for the model: the agent container writes a plausible port into
+    /target, a transcript into its home, and one line into the proxy's log.
     """
     with (
-        patch("agent_harness_sandbox.utils.lockdown.docker", autospec=True) as m,
-        patch("agent_harness_sandbox.utils.lockdown.docker_utils", autospec=True),
+        patch("python_on_whales.docker.build", autospec=True) as build,
+        patch("python_on_whales.docker.run", autospec=True) as run,
+        patch("python_on_whales.docker.logs", autospec=True) as logs,
+        patch("python_on_whales.docker.wait", autospec=True) as wait,
+        patch("python_on_whales.docker.network", autospec=True) as network,
+        patch("python_on_whales.docker.container", autospec=True),
+        patch("python_on_whales.utils.run", autospec=True),
     ):
-        m.image.exists.return_value = True
-        m.network.docker_cmd = ["docker"]
-        m.logs.return_value = ""
-        yield m
+        network.docker_cmd = ["docker"]
+        proxy_logs = []
 
-
-@pytest.fixture
-def agent_image_docker():
-    """agent-harness-sandbox's image builds, faked at the docker boundary."""
-    with patch("agent_harness_sandbox.build_agent_image.docker", autospec=True) as m:
-        yield m
-
-
-@pytest.fixture
-def porting_docker(porting_calls, claude_home, lockdown_docker, agent_image_docker, port_result):
-    """The porting sandbox, faked at the docker boundary.
-
-    Standing in for the model: instead of running claude, it writes a
-    plausible ported implementation into the bound output directory.
-    """
-    with patch("agent_harness_sandbox.run_agent_harness_sandbox.docker", autospec=True) as m:
-        m.image.exists.return_value = True
-
-        def fake_run(tag, cmd, envs=None, volumes=None, **_):
+        def fake_run(image, command=(), volumes=(), **options):
+            if image == PROXY_IMAGE:
+                proxy_logs.append(volume_source(volumes, "/var/log/tinyproxy") / "tinyproxy.log")
+                return MagicMock(name=image)
             output = volume_source(volumes, "/target")
-            credentials = volume_source(volumes, CLAUDE_CONFIG_TARGET)
             porting_calls.append(
                 {
-                    "prompt": cmd[-1],
-                    "command": list(cmd),
+                    "prompt": shlex.split(command[-1])[2],
+                    "command": shlex.split(command[-1]),
                     "volumes": volumes,
-                    "envs": envs,
-                    "credentials": (credentials / ".credentials.json").read_text(),
+                    "credentials": (
+                        volume_source(volumes, AGENT_HOME) / ".claude" / ".credentials.json"
+                    ).read_text(),
                     "container_tree": sorted(
                         f"{target}/{path.relative_to(source)}"
                         for source, target, _ in volumes
@@ -192,7 +186,16 @@ def porting_docker(porting_calls, claude_home, lockdown_docker, agent_image_dock
                 }
             )
             (output / "ported.py").write_text("class GBNF: ...")
-            return json.dumps(port_result)
+            transcript = volume_source(volumes, AGENT_HOME) / TRANSCRIPT_PATH
+            transcript.parent.mkdir(parents=True)
+            transcript.write_text(TRANSCRIPT)
+            proxy_logs[-1].write_text(PROXY_LOG)
+            return MagicMock(name=image)
 
-        m.run.side_effect = fake_run
-        yield m
+        build.return_value = None
+        run.side_effect = fake_run
+        logs.side_effect = lambda *_args, **_options: iter(
+            [("stdout", json.dumps(port_result).encode())]
+        )
+        wait.side_effect = lambda *_args: exit_code[0]
+        yield run

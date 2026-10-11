@@ -11,7 +11,7 @@ HEAD = "c" * 40
 IMAGE_ID = "sha256:" + "b" * 64
 
 AGENT = Mock(name="agent")
-AGENT.image = "agent-harness-sandbox-claude:latest"
+AGENT.image = "botbox-claude:latest"
 
 CONDITION = {
     "source_language": "javascript",
