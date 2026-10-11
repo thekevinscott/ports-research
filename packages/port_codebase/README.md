@@ -1,17 +1,40 @@
-# porting-harness
+# port_codebase
 
-Ports a reference library into another language, using agent-harness-sandbox.
+Ports a reference library into another language, inside a [botbox](https://github.com/thekevinscott/botbox).
 
-`run_porting_harness` takes a prompt, an input directory and an output
-directory. The input is one folder; the sandbox mounts a throwaway writable copy at `/input`. The output
-directory mounts writable at `/target` and is the port as the agent leaves it.
+`port_codebase` takes a prompt, a source directory and an output directory. The agent reads the source and writes the port to the output.
 
-The harness owns a system prompt, `prompt.txt`, that frames the task: the
-reference is at `/input`, the port goes to `/target`. The caller's prompt is
-appended to it, and only the caller can describe the folder it laid out: what
-is the source, what is a suite, what to port to.
+The harness's system prompt, `prompt.txt`, tells the agent where those two directories are. The caller's prompt is appended to it and describes the source's layout: what is the library, what is a suite, what to port to. Paths in it are relative to the source.
 
-Library only, no CLI. Generic: knows nothing about gbnf. Does not produce
-tests and does not grade the result.
+Does not produce tests and does not grade the result.
 
-Depends on agent-harness-sandbox.
+## Usage
+
+```python
+from botbox import ClaudeAgent
+from port_codebase import port_codebase
+
+result = port_codebase(
+    agent=ClaudeAgent(model="claude-opus-5", effort="high"),
+    prompt="`Port it to python. `tests/` is the suite for the port.",
+    source=Path("./reference"),
+    output=Path("./port"),
+)
+
+print(result.stdout)      # claude's JSON result
+print(result.transcript)  # botbox RunResult: session jsonl by path
+print(result.proxy)       # the proxy log
+```
+
+```python
+port_codebase(
+    *,
+    agent: Agent,
+    prompt: str,
+    source: Path,
+    output: Path,
+) -> RunResult
+```
+
+Returns [botbox's `RunResult`](github.io) unchanged. 
+
