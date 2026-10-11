@@ -2,7 +2,7 @@ from pathlib import Path
 
 from botbox import Agent
 from port_codebase import port_codebase
-from port_codebase.prompt import Prompt
+from prompt import Prompt
 from .condition_name import condition_name
 from .prepare_filesystem import PreparedFilesystem
 from .suites_information import suites_information

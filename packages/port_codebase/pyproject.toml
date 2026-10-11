@@ -10,11 +10,15 @@ requires-python = ">=3.14"
 dependencies = [
     "botbox>=0.0.4",
     "pathspec>=1.1.1",
+    "prompt",
 ]
 
 [build-system]
 requires = ["uv_build>=0.10.11,<0.11.0"]
 build-backend = "uv_build"
+
+[tool.uv.sources]
+prompt = { path = "../prompt", editable = true }
 
 [tool.uv.build-backend]
 # Colocated tests are development code; keep them out of the wheel and sdist.

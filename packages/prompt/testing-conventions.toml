@@ -1,0 +1,4 @@
+[[python.exempt]]
+path = "prompt/__init__.py"
+rules = ["colocated-test"]
+reason = "re-export barrel; Prompt is tested in its own module"

@@ -6,7 +6,7 @@ from unittest.mock import DEFAULT, Mock, patch
 import pytest
 
 from botbox import RunResult
-from port_codebase.prompt import Prompt
+from prompt import Prompt
 
 from gbnf_experiment.run_gbnf_experiment import PROMPT_PATH, run_gbnf_experiment
 

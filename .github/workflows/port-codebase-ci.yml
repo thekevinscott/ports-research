@@ -6,6 +6,7 @@ on:
     paths:
       - 'packages/port_codebase/**'
       - '!packages/port_codebase/README.md'
+      - 'packages/prompt/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from port_codebase.prompt import Prompt
+from prompt import Prompt
 
 SUITES_PATH = Path(__file__).parent / "prompts" / "suites.txt"
 SUITE_PATH = Path(__file__).parent / "prompts" / "suite.txt"

@@ -118,6 +118,7 @@ dependencies = [
     { name = "botbox" },
     { name = "click" },
     { name = "port-codebase" },
+    { name = "prompt" },
     { name = "pydantic-settings" },
     { name = "python-on-whales" },
 ]
@@ -134,6 +135,7 @@ requires-dist = [
     { name = "botbox", specifier = ">=0.0.4" },
     { name = "click", specifier = ">=8.5.0" },
     { name = "port-codebase", editable = "../port_codebase" },
+    { name = "prompt", editable = "../prompt" },
     { name = "pydantic-settings", specifier = ">=2.15.0" },
     { name = "python-on-whales", specifier = ">=0.81.0" },
 ]
@@ -188,13 +190,29 @@ source = { editable = "../port_codebase" }
 dependencies = [
     { name = "botbox" },
     { name = "pathspec" },
+    { name = "prompt" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "botbox", specifier = ">=0.0.4" },
     { name = "pathspec", specifier = ">=1.1.1" },
+    { name = "prompt", editable = "../prompt" },
 ]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "coverage", specifier = ">=7.16.0" },
+    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-describe", specifier = ">=3.2.0" },
+]
+
+[[package]]
+name = "prompt"
+version = "0.1.0"
+source = { editable = "../prompt" }
+
+[package.metadata]
 
 [package.metadata.requires-dev]
 dev = [
