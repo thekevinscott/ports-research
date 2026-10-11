@@ -4,7 +4,7 @@ Ports a reference library into another language, inside a [botbox](https://githu
 
 `port_codebase` takes a prompt, a source directory and an output directory. The agent reads the source and writes the port to the output.
 
-The harness's system prompt, `prompt.txt`, tells the agent where those two directories are. The caller's prompt is appended to it and describes the source's layout: what is the library, what is a suite, what to port to. Paths in it are relative to the source.
+The harness's system prompt, `prompts/prompt.txt`, tells the agent where those two directories are. The caller's prompt is appended to it and describes the source's layout: what is the library, what is a suite, what to port to. Paths in it are relative to the source.
 
 Does not produce tests and does not grade the result.
 

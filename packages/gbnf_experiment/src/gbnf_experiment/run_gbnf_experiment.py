@@ -12,7 +12,7 @@ TARGET_LANGUAGES = {"javascript": "python", "python": "javascript"}
 PACKAGE_MANAGERS = {"python": "uv", "javascript": "pnpm"}
 # The library half of the prompt. port_codebase frames the task; only this
 # package knows how it laid the source directory out.
-PROMPT_PATH = Path(__file__).parent / "prompt.txt"
+PROMPT_PATH = Path(__file__).parent / "prompts" / "prompt.txt"
 
 
 def run_gbnf_experiment(

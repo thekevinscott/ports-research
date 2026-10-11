@@ -2,8 +2,8 @@ from pathlib import Path
 
 from port_codebase.prompt import Prompt
 
-SUITES_PATH = Path(__file__).parent / "suites.txt"
-SUITE_PATH = Path(__file__).parent / "suite.txt"
+SUITES_PATH = Path(__file__).parent / "prompts" / "suites.txt"
+SUITE_PATH = Path(__file__).parent / "prompts" / "suite.txt"
 OTHER = {"python": "javascript", "javascript": "python"}
 # Where each suite sits in /shared, read from the rules that admit it.
 UNIT_TESTS = {

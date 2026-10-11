@@ -27,7 +27,7 @@ Three packages, each configuring the one above it.
   up) in whatever image it is handed, inside a container behind an egress
   proxy.
 - `packages/port_codebase` — configures agent-harness-sandbox, provides a
-  prompt (`src/port_codebase/prompt.txt`) and a layout. Reference, tests and
+  prompt (`src/port_codebase/prompts/prompt.txt`) and a layout. Reference, tests and
   output are synced locally: direct bind mounts, not copies. Library only:
   `run_porting_harness` expects `source/` and `tests/` under the reference
   directory, mounts each read-only, and binds the output directory writable.
