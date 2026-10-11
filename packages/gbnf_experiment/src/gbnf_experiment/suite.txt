@@ -1,1 +1,1 @@
-- /input/tests/{language}, written in {language}.
+- tests/{language}, written in {language}.

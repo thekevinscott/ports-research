@@ -5,6 +5,7 @@ from unittest.mock import DEFAULT, Mock, patch
 
 import pytest
 
+from botbox import RunResult
 from port_codebase.prompt import Prompt
 
 from gbnf_experiment.run_gbnf_experiment import PROMPT_PATH, run_gbnf_experiment
@@ -63,15 +64,23 @@ def assemble_reference_implementation(tmp_path):
         yield m
 
 
-RESULT_JSON = '{"num_turns": 12, "total_cost_usd": 3.21, "is_error": false}'
+RESULT_JSON = '{"num_turns": 12, "is_error": false}'
+TRANSCRIPT = {
+    ".claude/projects/-target/session.jsonl": '{"type": "user"}\n',
+    ".claude/projects/-target/session/subagents/agent-1.jsonl": '{"type": "assistant"}\n',
+}
+PROXY_LOG = "CONNECT api.anthropic.com:443\n"
+RUN_RESULT = RunResult(
+    stdout=RESULT_JSON, stderr="", exit_code=0, transcript=TRANSCRIPT, proxy=PROXY_LOG
+)
 
 
 @pytest.fixture
-def run_porting_harness():
+def port_codebase():
     with patch(
-        "gbnf_experiment.run_gbnf_experiment.run_porting_harness", autospec=True
+        "gbnf_experiment.run_gbnf_experiment.port_codebase", autospec=True
     ) as m:
-        m.return_value = RESULT_JSON
+        m.return_value = RUN_RESULT
         yield m
 
 
@@ -95,7 +104,7 @@ def write_manifest():
         yield m
 
 
-AGENT = Mock(name="agent")
+AGENT = Mock(name="agent", model="claude-opus-5", effort="high")
 
 CONFIG = {
     "agent": AGENT,
@@ -103,8 +112,6 @@ CONFIG = {
     "include_javascript_tests": False,
     "include_python_tests": False,
     "debug": False,
-    "effort": "high",
-    "model": "claude-opus-5",
 }
 
 
@@ -143,7 +150,7 @@ def describe_run():
         prepare_cache_key,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         experiment()
         prepare_reference_implementation.assert_called_once_with(
@@ -157,7 +164,7 @@ def describe_run():
         prepare_cache_key,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         (settings.prepared_directory / prepare_cache_key).mkdir(parents=True)
         experiment()
@@ -168,52 +175,44 @@ def describe_run():
         settings,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         experiment()
-        assert run_porting_harness.call_args.kwargs["input"] is (
+        assert port_codebase.call_args.kwargs["source"] is (
             assemble_reference_implementation.return_value
         )
-        assert run_porting_harness.call_args.kwargs["output_directory"] == (
+        assert port_codebase.call_args.kwargs["output"] == (
             settings.data_directory / RUN_DIRECTORY_NAME / "ported_implementation"
         )
 
-    def it_ports_at_the_configured_effort(
+    def it_ports_with_the_agent_the_caller_chose(
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
-        experiment(effort="max")
-        assert run_porting_harness.call_args.kwargs["effort"] == "max"
+        chosen = Mock(name="chosen", model="claude-sonnet-4-5", effort="max")
+        experiment(agent=chosen)
+        assert port_codebase.call_args.kwargs["agent"] is chosen
 
-    def it_ports_on_the_configured_model(
+    def it_forwards_debug_to_the_preparation_only(
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
-    ):
-        experiment(model="claude-sonnet-4-5")
-        assert run_porting_harness.call_args.kwargs["model"] == "claude-sonnet-4-5"
-
-    def it_forwards_debug_to_the_preparation_and_the_port(
-        experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         experiment(debug=True)
         assert prepare_reference_implementation.call_args.kwargs["debug"] is True
-        assert run_porting_harness.call_args.kwargs["debug"] is True
+        assert "debug" not in port_codebase.call_args.kwargs
 
     def it_names_the_direction_in_the_prompt_it_sends(
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         experiment(source_language="python")
-        assert run_porting_harness.call_args.kwargs["prompt"] == (
+        assert port_codebase.call_args.kwargs["prompt"] == (
             str(
                 Prompt(
                     PROMPT_PATH,
@@ -228,10 +227,10 @@ def describe_run():
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         experiment(source_language="javascript")
-        assert run_porting_harness.call_args.kwargs["prompt"] == (
+        assert port_codebase.call_args.kwargs["prompt"] == (
             str(
                 Prompt(
                     PROMPT_PATH,
@@ -246,56 +245,56 @@ def describe_run():
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         experiment(include_python_tests=True)
-        assert "/input/tests/python" in run_porting_harness.call_args.kwargs["prompt"]
+        assert "tests/python" in port_codebase.call_args.kwargs["prompt"]
 
     def it_names_no_suite_when_the_condition_mounted_none(
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         experiment()
-        assert "/input/tests" not in run_porting_harness.call_args.kwargs["prompt"]
+        assert "tests/" not in port_codebase.call_args.kwargs["prompt"]
 
     def describe_the_package_manager_it_names():
         def it_names_uv_when_the_target_is_python(
             experiment,
             prepare_reference_implementation,
             assemble_reference_implementation,
-            run_porting_harness,
+            port_codebase,
         ):
             experiment(source_language="javascript")
-            assert "uv" in run_porting_harness.call_args.kwargs["prompt"]
+            assert "uv" in port_codebase.call_args.kwargs["prompt"]
 
         def it_names_pnpm_when_the_target_is_javascript(
             experiment,
             prepare_reference_implementation,
             assemble_reference_implementation,
-            run_porting_harness,
+            port_codebase,
         ):
             experiment(source_language="python")
-            assert "pnpm" in run_porting_harness.call_args.kwargs["prompt"]
+            assert "pnpm" in port_codebase.call_args.kwargs["prompt"]
 
         def it_names_only_the_target_language_manager(
             experiment,
             prepare_reference_implementation,
             assemble_reference_implementation,
-            run_porting_harness,
+            port_codebase,
         ):
             experiment(source_language="javascript")
-            assert "pnpm" not in run_porting_harness.call_args.kwargs["prompt"]
+            assert "pnpm" not in port_codebase.call_args.kwargs["prompt"]
 
     def it_leaves_no_placeholder_in_the_prompt(
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         experiment()
-        prompt = run_porting_harness.call_args.kwargs["prompt"]
+        prompt = port_codebase.call_args.kwargs["prompt"]
         assert "{" not in prompt
         assert "}" not in prompt
 
@@ -306,7 +305,7 @@ def describe_the_run_directory():
         settings,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         run_directory = experiment()
         assert run_directory == settings.data_directory / RUN_DIRECTORY_NAME
@@ -315,7 +314,7 @@ def describe_the_run_directory():
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
         run_directory_name,
     ):
         experiment(include_python_tests=True)
@@ -326,7 +325,7 @@ def describe_the_run_directory():
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
         run_directory_name,
     ):
         before = datetime.now(UTC)
@@ -339,11 +338,11 @@ def describe_the_run_directory():
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         seen = {}
-        run_porting_harness.side_effect = lambda **kwargs: seen.update(
-            existed=kwargs["output_directory"].is_dir()
+        port_codebase.side_effect = lambda **kwargs: seen.update(
+            existed=kwargs["output"].is_dir()
         ) or DEFAULT
         experiment()
         assert seen["existed"] is True
@@ -353,44 +352,32 @@ def describe_the_run_directory():
         settings,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         assert experiment() != experiment()
 
-    def it_captures_the_transcript_beside_the_manifest(
+    def it_banks_each_transcript_file_at_its_path_under_transcript(
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         run_directory = experiment()
-        assert run_porting_harness.call_args.kwargs["transcripts"] == (
-            run_directory / "transcript"
-        )
+        banked = {
+            path.relative_to(run_directory / "transcript").as_posix(): path.read_text()
+            for path in (run_directory / "transcript").rglob("*")
+            if path.is_file()
+        }
+        assert banked == TRANSCRIPT
 
-    def it_banks_the_proxy_denial_log_beside_the_manifest(
+    def it_banks_the_proxy_log_beside_the_manifest(
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         run_directory = experiment()
-        assert run_porting_harness.call_args.kwargs["proxy_log"] == (
-            run_directory / "proxy.log"
-        )
-
-    def it_creates_the_transcript_directory_before_the_port(
-        experiment,
-        prepare_reference_implementation,
-        assemble_reference_implementation,
-        run_porting_harness,
-    ):
-        seen = {}
-        run_porting_harness.side_effect = lambda **kwargs: seen.update(
-            existed=kwargs["transcripts"].is_dir()
-        ) or DEFAULT
-        experiment()
-        assert seen["existed"] is True
+        assert (run_directory / "proxy.log").read_text() == PROXY_LOG
 
 
 def describe_the_manifest():
@@ -398,7 +385,7 @@ def describe_the_manifest():
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
         write_manifest,
     ):
         run_directory = experiment()
@@ -408,14 +395,13 @@ def describe_the_manifest():
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
         write_manifest,
     ):
         experiment(
+            agent=Mock(name="agent", model="claude-sonnet-4-5", effort="low"),
             source_language="python",
             include_javascript_tests=True,
-            effort="low",
-            model="claude-sonnet-4-5",
         )
         assert write_manifest.call_args.kwargs["condition"] == {
             "name": "source-python_javascript-tests_effort-low_model-claude-sonnet-4-5",
@@ -432,7 +418,7 @@ def describe_the_manifest():
         settings,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
         write_manifest,
     ):
         experiment()
@@ -442,22 +428,22 @@ def describe_the_manifest():
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
         write_manifest,
     ):
         """The manifest's image id has to name the harness the port actually ran under."""
-        chosen = Mock(name="chosen")
+        chosen = Mock(name="chosen", model="claude-sonnet-4-5", effort="max")
 
         experiment(agent=chosen)
 
-        assert run_porting_harness.call_args.kwargs["agent"] is chosen
+        assert port_codebase.call_args.kwargs["agent"] is chosen
         assert write_manifest.call_args.kwargs["image_tag"] is chosen.image
 
     def it_shares_the_timestamp_with_the_directory_name(
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
         run_directory_name,
         write_manifest,
     ):
@@ -470,7 +456,7 @@ def describe_the_manifest():
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
         write_manifest,
     ):
         seen = {}
@@ -487,11 +473,11 @@ def describe_the_manifest():
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
         write_manifest,
     ):
         order = []
-        run_porting_harness.side_effect = lambda **kwargs: order.append("port") or DEFAULT
+        port_codebase.side_effect = lambda **kwargs: order.append("port") or DEFAULT
         write_manifest.side_effect = lambda *args, **kwargs: order.append("manifest")
         experiment()
         assert order == ["manifest", "port", "manifest"]
@@ -502,7 +488,7 @@ def describe_the_banked_reference():
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         seen = {}
         assemble_reference_implementation.side_effect = lambda **kwargs: seen.update(
@@ -515,20 +501,19 @@ def describe_the_banked_reference():
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
         run_directory = experiment()
         assert not (run_directory / "reference_implementation").exists()
 
 
 def describe_the_result():
-    def it_banks_the_harness_result_as_result_json(
+    def it_banks_the_agent_stdout_as_result_json(
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
-        run_porting_harness.return_value = RESULT_JSON
         run_directory = experiment()
         result = run_directory / "result.json"
         assert result.is_file()
@@ -539,37 +524,34 @@ def describe_the_result():
         settings,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
-        run_porting_harness.side_effect = RuntimeError("the container died")
+        port_codebase.side_effect = RuntimeError("the container died")
         with pytest.raises(RuntimeError):
             experiment()
         run_directory = settings.data_directory / RUN_DIRECTORY_NAME
         assert not (run_directory / "result.json").exists()
 
-    def it_banks_what_a_dead_port_printed(
+    def it_banks_the_stdout_of_a_non_zero_exit(
         experiment,
-        settings,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
     ):
-        died = RuntimeError("exited 1")
-        died.stdout = RESULT_JSON
-        run_porting_harness.side_effect = died
-        with pytest.raises(RuntimeError):
-            experiment()
-        run_directory = settings.data_directory / RUN_DIRECTORY_NAME
+        port_codebase.return_value = RunResult(
+            stdout=RESULT_JSON, stderr="", exit_code=1, transcript={}, proxy=""
+        )
+        run_directory = experiment()
         assert (run_directory / "result.json").read_text() == RESULT_JSON
 
     def it_completes_the_manifest_with_the_error_when_the_port_dies(
         experiment,
         prepare_reference_implementation,
         assemble_reference_implementation,
-        run_porting_harness,
+        port_codebase,
         write_manifest,
     ):
-        run_porting_harness.side_effect = RuntimeError("the container died")
+        port_codebase.side_effect = RuntimeError("the container died")
         with pytest.raises(RuntimeError):
             experiment()
         assert write_manifest.call_args.kwargs["error"] == "the container died"

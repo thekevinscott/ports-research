@@ -3,7 +3,7 @@ import hashlib
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Tuple
-from agent_harness_sandbox.agents.agent import Agent
+from botbox import Agent
 from ..config import settings, prepare_cache_key
 from port_codebase.select_files import select_files
 from .assemble_reference_implementation import assemble_reference_implementation

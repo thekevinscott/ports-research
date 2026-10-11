@@ -2,32 +2,6 @@ version = 1
 revision = 5
 requires-python = ">=3.14"
 
-[options]
-exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
-exclude-newer-span = "P3D"
-
-[[package]]
-name = "agent-harness-sandbox"
-version = "0.1.0"
-source = { editable = "../agent-harness-sandbox" }
-dependencies = [
-    { name = "click" },
-    { name = "python-on-whales" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "click", specifier = ">=8.5.0" },
-    { name = "python-on-whales", specifier = ">=0.81.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "coverage", specifier = ">=7.16.0" },
-    { name = "pytest", specifier = ">=9.1.1" },
-    { name = "pytest-describe", specifier = ">=3.2.0" },
-]
-
 [[package]]
 name = "annotated-types"
 version = "0.8.0"
@@ -35,6 +9,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/5f/56/a8120250d128bed162cd73c76d45f6ef9991f3e068f62a8ee060afa3104a/annotated_types-0.8.0.tar.gz", hash = "sha256:13b2beaad985e05e2d6407ee4c4f35590b11f8d693a258a561055cac8f64cab7", size = 15893, upload-time = "2026-07-23T20:16:13.995Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/99/91/8acff4f5e50511b911bbccb72b8628a49c68ce14148cd9f6431094859a90/annotated_types-0.8.0-py3-none-any.whl", hash = "sha256:f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0", size = 13427, upload-time = "2026-07-23T20:16:12.938Z" },
+]
+
+[[package]]
+name = "botbox"
+version = "0.0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "python-on-whales" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ef/27/315e3bc9b29f52cd4ad946e9fd6f4055ab0d0a1ffefc9b9ca576ed237a1d/botbox-0.0.4.tar.gz", hash = "sha256:aea7d97fcadb51473d092ef999e2dec8d8fc83d380c948077f6f555f00f17ce9", size = 39529, upload-time = "2026-10-11T19:32:37.054Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/82/4e/21dd3b26b149feabe7fb64e9e45e9d697799a5e3e142ca129705e9ecc46c/botbox-0.0.4-py3-none-any.whl", hash = "sha256:4f001b24e0de45820a0c2280151cf13b6e268b4974b0cd32ab4b6c367e9c03e6", size = 10712, upload-time = "2026-10-11T19:32:35.826Z" },
 ]
 
 [[package]]
@@ -129,6 +115,7 @@ name = "gbnf-experiment"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "botbox" },
     { name = "click" },
     { name = "port-codebase" },
     { name = "pydantic-settings" },
@@ -144,6 +131,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "botbox", specifier = ">=0.0.4" },
     { name = "click", specifier = ">=8.5.0" },
     { name = "port-codebase", editable = "../port_codebase" },
     { name = "pydantic-settings", specifier = ">=2.15.0" },
@@ -198,13 +186,13 @@ name = "port-codebase"
 version = "0.1.0"
 source = { editable = "../port_codebase" }
 dependencies = [
-    { name = "agent-harness-sandbox" },
+    { name = "botbox" },
     { name = "pathspec" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "agent-harness-sandbox", editable = "../agent-harness-sandbox" },
+    { name = "botbox", specifier = ">=0.0.4" },
     { name = "pathspec", specifier = ">=1.1.1" },
 ]
 

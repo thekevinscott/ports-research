@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
+    "botbox>=0.0.4",
     "click>=8.5.0",
     "port_codebase",
     "pydantic-settings>=2.15.0",
@@ -23,7 +24,6 @@ build-backend = "uv_build"
 
 [tool.uv.sources]
 port_codebase = { path = "../port_codebase", editable = true }
-agent-harness-sandbox = { path = "../agent-harness-sandbox", editable = true }
 
 [dependency-groups]
 dev = [

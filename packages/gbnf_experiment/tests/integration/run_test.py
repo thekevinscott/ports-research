@@ -4,30 +4,29 @@ from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
+from botbox import ClaudeAgent
+from python_on_whales import docker
 from python_on_whales.exceptions import DockerException
 
-from agent_harness_sandbox.agents.ClaudeAgent import ClaudeAgent
 from gbnf_experiment import run_gbnf_experiment
 from gbnf_experiment.cli import cli
 from gbnf_experiment.config import prepare_cache_key, settings
-from port_codebase.prompt import Prompt
-from port_codebase.run_porting_harness import PROMPT_PATH
 
-from conftest import GRAMMAR_FIXTURES
+from conftest import FAKE_CREDENTIALS, GRAMMAR_FIXTURES, PROXY_LOG, TRANSCRIPT, TRANSCRIPT_PATH
 
 # Spelled out rather than imported: a reworded prompt has to move the expected
 # text here too, or the two sides drift together and prove nothing.
 UPSTREAM_PROMPT = (
-    "Port the implementation under /input/source to {target_language}.\n"
+    "Port the implementation under source/ to {target_language}.\n"
     "Manage the port's dependencies and run its commands with {package_manager}.\n"
 )
 UPSTREAM_PROMPT_WITH_PYTHON_SUITE = (
-    "Port the implementation under /input/source to {target_language}.\n"
+    "Port the implementation under source/ to {target_language}.\n"
     "Manage the port's dependencies and run its commands with {package_manager}.\n"
     "\n"
     "The following test suites are mounted alongside the source:\n"
     "\n"
-    "- /input/tests/python, written in python.\n"
+    "- tests/python, written in python.\n"
 )
 
 JAVASCRIPT_REFERENCE = [
@@ -58,15 +57,13 @@ CONFIG = {
     "include_javascript_tests": False,
     "include_python_tests": False,
     "debug": False,
-    "effort": "high",
-    "model": "claude-opus-5",
 }
 
 
 @pytest.fixture
 def experiment(data_directory, prepare_docker, porting_docker, claude_home):
-    def run(**kwargs):
-        agent = ClaudeAgent(host_home=claude_home)
+    def run(model="claude-opus-5", effort="high", **kwargs):
+        agent = ClaudeAgent(model=model, effort=effort, host_home=claude_home)
         return run_gbnf_experiment(**{"agent": agent, **CONFIG, **kwargs})
 
     return run
@@ -178,37 +175,22 @@ def describe_gbnf_experiment():
         ):
             experiment(source_language="javascript")
             [call] = porting_calls
-            assert call["prompt"] == str(
-                Prompt(
-                    PROMPT_PATH,
-                    upstream=UPSTREAM_PROMPT.format(
-                        target_language="python", package_manager="uv"
-                    ),
-                )
+            assert call["prompt"].endswith(
+                "\n\n" + UPSTREAM_PROMPT.format(target_language="python", package_manager="uv") + "\n"
             )
 
         def it_renders_the_reverse_direction(experiment, porting_calls):
             experiment(source_language="python")
             [call] = porting_calls
-            assert call["prompt"] == str(
-                Prompt(
-                    PROMPT_PATH,
-                    upstream=UPSTREAM_PROMPT.format(
-                        target_language="javascript", package_manager="pnpm"
-                    ),
-                )
+            assert call["prompt"].endswith(
+                "\n\n" + UPSTREAM_PROMPT.format(target_language="javascript", package_manager="pnpm") + "\n"
             )
 
         def it_names_the_suites_the_condition_mounted(experiment, porting_calls):
             experiment(source_language="javascript", include_python_tests=True)
             [call] = porting_calls
-            assert call["prompt"] == str(
-                Prompt(
-                    PROMPT_PATH,
-                    upstream=UPSTREAM_PROMPT_WITH_PYTHON_SUITE.format(
-                        target_language="python", package_manager="uv"
-                    ),
-                )
+            assert call["prompt"].endswith(
+                "\n\n" + UPSTREAM_PROMPT_WITH_PYTHON_SUITE.format(target_language="python", package_manager="uv") + "\n"
             )
 
         def it_collects_the_port_into_the_run_directory(experiment, data_directory):
@@ -246,19 +228,19 @@ def describe_the_run_directory():
         experiment(source_language="python")
         assert len(list(data_directory.iterdir())) == 2
 
-    def it_exists_before_the_container_starts(experiment, porting_docker):
+    def it_runs_the_agent_container_once(experiment, porting_calls):
         experiment()
-        porting_docker.run.assert_called_once()
+        assert len(porting_calls) == 1
 
-    def it_banks_the_proxy_log_the_jail_wrote(experiment, data_directory):
+    def it_banks_the_proxy_log_the_box_returned(experiment, data_directory):
         experiment()
         [run_directory] = data_directory.iterdir()
-        assert (run_directory / "proxy.log").is_file()
+        assert (run_directory / "proxy.log").read_text() == PROXY_LOG
 
-    def it_banks_a_transcript_directory_beside_the_manifest(experiment, data_directory):
+    def it_banks_the_transcript_at_its_path_under_the_agent_home(experiment, data_directory):
         experiment()
         [run_directory] = data_directory.iterdir()
-        assert (run_directory / "transcript").is_dir()
+        assert (run_directory / "transcript" / TRANSCRIPT_PATH).read_text() == TRANSCRIPT
 
 
 def describe_the_clean_slate():
@@ -353,56 +335,58 @@ def describe_the_manifest():
         )
 
 
-def describe_a_run_that_dies():
+def describe_a_run_that_exits_non_zero():
     @pytest.fixture
-    def dead_port(porting_docker, port_result):
+    def dead_port(port_result, exit_code):
         """What the 429 casualties looked like: claude exits 1 after printing its result."""
         port_result.update(
             is_error=True,
             api_error_status=429,
             result="You've hit your monthly spend limit",
         )
-        porting_docker.run.side_effect = DockerException(
-            ["docker", "container", "run"], 1, stdout=json.dumps(port_result).encode()
-        )
+        exit_code[0] = 1
 
-    def it_still_raises(experiment, dead_port):
+    def it_banks_the_result_the_agent_printed(experiment, data_directory, dead_port):
+        experiment()
+        [run_directory] = data_directory.iterdir()
+        result = json.loads((run_directory / "result.json").read_text())
+        assert result["is_error"] is True
+        assert result["api_error_status"] == 429
+
+    def it_records_no_error_in_the_manifest(experiment, manifest, dead_port):
+        experiment()
+        assert "error" not in manifest()
+
+
+def describe_a_run_that_raises():
+    @pytest.fixture
+    def failed_build(porting_docker):
+        """The image build fails, so port_codebase raises before any container starts."""
+        docker.build.side_effect = DockerException(["docker", "build"], 1)
+
+    def it_still_raises(experiment, failed_build):
         with pytest.raises(DockerException):
             experiment()
 
-    def it_stamps_completed_at(experiment, manifest, dead_port):
+    def it_stamps_completed_at(experiment, manifest, failed_build):
         with pytest.raises(DockerException):
             experiment()
         assert re.fullmatch(
             r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", manifest()["completed_at"]
         )
 
-    def it_marks_the_error_with_the_sandbox_message(experiment, manifest, dead_port):
+    def it_marks_the_error(experiment, manifest, failed_build):
         with pytest.raises(DockerException):
             experiment()
         assert manifest()["error"].startswith(
-            "The command executed was `docker container run`.\nIt returned with code 1"
+            "The command executed was `docker build`.\nIt returned with code 1"
         )
 
-    def it_banks_the_result_the_agent_printed(experiment, data_directory, dead_port):
-        with pytest.raises(DockerException):
-            experiment()
-        [run_directory] = data_directory.iterdir()
-        result = json.loads((run_directory / "result.json").read_text())
-        assert result["is_error"] is True
-        assert result["api_error_status"] == 429
-
-    def it_banks_no_result_when_the_agent_printed_nothing(
-        experiment, data_directory, manifest, porting_docker
-    ):
-        porting_docker.run.side_effect = DockerException(
-            ["docker", "container", "run"], 137, stdout=b""
-        )
+    def it_banks_no_result(experiment, data_directory, failed_build):
         with pytest.raises(DockerException):
             experiment()
         [run_directory] = data_directory.iterdir()
         assert not (run_directory / "result.json").exists()
-        assert manifest()["error"]
 
 
 def staged_reference(call):
@@ -461,22 +445,11 @@ def describe_the_rendered_prompt():
 
 
 def describe_the_container_view():
-    def it_binds_the_port_at_the_fixed_container_path(experiment, porting_calls):
-        experiment(include_python_tests=True)
-        [call] = porting_calls
-        targets = [target for _, target, _ in call["volumes"]]
-        assert "/target" in targets
-
     def it_stages_the_credentials_the_suite_planted(experiment, porting_calls):
         """A patch that silently missed would bind the real host token instead."""
         experiment()
         [call] = porting_calls
-        assert call["credentials"] == '{"fake": "integration-suite"}'
-
-    def it_hides_the_condition_from_the_environment(experiment, porting_calls):
-        experiment(include_python_tests=True)
-        [call] = porting_calls
-        assert not any("python-tests" in value for value in call["envs"].values())
+        assert call["credentials"] == FAKE_CREDENTIALS
 
     def it_hides_the_host_run_directory_from_the_prompt(experiment, porting_calls, data_directory):
         experiment()
@@ -484,15 +457,18 @@ def describe_the_container_view():
         [run_directory] = data_directory.iterdir()
         assert run_directory.name not in call["prompt"]
 
-    def it_still_builds_the_jail_the_container_joins(experiment, porting_calls):
-        experiment()
-        [call] = porting_calls
-        assert call["envs"]["HTTPS_PROXY"].startswith("http://agent-harness-sandbox-proxy-")
-
 
 def describe_cli():
+    @pytest.fixture
+    def home(tmp_path, monkeypatch):
+        """ClaudeAgent() reads credentials from ~/.claude; point ~ at a throwaway."""
+        home = tmp_path / "home"
+        (home / ".claude").mkdir(parents=True)
+        (home / ".claude" / ".credentials.json").write_text(FAKE_CREDENTIALS)
+        monkeypatch.setenv("HOME", str(home))
+
     def it_prints_where_the_run_landed(
-        data_directory, prepare_docker, porting_docker
+        home, data_directory, prepare_docker, porting_docker
     ):
         result = CliRunner().invoke(cli, ["--source-language", "javascript"])
         [run_directory] = data_directory.iterdir()
