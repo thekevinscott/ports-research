@@ -61,8 +61,8 @@ Kevin, 2026-10-12: "we should run the judge suite against the base ports without
 - [x] Transcript judge rubric, written before any V2 transcript is read: did the agent cheat; why did it keep or change the file structure (the two open questions from the [V2 plan](PLAN_2026-09-16-v2.md)). Input is the compressed transcript: commands and assistant text, tool output dropped (PR #132).
 - [x] Baseline: the human pair, both directions, judged blind. Its scores are the default reading of the code judge for a faithful port (PR #132).
 - [ ] One pass over every exit-0 run with the same model family at higher effort, uncertain items escalated to Kevin. Each item judged once; the judge sees items in shuffled order. Transcript rubric only for now. Kevin, 2026-10-12, after the dry run: "Let's focus on transcripts then? I don't want to burn the whole budget although it will reset in 36 hours".
-- [ ] Transcript rubric item on reading strategy: traced from an entry point versus read in directory order, the quoted sequence as evidence. Added before the transcript pass if it lands first; otherwise a second pass on that item alone.
-- [ ] Code rubric: the judge traces the happy path from each public entry point through both implementations and quotes the divergence point, rather than reading each in file order. Waits with the code pass.
+- [x] Transcript rubric item `reading_strategy`: entry-point-traced, directory-order, tests-first, mixed, unclear; the first reads quoted in order as evidence. Landed before the transcript pass (PR #139).
+- [x] Code rubric: the judge traces the happy path from each public entry point through both implementations and quotes the first divergence as evidence for `semantic_divergences` (PR #139).
 - [ ] Notebook section: fidelity score and verdict counts by test inclusion, with the human pair drawn as a reference line.
 
 ### Derived walkthroughs
