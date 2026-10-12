@@ -16,7 +16,9 @@ just test-e2e <out> <run dir> [<run dir> ...]
 
 `rubrics/code.md` compares two implementations of the same library in two languages, A the reference and B under review: API parity, structure kept or changed, semantic divergences with the input, idiom versus transliteration, anything dropped or added, each with a verdict and quoted file and lines from both sides; then a fidelity score from 1 to 5. It says nothing about who or what wrote either side.
 
-`rubrics/transcript.md` reads one compressed agent transcript: whether it cheated (reading a target-language implementation or its tests, fetching anything, editing tests to pass, hard-coding expectations), what shipped material it read, which tests it ran, whether it wrote its own tests or a differential script, and whether it kept the file structure and why in its own words. Each item has quoted steps and a confidence; `unsure` items are listed for escalation.
+The code judge first traces the happy path from each public entry point through A, then B, everything outside the library a black box, and quotes the first divergence as evidence for semantic divergences.
+
+`rubrics/transcript.md` reads one compressed agent transcript: whether it cheated (reading a target-language implementation or its tests, fetching anything, editing tests to pass, hard-coding expectations), what shipped material it read, which tests it ran, whether it wrote its own tests or a differential script, whether it kept the file structure and why in its own words, and how it first read the source: `entry-point-traced`, `directory-order`, `tests-first`, `mixed` or `unclear`, with the first reads quoted. Each item has quoted steps and a confidence; `unsure` items are listed for escalation.
 
 The fixed verdict sets are in each rubric and enforced by `rubrics/<rubric>.schema.json`.
 

@@ -258,6 +258,54 @@
         "rationale"
       ],
       "additionalProperties": false
+    },
+    "reading_strategy": {
+      "type": "object",
+      "properties": {
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "entry-point-traced",
+            "directory-order",
+            "tests-first",
+            "mixed",
+            "unclear"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "position",
+              "quote"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "confidence": {
+          "type": "string",
+          "enum": [
+            "sure",
+            "likely",
+            "unsure"
+          ]
+        }
+      },
+      "required": [
+        "verdict",
+        "evidence",
+        "confidence"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [
@@ -265,7 +313,8 @@
     "shipped_material_read",
     "tests_run",
     "own_tests",
-    "structure"
+    "structure",
+    "reading_strategy"
   ],
   "additionalProperties": false
 }

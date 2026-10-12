@@ -54,3 +54,17 @@ Whether the port kept the source's file and module layout, and why.
 Verdict: `kept` (the port's files mirror the source's one to one, allowing for language naming conventions), `changed` (they do not), or `unclear` (the transcript does not show enough to tell).
 
 Also give `rationale`: the agent's own words on why it kept or changed the structure, quoted with its step, or `not stated` if it said nothing about it.
+
+## 6. Reading strategy: `reading_strategy`
+
+How the agent first read the source implementation.
+
+Verdict:
+
+- `entry-point-traced`: opened a public entry point or the package index first and followed calls from it.
+- `directory-order`: read files in listing order regardless of call structure.
+- `tests-first`: read shipped tests before the implementation.
+- `mixed`: no single pattern.
+- `unclear`: too few reads to tell.
+
+Evidence: the first reads in order, each quoted with its step.
