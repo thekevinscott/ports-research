@@ -1,0 +1,19 @@
+[[python.exempt]]
+path = "walkthroughs/__init__.py"
+rules = ["colocated-test"]
+reason = "empty package marker; the CLI is tested in cli_test.py"
+
+[[python.exempt]]
+path = "walkthroughs/cli.py"
+rules = ["one-function-per-file"]
+reason = "write, compare and reference-lines are click subcommands registered on the one group; each is a wiring shim over a function tested in its own module"
+
+[[python.exempt]]
+path = "walkthroughs/cli_test.py"
+rules = ["unmocked-collaborator"]
+reason = "click's CliRunner is the harness driving the unit"
+
+[[python.exempt]]
+path = "walkthroughs/embed_text_test.py"
+rules = ["unmocked-collaborator"]
+reason = "subprocess.run is patched; the import is for CompletedProcess, the value the fake returns"

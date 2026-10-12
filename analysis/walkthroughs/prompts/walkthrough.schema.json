@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entry_points"],
+  "properties": {
+    "entry_points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "happy_path", "error_paths", "invariants"],
+        "properties": {
+          "name": {"type": "string"},
+          "happy_path": {"type": "array", "items": {"type": "string"}},
+          "error_paths": {"type": "array", "items": {"type": "string"}},
+          "invariants": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    }
+  }
+}
