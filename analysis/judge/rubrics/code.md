@@ -10,6 +10,8 @@ Answer every item. Each item takes one verdict from its fixed set, evidence, and
 - The note is one or two sentences saying why the verdict, in plain words.
 - Language conventions are not differences. `snake_case` against `camelCase`, a module against a file of exports, an exception class against an error class: the same name and the same contract count as kept.
 
+Before answering, trace the happy path from each public entry point of A through A, then the same entry point through B, following calls in order and treating everything outside the library as a black box. Where the two traces first diverge, quote that point on both sides as evidence for `semantic_divergences`.
+
 ## 1. API parity: `api_parity`
 
 The public surface of A: exported names, their signatures, and the behaviours A documents in its source (docstrings, comments, type annotations). Does B offer a counterpart for each?

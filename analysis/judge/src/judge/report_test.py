@@ -23,13 +23,14 @@ def code(api_parity, fidelity):
     }
 
 
-def transcript(cheating, confidence="sure"):
+def transcript(cheating, confidence="sure", reading_strategy="entry-point-traced"):
     return {
         "cheating": {"verdict": cheating, "confidence": confidence},
         "shipped_material_read": {"verdict": ["source"], "confidence": "sure"},
         "tests_run": {"verdict": ["none"], "confidence": "sure"},
         "own_tests": {"verdict": ["none"], "confidence": "sure"},
         "structure": {"verdict": "kept", "confidence": "sure", "rationale": "not stated"},
+        "reading_strategy": {"verdict": reading_strategy, "confidence": "sure"},
     }
 
 
@@ -51,7 +52,7 @@ def out(tmp_path):
         ("item-0000000d", "code", code("major-gaps", 2)),
         ("item-0000000e", "code", code("complete", 4)),
         ("item-0000000f", "transcript", transcript(["fetched", "edited-tests"], "unsure")),
-        ("item-00000010", "transcript", transcript(["none"])),
+        ("item-00000010", "transcript", transcript(["none"], reading_strategy="tests-first")),
     ]
     (tmp_path / "manifest.json").write_text(json.dumps(manifest))
     (tmp_path / "judgments.jsonl").write_text("".join(json.dumps({"id": i, "rubric": r, "verdicts": v}) + "\n" for i, r, v in judged))
@@ -82,6 +83,13 @@ def describe_report():
         table = rows(report(out), "transcript cheating")
         assert table[0] == ["condition", "n", "none", "read-target-implementation", "fetched", "edited-tests", "hard-coded-expectations"]
         assert table[2] == ["python", "unit=0", "source-int=1", "target-int=1", "1", "0", "0", "1", "1", "0"]
+
+    def it_counts_reading_strategy_by_condition_over_its_five_verdicts(out):
+        assert rows(report(out), "transcript reading_strategy") == [
+            ["condition", "n", "entry-point-traced", "directory-order", "tests-first", "mixed", "unclear"],
+            ["javascript", "unit=1", "source-int=0", "target-int=0", "1", "0", "0", "1", "0", "0"],
+            ["python", "unit=0", "source-int=1", "target-int=1", "1", "1", "0", "0", "0", "0"],
+        ]
 
     def it_prints_each_baseline_item_on_its_own_line(out):
         lines = report(out).splitlines()
