@@ -33,18 +33,29 @@ Depends on port_codebase and botbox.
 
 ## Running the matrix
 
-`scripts/run_matrix.py` runs `run_gbnf_experiment` through the SDK over cells: source language × the 8 combinations of the three test flags × four models (Opus 5.5, Sonnet 5.5, Fable 5.1, Haiku 4.5) × each effort in `--efforts`. 64 cells per effort.
+`scripts/run_matrix.py` runs `run_gbnf_experiment` through the SDK over cells: source language × the 8 combinations of the three test flags × model × effort.
+
+Defaults are the approved study: `claude-opus-5-5` at `medium` effort, 16 cells a round, 12 rounds, 192 runs.
 
 ```
-uv run --env-file ../../.env python scripts/run_matrix.py --parallel 2 --efforts low,xhigh
+uv run --env-file ../../.env python scripts/run_matrix.py
 ```
+
+| Flag | Default |
+| --- | --- |
+| `--n` | `12` rounds. `0` runs until stopped. |
+| `--parallel` | `2` runs at a time. |
+| `--efforts` | `medium`. Comma-separated, e.g. `low,xhigh`. |
+| `--models` | `claude-opus-5-5`. Any of `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-fable-5-1`, `claude-haiku-4-5-20251001`. |
+| `--source-languages` | Both. |
+| `--cells` | All. Names are the manifest's condition name, as printed per run, e.g. `source-python_unit-tests_effort-medium_model-claude-opus-5-5`. |
 
 It exits before doing anything if `ANTHROPIC_API_KEY` is unset or empty. The key goes to `ClaudeAgent(api_key=)`; subscription credentials are never used.
 
-It first prepares all 16 conditions one at a time, since concurrent prepares of one condition collide. Then each round runs every cell once in a fresh shuffled order, `--parallel` at a time, until `--n` rounds are done or it is stopped.
+It first prepares all 16 conditions one at a time, since concurrent prepares of one condition collide.
+
+Runs are round-robin: a round runs every cell once in a fresh shuffled order, and the next round starts only after it. Stopped early at n rounds, every cell has n or n+1 runs.
 
 Each finished run appends one line to `data/runs/matrix-<UTC timestamp>.jsonl`: the cell, the round, the run directory or the error, `exit_code`, wall seconds and `result.json`'s `usage`. A run that raises is recorded and the loop continues.
 
 Ctrl-C starts no new runs and waits for the in-flight ones to finish and be recorded. Runs ignore SIGINT, as do their docker subprocesses.
-
-`--efforts` is comma-separated; omitted, every cell runs at the claude CLI's default effort. `--models`, `--source-languages` and `--cells` (the manifest's condition name, as printed per run, e.g. `source-python_unit-tests_effort-low_model-claude-haiku-4-5-20251001`) restrict the cells.

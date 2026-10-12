@@ -1,16 +1,17 @@
 """Run the gbnf experiment matrix: every cell once per round, each round shuffled, until --n or Ctrl-C."""
 
+import argparse
 import json
 import os
 import random
 import signal
+import sys
 from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 from datetime import UTC, datetime
 from itertools import count, product
 from pathlib import Path
 from time import monotonic
 
-import click
 from botbox import ClaudeAgent
 
 from gbnf_experiment.condition_name import LABELS, condition_name
@@ -28,10 +29,13 @@ MODELS = (
     "claude-fable-5-1",
     "claude-haiku-4-5-20251001",
 )
+# The approved study: 16 cells a round, 12 rounds, 192 runs.
+DEFAULT_MODELS = ("claude-opus-5-5",)
+DEFAULT_EFFORTS = ("medium",)
+DEFAULT_ROUNDS = 12
 
 
-def cells(efforts: tuple[str | None, ...] = (None,)) -> list[dict]:
-    """None leaves effort to the claude CLI's default."""
+def cells(efforts: tuple[str, ...] = DEFAULT_EFFORTS) -> list[dict]:
     return [
         {
             "source_language": source_language,
@@ -51,6 +55,10 @@ def cell_name(cell: dict) -> str:
 
 
 def schedule(cells: list[dict], n: int | None):
+    """Round-robin: a round is every cell once, shuffled, and the next starts only after it.
+
+    Stopped at any point, no cell is more than one run ahead of another.
+    """
     for round_number in count(1) if n is None else range(1, n + 1):
         for cell in random.sample(cells, len(cells)):
             yield round_number, cell
@@ -111,58 +119,53 @@ def run_matrix(
             try:
                 done, in_flight = wait(in_flight, return_when=FIRST_COMPLETED)
             except KeyboardInterrupt:
-                click.echo("Stopping: no new runs start; waiting for the in-flight runs.", err=True)
+                print("Stopping: no new runs start; waiting for the in-flight runs.", file=sys.stderr)
                 stopping = True
                 continue
             for future in done:
                 record = future.result()
                 log.write(json.dumps(record) + "\n")
                 log.flush()
-                click.echo(
+                print(
                     f"round {record['round']} {cell_name(record['cell'])}: "
                     f"exit_code={record['exit_code']} error={record['error']}",
-                    err=True,
+                    file=sys.stderr,
                 )
 
 
-@click.command()
-@click.option("--n", type=click.IntRange(min=1), help="Rounds. Default: until stopped.")
-@click.option("--parallel", type=click.IntRange(min=1), default=2, show_default=True)
-@click.option(
-    "--efforts",
-    callback=lambda _, __, value: tuple(value.split(",")) if value else (None,),
-    help="Comma-separated, e.g. low,xhigh. Default: the claude CLI's.",
-)
-@click.option("--models", multiple=True, type=click.Choice(MODELS))
-@click.option("--source-languages", multiple=True, type=click.Choice(SOURCE_LANGUAGES))
-@click.option("--cells", "names", multiple=True, help="Cell names, as printed per run.")
-def cli(
-    n: int | None,
-    parallel: int,
-    efforts: tuple[str | None, ...],
-    models: tuple[str, ...],
-    source_languages: tuple[str, ...],
-    names: tuple[str, ...],
-) -> None:
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--n", type=int, default=DEFAULT_ROUNDS, help="Rounds; 0 runs until stopped. Default: %(default)s."
+    )
+    parser.add_argument("--parallel", type=int, default=2, help="Default: %(default)s.")
+    parser.add_argument(
+        "--efforts",
+        type=lambda value: tuple(value.split(",")),
+        default=DEFAULT_EFFORTS,
+        help="Comma-separated, e.g. low,xhigh. Default: medium.",
+    )
+    parser.add_argument("--models", nargs="+", choices=MODELS, default=DEFAULT_MODELS)
+    parser.add_argument("--source-languages", nargs="+", choices=SOURCE_LANGUAGES)
+    parser.add_argument("--cells", nargs="+", help="Cell names, as printed per run.")
+    args = parser.parse_args(argv)
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
-        raise click.ClickException(
-            "ANTHROPIC_API_KEY is unset or empty; pass it with `uv run --env-file`."
-        )
+        sys.exit("ANTHROPIC_API_KEY is unset or empty; pass it with `uv run --env-file`.")
     selected = [
         cell
-        for cell in cells(efforts)
-        if (not models or cell["model"] in models)
-        and (not source_languages or cell["source_language"] in source_languages)
-        and (not names or cell_name(cell) in names)
+        for cell in cells(args.efforts)
+        if cell["model"] in args.models
+        and (not args.source_languages or cell["source_language"] in args.source_languages)
+        and (not args.cells or cell_name(cell) in args.cells)
     ]
     if not selected:
-        raise click.ClickException("No cells selected.")
+        sys.exit("No cells selected.")
     settings.data_directory.mkdir(parents=True, exist_ok=True)
     out = settings.data_directory / f"matrix-{datetime.now(UTC):%Y%m%dT%H%M%SZ}.jsonl"
-    click.echo(f"{len(selected)} cells; writing {out}", err=True)
-    run_matrix(selected, n=n, parallel=parallel, api_key=api_key, out=out)
+    print(f"{len(selected)} cells; writing {out}", file=sys.stderr)
+    run_matrix(selected, n=args.n or None, parallel=args.parallel, api_key=api_key, out=out)
 
 
 if __name__ == "__main__":
-    cli()
+    main()

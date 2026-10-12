@@ -1,12 +1,12 @@
 import json
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from itertools import islice
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
-from click.testing import CliRunner
-from run_matrix import MODELS, cell_name, cells, cli, run_matrix, schedule
+from run_matrix import MODELS, cell_name, cells, main, run_matrix, schedule
 
 API_KEY = "sk-ant-test"
 NAMES = (
@@ -62,8 +62,8 @@ def describe_cells():
     def it_covers_every_model():
         assert {cell["model"] for cell in cells()} == set(MODELS)
 
-    def it_leaves_effort_to_the_cli_by_default():
-        assert {cell["effort"] for cell in cells()} == {None}
+    def it_runs_at_medium_effort_by_default():
+        assert {cell["effort"] for cell in cells()} == {"medium"}
 
     def it_multiplies_the_cells_by_each_effort():
         both = cells(efforts=("low", "xhigh"))
@@ -90,6 +90,13 @@ def describe_schedule():
 
     def it_is_unbounded_without_n():
         assert len(list(islice(schedule(cells(), n=None), 64 * 5))) == 64 * 5
+
+    def it_never_lets_one_cell_get_two_runs_ahead_of_another():
+        everything = cells()
+        counts = Counter({cell_name(cell): 0 for cell in everything})
+        for _, cell in schedule(everything, n=4):
+            counts[cell_name(cell)] += 1
+            assert max(counts.values()) - min(counts.values()) <= 1
 
 
 def describe_run_matrix():
@@ -124,6 +131,15 @@ def describe_run_matrix():
         assert lines[0]["run_directory"] is None
         assert all(line["error"] is None for line in lines[1:])
 
+    def it_logs_runs_so_that_any_prefix_is_balanced_across_cells(tmp_path, gbnf_experiment):
+        out = tmp_path / "matrix.jsonl"
+        everything = cells()
+        run_matrix(everything, n=3, parallel=1, api_key=API_KEY, out=out)
+        counts = Counter({cell_name(cell): 0 for cell in everything})
+        for line in read(out):
+            counts[cell_name(line["cell"])] += 1
+            assert max(counts.values()) - min(counts.values()) <= 1
+
     def it_writes_runs_in_round_order(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
         run_matrix(cells(), n=2, parallel=1, api_key=API_KEY, out=out)
@@ -149,31 +165,49 @@ def describe_run_matrix():
         assert "prepare" not in names[16:]
 
 
-def describe_cli():
+@pytest.fixture
+def matrix(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", API_KEY)
+    with patch("run_matrix.run_matrix", autospec=True) as m:
+        yield m
+
+
+def describe_main():
     @pytest.mark.parametrize("environment", [{}, {"ANTHROPIC_API_KEY": ""}])
     def it_refuses_to_start_without_an_api_key(
-        environment, monkeypatch, gbnf_experiment, prepare, claude_agent
+        environment, monkeypatch, capsys, gbnf_experiment, prepare, claude_agent
     ):
         monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
-        result = CliRunner().invoke(cli, ["--n", "1"], env=environment)
-        assert result.exit_code != 0
-        assert "ANTHROPIC_API_KEY" in result.output
+        for key, value in environment.items():
+            monkeypatch.setenv(key, value)
+        with pytest.raises(SystemExit) as exit:
+            main(["--n", "1"])
+        assert exit.value.code != 0
+        assert "ANTHROPIC_API_KEY" in str(exit.value.code)
         prepare.assert_not_called()
         gbnf_experiment.assert_not_called()
         claude_agent.assert_not_called()
 
-    def it_runs_every_cell_at_every_effort_given(monkeypatch):
-        monkeypatch.setenv("ANTHROPIC_API_KEY", API_KEY)
-        with patch("run_matrix.run_matrix", autospec=True) as matrix:
-            result = CliRunner().invoke(cli, ["--efforts", "low,xhigh"])
-        assert result.exit_code == 0, result.output
+    def it_runs_twelve_rounds_of_opus_at_medium_effort_by_default(matrix):
+        main([])
+        selected = matrix.call_args.args[0]
+        assert len(selected) == 16
+        assert {(cell["model"], cell["effort"]) for cell in selected} == {
+            ("claude-opus-5-5", "medium")
+        }
+        assert matrix.call_args.kwargs["n"] == 12
+
+    def it_runs_until_stopped_at_n_zero(matrix):
+        main(["--n", "0"])
+        assert matrix.call_args.kwargs["n"] is None
+
+    def it_runs_every_cell_at_every_effort_and_model_given(matrix):
+        main(["--efforts", "low,xhigh", "--models", *MODELS])
         selected = matrix.call_args.args[0]
         assert len(selected) == 128
         assert {cell["effort"] for cell in selected} == {"low", "xhigh"}
 
-    def it_selects_cells_by_name_including_effort(monkeypatch):
-        monkeypatch.setenv("ANTHROPIC_API_KEY", API_KEY)
-        with patch("run_matrix.run_matrix", autospec=True) as matrix:
-            CliRunner().invoke(cli, ["--efforts", "low,xhigh", "--cells", NAMES[1]])
+    def it_selects_cells_by_name_including_effort(matrix):
+        main(["--efforts", "low,xhigh", "--cells", NAMES[1]])
         [cell] = matrix.call_args.args[0]
         assert cell["effort"] == "xhigh"
