@@ -20,6 +20,10 @@ WALKTHROUGH = {
         }
     ]
 }
+MODELS_ENTRY = {
+    "id": "qwen3-embedding-0.6b-q8_0",
+    "status": {"value": "loaded", "args": ["--embeddings", "--pooling", "last", "--model", "/models/qwen3-embedding-0.6b-q8_0.gguf"]},
+}
 
 
 @pytest.fixture
@@ -55,10 +59,21 @@ def run_cli(tmp_path, calls):
 
 @pytest.fixture
 def embeddings_url():
-    """A local OpenAI-compatible /v1/embeddings server: each word of the input hashed into one of 64 dimensions."""
+    """A local OpenAI-compatible /v1/embeddings server: each word of the input hashed into one of 64 dimensions.
+
+    GET /v1/models lists one model the way a llama.cpp router does, its launch arguments under status.args.
+    """
     requests = []
 
     class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            payload = json.dumps({"data": [MODELS_ENTRY]}).encode()
+            self.send_response(200 if self.path == "/v1/models" else 404)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
         def do_POST(self):
             body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
             requests.append(body)

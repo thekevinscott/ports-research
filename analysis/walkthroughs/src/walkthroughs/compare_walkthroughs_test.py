@@ -8,7 +8,7 @@ def same_text(reference, port):
     return [[1.0 if r == p else 0.0 for p in port] for r in reference]
 
 
-SIMILARITY = {"name": "fake", "threshold": 0.8, "score": same_text}
+SIMILARITY = {"name": "fake", "threshold": 0.8, "score": same_text, "embeddings": {"url": "http://host/v1", "model": "m", "server": None}}
 
 
 def entry(name, happy=(), errors=(), invariants=()):
@@ -44,6 +44,7 @@ def describe_compare_walkthroughs():
         assert compared["error_paths"] == {"mean_coverage": 0.0, "mean_order_agreement": None}
         assert compared["invariants"] == {"mean_coverage": None, "mean_order_agreement": None}
 
-    def it_records_the_similarity_and_threshold_it_used():
+    def it_records_the_similarity_threshold_and_embedding_server_it_used():
         compared = compare_walkthroughs({"entry_points": []}, {"entry_points": []}, SIMILARITY)
         assert (compared["similarity"], compared["threshold"], compared["mean_coverage"]) == ("fake", 0.8, None)
+        assert compared["embeddings"] == {"url": "http://host/v1", "model": "m", "server": None}

@@ -45,6 +45,9 @@ def describe_compare():
         compared = json.loads(result.stdout)
         [pair] = compared["entry_points"]
         assert (compared["similarity"], compared["threshold"]) == ("embeddings", 0.8)
+        assert compared["embeddings"]["url"] == embeddings_url
+        assert compared["embeddings"]["model"] == compared["embeddings"]["server"]["id"] == "qwen3-embedding-0.6b-q8_0"
+        assert compared["embeddings"]["server"]["status"]["args"][1:3] == ["--pooling", "last"]
         assert pair["happy_path"]["coverage"] == compared["mean_coverage"] == 2 / 3
         assert pair["happy_path"]["order_agreement"] == 0.5
         assert pair["happy_path"]["missing_steps"] == ["return the parser"]
@@ -58,7 +61,7 @@ def describe_compare():
         result = run_cli("compare", "--reference", reference, "--port", port, "--no-embeddings")
         assert result.returncode == 0, result.stderr
         compared = json.loads(result.stdout)
-        assert (compared["similarity"], compared["threshold"], compared["mean_coverage"]) == ("jaccard", 0.5, 1.0)
+        assert (compared["similarity"], compared["threshold"], compared["mean_coverage"], compared["embeddings"]) == ("jaccard", 0.5, 1.0, None)
 
     def it_refuses_without_a_url_or_the_fallback(run_cli, make_walkthrough):
         reference = make_walkthrough("reference", [])
@@ -81,3 +84,4 @@ def describe_reference_lines():
         assert set(lines["noise_floor"]) == {"python", "javascript"}
         assert set(lines["baseline"]) == {"python_to_javascript", "javascript_to_python"}
         assert all(c["mean_coverage"] == 1.0 for group in ("noise_floor", "baseline") for c in lines[group].values())
+        assert all(c["embeddings"]["server"]["id"] == "qwen3-embedding-0.6b-q8_0" for group in ("noise_floor", "baseline") for c in lines[group].values())
