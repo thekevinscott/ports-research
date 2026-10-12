@@ -55,8 +55,8 @@ Kevin, 2026-10-12: "we should run the judge suite against the base ports without
 
 ### Not this cycle
 
-- LLM judge over the code itself.
-- Fidelity scale, internal-state parity script, grader validation by mutation. Catalogued in the fidelity notebook (PR #121).
+- Fidelity scale, internal-state parity script (Mistral), grader validation by mutation.
+- Literature only: property-based and metamorphic relations, differential symbolic execution, doc-as-spec judging, security gate. See [literature/SYNTHESIS.md](../literature/SYNTHESIS.md).
 
 ## Statistics
 
