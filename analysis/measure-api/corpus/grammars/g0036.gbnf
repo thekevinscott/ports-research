@@ -1,0 +1,10 @@
+#
+root ::= "*{\r"* (
+  "z"? |
+  word |
+  [Bα-ω>]+) (
+  "\\"+)?
+
+head-part ::= chunk
+word ::= "}'+"
+chunk ::= "!Z9"

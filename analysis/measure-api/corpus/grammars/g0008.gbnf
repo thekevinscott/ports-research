@@ -1,0 +1,4 @@
+# a comment | with ::= inside
+root ::= tail-part  # held-out grammar
+tail-part ::= "\u4E2D\x63\\\x3D"+
+

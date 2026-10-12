@@ -1,0 +1,4 @@
+root ::= "λ"
+chunk ::= "{9" | [^一-丏A-F]
+word ::= "}*\x7C"*  #
+nest ::= "=" nest "\x42" | [a-z]

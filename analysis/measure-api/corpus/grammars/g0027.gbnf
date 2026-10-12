@@ -1,0 +1,3 @@
+root ::= ([^\u4E2D] item item)* | ([^bß] "," [z])*
+item ::= [x\\]
+extra ::= "\q"

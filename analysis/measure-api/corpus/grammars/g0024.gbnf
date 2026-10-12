@@ -1,0 +1,4 @@
+root ::= "|ß:;"* "\x21"+ ([{\x30-\x39] | atom | [+]) [0-\x39] [A-F(é]
+word ::= "(" tail-part
+tail-part ::= [^Zα-ω]
+atom ::= [;\u4E00-丏0-9] "^'" [^α-ωA-F\x7A] "\xDFz{^"+  # a comment | with ::= inside

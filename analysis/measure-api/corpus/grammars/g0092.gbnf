@@ -1,0 +1,7 @@
+head-part ::= [^1] digits
+root ::= "a[:"+ [^α-ω\u03B1-\u03C9]
+
+digits ::= ("\x2F"+)+ | "9é" "\x3F y'" | "]é]" | "!" | [^😀\x5E] | "Z" | "\x5D" | "\\" | [^α-ω]*
+item ::= ("\xE9\x62" | digits digits "{\x2A" | [|\x2D] "b^") [^a-z/]  # a comment | with ::= inside
+
+9extra ::= "a"

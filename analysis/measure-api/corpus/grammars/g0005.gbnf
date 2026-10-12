@@ -1,0 +1,4 @@
+#
+start ::= [\x2E;] [a-\x7AZ\]]* (pair "\x29" "?'-(")+ pair
+
+pair ::= "9\\z"

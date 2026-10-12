@@ -1,0 +1,9 @@
+root = ("\x2A"+ | tail-part "\x7A!}") [a-\x7A\n]
+digits ::= [(]
+tail-part ::= [^:b] |
+  ("]😀+\\" |
+  nest |
+  "!\x2F")* |
+  "*\x3F" [,]
+nest ::= [α-\u03C9B] nest ";)\t" |
+  "é|| "  #

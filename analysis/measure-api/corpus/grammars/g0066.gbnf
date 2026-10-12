@@ -1,0 +1,7 @@
+root ::= (item | item | [b\x41-\x46 ])? [*] "\\" item "\x5E)" [\n\r] [\r一-丏] "\U0001F600" ([α-ω\x30-9] | nest | nest)  #
+head-part ::= atom? nest "λ\x39\U0001F600" [,A-F]
+atom ::= item [1/] item
+item ::= "\x5F"
+
+nest ::= "\x3B\"," nest [\x5Eα-\u03C9] | [)\n\x61-z]
+extra ::= "\q"

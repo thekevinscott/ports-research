@@ -1,0 +1,3 @@
+root ::= [Z(] "\"+/" [一-丏0-9] [a-z\x61-z] ("1" nest nest | [\x61-z]) "1.😀|" [1 x] "0>\n\x7C"? [\x41-F]  # a comment | with ::= inside
+nest ::= [\x21一-\u4E0F] nest "中\x5F;\x2B" | "B"
+

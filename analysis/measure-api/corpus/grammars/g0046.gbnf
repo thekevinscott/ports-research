@@ -1,0 +1,3 @@
+root ::= "éé\x3F"? | (chunk head-part head-part)+ | [!α-ω\x2A]? | [?]
+head-part ::= "=\x41Z*"  # held-out grammar
+chunk ::= [0-9一-\u4E0F\\] | "c\n"? | [a-z\x2C] [\\\xE9]

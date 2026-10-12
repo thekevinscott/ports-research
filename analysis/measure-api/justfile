@@ -1,0 +1,25 @@
+# The gbnf pin: packages/gbnf_experiment/src/gbnf_experiment/config.py `gbnf_commit`.
+gbnf_commit := "13f1aca495d11e160fffd68c4ba299a2415909d8"
+patches := justfile_directory() / "../../packages/gbnf_experiment/docker/gbnf-prepare/patches"
+
+test-unit:
+    uv run pytest src -x -q
+
+test-integration:
+    uv run pytest tests/integration -x -q
+
+lint:
+    uv run ruff check src tests
+
+# Clone the pin, apply the patches, and write the reference outputs next to the corpus.
+reference:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    checkout=$(mktemp -d)
+    trap 'rm -rf "$checkout"' EXIT
+    git -C "$checkout" init -q
+    git -C "$checkout" fetch -q --depth 1 https://github.com/thekevinscott/gbnf {{gbnf_commit}}
+    git -C "$checkout" checkout -q FETCH_HEAD
+    git -C "$checkout" apply {{patches}}/*.patch
+    uv run measure-api run --corpus corpus --implementation "$checkout/packages/gbnf/python" --language python --out corpus/reference-python.jsonl
+    uv run measure-api run --corpus corpus --implementation "$checkout/packages/gbnf/javascript" --language typescript --out corpus/reference-typescript.jsonl

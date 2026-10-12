@@ -1,0 +1,44 @@
+[[python.exempt]]
+path = "measure_api/__init__.py"
+rules = ["colocated-test"]
+reason = "empty package marker; the CLI is tested in cli_test.py"
+
+[[python.exempt]]
+path = "measure_api/cli.py"
+rules = ["one-function-per-file"]
+reason = "generate, run and compare are click subcommands registered on the one group; each is a wiring shim over a function tested in its own module"
+
+[[python.exempt]]
+path = "measure_api/cli_test.py"
+rules = ["unmocked-collaborator", "no-first-party-patch"]
+reason = "click's CliRunner is the harness driving the unit; generate_corpus, run_corpus and compare_cases are patched at their cli import binding to test argument wiring"
+
+[[python.exempt]]
+path = "measure_api/run_case_test.py"
+rules = ["unmocked-collaborator"]
+reason = "signal and subprocess supply the SIGKILL constant and the TimeoutExpired the mocked Popen raises; Popen and killpg themselves are patched"
+
+[[python.exempt]]
+path = "measure_api/random_string_test.py"
+rules = ["unmocked-collaborator"]
+reason = "a seeded random.Random is the input under test, not a collaborator"
+
+[[python.exempt]]
+path = "measure_api/generate_corpus_test.py"
+rules = ["unmocked-collaborator"]
+reason = "byte-identical output for a seed is the unit; it only holds over the real measure-behavior generator and random_string"
+
+[[python.exempt]]
+path = "measure_api/same_step_test.py"
+rules = ["unmocked-collaborator"]
+reason = "rule_set is the set comparison the step equality is defined by"
+
+[[python.exempt]]
+path = "measure_api/classify_case_test.py"
+rules = ["unmocked-collaborator"]
+reason = "same_step is the step equality the outcomes are defined by"
+
+[[python.exempt]]
+path = "measure_api/compare_cases_test.py"
+rules = ["unmocked-collaborator"]
+reason = "classify_case decides each case's outcome; the report is its tally"

@@ -1,0 +1,16 @@
+#
+root ::= "\xDF"+  # a comment | with ::= inside
+atom ::= nest+ nest (
+  "]\x2Eλ" |
+  [^A-F0])
+digits ::= [^一-丏{] |
+  (
+  [a-\x7A] | [/]) (
+  nest | [\x78一-丏]) (
+  head-part | [.] |
+  [^;]) | "1_\x63\x28" |
+  "Bλ{," | "c ^" |
+  head-part [^9a-z] | "\x5F! " [^x,0-9]
+head-part ::= [\n] ([:0-\x39"]? | nest | ">" | nest | [0-9]?)  # held-out grammar
+nest ::= "\x31\x3E " nest ":" | [^!a-z,]
+extra ::= "abc

@@ -1,0 +1,9 @@
+digits ::= "|\x5A" |
+  "!A"? "}" "\x5D\x2B" "x\x5Da" | [α-ω\x7B0-9] "['" "|*\x41" (
+  [一-\u4E0F\u4E00-丏;] | "\x3F\".\x3B" |
+  "c\n")
+item ::= digits
+
+atom ::= [\[] "-\u03BB"
+root ::= "*\xDFé中"+  #
+

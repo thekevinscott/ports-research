@@ -1,0 +1,6 @@
+# held-out grammar
+chunk ::= [!]  # a comment | with ::= inside
+
+root ::= [=]
+
+atom ::= "."

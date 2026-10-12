@@ -1,0 +1,3 @@
+chunk ::= [^A-F\]!]+ | tail-part | "\x28\"<!" "a" "ßß" | [\u03B1-ωα-ω] | (tail-part | "_;ß") ("A😀" | tail-part | [0-90-9\t])
+root ::= "B"? "\r\x7D\x79}" "0\x3C+" chunk [^.0-9]  # a comment | with ::= inside
+tail-part ::= [0-\x39<a-z]  # held-out grammar

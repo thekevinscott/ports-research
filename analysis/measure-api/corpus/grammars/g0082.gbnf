@@ -1,0 +1,5 @@
+root ::= nest  # a comment | with ::= inside
+
+nest ::= [^\x61-\x7ABa-z] nest "\x7A " | "\"9\n\\"
+
+extra ::= [a-z

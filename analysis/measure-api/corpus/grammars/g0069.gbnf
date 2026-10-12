@@ -1,0 +1,2 @@
+#
+root ::= "B,c"  # a comment | with ::= inside
