@@ -71,44 +71,6 @@ GIT_DIFF_REPORT = {
     "deleted": 4,
     "formatter_failures": [],
 }
-API_TARGET = {
-    "cases": 500,
-    "agree_with_reference": 450,
-    "disagree_with_reference": 50,
-    "target_p50_elapsed_ns": 310550.0,
-}
-API_FIXTURE_TARGET = {
-    **API_TARGET,
-    "cases": 453,
-    "agree_with_reference": 453,
-    "disagree_with_reference": 0,
-    "target_p50_elapsed_ns": 285100.0,
-}
-
-
-def rung(name: str, input_len: int, add_ms: float) -> dict:
-    def phase(ms: float) -> dict:
-        return {"median": ms * 1e6, "p90": ms * 1.1e6, "min": ms * 0.9e6, "spread": 0.1}
-
-    return {"rung": name, "input_len": input_len, "construct_ns": phase(0.5), "add_ns": phase(add_ms)}
-
-
-API_LADDER_TARGET = {
-    **API_TARGET,
-    "cases": 22,
-    "agree_with_reference": 22,
-    "disagree_with_reference": 0,
-    "timings": [rung("1-literal", 1, 1.0), rung("8-json-depth", 10, 2.0), rung("8-json-depth", 100, 20.0)],
-    "reference_timings": [
-        rung("1-literal", 1, 1.0),
-        rung("8-json-depth", 10, 1.0),
-        rung("8-json-depth", 100, 10.0),
-    ],
-}
-
-
-def api_report(target: Path, entry: dict) -> str:
-    return json.dumps({"language": "typescript", "cases": entry["cases"], "targets": {str(target): entry}})
 
 
 def make_tree(root: Path) -> None:
@@ -147,9 +109,9 @@ def reference(tmp_path: Path) -> Path:
 def uncached(monkeypatch):
     for store in (
         codebase_module.test_runs_cache,
-        codebase_module.exercise_api_cache,
         codebase_module.reference_diff_cache,
         codebase_module.behavior_cache,
+        codebase_module.api_cache,
     ):
         monkeypatch.setattr(store, "read", False)
         monkeypatch.setattr(store, "write", False)
@@ -238,34 +200,6 @@ def diff_cached(monkeypatch, tmp_path):
         codebase_module.reference_diff_cache,
         "path",
         lambda reference, target, **kwargs: tmp_path / "diff" / f"{Path(target).name}.pkl",
-    )
-
-
-ENTRY_BY_CASE_FILE = {"fixtures.jsonl": API_FIXTURE_TARGET, "ladder.jsonl": API_LADDER_TARGET}
-
-
-def respond_to_exercise_api(target: Path):
-    def respond(argv, **kwargs):
-        cases = Path(argv[argv.index("--cases") + 1]).name
-        entry = ENTRY_BY_CASE_FILE.get(cases, API_TARGET)
-        return Mock(returncode=0, stdout=api_report(target, entry), stderr="")
-
-    return respond
-
-
-@pytest.fixture
-def exercise_api_process(uncached, run):
-    with patch("src.Codebase.subprocess", autospec=True) as m:
-        m.run.side_effect = respond_to_exercise_api(Path(run["run_dir"]) / "ported_implementation")
-        yield m
-
-
-@pytest.fixture
-def api_cached(monkeypatch, tmp_path):
-    monkeypatch.setattr(
-        codebase_module.exercise_api_cache,
-        "path",
-        lambda case_set, run_id, **kwargs: tmp_path / "cache" / case_set / f"{run_id}.pkl",
     )
 
 
@@ -760,192 +694,6 @@ def describe_reference_diff():
         assert m.run.call_count == 1
 
 
-def describe_api_agreement():
-    def it_has_none_without_a_reference(run):
-        codebase = Codebase.from_run(run)
-        assert codebase.api_agreement_pct is None
-        assert codebase.api_fixture_agreement_pct is None
-        assert codebase.api_p50_ms is None
-
-    def it_has_none_for_a_bare_path(tree, reference):
-        assert Codebase(tree, language="python", reference=reference).api_agreement_pct is None
-
-    def it_reports_agreeing_generated_cases_over_all_cases_as_a_percentage(
-        run, reference, exercise_api_process
-    ):
-        assert Codebase.from_run(run, reference=reference).api_agreement_pct == 90.0
-
-    def it_reports_fixture_agreement_from_the_fixture_cases(run, reference, exercise_api_process):
-        assert Codebase.from_run(run, reference=reference).api_fixture_agreement_pct == 100.0
-
-    def it_reports_the_generated_p50_in_milliseconds(run, reference, exercise_api_process):
-        assert Codebase.from_run(run, reference=reference).api_p50_ms == 0.31055
-
-    def it_runs_exercise_api_against_the_reference_with_the_generated_cases_and_adapt(
-        run, reference, exercise_api_process
-    ):
-        Codebase.from_run(run, reference=reference).api_agreement_pct
-        argv = exercise_api_process.run.call_args.args[0]
-        assert argv[argv.index("exercise-api") :] == [
-            "exercise-api",
-            "--language",
-            "typescript",
-            "--reference",
-            str(reference),
-            "--target",
-            str(Path(run["run_dir"]) / "ported_implementation"),
-            "--cases",
-            str(codebase_module.CASES["generated"]),
-            "--adapt",
-        ]
-
-    def it_runs_the_fixture_cases_for_the_fixture_rate(run, reference, exercise_api_process):
-        Codebase.from_run(run, reference=reference).api_fixture_agreement_pct
-        argv = exercise_api_process.run.call_args.args[0]
-        assert argv[-3:] == ["--cases", str(codebase_module.CASES["fixtures"]), "--adapt"]
-
-    def it_ships_the_case_files_in_the_exercise_api_package():
-        for path in codebase_module.CASES.values():
-            assert path.is_file()
-
-    def it_caches_each_case_set_apart():
-        generated = codebase_module.exercise_api_cache.path("generated", "abc")
-        fixtures = codebase_module.exercise_api_cache.path("fixtures", "abc")
-        assert str(generated).endswith("codebases/exercise-api/generated/abc.pkl")
-        assert str(fixtures).endswith("codebases/exercise-api/fixtures/abc.pkl")
-
-    def it_runs_each_case_set_once_and_shares_it_between_agreement_and_p50(run, reference, api_cached):
-        with patch("src.Codebase.subprocess", autospec=True) as m:
-            m.run.side_effect = respond_to_exercise_api(Path(run["run_dir"]) / "ported_implementation")
-            codebase = Codebase.from_run(run, reference=reference)
-            values = (codebase.api_agreement_pct, codebase.api_fixture_agreement_pct, codebase.api_p50_ms)
-        assert values == (90.0, 100.0, 0.31055)
-        assert m.run.call_count == 2
-
-    def it_raises_when_exercise_api_produced_no_report(run, reference, uncached):
-        with patch("src.Codebase.subprocess", autospec=True) as m:
-            m.run.return_value = Mock(returncode=1, stdout="", stderr="boom")
-            with pytest.raises(RuntimeError, match="boom"):
-                Codebase.from_run(run, reference=reference).api_agreement_pct
-
-
-def describe_performance_ladder():
-    def it_has_none_without_a_reference(run):
-        codebase = Codebase.from_run(run)
-        assert codebase.ladder_median_ms is None
-        assert codebase.ladder_slope is None
-        assert codebase.ladder_reference_slope is None
-        assert codebase.ladder_ref_ratio is None
-        assert codebase.ladder_timings is None
-        assert codebase.ladder_rungs is None
-        assert codebase.ladder_total_ms is None
-        assert codebase.ladder_rungs_completed is None
-
-    def it_takes_the_median_of_the_per_rung_add_medians(run, reference, exercise_api_process):
-        assert Codebase.from_run(run, reference=reference).ladder_median_ms == 2.0
-
-    def it_fits_the_log_log_slope_over_the_deepest_rung(run, reference, exercise_api_process):
-        assert Codebase.from_run(run, reference=reference).ladder_slope == 1.0
-
-    def it_divides_the_ports_median_by_the_references(run, reference, exercise_api_process):
-        assert Codebase.from_run(run, reference=reference).ladder_ref_ratio == 2.0
-
-    def it_fits_the_same_slope_over_the_references_own_rungs(run, reference, uncached):
-        entry = {
-            **API_LADDER_TARGET,
-            "reference_timings": [
-                rung("1-literal", 1, 1.0),
-                rung("8-json-depth", 10, 1.0),
-                rung("8-json-depth", 100, 100.0),
-            ],
-        }
-        with patch("src.Codebase.subprocess", autospec=True) as m:
-            target = Path(run["run_dir"]) / "ported_implementation"
-            m.run.return_value = Mock(returncode=0, stdout=api_report(target, entry), stderr="")
-            codebase = Codebase.from_run(run, reference=reference)
-            assert codebase.ladder_slope == 1.0
-            assert codebase.ladder_reference_slope == 2.0
-
-    def it_exposes_the_per_rung_timings_for_the_chart(run, reference, exercise_api_process):
-        codebase = Codebase.from_run(run, reference=reference)
-        assert [entry["rung"] for entry in codebase.ladder_timings] == [
-            "1-literal",
-            "8-json-depth",
-            "8-json-depth",
-        ]
-        assert len(codebase.ladder_reference_timings) == 3
-
-    def it_exposes_each_rung_as_index_rung_input_len_and_ms(run, reference, exercise_api_process):
-        codebase = Codebase.from_run(run, reference=reference)
-        assert codebase.ladder_rungs[0] == {"index": 0, "rung": "1-literal", "input_len": 1, "ms": 1.0}
-        assert [entry["ms"] for entry in codebase.ladder_rungs] == [1.0, 2.0, 20.0]
-        assert [entry["ms"] for entry in codebase.ladder_reference_rungs] == [1.0, 1.0, 10.0]
-
-    def it_numbers_each_rung_by_its_place_in_the_ladder_case_file(run, reference, uncached):
-        cases = [json.loads(line) for line in codebase_module.CASES["ladder"].read_text().splitlines()]
-        picked = [cases[0], cases[4], cases[21]]
-        entry = {
-            **API_LADDER_TARGET,
-            "timings": [rung(case["rung"], len(case["input"]), 1.0) for case in picked],
-        }
-        with patch("src.Codebase.subprocess", autospec=True) as m:
-            target = Path(run["run_dir"]) / "ported_implementation"
-            m.run.return_value = Mock(returncode=0, stdout=api_report(target, entry), stderr="")
-            codebase = Codebase.from_run(run, reference=reference)
-            assert [entry["index"] for entry in codebase.ladder_rungs] == [0, 4, 21]
-
-    def it_totals_the_per_rung_medians_over_the_rungs_that_completed(run, reference, exercise_api_process):
-        codebase = Codebase.from_run(run, reference=reference)
-        assert codebase.ladder_total_ms == 23.0
-        assert codebase.ladder_reference_total_ms == 12.0
-        assert codebase.ladder_rungs_completed == 3
-
-    def it_has_none_when_every_rung_failed(run, reference, uncached):
-        with patch("src.Codebase.subprocess", autospec=True) as m:
-            target = Path(run["run_dir"]) / "ported_implementation"
-            entry = {**API_LADDER_TARGET, "timings": []}
-            m.run.return_value = Mock(returncode=0, stdout=api_report(target, entry), stderr="")
-            codebase = Codebase.from_run(run, reference=reference)
-            assert codebase.ladder_median_ms is None
-            assert codebase.ladder_ref_ratio is None
-            assert codebase.ladder_total_ms is None
-            assert codebase.ladder_rungs == []
-            assert codebase.ladder_rungs_completed == 0
-
-    def it_has_none_when_the_driver_failed_before_any_timing(run, reference, uncached):
-        with patch("src.Codebase.subprocess", autospec=True) as m:
-            target = Path(run["run_dir"]) / "ported_implementation"
-            entry = {key: value for key, value in API_LADDER_TARGET.items() if key != "timings"}
-            m.run.return_value = Mock(returncode=0, stdout=api_report(target, entry), stderr="")
-            codebase = Codebase.from_run(run, reference=reference)
-            assert codebase.ladder_timings is None
-            assert codebase.ladder_median_ms is None
-            assert codebase.ladder_slope is None
-            assert codebase.ladder_ref_ratio is None
-            assert codebase.ladder_rungs is None
-            assert codebase.ladder_total_ms is None
-            assert codebase.ladder_rungs_completed is None
-
-    def it_takes_the_repeat_budget_from_the_ladder_case_file_not_a_flag(run, reference, exercise_api_process):
-        codebase = Codebase.from_run(run, reference=reference)
-        codebase.ladder_median_ms
-        argv = exercise_api_process.run.call_args.args[0]
-        assert argv[argv.index("--cases") :] == [
-            "--cases",
-            str(codebase_module.CASES["ladder"]),
-            "--adapt",
-        ]
-        assert "--repeat" not in argv
-        cases = [json.loads(line) for line in codebase_module.CASES["ladder"].read_text().splitlines()]
-        assert all({"repeat", "warmup"} <= set(case) for case in cases)
-
-    def it_caches_the_ladder_apart_from_the_other_case_sets():
-        assert codebase_module.CASES["ladder"].name == "ladder.jsonl"
-        assert str(codebase_module.exercise_api_cache.path("ladder", "abc")).endswith(
-            "codebases/exercise-api/ladder/abc.pkl"
-        )
-
-
 OUTCOMES = ["accept", "reject", "error", "crash"]
 REFERENCE_OUTCOMES = ["accept", "reject", "error", "accept"]
 
@@ -1179,3 +927,221 @@ def describe_content_hash():
         make_tree(tmp_path / "a")
         (tmp_path / "a" / "pkg" / "loop").symlink_to(tmp_path / "a")
         assert len(content_hash(tmp_path / "a")) == 64
+
+
+def describe_tool_directories():
+    def it_points_every_tool_at_a_package_in_the_tree():
+        directories = {
+            name: value
+            for name, value in vars(codebase_module).items()
+            if name.endswith("_DIR") and isinstance(value, Path)
+        }
+        assert directories
+        assert [name for name, path in directories.items() if not path.is_dir()] == []
+
+
+def step(rules: list[dict] | None = None, error: str | None = None) -> dict:
+    if error is not None:
+        return {"step": "construct", "error": {"class": error, "pos": None}}
+    return {"step": "construct", "rules": rules}
+
+
+OK = [step([{"type": "RuleChar", "value": [97]}])]
+OTHER = [step([{"type": "RuleChar", "value": [98]}])]
+RAISES = [step(error="GrammarParseError")]
+# The reference returns, returns, raises, returns; the port matches, differs, matches the
+# raise and crashes: one case per outcome but error_mismatch.
+REFERENCE_CASES = [(OK, None), (OK, None), (RAISES, None), (OK, None)]
+PORT_CASES = [(OK, None), (OTHER, None), (RAISES, None), (None, "Traceback: boom")]
+
+
+def case_lines(cases: list[tuple[list[dict] | None, str | None]]) -> str:
+    return "".join(
+        json.dumps({"grammar": "g0000", "input": i, "steps": steps, "crash": crash}) + "\n"
+        for i, (steps, crash) in enumerate(cases)
+    )
+
+
+def api_status(case: dict) -> str:
+    if case["crash"] is not None:
+        return "crash"
+    return "error" if any("error" in s for s in case["steps"]) else "ok"
+
+
+def api_outcome(reference: dict, port: dict) -> str:
+    if "crash" in (api_status(reference), api_status(port)):
+        return "crash"
+    if reference["steps"] == port["steps"]:
+        return "error_match" if api_status(reference) == "error" else "match"
+    return "mismatch" if api_status(reference) == api_status(port) == "ok" else "error_mismatch"
+
+
+def respond_to_measure_api(port_cases: list[tuple[list[dict] | None, str | None]]):
+    def respond(argv, **kwargs):
+        out = Path(argv[argv.index("--out") + 1])
+        if "compare" in argv:
+            reference = read_jsonl(argv[argv.index("--reference") + 1])
+            port = read_jsonl(argv[argv.index("--port") + 1])
+            statuses = ["ok", "error", "crash"]
+            outcomes = dict.fromkeys(["match", "mismatch", "error_match", "error_mismatch", "crash"], 0)
+            confusion = {a: dict.fromkeys(statuses, 0) for a in statuses}
+            for r, p in zip(reference, port):
+                outcomes[api_outcome(r, p)] += 1
+                confusion[api_status(r)][api_status(p)] += 1
+            agreements = outcomes["match"] + outcomes["error_match"]
+            report = {
+                "cases": len(reference),
+                "agreements": agreements,
+                "agreement_rate": agreements / len(reference),
+                "outcomes": outcomes,
+                "confusion": confusion,
+                "disagreements": [],
+            }
+            out.write_text(json.dumps(report))
+        else:
+            out.write_text(case_lines(port_cases))
+        return Mock(returncode=0, stdout="", stderr="")
+
+    return respond
+
+
+@pytest.fixture
+def api_corpus(monkeypatch, tmp_path):
+    corpus = tmp_path / "api-corpus"
+    corpus.mkdir()
+    for driver in ("python", "typescript"):
+        (corpus / f"reference-{driver}.jsonl").write_text(case_lines(REFERENCE_CASES))
+    monkeypatch.setattr(codebase_module, "API_CORPUS", corpus)
+    return corpus
+
+
+@pytest.fixture
+def api_process(uncached, api_corpus):
+    with patch("src.Codebase.subprocess", autospec=True) as m:
+        m.run.side_effect = respond_to_measure_api(PORT_CASES)
+        yield m
+
+
+@pytest.fixture
+def api_cached(monkeypatch, tmp_path):
+    monkeypatch.setattr(
+        codebase_module.api_cache,
+        "path",
+        lambda contents, **kwargs: tmp_path / "api" / f"{contents}.pkl",
+    )
+
+
+def measure_api_argv(process, command: str) -> list[str]:
+    for call in process.run.call_args_list:
+        argv = call.args[0]
+        if argv[argv.index("measure-api") + 1] == command:
+            return argv[argv.index("measure-api") :]
+    raise AssertionError(f"measure-api {command} never ran")
+
+
+def describe_api():
+    def it_reports_agreement_with_the_reference_as_a_percentage(python_port, api_process):
+        assert Codebase.from_run(python_port).api_agreement_pct == 50.0
+
+    def it_reports_a_count_per_outcome(python_port, api_process):
+        assert Codebase.from_run(python_port).api_outcomes == {
+            "match": 1,
+            "mismatch": 1,
+            "error_match": 1,
+            "error_mismatch": 0,
+            "crash": 1,
+        }
+
+    def it_reports_the_confusion_counts_by_reference_and_port_status(python_port, api_process):
+        confusion = Codebase.from_run(python_port).api_confusion
+        assert confusion["ok"] == {"ok": 2, "error": 0, "crash": 1}
+        assert confusion["error"]["error"] == 1
+
+    def it_runs_a_python_port_against_the_held_out_corpus_with_the_python_driver(
+        python_port, api_process, api_corpus
+    ):
+        Codebase.from_run(python_port).api_agreement_pct
+        argv = measure_api_argv(api_process, "run")
+        assert argv[:6] == [
+            "measure-api",
+            "run",
+            "--corpus",
+            str(api_corpus),
+            "--implementation",
+            str(Path(python_port["run_dir"]) / "ported_implementation"),
+        ]
+        assert argv[argv.index("--language") + 1] == "python"
+
+    def it_runs_a_javascript_port_that_ships_src_index_ts_with_the_typescript_driver(
+        javascript_port, api_process
+    ):
+        Codebase.from_run(javascript_port).api_agreement_pct
+        argv = measure_api_argv(api_process, "run")
+        assert argv[argv.index("--language") + 1] == "typescript"
+
+    def it_compares_the_port_with_the_reference_cases_of_its_driver(
+        javascript_port, api_process, api_corpus
+    ):
+        Codebase.from_run(javascript_port).api_agreement_pct
+        argv = measure_api_argv(api_process, "compare")
+        assert argv[argv.index("--reference") + 1] == str(api_corpus / "reference-typescript.jsonl")
+
+    def it_runs_measure_api_from_its_own_package(python_port, api_process):
+        Codebase.from_run(python_port).api_agreement_pct
+        argv = api_process.run.call_args.args[0]
+        assert argv[:4] == ["uv", "run", "--directory", str(codebase_module.MEASURE_API_DIR)]
+
+    def it_gives_a_javascript_port_without_src_index_ts_zero_agreement_and_a_note(
+        tmp_path, api_process
+    ):
+        run = v2_run(tmp_path, "20261012T000000Z_js000003", "javascript")
+        (Path(run["run_dir"]) / "ported_implementation" / "index.js").write_text("")
+        codebase = Codebase.from_run(run)
+        assert codebase.api_agreement_pct == 0.0
+        assert codebase.api_outcomes["crash"] == 4
+        assert codebase.api_note == "every case crashed: no src/index.ts"
+        assert [call.args[0][5] for call in api_process.run.call_args_list] == ["compare"]
+
+    def it_notes_the_first_crash_when_every_case_crashed(python_port, api_process):
+        api_process.run.side_effect = respond_to_measure_api(
+            [(None, "ModuleNotFoundError: No module named 'gbnf'")] * 4
+        )
+        codebase = Codebase.from_run(python_port)
+        assert codebase.api_agreement_pct == 0.0
+        assert codebase.api_note == "every case crashed: ModuleNotFoundError: No module named 'gbnf'"
+
+    def it_has_no_note_when_a_case_ran(python_port, api_process):
+        assert Codebase.from_run(python_port).api_note is None
+
+    def it_runs_measure_api_once_for_every_column(python_port, api_process):
+        codebase = Codebase.from_run(python_port)
+        codebase.api_agreement_pct
+        codebase.api_outcomes
+        codebase.api_confusion
+        codebase.api_note
+        assert api_process.run.call_count == 2
+
+    def it_raises_when_measure_api_fails(python_port, api_process):
+        api_process.run.side_effect = None
+        api_process.run.return_value = Mock(returncode=1, stdout="", stderr="boom")
+        with pytest.raises(RuntimeError, match="boom"):
+            Codebase.from_run(python_port).api_agreement_pct
+
+    def it_caches_under_codebases_api_by_the_ports_contents():
+        assert str(codebase_module.api_cache.path("abc")).endswith("codebases/api/abc.pkl")
+
+    def it_serves_a_port_with_the_same_contents_from_the_cache(
+        tmp_path, python_port, api_corpus, api_cached
+    ):
+        twin = v2_run(tmp_path, "20261012T000000Z_py000003", "python")
+        shutil.copytree(
+            Path(python_port["run_dir"]) / "ported_implementation",
+            Path(twin["run_dir"]) / "ported_implementation",
+            dirs_exist_ok=True,
+        )
+        with patch("src.Codebase.subprocess", autospec=True) as m:
+            m.run.side_effect = respond_to_measure_api(PORT_CASES)
+            first = Codebase.from_run(python_port).api_agreement_pct
+            second = Codebase.from_run(twin).api_agreement_pct
+        assert (first, second) == (50.0, 50.0)
+        assert m.run.call_count == 2

@@ -1,12 +1,10 @@
 import json
-import math
 import os
-import statistics
 import subprocess
 from datetime import timedelta
 from fnmatch import fnmatch
 from hashlib import sha256
-from functools import cached_property, lru_cache
+from functools import cached_property
 from itertools import chain
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -23,20 +21,15 @@ EXECUTE_TEST_SUITE_DIR = ANALYSIS / "execute-test-suite"
 MEASURE_AST_DIR = ANALYSIS / "measure-ast"
 MEASURE_EMBEDDING_DIR = ANALYSIS / "measure-embedding"
 ROUND_TRIP_DIR = ANALYSIS / "round-trip-experiment"
-EXERCISE_API_DIR = ANALYSIS / "exercise-api"
 MEASURE_BEHAVIOR_DIR = ANALYSIS / "measure-behavior"
-# The held-out corpus: generated grammars and inputs no agent container ever mounts.
+MEASURE_API_DIR = ANALYSIS / "measure-api"
+# The held-out corpora: generated grammars and inputs no agent container ever mounts.
 BEHAVIOR_CORPUS = MEASURE_BEHAVIOR_DIR / "corpus"
-# measure-behavior loads a javascript port through its typescript driver.
-BEHAVIOR_DRIVERS = {"python": "python", "javascript": "typescript"}
+API_CORPUS = MEASURE_API_DIR / "corpus"
+# measure-behavior and measure-api load a javascript port through their typescript driver.
+DRIVERS = {"python": "python", "javascript": "typescript"}
 # Installed dependencies and caches are not the port's own code.
 CONTENT_SKIP = {"node_modules", "__pycache__"}
-CASES = {
-    "generated": EXERCISE_API_DIR / "cases" / "generated-seed0-500.jsonl",
-    "fixtures": EXERCISE_API_DIR / "cases" / "fixtures.jsonl",
-    "ladder": EXERCISE_API_DIR / "cases" / "ladder.jsonl",
-}
-LADDER_SLOPE_RUNG = "8-json-depth"
 EMBEDDINGS = Path.home() / ".cache" / "ports" / "analysis" / "embeddings-stripped"
 EMBEDDING_MODEL = "qwen3-embedding-0.6b-q8_0"
 
@@ -49,9 +42,6 @@ test_runs_cache = disk_cache / (
         f"{'-adapt' if adapt else ''}{'-coverage' if coverage else ''}/{run_id}.pkl"
     )
 )
-exercise_api_cache = disk_cache / (
-    lambda case_set, run_id, **kwargs: f"codebases/exercise-api/{case_set}/{run_id}.pkl"
-)
 reference_diff_cache = disk_cache / (
     lambda reference, target, **kwargs: (
         f"codebases/reference-diff/{sha256(f'{reference}\n{target}'.encode()).hexdigest()}.pkl"
@@ -59,6 +49,7 @@ reference_diff_cache = disk_cache / (
 )
 
 behavior_cache = disk_cache / (lambda contents, **kwargs: f"codebases/behavior/{contents}.pkl")
+api_cache = disk_cache / (lambda contents, **kwargs: f"codebases/api/{contents}.pkl")
 
 
 def exclude_args(exclude: list[str]) -> list[str]:
@@ -75,51 +66,6 @@ def run_tool(directory: Path, *argv: str) -> dict:
         raise RuntimeError(
             f"{' '.join(argv)} produced no report (exit {process.returncode}): {process.stderr}"
         )
-
-
-def _add_ms(entry: dict) -> float:
-    return entry["add_ns"]["median"] / 1e6
-
-
-@lru_cache
-def _ladder_index() -> dict[tuple[str, int], int]:
-    """Position in the case file, so a rung a port failed is a gap rather than a shift."""
-    cases = [json.loads(line) for line in CASES["ladder"].read_text().splitlines()]
-    return {(case["rung"], len(case["input"])): index for index, case in enumerate(cases)}
-
-
-def _log_log_slope(points: list[tuple[float, float]]) -> float | None:
-    """Least-squares slope of log(y) against log(x), the measure-complexity-curve formula."""
-    if len(points) < 2:
-        return None
-    xs = [math.log(x) for x, _ in points]
-    ys = [math.log(y) for _, y in points]
-    mean_x, mean_y = sum(xs) / len(xs), sum(ys) / len(ys)
-    denominator = sum((x - mean_x) ** 2 for x in xs)
-    if denominator == 0:
-        return None
-    return sum((x - mean_x) * (y - mean_y) for x, y in zip(xs, ys)) / denominator
-
-
-@exercise_api_cache
-def run_exercise_api(
-    case_set: str, run_id: str, *, language: str, reference: Path, target: Path
-) -> dict:
-    # The ladder file carries a repeat and warm-up budget per case, so no flag is needed.
-    report = run_tool(
-        EXERCISE_API_DIR,
-        "exercise-api",
-        "--language",
-        language,
-        "--reference",
-        str(reference),
-        "--target",
-        str(target),
-        "--cases",
-        str(CASES[case_set]),
-        "--adapt",
-    )
-    return report["targets"][str(target)]
 
 
 @reference_diff_cache
@@ -153,27 +99,30 @@ def content_hash(path: Path) -> str:
     return digest.hexdigest()
 
 
-def run_measure_behavior_cli(*argv: str) -> None:
+def run_cli(directory: Path, *argv: str) -> None:
     process = subprocess.run(
-        ["uv", "run", "--directory", str(MEASURE_BEHAVIOR_DIR), "measure-behavior", *argv],
-        capture_output=True,
-        text=True,
+        ["uv", "run", "--directory", str(directory), *argv], capture_output=True, text=True
     )
     if process.returncode != 0:
         raise RuntimeError(
-            f"measure-behavior {' '.join(argv)} failed (exit {process.returncode}): {process.stderr}"
+            f"{' '.join(argv)} failed (exit {process.returncode}): {process.stderr}"
         )
+
+
+def driver_can_load(implementation: Path, driver: str) -> bool:
+    """The typescript driver loads src/index.ts; without one there is no module to load."""
+    return driver != "typescript" or (implementation / "src" / "index.ts").is_file()
 
 
 @behavior_cache
 def run_measure_behavior(contents: str, *, implementation: Path, language: str) -> dict:
-    driver = BEHAVIOR_DRIVERS[language]
+    driver = DRIVERS[language]
     reference = BEHAVIOR_CORPUS / f"reference-{driver}.jsonl"
     with TemporaryDirectory() as scratch:
         outcomes = Path(scratch) / "outcomes.jsonl"
         report = Path(scratch) / "report.json"
-        if driver == "typescript" and not (implementation / "src" / "index.ts").is_file():
-            # The typescript driver has no module to load: every pair crashes, as a load failure does.
+        if not driver_can_load(implementation, driver):
+            # Every pair crashes, as a load failure does.
             outcomes.write_text(
                 "".join(
                     json.dumps({**json.loads(line), "outcome": "crash", "error": "no src/index.ts"})
@@ -182,7 +131,9 @@ def run_measure_behavior(contents: str, *, implementation: Path, language: str) 
                 )
             )
         else:
-            run_measure_behavior_cli(
+            run_cli(
+                MEASURE_BEHAVIOR_DIR,
+                "measure-behavior",
                 "run",
                 "--corpus",
                 str(BEHAVIOR_CORPUS),
@@ -193,13 +144,71 @@ def run_measure_behavior(contents: str, *, implementation: Path, language: str) 
                 "--out",
                 str(outcomes),
             )
-        run_measure_behavior_cli(
-            "compare", "--reference", str(reference), "--port", str(outcomes), "--out", str(report)
+        run_cli(
+            MEASURE_BEHAVIOR_DIR,
+            "measure-behavior",
+            "compare",
+            "--reference",
+            str(reference),
+            "--port",
+            str(outcomes),
+            "--out",
+            str(report),
         )
         port = [json.loads(line) for line in outcomes.read_text().splitlines()]
         note = (
             f"every pair crashed: {port[0]['error']}"
             if all(pair["outcome"] == "crash" for pair in port)
+            else None
+        )
+        return {**json.loads(report.read_text()), "note": note}
+
+
+@api_cache
+def run_measure_api(contents: str, *, implementation: Path, language: str) -> dict:
+    driver = DRIVERS[language]
+    reference = API_CORPUS / f"reference-{driver}.jsonl"
+    with TemporaryDirectory() as scratch:
+        cases = Path(scratch) / "cases.jsonl"
+        report = Path(scratch) / "report.json"
+        if not driver_can_load(implementation, driver):
+            # Every case crashes, as a load failure does.
+            cases.write_text(
+                "".join(
+                    json.dumps({**json.loads(line), "steps": None, "crash": "no src/index.ts"})
+                    + "\n"
+                    for line in reference.read_text().splitlines()
+                )
+            )
+        else:
+            run_cli(
+                MEASURE_API_DIR,
+                "measure-api",
+                "run",
+                "--corpus",
+                str(API_CORPUS),
+                "--implementation",
+                str(implementation),
+                "--language",
+                driver,
+                "--out",
+                str(cases),
+            )
+        run_cli(
+            MEASURE_API_DIR,
+            "measure-api",
+            "compare",
+            "--reference",
+            str(reference),
+            "--port",
+            str(cases),
+            "--out",
+            str(report),
+        )
+        port = [json.loads(line) for line in cases.read_text().splitlines()]
+        note = (
+            f"every case crashed: {port[0]['crash']}"
+            if all(case["crash"] is not None for case in port)
             else None
         )
         return {**json.loads(report.read_text()), "note": note}
@@ -549,9 +558,13 @@ class Codebase:
         return 100 * (lines - self._reference_diff["deletions"]) / lines
 
     @cached_property
+    def _contents(self) -> str:
+        return content_hash(self.path)
+
+    @cached_property
     def _behavior(self) -> dict:
         return run_measure_behavior(
-            content_hash(self.path), implementation=self.path, language=self.language
+            self._contents, implementation=self.path, language=self.language
         )
 
     @property
@@ -566,117 +579,22 @@ class Codebase:
     def behavior_note(self) -> str | None:
         return self._behavior["note"]
 
-    def _api(self, case_set: str) -> dict | None:
-        if self.run is None or self.reference is None:
-            return None
-        return run_exercise_api(
-            case_set,
-            self.run["run_id"],
-            language=self.language,
-            reference=self.reference,
-            target=self.path,
-        )
-
-    def _api_agreement_pct(self, case_set: str) -> float | None:
-        result = self._api(case_set)
-        return None if result is None else 100 * result["agree_with_reference"] / result["cases"]
+    @cached_property
+    def _api(self) -> dict:
+        return run_measure_api(self._contents, implementation=self.path, language=self.language)
 
     @property
-    def api_agreement_pct(self) -> float | None:
-        return self._api_agreement_pct("generated")
+    def api_agreement_pct(self) -> float:
+        return 100 * self._api["agreements"] / self._api["cases"]
 
     @property
-    def api_fixture_agreement_pct(self) -> float | None:
-        return self._api_agreement_pct("fixtures")
+    def api_outcomes(self) -> dict[str, int]:
+        return self._api["outcomes"]
 
     @property
-    def api_p50_ms(self) -> float | None:
-        result = self._api("generated")
-        return None if result is None else result["target_p50_elapsed_ns"] / 1e6
-
-    def _ladder(self, key: str) -> list[dict] | None:
-        # A driver that failed every case carries no timings at all, so the key is absent.
-        result = self._api("ladder")
-        return None if result is None else result.get(key)
-
-    def _ladder_median_ms(self, key: str) -> float | None:
-        timings = self._ladder(key)
-        return None if not timings else statistics.median(_add_ms(entry) for entry in timings)
+    def api_confusion(self) -> dict[str, dict[str, int]]:
+        return self._api["confusion"]
 
     @property
-    def ladder_timings(self) -> list[dict] | None:
-        return self._ladder("timings")
-
-    @property
-    def ladder_reference_timings(self) -> list[dict] | None:
-        return self._ladder("reference_timings")
-
-    @property
-    def ladder_median_ms(self) -> float | None:
-        return self._ladder_median_ms("timings")
-
-    def _ladder_slope(self, key: str) -> float | None:
-        timings = self._ladder(key)
-        if timings is None:
-            return None
-        return _log_log_slope(
-            [
-                (entry["input_len"], _add_ms(entry))
-                for entry in timings
-                if entry["rung"] == LADDER_SLOPE_RUNG
-            ]
-        )
-
-    @property
-    def ladder_slope(self) -> float | None:
-        return self._ladder_slope("timings")
-
-    @property
-    def ladder_reference_slope(self) -> float | None:
-        return self._ladder_slope("reference_timings")
-
-    @property
-    def ladder_ref_ratio(self) -> float | None:
-        target = self._ladder_median_ms("timings")
-        reference = self._ladder_median_ms("reference_timings")
-        return None if target is None or not reference else target / reference
-
-    def _ladder_rungs(self, key: str) -> list[dict] | None:
-        timings = self._ladder(key)
-        if timings is None:
-            return None
-        index = _ladder_index()
-        return [
-            {
-                "index": index.get((entry["rung"], entry["input_len"])),
-                "rung": entry["rung"],
-                "input_len": entry["input_len"],
-                "ms": _add_ms(entry),
-            }
-            for entry in timings
-        ]
-
-    @property
-    def ladder_rungs(self) -> list[dict] | None:
-        return self._ladder_rungs("timings")
-
-    @property
-    def ladder_reference_rungs(self) -> list[dict] | None:
-        return self._ladder_rungs("reference_timings")
-
-    @property
-    def ladder_rungs_completed(self) -> int | None:
-        timings = self._ladder("timings")
-        return None if timings is None else len(timings)
-
-    def _ladder_total_ms(self, key: str) -> float | None:
-        timings = self._ladder(key)
-        return None if not timings else sum(_add_ms(entry) for entry in timings)
-
-    @property
-    def ladder_total_ms(self) -> float | None:
-        return self._ladder_total_ms("timings")
-
-    @property
-    def ladder_reference_total_ms(self) -> float | None:
-        return self._ladder_total_ms("reference_timings")
+    def api_note(self) -> str | None:
+        return self._api["note"]

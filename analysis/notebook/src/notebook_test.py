@@ -100,6 +100,9 @@ CHART_NAMES = (
     "behavior_title",
     "behavior_chart",
     "behavior_runs",
+    "API_LEAD",
+    "API_OUTCOME_TITLES",
+    "api_title",
     "DOT_STROKE",
     "IQR_OPACITY",
     "IQR_WIDTH",
@@ -125,7 +128,17 @@ CHART_NAMES = (
 
 
 def v2_row(
-    run_id, source, flags, agreement, note=None, *, tokens=1000, loc=500, exit_code=0, reason=None
+    run_id,
+    source,
+    flags,
+    agreement,
+    note=None,
+    *,
+    api=None,
+    tokens=1000,
+    loc=500,
+    exit_code=0,
+    reason=None,
 ):
     return {
         "run_id": run_id,
@@ -142,14 +155,17 @@ def v2_row(
         "behavior_agreement_pct": agreement,
         "reference_accept_port_crash": 0,
         "behavior_note": note,
+        "api_agreement_pct": api,
     }
 
 
 V2_RUNS = [
-    v2_row("a", "python", (0, 1, 1), 99.0, tokens=1000, loc=400),
-    v2_row("b", "python", (0, 1, 1), 97.0, tokens=3000, loc=600),
-    v2_row("c", "python", (1, 1, 1), 96.0, tokens=2000, loc=700),
-    v2_row("d", "javascript", (0, 0, 0), 0.0, "every pair crashed: no src/index.ts", tokens=4000, loc=900),
+    v2_row("a", "python", (0, 1, 1), 99.0, api=90.0, tokens=1000, loc=400),
+    v2_row("b", "python", (0, 1, 1), 97.0, api=95.0, tokens=3000, loc=600),
+    v2_row("c", "python", (1, 1, 1), 96.0, api=80.0, tokens=2000, loc=700),
+    v2_row(
+        "d", "javascript", (0, 0, 0), 0.0, "every pair crashed: no src/index.ts", api=0.0, tokens=4000, loc=900
+    ),
 ]
 # Every finished attempt: the exit-0 runs above plus the ones the forward tables exclude.
 V2_ATTEMPTS = [
@@ -290,6 +306,7 @@ def test_the_v2_summary_has_n_exclusions_and_the_quartiles_of_every_lead():
     assert row["median_behavior_agreement_pct"] == 98.0
     assert row["q1_behavior_agreement_pct"] == 97.5
     assert row["q3_behavior_agreement_pct"] == 98.5
+    assert row["median_api_agreement_pct"] == 92.5
     assert (row["q1_total_tokens"], row["median_total_tokens"], row["q3_total_tokens"]) == (
         1500.0,
         2000.0,
@@ -350,7 +367,7 @@ def test_the_spearman_table_ranks_every_varied_measure_against_behavior_agreemen
     assert "behavior_agreement_pct" not in measures
     # Constant over these runs, so its rank correlation is undefined.
     assert "reference_accept_port_crash" not in measures
-    assert set(measures) == {"total_tokens", "loc"}
+    assert set(measures) == {"api_agreement_pct", "total_tokens", "loc"}
     # agreement 99, 97, 96, 0 against loc 400, 600, 700, 900: a reversed order.
     assert round(table.filter(pl.col("measure") == "loc")["rho"][0], 9) == -1.0
     assert table["rho"].abs().to_list() == sorted(table["rho"].abs().to_list(), reverse=True)
@@ -363,7 +380,7 @@ def test_the_spearman_heatmap_is_titled_in_prose_and_draws_every_pair():
     assert spec["title"]["text"] == "How per-run measures rank against each other on V2 runs (Spearman)"
     cells = spec["layer"][0]
     assert cells["mark"]["type"] == "rect"
-    assert len(spec["datasets"][spec["data"]["name"]]) == 3 * 3
+    assert len(spec["datasets"][spec["data"]["name"]]) == 4 * 4
 
 
 def test_the_spearman_heatmap_diverges_through_grey_without_passing_through_another_hue():
@@ -374,6 +391,26 @@ def test_the_spearman_heatmap_diverges_through_grey_without_passing_through_anot
     assert color["scale"]["domain"] == [-1, 0, 1]
     assert color["scale"]["interpolate"] == "lab"
     assert color["legend"]["format"] == ".1f"
+
+
+def test_the_v2_statistics_lead_with_held_out_behavior_and_api_agreement():
+    leads = definitions(*CHART_NAMES)["V2_LEADS"]
+    assert leads[:2] == ["behavior_agreement_pct", "api_agreement_pct"]
+
+
+def test_v2_runs_carry_api_agreement_for_the_statistics():
+    assert "'api_agreement_pct': codebase.api_agreement_pct" in assigned("v2_runs")
+    assert "api_agreement_pct" not in assigned("V2_NOT_MEASURED")
+
+
+def test_the_flag_comparison_reads_api_agreement():
+    import polars as pl
+
+    table = definitions(*CHART_NAMES)["flag_comparison"](pl.DataFrame(V2_RUNS), "api_agreement_pct")
+    pooled = table.filter(
+        (pl.col("flag") == "include_unit_tests") & (pl.col("source_language") == "pooled")
+    ).row(0, named=True)
+    assert pooled["gap"] == 80.0 - 90.0
 
 
 def test_v2_runs_carry_their_size():
@@ -411,3 +448,143 @@ def test_the_notebook_renders_the_v2_statistics_section():
 
 def test_the_chart_export_takes_the_spearman_heatmap_from_the_notebook():
     assert 'notebook["spearman_chart"]' in (NOTEBOOK.parent / "export_charts.py").read_text()
+
+
+def test_the_api_section_measures_v2_runs_only():
+    assert "for codebase in v2_codebases" in assigned("v2_api_runs")
+
+
+API_STATUSES = ("ok", "error", "crash")
+API_OUTCOMES = {"match": 1, "mismatch": 0, "error_match": 0, "error_mismatch": 0, "crash": 0}
+API_CONFUSION = {reference: dict.fromkeys(API_STATUSES, 0) for reference in API_STATUSES}
+API_NAMES = (*CHART_NAMES, "api_chart", "api_runs")
+
+
+def api_row(run_id, source, flags, agreement, note=None):
+    return {
+        "run_id": run_id,
+        "source_language": source,
+        "target_language": "javascript" if source == "python" else "python",
+        **dict(zip(V2_FLAG_NAMES, flags)),
+        "api_agreement_pct": agreement,
+        "api_crash": 0,
+        "api_reference_ok_port_crash": 0,
+        "api_note": note,
+    }
+
+
+API_RUNS = [
+    api_row("a", "python", (0, 1, 1), 99.0),
+    api_row("b", "python", (0, 1, 1), 97.0),
+    api_row("c", "python", (1, 1, 1), 96.0),
+    api_row("d", "javascript", (0, 0, 0), 0.0, "every case crashed: no src/index.ts"),
+]
+
+
+def test_a_v2_run_carries_api_agreement_every_outcome_and_status_count_and_a_note():
+    from types import SimpleNamespace
+
+    api_columns = definitions("api_columns")["api_columns"]
+    codebase = SimpleNamespace(
+        api_agreement_pct=100.0, api_outcomes=API_OUTCOMES, api_confusion=API_CONFUSION, api_note=None
+    )
+    columns = api_columns(codebase)
+    assert columns["api_agreement_pct"] == 100.0
+    assert columns["api_note"] is None
+    assert [column for column in columns if column in {f"api_{o}" for o in API_OUTCOMES}] == [
+        "api_match",
+        "api_mismatch",
+        "api_error_match",
+        "api_error_mismatch",
+        "api_crash",
+    ]
+    assert len([column for column in columns if column.startswith("api_reference_")]) == 9
+    assert "api_reference_ok_port_crash" in columns
+
+
+def test_the_api_chart_draws_a_dot_per_run_and_a_median_tick_per_condition_on_0_to_100():
+    import polars as pl
+
+    namespace = definitions(*API_NAMES)
+    spec = namespace["api_chart"](pl.DataFrame(API_RUNS)).to_dict()
+    assert spec["title"]["text"] == "Held-out API agreement with the reference (%)"
+    panels = spec["concat"]
+    assert [panel["title"]["text"] for panel in panels] == [
+        "python → javascript",
+        "javascript → python",
+    ]
+    marks = [layer["mark"]["type"] for layer in panels[0]["layer"]]
+    assert marks == ["rule", "tick", "point"]
+    assert panels[0]["layer"][1]["encoding"]["y"]["aggregate"] == "median"
+    assert panels[0]["layer"][2]["encoding"]["y"]["scale"]["domain"] == [0, 100]
+    x = panels[0]["layer"][2]["encoding"]["x"]
+    assert x["scale"]["domain"] == [label for label, *_ in namespace["V2_CONDITIONS"]]
+    datasets = spec["datasets"]
+    assert len(datasets[panels[0]["data"]["name"]]) == 3
+    assert len(datasets[panels[1]["data"]["name"]]) == 1
+
+
+def test_the_api_chart_draws_the_interquartile_range_and_labels_each_condition_with_its_n():
+    import polars as pl
+
+    namespace = definitions(*API_NAMES)
+    spec = namespace["api_chart"](pl.DataFrame(API_RUNS)).to_dict()
+    iqr = spec["concat"][0]["layer"][0]
+    assert iqr["encoding"]["y"]["aggregate"] == "q1"
+    assert iqr["encoding"]["y2"]["aggregate"] == "q3"
+    python = spec["concat"][0]["layer"][2]["encoding"]["x"]["axis"]["labelExpr"]
+    assert "'source + target': 'n=2'" in python
+
+
+def test_the_api_chart_titles_an_outcome_and_a_status_count_in_prose():
+    import polars as pl
+
+    api_chart = definitions(*API_NAMES)["api_chart"]
+    frame = pl.DataFrame(API_RUNS)
+    titles = [
+        api_chart(frame, column).to_dict()["title"]["text"]
+        for column in ("api_crash", "api_reference_ok_port_crash")
+    ]
+    assert titles == [
+        "Cases where either side crashed",
+        "Cases the reference runs without raising and the port crashes on",
+    ]
+
+
+def test_every_api_column_has_a_prose_title():
+    api_title = definitions(*API_NAMES)["api_title"]
+    outcomes = [f"api_{outcome}" for outcome in API_OUTCOMES]
+    statuses = [f"api_reference_{a}_port_{b}" for a in API_STATUSES for b in API_STATUSES]
+    titles = [api_title(column) for column in outcomes + statuses]
+    assert len(set(titles)) == 14
+    assert not any("_" in title for title in titles)
+
+
+def test_the_api_run_table_shows_the_note_of_a_port_that_never_loaded():
+    import polars as pl
+
+    runs = definitions(*API_NAMES)["api_runs"](pl.DataFrame(API_RUNS))
+    row = runs.filter(pl.col("run_id") == "d").row(0, named=True)
+    assert row["condition"] == "none"
+    assert row["api_agreement_pct"] == 0.0
+    assert row["api_note"] == "every case crashed: no src/index.ts"
+
+
+def rendered_cell(call: str) -> int:
+    cells = [
+        index
+        for index, cell in enumerate(ast.parse(SOURCE).body)
+        if isinstance(cell, ast.FunctionDef)
+        and any(ast.unparse(node) == call for node in cell.body)
+    ]
+    assert len(cells) == 1
+    return cells[0]
+
+
+def test_the_notebook_renders_the_api_section_right_after_the_behavior_section():
+    # The API section's heading cell sits between the two reports.
+    assert rendered_cell("api_report()") == rendered_cell("behavior_report()") + 2
+
+
+def test_the_chart_export_takes_the_api_chart_from_the_notebook():
+    assert 'notebook["api_chart"]' in (NOTEBOOK.parent / "export_charts.py").read_text()

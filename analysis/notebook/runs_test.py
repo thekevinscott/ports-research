@@ -1,5 +1,4 @@
 import ast
-import re
 from pathlib import Path
 
 import altair as alt
@@ -196,42 +195,7 @@ def describe_reference_row():
         assert reference_row(StubCodebase)["adapted_integration_coverage_pct"] == 61.5
 
 
-def cell_defining(name: str) -> ast.FunctionDef:
-    for node in ast.parse(SOURCE).body:
-        if isinstance(node, ast.FunctionDef) and any(
-            isinstance(target, ast.Name) and target.id == name
-            for child in ast.walk(node)
-            for target in getattr(child, "targets", [])
-        ):
-            return node
-    raise AssertionError(f"{name} is not assigned in any cell of runs.py")
-
-
-def calls(name: str) -> list[str]:
-    return [
-        ast.unparse(node)
-        for node in ast.walk(ast.parse(SOURCE))
-        if isinstance(node, ast.Call) and ast.unparse(node.func) == name
-    ]
-
-
-def nudges(values: list[float]) -> list[float]:
-    namespace: dict = {}
-    module = ast.Module(
-        body=[
-            ast.Assign(
-                targets=[ast.Name(id="RATIO_TOLERANCE", ctx=ast.Store())],
-                value=assignment("RATIO_TOLERANCE"),
-            ),
-            function_def("nudges"),
-        ],
-        type_ignores=[],
-    )
-    exec(compile(ast.fix_missing_locations(module), str(NOTEBOOK), "exec"), namespace)
-    return namespace["nudges"](values)
-
-
-CHART_BUILDERS = ["chart", "pair_chart", "ratio_chart", "round_trip_chart"]
+CHART_BUILDERS = ["chart", "pair_chart", "round_trip_chart"]
 CHARTED_COLUMNS = [
     "COST_COLUMNS",
     "SIZE_COLUMNS",
@@ -360,74 +324,6 @@ def describe_round_trip_chart():
         note = note[note.index("### reference diff") :]
         assert "The reverse leg's own condition is constant" in note
         assert "`both tests` cell" in note
-
-
-def describe_ladder_ratio_chart():
-    def it_leaves_a_dot_with_no_neighbour_on_the_centre_line():
-        assert nudges([1.0, 2.0, 3.0]) == [0.0, 0.0, 0.0]
-
-    def it_spreads_only_the_dots_that_would_overlap():
-        assert nudges([1.0, 1.005, 1.01, 3.0]) == [-1.0, 0.0, 1.0, 0.0]
-
-    def it_puts_the_conditions_on_the_x_axis_in_order():
-        body = ast.unparse(function_def("ratio_chart"))
-        assert "alt.X('condition:N', sort=[label for label, *_ in conditions(source_language)]" in body
-
-    def it_drops_the_condition_colour():
-        assert "condition_colour" not in ast.unparse(function_def("ratio_chart"))
-
-    def it_shares_one_y_domain_across_both_directions():
-        assert "ratio_domain()" in ast.unparse(function_def("ratio_chart"))
-        domain = ast.unparse(function_def("ratio_domain"))
-        assert "runs.select" in domain
-        assert "pl.lit(1.0).alias('reference')" in domain
-
-    def it_titles_the_chart_in_words():
-        assert "ladder time relative to the reference" in ast.unparse(function_def("ratio_chart"))
-
-
-def describe_performance_notes():
-    def it_takes_no_private_names_out_of_the_codebase_module():
-        cell = ast.unparse(cell_defining("performance_notes"))
-        assert "_log_log_slope" not in cell
-        assert "LADDER_SLOPE_RUNG" not in cell
-
-    def it_reads_the_slope_and_the_reference_rungs_off_the_frame():
-        assert ast.literal_eval(assignment("LADDER_NOTE_METRICS")) == [
-            "ladder_slope",
-            "ladder_reference_slope",
-            "ladder_reference_rungs",
-        ]
-        assert "LADDER_NOTE_METRICS" in starred_names("METRICS")
-
-    def it_names_only_properties_of_codebase():
-        for metric in ast.literal_eval(assignment("LADDER_NOTE_METRICS")):
-            assert isinstance(getattr(Codebase, metric, None), property)
-
-    def it_keeps_the_slope_out_of_the_summary_tables():
-        assert "ladder_slope" not in ast.literal_eval(assignment("PERFORMANCE_METRICS"))
-
-    def it_carries_two_findings_and_an_open_question():
-        cell = ast.unparse(cell_defining("performance_notes"))
-        for label in ("Scaling", "Failure envelope", "Open question"):
-            assert label in cell
-
-    def it_computes_every_number_instead_of_typing_it():
-        assert not re.search(r"\d+\.\d+", ast.unparse(cell_defining("performance_notes")))
-
-    def it_reads_both_the_forward_and_the_reverse_frame():
-        arguments = {argument.arg for argument in cell_defining("performance_notes").args.args}
-        assert {"runs", "reverse_runs"} <= arguments
-
-    def it_renders_the_notes_in_an_accordion():
-        stacks = [text for text in calls("mo.vstack") if "performance_notes" in text]
-        assert len(stacks) == 1
-        assert "### notes" in stacks[0]
-        assert "mo.accordion({'Notes':" in stacks[0]
-
-    def it_sits_between_the_ladder_and_the_reverse_ports():
-        assert SOURCE.index('report("performance")') < SOURCE.index("performance_notes")
-        assert SOURCE.index("performance_notes") < SOURCE.index("## Reverse ports")
 
 
 def describe_port_to_port_section():
