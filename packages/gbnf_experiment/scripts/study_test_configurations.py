@@ -97,7 +97,7 @@ def ignore_interrupts() -> None:
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
 
-def run_matrix(
+def study_test_configurations(
     cells: list[dict], *, n: int | None, parallel: int, api_key: str, out: Path
 ) -> None:
     # Concurrent prepares of one condition collide in its shared staging directory.
@@ -164,7 +164,7 @@ def main(argv: list[str] | None = None) -> None:
     settings.data_directory.mkdir(parents=True, exist_ok=True)
     out = settings.data_directory / f"matrix-{datetime.now(UTC):%Y%m%dT%H%M%SZ}.jsonl"
     print(f"{len(selected)} cells; writing {out}", file=sys.stderr)
-    run_matrix(selected, n=args.n or None, parallel=args.parallel, api_key=api_key, out=out)
+    study_test_configurations(selected, n=args.n or None, parallel=args.parallel, api_key=api_key, out=out)
 
 
 if __name__ == "__main__":

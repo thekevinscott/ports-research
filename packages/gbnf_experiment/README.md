@@ -33,12 +33,12 @@ Depends on port_codebase and botbox.
 
 ## Running the matrix
 
-`scripts/run_matrix.py` runs `run_gbnf_experiment` through the SDK over cells: source language × the 8 combinations of the three test flags × model × effort.
+`scripts/study_test_configurations.py` runs `run_gbnf_experiment` through the SDK over cells: source language × the 8 combinations of the three test flags × model × effort.
 
 Defaults are the approved study: `claude-opus-5-5` at `medium` effort, 16 cells a round, 12 rounds, 192 runs.
 
 ```
-uv run --env-file ../../.env python scripts/run_matrix.py
+uv run --env-file ../../.env python scripts/study_test_configurations.py
 ```
 
 | Flag | Default |

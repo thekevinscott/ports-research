@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
-from run_matrix import MODELS, cell_name, cells, main, run_matrix, schedule
+from study_test_configurations import MODELS, cell_name, cells, main, study_test_configurations, schedule
 
 API_KEY = "sk-ant-test"
 NAMES = (
@@ -26,27 +26,27 @@ def run_directory(tmp_path):
 
 @pytest.fixture
 def gbnf_experiment(run_directory):
-    with patch("run_matrix.run_gbnf_experiment", autospec=True) as m:
+    with patch("study_test_configurations.run_gbnf_experiment", autospec=True) as m:
         m.return_value = run_directory
         yield m
 
 
 @pytest.fixture(autouse=True)
 def claude_agent():
-    with patch("run_matrix.ClaudeAgent", autospec=True) as m:
+    with patch("study_test_configurations.ClaudeAgent", autospec=True) as m:
         yield m
 
 
 @pytest.fixture(autouse=True)
 def prepare():
-    with patch("run_matrix.prepare_reference_implementation", autospec=True) as m:
+    with patch("study_test_configurations.prepare_reference_implementation", autospec=True) as m:
         yield m
 
 
 @pytest.fixture(autouse=True)
 def threads():
     # Mocks do not cross a process boundary, and only the main thread may set a signal handler.
-    with patch("run_matrix.ProcessPoolExecutor", lambda parallel, **_: ThreadPoolExecutor(parallel)):
+    with patch("study_test_configurations.ProcessPoolExecutor", lambda parallel, **_: ThreadPoolExecutor(parallel)):
         yield
 
 
@@ -102,7 +102,7 @@ def describe_schedule():
 def describe_run_matrix():
     def it_writes_one_line_per_run(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
-        run_matrix(cells(), n=2, parallel=2, api_key=API_KEY, out=out)
+        study_test_configurations(cells(), n=2, parallel=2, api_key=API_KEY, out=out)
         assert len(read(out)) == 128
 
     def it_writes_the_cell_round_run_directory_exit_code_wall_time_and_usage(
@@ -110,7 +110,7 @@ def describe_run_matrix():
     ):
         out = tmp_path / "matrix.jsonl"
         [cell] = cells(efforts=("high",))[:1]
-        run_matrix([cell], n=1, parallel=1, api_key=API_KEY, out=out)
+        study_test_configurations([cell], n=1, parallel=1, api_key=API_KEY, out=out)
         [line] = read(out)
         assert line["cell"] == cell
         assert line["cell"]["effort"] == "high"
@@ -124,7 +124,7 @@ def describe_run_matrix():
     def it_keeps_going_when_a_run_raises(tmp_path, gbnf_experiment, run_directory):
         gbnf_experiment.side_effect = [RuntimeError("boom"), *[run_directory] * 63]
         out = tmp_path / "matrix.jsonl"
-        run_matrix(cells(), n=1, parallel=1, api_key=API_KEY, out=out)
+        study_test_configurations(cells(), n=1, parallel=1, api_key=API_KEY, out=out)
         lines = read(out)
         assert len(lines) == 64
         assert lines[0]["error"] == "boom"
@@ -134,7 +134,7 @@ def describe_run_matrix():
     def it_logs_runs_so_that_any_prefix_is_balanced_across_cells(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
         everything = cells()
-        run_matrix(everything, n=3, parallel=1, api_key=API_KEY, out=out)
+        study_test_configurations(everything, n=3, parallel=1, api_key=API_KEY, out=out)
         counts = Counter({cell_name(cell): 0 for cell in everything})
         for line in read(out):
             counts[cell_name(line["cell"])] += 1
@@ -142,7 +142,7 @@ def describe_run_matrix():
 
     def it_writes_runs_in_round_order(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
-        run_matrix(cells(), n=2, parallel=1, api_key=API_KEY, out=out)
+        study_test_configurations(cells(), n=2, parallel=1, api_key=API_KEY, out=out)
         rounds = [line["round"] for line in read(out)]
         assert rounds == [1] * 64 + [2] * 64
 
@@ -150,7 +150,7 @@ def describe_run_matrix():
         tmp_path, gbnf_experiment, claude_agent
     ):
         two = [cell for cell in cells(efforts=("low", "xhigh")) if cell_name(cell) in NAMES]
-        run_matrix(two, n=1, parallel=1, api_key=API_KEY, out=tmp_path / "m")
+        study_test_configurations(two, n=1, parallel=1, api_key=API_KEY, out=tmp_path / "m")
         assert sorted(c.kwargs["effort"] for c in claude_agent.call_args_list) == ["low", "xhigh"]
         for c in claude_agent.call_args_list:
             assert c.kwargs == {"model": MODELS[0], "effort": c.kwargs["effort"], "api_key": API_KEY}
@@ -159,7 +159,7 @@ def describe_run_matrix():
         order = Mock()
         order.attach_mock(prepare, "prepare")
         order.attach_mock(gbnf_experiment, "run")
-        run_matrix(cells(), n=1, parallel=2, api_key=API_KEY, out=tmp_path / "m")
+        study_test_configurations(cells(), n=1, parallel=2, api_key=API_KEY, out=tmp_path / "m")
         names = [name for name, _, _ in order.mock_calls]
         assert names[:16] == ["prepare"] * 16
         assert "prepare" not in names[16:]
@@ -168,7 +168,7 @@ def describe_run_matrix():
 @pytest.fixture
 def matrix(monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", API_KEY)
-    with patch("run_matrix.run_matrix", autospec=True) as m:
+    with patch("study_test_configurations.study_test_configurations", autospec=True) as m:
         yield m
 
 
