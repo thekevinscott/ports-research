@@ -206,3 +206,29 @@ def describe_manifest():
     def it_rejects_an_unknown_source_language(measure):
         with pytest.raises(ValueError, match="source_language"):
             measure(bash("ls"), source_language="typescript")
+
+
+def describe_reading_order():
+    def it_follows_read_calls_and_reading_commands_in_order(measure):
+        result = measure(
+            bash("cd /input/python && cat README.md"),
+            tool("Read", file_path="/input/python/gbnf/__init__.py"),
+            bash("cd /input/python/gbnf && cat graph.py __init__.py"),
+            tool("Grep", pattern="x"),
+            bash("cat > /target/a.py <<'EOF'\nx\nEOF"),
+            tool("Read", file_path="/input/python/gbnf/graph.py"),
+            tool("Edit", file_path="/target/a.py"),
+            tool("Read", file_path="/target/a.py"),
+        )
+        assert (result["first_read_path"], result["first_read_class"]) == ("/input/python/README.md", "source")
+        assert result["read_order"] == ["/input/python/README.md", "/input/python/gbnf/__init__.py", "/input/python/gbnf/graph.py"]
+        assert result["first_read_is_entry_point"] is True
+        assert (result["files_read_before_first_write"], result["source_files_read_before_first_write"]) == (3, 3)
+        assert (result["reread_count"], result["max_rereads_of_one_file"], result["max_rereads_path"]) == (2, 1, "/input/python/gbnf/__init__.py")
+        assert result["search_calls_per_file_read"] == 0.25
+        assert result["reads_after_last_write"] == 1
+
+    def it_names_a_read_of_a_copy_by_its_origin(measure):
+        result = measure(bash("cp -r /input/javascript/src /tmp/ref"), bash("cat /tmp/ref/index.ts"), source_language="javascript")
+        assert result["read_order"] == ["/input/javascript/src/index.ts"]
+        assert result["first_read_is_entry_point"] is True

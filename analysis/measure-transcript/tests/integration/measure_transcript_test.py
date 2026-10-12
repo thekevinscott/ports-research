@@ -76,3 +76,21 @@ def describe_measure_transcript():
         result = run_cli("--run", tmp_path)
         assert result.returncode != 0
         assert "no transcript" in result.stderr
+
+
+def describe_reading_order():
+    def it_names_the_first_read_and_the_source_read_order(report):
+        assert (report["first_read_path"], report["first_read_class"]) == ("/input/*.md", "other")
+        assert report["read_order"] == ["/input/javascript/README.md", "/input/javascript/package.json", "/input/javascript/src/$f"]
+        # The source is read through a `for f in ...; do cat $f` loop: no code file is named.
+        assert report["first_read_is_entry_point"] is None
+
+    def it_counts_files_read_before_the_first_write(report):
+        assert (report["files_read_before_first_write"], report["source_files_read_before_first_write"]) == (15, 3)
+
+    def it_counts_rereads(report):
+        assert (report["reread_count"], report["max_rereads_of_one_file"]) == (12, 3)
+        assert report["max_rereads_path"] == "/tmp/claude-1000/-target/*/tasks/bxqix6v8j.output"
+
+    def it_relates_searches_and_late_reads(report):
+        assert (report["search_calls_per_file_read"], report["reads_after_last_write"]) == (0.0, 0)
