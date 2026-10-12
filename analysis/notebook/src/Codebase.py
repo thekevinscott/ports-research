@@ -23,6 +23,7 @@ MEASURE_EMBEDDING_DIR = ANALYSIS / "measure-embedding"
 ROUND_TRIP_DIR = ANALYSIS / "round-trip-experiment"
 MEASURE_BEHAVIOR_DIR = ANALYSIS / "measure-behavior"
 MEASURE_API_DIR = ANALYSIS / "measure-api"
+MEASURE_TRANSCRIPT_DIR = ANALYSIS / "measure-transcript"
 # The held-out corpora: generated grammars and inputs no agent container ever mounts.
 BEHAVIOR_CORPUS = MEASURE_BEHAVIOR_DIR / "corpus"
 API_CORPUS = MEASURE_API_DIR / "corpus"
@@ -59,6 +60,7 @@ reference_diff_cache = disk_cache / (
 behavior_cache = disk_cache / (lambda contents, **kwargs: f"codebases/behavior/{contents}.pkl")
 api_cache = disk_cache / (lambda contents, **kwargs: f"codebases/api/{contents}.pkl")
 ast_cache = disk_cache / (lambda contents, **kwargs: f"codebases/ast/{contents}.pkl")
+transcript_cache = disk_cache / (lambda contents, **kwargs: f"codebases/transcript/{contents}.pkl")
 
 
 def exclude_args(exclude: list[str]) -> list[str]:
@@ -106,6 +108,22 @@ def content_hash(path: Path) -> str:
             digest.update(f"{file.relative_to(path)}\n".encode())
             digest.update(sha256(file.read_bytes()).digest())
     return digest.hexdigest()
+
+
+def transcript_hash(run_dir: Path) -> str:
+    """The run's transcripts, hidden directories included, and the source language that classes their paths."""
+    digest = sha256()
+    condition = json.loads((run_dir / "manifest.json").read_text())["condition"]
+    digest.update(f"{condition['source_language']}\n".encode())
+    for file in sorted((run_dir / "transcript").rglob("*.jsonl")):
+        digest.update(f"{file.relative_to(run_dir)}\n".encode())
+        digest.update(sha256(file.read_bytes()).digest())
+    return digest.hexdigest()
+
+
+@transcript_cache
+def run_measure_transcript(contents: str, *, run_dir: Path) -> dict:
+    return run_tool(MEASURE_TRANSCRIPT_DIR, "measure-transcript", "--run", str(run_dir))
 
 
 def run_cli(directory: Path, *argv: str) -> None:
@@ -676,3 +694,9 @@ class Codebase:
     @property
     def ast_note(self) -> str | None:
         return self._ast_compare["note"]
+
+    @cached_property
+    def transcript(self) -> dict:
+        """measure-transcript's report on the run's transcripts."""
+        run_dir = Path(self.run["run_dir"])
+        return run_measure_transcript(transcript_hash(run_dir), run_dir=run_dir)

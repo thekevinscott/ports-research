@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 import src.Codebase as codebase_module
-from src.Codebase import Codebase, content_hash
+from src.Codebase import Codebase, content_hash, transcript_hash
 
 EXCLUDE = ["__pycache__", "*_test.py"]
 SOURCE = "x = 1\n\n# note\ny = 2\n"
@@ -113,6 +113,7 @@ def uncached(monkeypatch):
         codebase_module.behavior_cache,
         codebase_module.api_cache,
         codebase_module.ast_cache,
+        codebase_module.transcript_cache,
     ):
         monkeypatch.setattr(store, "read", False)
         monkeypatch.setattr(store, "write", False)
@@ -1324,3 +1325,113 @@ def describe_pinned_reference():
             with pytest.raises(RuntimeError, match="unreachable"):
                 codebase_module.pinned_reference()
         assert not (tmp_path / "pinned").exists()
+TRANSCRIPT_REPORT = {"turns": 43, "read_source_tests": 3, "suite_run_count": 5}
+
+
+def write_transcript(run: dict, text: str = '{"type": "assistant"}\n') -> None:
+    run_dir = Path(run["run_dir"])
+    (run_dir / "manifest.json").write_text(
+        json.dumps({"condition": {"source_language": run["source_language"]}})
+    )
+    projects = run_dir / "transcript" / ".claude" / "projects" / "-target"
+    projects.mkdir(parents=True, exist_ok=True)
+    (projects / "session.jsonl").write_text(text)
+
+
+@pytest.fixture
+def transcript_run(python_port):
+    write_transcript(python_port)
+    return python_port
+
+
+@pytest.fixture
+def transcript_process(uncached):
+    with patch("src.Codebase.subprocess", autospec=True) as m:
+        m.run.return_value = Mock(returncode=0, stdout=json.dumps(TRANSCRIPT_REPORT), stderr="")
+        yield m
+
+
+@pytest.fixture
+def transcript_cached(monkeypatch, tmp_path):
+    monkeypatch.setattr(
+        codebase_module.transcript_cache,
+        "path",
+        lambda contents, **kwargs: tmp_path / "transcript" / f"{contents}.pkl",
+    )
+
+
+def describe_transcript():
+    def it_reports_what_measure_transcript_printed(transcript_run, transcript_process):
+        assert Codebase.from_run(transcript_run).transcript == TRANSCRIPT_REPORT
+
+    def it_runs_measure_transcript_on_the_run_directory_from_its_own_package(
+        transcript_run, transcript_process
+    ):
+        Codebase.from_run(transcript_run).transcript
+        assert transcript_process.run.call_args.args[0] == [
+            "uv",
+            "run",
+            "--directory",
+            str(codebase_module.MEASURE_TRANSCRIPT_DIR),
+            "measure-transcript",
+            "--run",
+            transcript_run["run_dir"],
+        ]
+
+    def it_runs_measure_transcript_once_per_codebase(transcript_run, transcript_process):
+        codebase = Codebase.from_run(transcript_run)
+        codebase.transcript
+        codebase.transcript
+        assert transcript_process.run.call_count == 1
+
+    def it_raises_when_measure_transcript_prints_no_report(transcript_run, transcript_process):
+        transcript_process.run.return_value = Mock(returncode=1, stdout="", stderr="Error: no transcript")
+        with pytest.raises(RuntimeError, match="no transcript"):
+            Codebase.from_run(transcript_run).transcript
+
+    def it_caches_under_codebases_transcript_by_the_transcripts_contents():
+        assert str(codebase_module.transcript_cache.path("abc")).endswith(
+            "codebases/transcript/abc.pkl"
+        )
+
+    def it_serves_a_run_with_the_same_transcript_from_the_cache(
+        tmp_path, transcript_run, transcript_cached
+    ):
+        twin = v2_run(tmp_path, "20261012T000000Z_py000004", "python")
+        write_transcript(twin)
+        with patch("src.Codebase.subprocess", autospec=True) as m:
+            m.run.return_value = Mock(returncode=0, stdout=json.dumps(TRANSCRIPT_REPORT), stderr="")
+            first = Codebase.from_run(transcript_run).transcript
+            second = Codebase.from_run(twin).transcript
+        assert first == second == TRANSCRIPT_REPORT
+        assert m.run.call_count == 1
+
+
+def describe_transcript_hash():
+    def it_matches_for_two_runs_with_the_same_transcript_and_source_language(tmp_path):
+        a = v2_run(tmp_path, "a", "python")
+        b = v2_run(tmp_path, "b", "python")
+        write_transcript(a)
+        write_transcript(b)
+        assert transcript_hash(Path(a["run_dir"])) == transcript_hash(Path(b["run_dir"]))
+
+    def it_reads_the_transcript_inside_the_hidden_claude_directory(tmp_path):
+        run = v2_run(tmp_path, "a", "python")
+        write_transcript(run)
+        before = transcript_hash(Path(run["run_dir"]))
+        write_transcript(run, '{"type": "user"}\n')
+        assert transcript_hash(Path(run["run_dir"])) != before
+
+    def it_changes_with_the_source_language_the_paths_are_classed_by(tmp_path):
+        a = v2_run(tmp_path, "a", "python")
+        b = v2_run(tmp_path, "b", "javascript")
+        write_transcript(a)
+        write_transcript(b)
+        assert transcript_hash(Path(a["run_dir"])) != transcript_hash(Path(b["run_dir"]))
+
+    def it_ignores_the_port(tmp_path):
+        run = v2_run(tmp_path, "a", "python")
+        write_transcript(run)
+        before = transcript_hash(Path(run["run_dir"]))
+        (Path(run["run_dir"]) / "ported_implementation" / "x.py").write_text("x = 1\n")
+        assert transcript_hash(Path(run["run_dir"])) == before

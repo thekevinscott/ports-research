@@ -161,6 +161,7 @@ def _():
             "ast_note": None,
         }
 
+    TRANSCRIPT_LEADS = ["read_source_tests", "read_target_tests", "suite_run_count", "own_tests_written"]
     V2_STRINGS = {"completed_at": pl.String, "error": pl.String, "terminal_reason": pl.String}
     v2_runs = pl.DataFrame(
         [
@@ -170,6 +171,7 @@ def _():
                 **behavior_columns(codebase),
                 "api_agreement_pct": codebase.api_agreement_pct,
                 **ast_columns(codebase),
+                **{lead: codebase.transcript[lead] for lead in TRANSCRIPT_LEADS},
             }
             for codebase in v2_codebases
         ],
@@ -203,6 +205,46 @@ def _():
         [{**codebase.run, **api_columns(codebase)} for codebase in v2_codebases],
         schema_overrides={"completed_at": pl.String, "error": pl.String, "api_note": pl.String},
     )
+    # The token split by cache tier is left out; the totals around the first write stay.
+    # Lists and the per-class last counts are flattened or quoted below.
+    TRANSCRIPT_DROPPED = {
+        "input_tokens",
+        "output_tokens",
+        "cache_read_tokens",
+        "cache_creation_tokens",
+        "suite_runs",
+        "last_suite_counts",
+        "own_test_files",
+        "fetch_commands",
+        "differential_evidence",
+    }
+    SUITE_CLASSES = ["source_tests", "target_tests", "own_tests", "unknown"]
+
+    def transcript_columns(codebase):
+        report = codebase.transcript
+        evidence = report["differential_evidence"]
+        return {
+            **{field: value for field, value in report.items() if field not in TRANSCRIPT_DROPPED},
+            **{
+                f"last_{suite}_{count}": report["last_suite_counts"].get(suite, {}).get(count)
+                for suite in SUITE_CLASSES
+                for count in ("passed", "failed")
+            },
+            "differential_evidence": None if evidence is None else evidence.get("command", evidence.get("path")),
+        }
+
+    v2_transcript_runs = pl.DataFrame(
+        [{**codebase.run, **transcript_columns(codebase)} for codebase in v2_codebases],
+        schema_overrides={
+            **V2_STRINGS,
+            "differential_evidence": pl.String,
+            **{f"last_{suite}_{count}": pl.Int64 for suite in SUITE_CLASSES for count in ("passed", "failed")},
+            "first_write_turn": pl.Int64,
+            "last_suite_run_turn": pl.Int64,
+            "tokens_before_first_write": pl.Int64,
+            "tokens_after_first_write": pl.Int64,
+        },
+    )
     port_pairs = within_direction_similarity(codebases)
     cell_pairs = within_cell(port_pairs)
     return (
@@ -217,6 +259,7 @@ def _():
         REFERENCE,
         REFERENCE_ID,
         TEST_METRICS,
+        TRANSCRIPT_LEADS,
         V2_FLAGS,
         alt,
         cell_pairs,
@@ -237,6 +280,7 @@ def _():
         v2_api_runs,
         v2_attempts,
         v2_runs,
+        v2_transcript_runs,
     )
 
 
@@ -296,6 +340,7 @@ def _(
     LAYOUT_RULE,
     REFERENCE_ID,
     TEST_METRICS,
+    TRANSCRIPT_LEADS,
     V2_FLAGS,
     alt,
     cell_pairs,
@@ -317,6 +362,7 @@ def _(
     v2_api_runs,
     v2_attempts,
     v2_runs,
+    v2_transcript_runs,
 ):
     CONDITION_FLAGS = ["include_python_tests", "include_typescript_tests"]
 
@@ -697,7 +743,9 @@ def _(
 
         def panel(source_language):
             by_source = labelled.filter(pl.col("source_language") == source_language)
-            rows = fan_out(by_source.select("condition", pl.col(metric).cast(pl.Float64).alias("value")))
+            values = by_source.select("condition", pl.col(metric).cast(pl.Float64).alias("value"))
+            # A run without a value has no dot, so it joins no n either.
+            rows = fan_out(values.drop_nulls("value"))
             x = alt.X(
                 "condition:N",
                 sort=labels,
@@ -916,10 +964,90 @@ def _(
             ]
         )
 
-    V2_LEADS = [BEHAVIOR_LEAD, API_LEAD, *AST_LEADS, "total_tokens", "loc"]
+    TRANSCRIPT_TITLES = {
+        "turns": "Assistant turns",
+        "bash_calls": "Bash calls",
+        "read_calls": "Read calls",
+        "write_calls": "Write calls",
+        "edit_calls": "Edit calls",
+        "search_calls": "Glob and Grep calls",
+        "read_source": "Reads of the source implementation",
+        "read_source_tests": "Reads of the source language's shipped tests",
+        "read_target_tests": "Reads of the target language's shipped tests",
+        "suite_run_count": "Test suite runs",
+        "own_tests_written": "Test files the agent wrote itself",
+        "fetch_attempts": "Network fetch and install attempts",
+        "tokens_before_first_write": "Tokens before the first write into the port",
+        "tokens_after_first_write": "Tokens from the first write into the port on",
+        "first_write_turn": "Turn of the first write into the port",
+        "last_suite_run_turn": "Turn of the last test suite run",
+        **{
+            f"last_{suite}_{count}": f"{count.capitalize()} tests in the last run of {name}"
+            for suite, name in (
+                ("source_tests", "the source language's shipped tests"),
+                ("target_tests", "the target language's shipped tests"),
+                ("own_tests", "the agent's own tests"),
+                ("unknown", "a suite of more than one class"),
+            )
+            for count in ("passed", "failed")
+        },
+    }
+    # Booleans: the section counts the runs where each holds instead of charting them.
+    TRANSCRIPT_COUNTED = ["touched_source_tests", "touched_target_tests", "differential_script"]
+
+    def transcript_title(metric):
+        return TRANSCRIPT_TITLES[metric]
+
+    def transcript_chart(frame, metric):
+        # Counts, never a percentage: no lead takes the 0 to 100 scale.
+        return behavior_chart(frame, metric, lead=None, title=transcript_title)
+
+    def transcript_counts(frame):
+        return by_cell(
+            frame,
+            pl.len().alias("n"),
+            *(pl.col(column).sum().alias(column) for column in TRANSCRIPT_COUNTED),
+        ).with_columns(pl.col("n", *TRANSCRIPT_COUNTED).fill_null(0))
+
+    def transcript_runs(frame):
+        others = [column for column in TRANSCRIPT_TITLES if column not in TRANSCRIPT_LEADS]
+        return with_v2_conditions(frame).select(
+            "run_id",
+            "source_language",
+            "condition",
+            *TRANSCRIPT_LEADS,
+            *TRANSCRIPT_COUNTED,
+            *others,
+            "differential_evidence",
+        )
+
+    def transcript_report():
+        if v2_transcript_runs.height == 0:
+            return mo.md("No completed V2 runs.")
+        labelled = transcript_runs(v2_transcript_runs)
+        others = [column for column in TRANSCRIPT_TITLES if column not in TRANSCRIPT_LEADS]
+        return mo.vstack(
+            [
+                *(transcript_chart(v2_transcript_runs, lead) for lead in TRANSCRIPT_LEADS),
+                mo.ui.table(
+                    transcript_counts(v2_transcript_runs),
+                    freeze_columns_left=["source_language", "condition"],
+                ),
+                mo.accordion(
+                    {
+                        "Other transcript columns": mo.vstack(
+                            [transcript_chart(v2_transcript_runs, column) for column in others]
+                        )
+                    }
+                ),
+                mo.accordion({f"Runs (n={labelled.height})": mo.ui.table(labelled)}),
+            ]
+        )
+
+    V2_LEADS = [BEHAVIOR_LEAD, API_LEAD, *AST_LEADS, "total_tokens", "loc", *TRANSCRIPT_LEADS]
     V2_SCOPES = ["pooled", *BEHAVIOR_SOURCES]
     # Per-run measures besides held-out behavior; the confusion counts join them from the frame.
-    V2_MEASURES = ["total_tokens", "api_calls", "duration_ms", "file_count", "loc"]
+    V2_MEASURES = ["total_tokens", "api_calls", "duration_ms", "file_count", "loc", *TRANSCRIPT_LEADS]
     SPEARMAN_CELL_PX = 26
     # red, neutral grey, blue: a diverging ramp whose midpoint reads as no correlation.
     DIVERGING = ["#e34948", "#f0efec", "#2a78d6"]
@@ -947,6 +1075,8 @@ def _(
             return behavior_title(measure)
         if measure in AST_LEADS:
             return ast_title(measure)
+        if measure in TRANSCRIPT_LEADS:
+            return transcript_title(measure)
         return api_title(measure) if measure == API_LEAD else metric_title(measure)
 
     def v2_summary(frame, attempts):
@@ -2025,6 +2155,7 @@ def _(
         report,
         reverse_report,
         spearman_chart,
+        transcript_report,
         v2_statistics_report,
     )
 
@@ -2049,7 +2180,7 @@ def _(mo):
             mo.accordion(
                 {
                     "How to read": mo.md("""
-                    V2 is the current study: 16 cells, 2 source languages (python → javascript, javascript → python) × 3 test flags (`include_unit_tests`, `include_source_integration_tests`, `include_target_integration_tests`), 12 runs per cell, claude-opus-5-5 at medium effort. A run that exited non-zero (killed with 137, or an api_error) is left out of every V2 table and chart and counted in the failure table. The V2 sections are the last four: Held-out behavior, Held-out API, AST relative to the reference and V2 statistics. Every V2 chart draws each run as a dot, the cell's median as a tick, its interquartile range as a faint bar, and n under each label.
+                    V2 is the current study: 16 cells, 2 source languages (python → javascript, javascript → python) × 3 test flags (`include_unit_tests`, `include_source_integration_tests`, `include_target_integration_tests`), 12 runs per cell, claude-opus-5-5 at medium effort. A run that exited non-zero (killed with 137, or an api_error) is left out of every V2 table and chart and counted in the failure table. The V2 sections are the last five: Held-out behavior, Held-out API, AST relative to the reference, Transcripts and V2 statistics. Every V2 chart draws each run as a dot, the cell's median as a tick, its interquartile range as a faint bar, and n under each label.
 
                     The sections in between are V1: 40 runs in eight cells (source language, python reference tests in the sandbox or not, typescript reference tests in the sandbox or not). Each V1 port is measured against the hand-written reference in its own target language, under the same excludes: the reference diff, the port-to-port diff, cost, size, test pass rates. They are read off the runs and the files, with no model involved.
                     """)
@@ -2459,6 +2590,43 @@ def _(ast_report):
 def _(mo):
     mo.vstack(
         [
+            mo.md("## Transcripts"),
+            mo.accordion(
+                {
+                    "Glossary": mo.md("""
+                    measure-transcript reads each run's Claude Code transcript, subagents included, and counts what the agent did. Every column is a count, a turn number or a quoted command. In the sandbox the reference sits at `/input/python` and `/input/javascript` and the port at `/target`. The shipped tests are `/input/python/tests/` and colocated `*_test.py` for python, `/input/javascript/integration-tests/` and colocated `*.test.ts` for javascript. A copy keeps its origin's class until the agent writes the file whole.
+
+                    - `read_source_tests`, `read_target_tests`, `read_source`: Read calls and `cat`, `head`, `less`, `grep`, `sed -n` commands that reach the source language's shipped tests, the target language's shipped tests, or the rest of the source implementation.
+                    - `suite_run_count`: commands that run a test suite (pytest, vitest, jest, `node --test`, `npm test`, `pnpm test`, `just test*`).
+                    - `own_tests_written`: test files the agent wrote under `/target` and did not copy from `/input`.
+                    - `touched_source_tests`, `touched_target_tests`: any read, write, search, command argument or suite run reached that suite. In the table, the runs in the cell where it holds.
+                    - `differential_script`: a command or written file runs both python and node, or names both a reference path and a port path. In the table, the runs in the cell where it holds; `differential_evidence` quotes the first.
+                    - `turns`: assistant messages. `bash_calls`, `read_calls`, `write_calls`, `edit_calls`, `search_calls` (Glob and Grep): tool calls.
+                    - `fetch_attempts`: WebFetch and WebSearch calls and `curl`, `wget`, `pip install`, `npm install` commands. The sandbox has no network; these count the attempts.
+                    - `tokens_before_first_write`, `tokens_after_first_write`: input, cache and output tokens summed over the turns before the first write into `/target` and from it on.
+                    - `first_write_turn`, `last_suite_run_turn`: the turn of the first write into `/target` and of the last suite run.
+                    - `last_<class>_passed`, `last_<class>_failed`: the pass and fail counts of the last suite run of that class whose summary line was read; `unknown` is a run that reached more than one class.
+                    """),
+                    "How to read": mo.md("""
+                    V2 runs only. The x axis is test inclusion: `unit` is the source language's unit suite, `source` and `target` the integration suites in the source and target language. Each dot is a run; the tick is the condition's median, the faint bar its interquartile range, and the number under each label its n. A run without a value (no write, no suite run of that class) has no dot and is not in the n.
+                    """),
+                }
+            ),
+        ]
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(transcript_report):
+    transcript_report()
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.vstack(
+        [
             mo.md("## V2 statistics"),
             mo.accordion(
                 {
@@ -2471,7 +2639,7 @@ def _(mo):
                     - `rho`: Spearman rank correlation, the Pearson correlation of the two measures' ranks (ties share their average rank), from −1 to 1. `n`: runs with both measures present.
                     """),
                     "How to read": mo.md("""
-                    V2 exit-0 runs only. The lead measures are held-out behavior agreement, held-out API agreement, the three AST leads, total tokens and LOC. The rank correlation table sets every per-run measure against held-out behavior agreement, so a cheap measure can be checked against it on this data; the heatmap shows every pair.
+                    V2 exit-0 runs only. The lead measures are held-out behavior agreement, held-out API agreement, the three AST leads, total tokens, LOC, and four transcript counts: reads of the source language's shipped tests, reads of the target language's shipped tests, test suite runs and test files the agent wrote itself. The rank correlation table sets every per-run measure against held-out behavior agreement, so a cheap measure can be checked against it on this data; the heatmap shows every pair.
                     """),
                 }
             ),
