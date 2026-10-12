@@ -25,7 +25,14 @@ One row per run, one column per measure, all in the runs notebook ([analysis/not
 - [ ] Reference diff: similarity, kept, identical, modified, renamed, added, deleted.
 - [ ] Levenshtein: token, character, path.
 - [ ] Embeddings: embedding-server pass over every V2 run so the per-run cache exists.
-- [ ] AST: parked. Kevin, 2026-10-12: "AST I find interesting but our initial attempt I didn't really understand and it seemed to say very little." The plain-language explainer asked for on 2026-09-10 is still owed.
+- [ ] AST, relative to the reference. Kevin, 2026-10-12: "AST I find interesting but our initial attempt I didn't really understand and it seemed to say very little." and "AST in particular I think we could go deeper". Today's seven measures describe the port alone. Each becomes relative:
+  - [ ] Delta to the human port: measure-ast on the hand-written target-language implementation once; every measure shown as port minus reference.
+  - [ ] Function-level matching: port functions paired with reference functions by normalised name and arity; matched fraction, unmatched on each side, line-count drift per pair.
+  - [ ] Tree edit distance on matched pairs, identifiers abstracted (GumTree style).
+  - [ ] Branch structure: distance between the per-function cyclomatic distributions of port and reference.
+  - [ ] Public API surface: exported names and signatures, port versus reference, as a set diff.
+  - [ ] All labelled structural drift, never fidelity alone: CodeBLEU's AST and dataflow subscores do not track functional correctness in the papers the embeddings review covers.
+  - [ ] The plain-language explainer asked for on 2026-09-10 is still owed.
 
 ### Held-out behavior
 
@@ -38,21 +45,35 @@ One row per run, one column per measure, all in the runs notebook ([analysis/not
 - [ ] Package `analysis/measure-api`: seeded corpus, per-step rule-set comparison against the reference, outcomes match, mismatch, error_match, error_mismatch, crash; agreement rate and confusion table (PR in flight).
 - [ ] Notebook section, same shape as the behavior section.
 
-### Transcripts
+### Transcripts, mechanical
 
-- [ ] Tier 1, mechanical: a parser from transcript jsonl to per-run columns. What the agent read (source, shipped tests, both, neither); how often it ran which suite and the pass counts it saw; whether it wrote its own tests or a differential script against the reference; Bash calls, turns, tokens per phase.
-- [ ] Tier 1 notebook section, charted by test inclusion.
-- [ ] Tier 2 rubric, written before any V2 transcript is read: did the agent cheat; why did it keep or change the file structure (the two open questions from the [V2 plan](PLAN_2026-09-16-v2.md)).
-- [ ] Tier 2 run once over every exit-0 run: compressed transcript (commands and assistant text, tool output dropped) to a stronger model, verdict with quoted evidence per item, uncertain runs escalated to Kevin.
+- [ ] A parser from transcript jsonl to per-run columns. What the agent read (source, shipped tests, both, neither); how often it ran which suite and the pass counts it saw; whether it wrote its own tests or a differential script against the reference; Bash calls, turns, tokens per phase.
+- [ ] Notebook section, charted by test inclusion.
+
+### LLM judges
+
+Kevin, 2026-10-12: "we should run the judge suite against the base ports without telling them, so we can measure a baseline of what they say by default." The base ports are the two hand-written gbnf implementations judged against each other, in both directions. They enter the suite as ordinary items; the judge is never told which items are agent ports and which are the human pair.
+
+- [ ] Code judge rubric, written before any V2 port is read: API parity, structure kept or changed and why, semantic divergences with quoted lines, idiom versus transliteration. Output per item: a verdict per rubric line with quoted evidence, plus one ordinal fidelity score.
+- [ ] Transcript judge rubric, written before any V2 transcript is read: did the agent cheat; why did it keep or change the file structure (the two open questions from the [V2 plan](PLAN_2026-09-16-v2.md)). Input is the compressed transcript: commands and assistant text, tool output dropped.
+- [ ] Baseline: the human pair, both directions, judged blind. Its scores are the default reading of the code judge for a faithful port.
+- [ ] One pass over every exit-0 run with a stronger model than the one under test, uncertain items escalated to Kevin. Each item judged once; the judge sees items in shuffled order.
+- [ ] Notebook section: fidelity score and verdict counts by test inclusion, with the human pair drawn as a reference line.
 
 ### Not this cycle
 
-- LLM judge over the code itself.
-- Fidelity scale, internal-state parity script, grader validation by mutation. Catalogued in the fidelity notebook (PR #121).
+- Fidelity scale, internal-state parity script (Mistral), grader validation by mutation.
+- Literature only: property-based and metamorphic relations, differential symbolic execution, doc-as-spec judging, security gate. See [literature/SYNTHESIS.md](../literature/SYNTHESIS.md).
 
 ## Statistics
 
-Kevin, 2026-09-16: "You are fully in charge of statistics." The proposal, unchanged from the V2 plan:
+Kevin, 2026-09-16: "You are fully in charge of statistics." The proposal, unchanged from the V2 plan, plus the basics the notebook lacks today:
+
+- [ ] n per cell, visible on every chart and in a summary table; exclusions counted beside it.
+- [ ] Interquartile range beside every median.
+- [ ] Failures by cell (exit 137, api_error) and cost per successful run, in a sidebar table.
+- [ ] Spearman correlation matrix of every per-run measure against held-out behavior and API agreement, so the cheap proxies are validated on our own data.
+- [ ] The "How to read" text rewritten for V2 (it still describes 40 runs in eight cells).
 
 - [ ] Per flag, compare the 96 runs with it on to the 96 with it off, within source language and pooled.
 - [ ] Permutation test on the difference in medians; bootstrap interval on the gap; minimum detectable gap stated up front, so a null reads as "too small to see", never "no effect".
