@@ -182,6 +182,16 @@ def measure_embedding_process():
         yield m
 
 
+@pytest.fixture(autouse=True)
+def embedding_server_key(monkeypatch):
+    """A server matching the cache, without a server; the check is cached, so each test starts it afresh."""
+    monkeypatch.setenv("GENERATE_EMBEDDING_BASE_URL", "http://host/v1")
+    codebase_module.check_embedding_server.cache_clear()
+    with patch("src.Codebase.embedding_server_key", return_value=codebase_module.EMBEDDING_SERVER) as m:
+        yield m
+    codebase_module.check_embedding_server.cache_clear()
+
+
 @pytest.fixture
 def code_distance_process():
     with patch("src.Codebase.subprocess", autospec=True) as m:
@@ -516,8 +526,20 @@ def describe_embedding_distance():
         codebase = Codebase.from_run(run, reference=reference)
         assert (codebase.chamfer_distance, codebase.chamfer_a_to_b, codebase.chamfer_b_to_a) == (0.11, 0.09, 0.13)
 
-    def it_keeps_stripped_vectors_in_their_own_cache_directory():
-        assert codebase_module.EMBEDDINGS.name == "embeddings-stripped"
+    def it_keeps_stripped_vectors_in_their_own_cache_directory_per_model_file_and_pooling():
+        assert codebase_module.EMBEDDINGS.parts[-2:] == ("embeddings-stripped", "qwen3-embedding-0.6b-q8_0-pooling-last")
+
+    def it_refuses_to_embed_from_a_server_whose_model_file_or_pooling_differs(run, reference, embedding_server_key, measure_embedding_process):
+        embedding_server_key.return_value = "qwen3-embedding-0.6b-f16-pooling-mean"
+        with pytest.raises(RuntimeError, match="serves qwen3-embedding-0.6b-f16-pooling-mean"):
+            Codebase.from_run(run, reference=reference).embedding_distance
+        embedding_server_key.assert_called_once_with("http://host/v1", codebase_module.EMBEDDING_MODEL)
+        measure_embedding_process.run.assert_not_called()
+
+    def it_refuses_to_embed_without_a_server_url(run, reference, monkeypatch, measure_embedding_process):
+        monkeypatch.delenv("GENERATE_EMBEDDING_BASE_URL")
+        with pytest.raises(RuntimeError, match="GENERATE_EMBEDDING_BASE_URL"):
+            Codebase.from_run(run, reference=reference).embedding_distance
 
     def it_embeds_the_port_and_the_reference_then_compares_them(
         run, reference, measure_embedding_process

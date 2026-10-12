@@ -4,7 +4,7 @@ import subprocess
 from datetime import timedelta
 from fnmatch import fnmatch
 from hashlib import sha256
-from functools import cached_property
+from functools import cache, cached_property
 from itertools import chain
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -13,6 +13,8 @@ import polars as pl
 from cachetta import Cachetta
 from dirsql._dirsql import DirSQL
 from pygount import SourceAnalysis
+
+from src.embedding_server_key import embedding_server_key
 
 FILES_SQL = "SELECT path, ext, size FROM './' ORDER BY path"
 FILES_SCHEMA = {"path": pl.String, "ext": pl.String, "size": pl.Int64}
@@ -39,8 +41,20 @@ REFERENCE_CHECKOUT = Path.home() / ".cache" / "ports" / "analysis" / "codebases"
 REFERENCE_EXCLUDE = {"python": [], "javascript": ["builder", "dev"]}
 # Installed dependencies and caches are not the port's own code.
 CONTENT_SKIP = {"node_modules", "__pycache__"}
-EMBEDDINGS = Path.home() / ".cache" / "ports" / "analysis" / "embeddings-stripped"
 EMBEDDING_MODEL = "qwen3-embedding-0.6b-q8_0"
+# The cache is keyed on the server's model file and pooling; new vectors come only from a server that matches.
+EMBEDDING_SERVER = "qwen3-embedding-0.6b-q8_0-pooling-last"
+EMBEDDINGS = Path.home() / ".cache" / "ports" / "analysis" / "embeddings-stripped" / EMBEDDING_SERVER
+
+
+@cache
+def check_embedding_server() -> None:
+    """Raise unless the server at GENERATE_EMBEDDING_BASE_URL runs EMBEDDING_MODEL from the file and pooling the cache is keyed on."""
+    url = os.environ.get("GENERATE_EMBEDDING_BASE_URL")
+    if not url:
+        raise RuntimeError("set GENERATE_EMBEDDING_BASE_URL to the embedding server's /v1 url")
+    if (served := embedding_server_key(url, EMBEDDING_MODEL)) != EMBEDDING_SERVER:
+        raise RuntimeError(f"{url} serves {served}; the embedding cache holds {EMBEDDING_SERVER}")
 
 # Ports never change once written, so their test results never expire.
 # timedelta.max overflows cachetta's expiry check on read.
@@ -534,6 +548,7 @@ class Codebase:
 
     @cached_property
     def _embedding(self) -> dict:
+        check_embedding_server()
         out = EMBEDDINGS / "runs" / self.run["run_id"]
         reference_out = EMBEDDINGS / "reference" / self.language
         self._embed(self.path, out)
