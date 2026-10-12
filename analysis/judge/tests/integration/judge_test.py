@@ -104,6 +104,36 @@ def describe_judge_run():
         judgments, _ = read_out(tmp_path / "out")
         assert len({j["id"] for j in judgments}) == len(judgments) == 2
 
+    def describe_replicate_fraction():
+        def it_writes_no_replicates_by_default(run_cli, make_run, tmp_path):
+            make_run("20261012T000000Z_aaaaaaaa", "python")
+            run_cli("run", "--rubric", "code", "--runs", tmp_path / "runs", "--out", tmp_path / "out")
+            assert sorted(p.name for p in (tmp_path / "out").iterdir()) == ["judgments.jsonl", "manifest.json"]
+
+        def it_judges_the_baselines_a_second_time_with_the_same_prompt(run_cli, make_run, calls, read_out, tmp_path):
+            make_run("20261012T000000Z_aaaaaaaa", "python")
+            args = ("run", "--rubric", "code", "--runs", tmp_path / "runs", "--out", tmp_path / "out", "--replicate-fraction", 1e-9)
+            result = run_cli(*args)
+            assert result.returncode == 0, result.stderr
+            judgments, manifest = read_out(tmp_path / "out")
+            replicates = [json.loads(line) for line in (tmp_path / "out" / "replicates.jsonl").read_text().splitlines()]
+            assert len(judgments) == 3
+            assert sorted(r["id"] for r in replicates) == sorted(i for i, e in manifest.items() if e["baseline"])
+            assert set(replicates[0]) == set(judgments[0])
+            prompts = [call["prompt"] for call in calls()]
+            assert len(prompts) == 5
+            assert sorted(prompts.count(p) for p in set(prompts)) == [1, 2, 2]
+            run_cli(*args)
+            assert len(calls()) == 5
+
+        def it_replicates_every_item_at_one(run_cli, make_run, read_out, tmp_path):
+            make_run("20261012T000000Z_aaaaaaaa", "python", steps=STEPS)
+            make_run("20261012T000000Z_bbbbbbbb", "javascript", steps=STEPS[:2])
+            run_cli("run", "--rubric", "transcript", "--runs", tmp_path / "runs", "--out", tmp_path / "out", "--replicate-fraction", 1)
+            judgments, _ = read_out(tmp_path / "out")
+            replicates = [json.loads(line) for line in (tmp_path / "out" / "replicates.jsonl").read_text().splitlines()]
+            assert sorted(r["id"] for r in replicates) == sorted(j["id"] for j in judgments)
+
     def it_leaves_out_runs_whose_agent_did_not_exit_0(run_cli, make_run, read_out, tmp_path):
         make_run("20261012T000000Z_aaaaaaaa", "python", steps=STEPS)
         make_run("20261012T000000Z_cccccccc", "python", steps=STEPS, exit_code=137)

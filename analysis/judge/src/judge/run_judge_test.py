@@ -50,16 +50,29 @@ def find_runs_function():
 
 
 @pytest.fixture
-def mocks(build_items_function, shuffle_items_function, clone_reference_function, judge_item_function, find_runs_function):
-    return {"build_items": build_items_function, "clone_reference": clone_reference_function, "judge_item": judge_item_function, "find_runs": find_runs_function}
+def replicate_items_function():
+    with patch("judge.run_judge.replicate_items", autospec=True) as m:
+        m.return_value = []
+        yield m
 
 
-def judgments(out):
-    return [json.loads(line) for line in (out / "judgments.jsonl").read_text().splitlines()]
+@pytest.fixture
+def mocks(build_items_function, shuffle_items_function, clone_reference_function, judge_item_function, find_runs_function, replicate_items_function):
+    return {
+        "build_items": build_items_function,
+        "clone_reference": clone_reference_function,
+        "judge_item": judge_item_function,
+        "find_runs": find_runs_function,
+        "replicate_items": replicate_items_function,
+    }
+
+
+def judgments(out, name="judgments.jsonl"):
+    return [json.loads(line) for line in (out / name).read_text().splitlines()]
 
 
 def go(out, **overrides):
-    options = {"rubric": "code", "runs": [Path("/runs")], "out": out, "limit": None, "model": "m", "effort": "e", "concurrency": 1}
+    options = {"rubric": "code", "runs": [Path("/runs")], "out": out, "limit": None, "model": "m", "effort": "e", "concurrency": 1, "replicate_fraction": 0}
     run_judge(**{**options, **overrides})
 
 
@@ -123,3 +136,32 @@ def describe_run_judge():
         with pytest.raises(RuntimeError, match="item-0000000b"):
             go(tmp_path / "out", concurrency=2)
         assert sorted(j["id"] for j in judgments(tmp_path / "out")) == ["item-0000000a", "item-0000000c"]
+
+    def describe_replicates():
+        def it_writes_no_replicates_at_fraction_zero(mocks, tmp_path):
+            go(tmp_path / "out")
+            mocks["replicate_items"].assert_called_once_with(list(reversed(ITEMS)), 0)
+            assert not (tmp_path / "out" / "replicates.jsonl").exists()
+
+        def it_judges_the_replicated_items_again_with_the_same_prompt_into_replicates_jsonl(mocks, tmp_path):
+            mocks["replicate_items"].return_value = [ITEMS[1]]
+            go(tmp_path / "out", replicate_fraction=0.1)
+            mocks["replicate_items"].assert_called_once_with(list(reversed(ITEMS)), 0.1)
+            prompts = [c.args[0][-9:] for c in mocks["judge_item"].call_args_list]
+            assert prompts == ["content c", "content b", "content a", "content b"]
+            first, [replicate] = judgments(tmp_path / "out"), judgments(tmp_path / "out", "replicates.jsonl")
+            assert replicate == next(j for j in first if j["id"] == "item-0000000b")
+            assert len(first) == 3
+
+        def it_offers_only_the_items_within_the_limit_for_replication(mocks, tmp_path):
+            go(tmp_path / "out", limit=2, replicate_fraction=0.1)
+            mocks["replicate_items"].assert_called_once_with(list(reversed(ITEMS))[:2], 0.1)
+            assert [j["id"] for j in judgments(tmp_path / "out")] == ["item-0000000c", "item-0000000b"]
+
+        def it_skips_items_already_replicated(mocks, tmp_path):
+            mocks["replicate_items"].return_value = [ITEMS[1]]
+            (tmp_path / "out").mkdir()
+            (tmp_path / "out" / "judgments.jsonl").write_text("".join(json.dumps({"id": item["id"]}) + "\n" for item in ITEMS))
+            (tmp_path / "out" / "replicates.jsonl").write_text(json.dumps({"id": "item-0000000b"}) + "\n")
+            go(tmp_path / "out", replicate_fraction=0.1)
+            mocks["judge_item"].assert_not_called()

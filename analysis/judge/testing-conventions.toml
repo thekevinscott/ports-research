@@ -21,7 +21,7 @@ reason = "which files appear is part of the item text under test; source_files i
 [[python.exempt]]
 path = "judge/run_judge_test.py"
 rules = ["no-first-party-patch"]
-reason = "build_items, find_runs, shuffle_items, clone_reference and judge_item are patched at their run_judge import binding; the orchestration is the unit"
+reason = "build_items, find_runs, shuffle_items, replicate_items, clone_reference and judge_item are patched at their run_judge import binding; the orchestration is the unit"
 
 [[python.exempt]]
 path = "judge/build_items_test.py"

@@ -26,7 +26,7 @@ def invoke(*args):
 
 def describe_run():
     def it_forwards_every_option(run_judge_function, tmp_path):
-        result = invoke("run", "--rubric", "transcript", "--runs", tmp_path, "--runs", tmp_path, "--out", tmp_path / "o", "--limit", 4, "--model", "m", "--effort", "high", "-k", 3)
+        result = invoke("run", "--rubric", "transcript", "--runs", tmp_path, "--runs", tmp_path, "--out", tmp_path / "o", "--limit", 4, "--model", "m", "--effort", "high", "-k", 3, "--replicate-fraction", 0.1)
         assert result.exit_code == 0, result.output
         assert run_judge_function.call_args.kwargs == {
             "rubric": "transcript",
@@ -36,12 +36,18 @@ def describe_run():
             "model": "m",
             "effort": "high",
             "concurrency": 3,
+            "replicate_fraction": 0.1,
         }
 
     def it_defaults_to_opus_at_max_effort_two_at_a_time_and_no_limit(run_judge_function, tmp_path):
         invoke("run", "--rubric", "code", "--runs", tmp_path, "--out", tmp_path / "o")
         kwargs = run_judge_function.call_args.kwargs
-        assert (kwargs["model"], kwargs["effort"], kwargs["concurrency"], kwargs["limit"]) == ("claude-opus-5-5", "max", 2, None)
+        assert (kwargs["model"], kwargs["effort"], kwargs["concurrency"], kwargs["limit"], kwargs["replicate_fraction"]) == ("claude-opus-5-5", "max", 2, None, 0)
+
+    def it_rejects_a_replicate_fraction_outside_zero_to_one(run_judge_function, tmp_path):
+        result = invoke("run", "--rubric", "code", "--runs", tmp_path, "--out", tmp_path / "o", "--replicate-fraction", 1.5)
+        assert result.exit_code != 0
+        run_judge_function.assert_not_called()
 
     def it_rejects_an_unknown_rubric(run_judge_function, tmp_path):
         result = invoke("run", "--rubric", "vibes", "--runs", tmp_path, "--out", tmp_path / "o")
