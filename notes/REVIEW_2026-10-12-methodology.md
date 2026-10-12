@@ -103,6 +103,18 @@ What would answer it: select V2 runs by the study's matrix logs.
 Answer: fixed in PR #163 (`139af2e5`). `PORTS_MATRICES` names the logs, and with it set the notebook keeps only the V2 runs they list. With the five study matrices: 192 runs, 12 per cell. Unset, nothing changes; the README gives the study's value.
 Severity: weakens.
 
+#### X5. **result.json's duration covers only the last turn in 48 of 192 runs.**
+Measure: wall time per run, as `duration_ms` in result.json, which the notebook read as the run's wall clock.
+Evidence:
+- result.json is the CLI's final result event, written as is (`packages/gbnf_experiment/src/gbnf_experiment/prepare_filesystem/prepared_filesystem.py:63`).
+- In 48 runs that event is not the first (`result_index` 1 to 3; 45 carry `origin.kind` `task-notification`). A background subagent's notification started another turn, and `duration_ms` is that turn alone: 3,965 to 22,044 ms.
+- For the same 48 runs, the first to last transcript timestamp spans 348,766 to 2,477,625 ms. For the other 144 runs, it is within 0.02% of `duration_ms`.
+- All 48 had unit tests on. 46 used 2.2M tokens or more; the lowest is 2,189,829.
+Why it matters: wall time is wrong for a quarter of the runs, and the faulty runs cluster in the unit-tests-on cells, so any duration comparison by flag is biased.
+What would answer it: measure wall time from the transcript. The harness should also record the whole run's duration, or every result event. That is `packages/` code, so it needs Kevin.
+Answer: fixed in the notebook in PR #169 (`85dce51d`). The run table adds `transcript_wall_ms` and `result_index`, and V2 statistics use `transcript_wall_ms`. A table lists runs whose `duration_ms` is more than 1% off the transcript span; on the study matrices it lists these 48. The harness is unchanged.
+Severity: weakens.
+
 ### Held-out behavior (measure-behavior)
 
 Measure: for 100 generated grammars and 799 inputs, whether the port accepts, rejects, errors or crashes. The score is the percent of pairs that match the hand-written reference in the port's target language. 100 means it agrees everywhere. A port that answers "reject" to everything scores 43-47.
@@ -454,6 +466,7 @@ Severity: weakens (V1 only).
 | X2 | Duplicates or trivial ports | none | holds |
 | X3 | Judge passes miss 2 and 4 runs | weakens | needs Kevin (top-up run) |
 | X4 | Run selection by directory contents, not study | weakens | fixed in PR #163 (`139af2e5`) |
+| X5 | result.json duration is the last turn in 48 runs | weakens | fixed in notebook PR #169 (`85dce51d`); harness needs Kevin |
 | B1 | Behavior depends on interface and layout | blocks | needs Kevin; driver-status control added in PR #165 (`fc588136`) |
 | B2 | References disagree on 25 of 799 pairs | weakens | conceded as a limit (≤ 3.1 points) |
 | B3 | Any error matches any error | cosmetic | conceded as a limit |
