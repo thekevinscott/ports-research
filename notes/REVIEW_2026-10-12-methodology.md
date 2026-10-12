@@ -418,7 +418,7 @@ Severity: weakens.
 
 #### C4. **The V1 embedding caches record a model label only.**
 Measure: V1 embedding distance between a port and the reference, from cached vectors.
-Evidence: `~/.cache/ports/analysis/embeddings/*/index.json` carries `model: qwen3-embedding-0.6b-q8_0` and `dims`. It records no server, quantisation or pooling.
+Evidence: each V1 cache's `index.json` (the notebook's embedding cache, `analysis/notebook/src/Codebase.py`) carries `model: qwen3-embedding-0.6b-q8_0` and `dims`. It records no server, quantisation or pooling.
 What would answer it: key the cache on the model file and pooling, and check the old vectors against a known server.
 Answer: fixed in PR #159 (`4d2940bc`). The cache directory is `embeddings-stripped/qwen3-embedding-0.6b-q8_0-pooling-last/`, and the notebook refuses a server whose `/models` entry reports another file or pooling. Re-embedding a seeded sample of 50 cached files (10 reference, 40 V1 run) on tower at q8_0, pooling last, gives cosine 0.99957-0.99999 to the cached vectors; one sentence embedded locally and on tower under one known configuration gives 0.99971. The old vectors were adopted under the new key on that evidence. No other pooling was tried, so the check shows agreement with this configuration, not how far another would differ.
 Severity: weakens (V1 only).
@@ -431,7 +431,7 @@ Severity: unverified.
 #### C6. **The V1 embedding pair export depends on a reference checkout outside the repo that no longer exists.**
 Measure: V1 embedding distances from `export_embedding_pairs.py`, which checks each cached vector set against its source before use.
 Evidence:
-- The source is `~/.cache/ports/gbnf-experiment/prepared/771a734d60ecbae5/source/<language>`, a hard-coded hash (`analysis/notebook/src/corpus.py:15`). That directory is gone on the analysis machine.
+- The source is the experiment's prepared checkout under a hard-coded hash, `PREPARED = "771a734d60ecbae5"` (`analysis/notebook/src/corpus.py:15`), in the local cache. That checkout is gone on the analysis machine.
 - The export failed with `cached file selection differs from source`: the source listing was empty. The 35 python and 37 typescript cached reference files are intact.
 Why it matters: the V1 embedding comparisons cannot be revalidated or exported, and the error named the wrong cause.
 What would answer it: rebuild the prepared checkout with the experiment's prepare step and confirm it reproduces hash `771a734d60ecbae5`. That runs `packages/` code, so it needs Kevin.
