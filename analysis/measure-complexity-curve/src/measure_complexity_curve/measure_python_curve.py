@@ -2,7 +2,7 @@ import shlex
 import tempfile
 from pathlib import Path
 
-from .hyperfine_mean import hyperfine_mean
+from measure_complexity_curve.hyperfine_mean import hyperfine_mean
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = PACKAGE_ROOT / "scripts" / "parse_grammar.py"

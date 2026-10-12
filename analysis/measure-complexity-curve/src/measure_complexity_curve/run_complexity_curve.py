@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from .build_corpus import build_corpus
-from .corpus_sizes import corpus_sizes
-from .log_log_slope import log_log_slope
-from .measure_python_curve import measure_python_curve
-from .measure_typescript_curve import measure_typescript_curve
+from measure_complexity_curve.build_corpus import build_corpus
+from measure_complexity_curve.corpus_sizes import corpus_sizes
+from measure_complexity_curve.log_log_slope import log_log_slope
+from measure_complexity_curve.measure_python_curve import measure_python_curve
+from measure_complexity_curve.measure_typescript_curve import measure_typescript_curve
 
 
 def run_complexity_curve(

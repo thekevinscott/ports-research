@@ -5,7 +5,7 @@ from pathlib import Path
 
 from python_on_whales import docker
 
-from ..config import settings
+from gbnf_experiment.config import settings
 
 ISO8601_UTC = "%Y-%m-%dT%H:%M:%SZ"
 MANIFEST_FILENAME = "manifest.json"

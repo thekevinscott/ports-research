@@ -2,9 +2,9 @@ from pathlib import Path
 
 import numpy as np
 
-from .chamfer_distance import chamfer_distance
-from .load_lengths import load_lengths
-from .load_unit_rows import load_unit_rows
+from measure_embedding.chamfer_distance import chamfer_distance
+from measure_embedding.load_lengths import load_lengths
+from measure_embedding.load_unit_rows import load_unit_rows
 
 
 def cosine_distance(u: np.ndarray, v: np.ndarray) -> float:

@@ -2,7 +2,7 @@ from unittest.mock import call, patch
 
 import pytest
 
-from .assemble_whitelist import assemble_whitelist
+from gbnf_experiment.prepare_filesystem.assemble_whitelist.assemble_whitelist import assemble_whitelist
 
 CASES = {
     "python_none": ("python", False, False, False, ["source"], []),

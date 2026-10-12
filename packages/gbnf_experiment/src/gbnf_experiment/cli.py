@@ -2,7 +2,7 @@ import click
 
 from botbox import ClaudeAgent
 
-from .run_gbnf_experiment import run_gbnf_experiment
+from gbnf_experiment.run_gbnf_experiment import run_gbnf_experiment
 
 DEFAULT_MODEL = "claude-opus-5"
 

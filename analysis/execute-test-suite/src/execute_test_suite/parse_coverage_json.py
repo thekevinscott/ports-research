@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from .coverage_result import CoverageResult
+from execute_test_suite.coverage_result import CoverageResult
 
 
 def parse_coverage_json(report_path: Path) -> CoverageResult:

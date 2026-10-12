@@ -1,8 +1,8 @@
 from collections.abc import Callable
 from pathlib import Path
 
-from .compare_targets import compare_targets
-from .run_driver import run_driver
+from exercise_api.compare_targets import compare_targets
+from exercise_api.run_driver import run_driver
 
 
 def exercise_api(

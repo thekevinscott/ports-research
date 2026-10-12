@@ -4,8 +4,8 @@ from pathlib import Path
 
 from python_on_whales import docker
 
-from ..config import compute_prepare_cache_key, settings
-from .assemble_whitelist.assemble_whitelist import assemble_whitelist
+from gbnf_experiment.config import compute_prepare_cache_key, settings
+from gbnf_experiment.prepare_filesystem.assemble_whitelist.assemble_whitelist import assemble_whitelist
 
 
 def prepare_reference_implementation(

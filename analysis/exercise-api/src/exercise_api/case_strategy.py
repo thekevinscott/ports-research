@@ -1,9 +1,9 @@
 from hypothesis import strategies as st
 
-from .corrupt_grammar import corrupt_grammar
-from .grammar_strategy import grammar_strategy
-from .render_grammar import render_grammar
-from .valid_string import valid_string
+from exercise_api.corrupt_grammar import corrupt_grammar
+from exercise_api.grammar_strategy import grammar_strategy
+from exercise_api.render_grammar import render_grammar
+from exercise_api.valid_string import valid_string
 
 INPUT_ALPHABET = "abcxyz0189ABC .,:\"()[]{}+-"
 KINDS = ["valid", "valid", "prefix", "prefix", "overrun", "random", "invalid_grammar"]

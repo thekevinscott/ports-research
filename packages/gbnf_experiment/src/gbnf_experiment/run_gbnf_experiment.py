@@ -3,8 +3,8 @@ from pathlib import Path
 from botbox import Agent
 from port_codebase import port_codebase
 from prompt import Prompt
-from .condition_name import condition_name
-from .prepare_filesystem import PreparedFilesystem
+from gbnf_experiment.condition_name import condition_name
+from gbnf_experiment.prepare_filesystem import PreparedFilesystem
 from gbnf_experiment.suites_information import LANGUAGE_NAMES, suites_information
 
 TARGET_LANGUAGES = {"javascript": "python", "python": "javascript"}

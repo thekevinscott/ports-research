@@ -3,9 +3,9 @@ from pathlib import Path
 
 import click
 
-from .config import Settings
-from .embed_file import embed_file
-from .write_vector import write_vector
+from generate_embedding.config import Settings
+from generate_embedding.embed_file import embed_file
+from generate_embedding.write_vector import write_vector
 
 
 @click.command()

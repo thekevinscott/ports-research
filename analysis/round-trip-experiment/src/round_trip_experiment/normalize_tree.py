@@ -2,9 +2,9 @@ from pathlib import Path
 
 from measure_embedding.strip_comments import strip_comments
 
-from .collect_files import collect_files
-from .format_tree import format_tree
-from .languages import LANGUAGES
+from round_trip_experiment.collect_files import collect_files
+from round_trip_experiment.format_tree import format_tree
+from round_trip_experiment.languages import LANGUAGES
 
 
 def without_blank_lines(source: bytes) -> bytes:

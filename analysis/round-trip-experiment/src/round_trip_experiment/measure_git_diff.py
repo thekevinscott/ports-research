@@ -1,8 +1,8 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from .git_diff_stats import git_diff_stats
-from .normalize_tree import normalize_tree
+from round_trip_experiment.git_diff_stats import git_diff_stats
+from round_trip_experiment.normalize_tree import normalize_tree
 
 SCRATCH = Path("/tmp/claude")
 

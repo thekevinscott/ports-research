@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from .suite_result import SuiteResult
+from execute_test_suite.suite_result import SuiteResult
 
 
 def parse_vitest_report(report_path: Path) -> SuiteResult:

@@ -1,7 +1,7 @@
 import random
 
-from .nested_literal import nested_literal
-from .rule_name import rule_name
+from measure_complexity_curve.nested_literal import nested_literal
+from measure_complexity_curve.rule_name import rule_name
 
 
 def generate_grammar(*, rule_count: int, nesting_depth: int, alternation_width: int, seed: int) -> str:

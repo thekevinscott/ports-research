@@ -2,7 +2,7 @@ import os
 from collections.abc import Collection
 from pathlib import Path
 
-from .excluded import excluded
+from measure_embedding.excluded import excluded
 
 
 def collect_files(target: Path, *, suffixes: Collection[str], exclude: list[str]) -> list[Path]:

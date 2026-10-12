@@ -2,7 +2,7 @@ from collections.abc import Iterator
 
 from tree_sitter import Node
 
-from .languages import LanguageSpec
+from measure_ast.languages import LanguageSpec
 
 
 def named_nodes(root: Node, *, prune: frozenset[str] = frozenset()) -> Iterator[tuple[Node, int]]:
