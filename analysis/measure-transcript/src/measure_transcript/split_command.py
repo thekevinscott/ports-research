@@ -1,23 +1,29 @@
 import re
 import shlex
 
+from measure_transcript.find_output import find_output
+from measure_transcript.loop_end import PUNCTUATION, loop_end
 from measure_transcript.resolve_path import resolve_path
 from measure_transcript.substitutions import PLACEHOLDER, substitutions
 
 HEREDOC = re.compile(r"<<(-?)\s*(['\"]?)([A-Za-z_][\w-]*)\2")
-PUNCTUATION = ";&|()<>\n"
 WRITE_REDIRECTS = {">", ">>", ">|", "&>", "&>>"}
+# Stands for the substitution numbered after it until the words are built.
+MARK = "\0"
 
 
-def split_command(command: str, cwd: str) -> dict:
+def split_command(command: str, cwd: str, files: set[str] = frozenset()) -> dict:
     """A Bash tool command as segments of words, each with the cwd it runs in and the files it writes.
 
     Heredoc bodies are cut out first and returned on their own. A `$(...)`
     substitution becomes segments of its own, ahead of the rest, and leaves
-    `$(...)` in its place. Segments split
-    at `;`, `&&`, `||`, `|`, parentheses and newlines. `cd` moves the cwd of the
-    segments after it. Redirect operators and their targets leave the words; a
-    `>` or `>>` target and a `tee` argument are writes.
+    `$(...)` in its place; a word that is a `find` substitution `files` can
+    answer (see `find_output`) becomes the paths it prints instead. Segments
+    split at `;`, `&&`, `||`, `|`, parentheses and newlines. `cd` moves the cwd
+    of the segments after it. A `for VAR in WORDS; do ...; done` loop is
+    unrolled: its body once per word, with `$VAR` and `${VAR}` replaced.
+    Redirect operators and their targets leave the words; a `>` or `>>` target
+    and a `tee` argument are writes.
     """
     lines, heredocs, pending = [], [], []
     for line in command.split("\n"):
@@ -35,7 +41,7 @@ def split_command(command: str, cwd: str) -> dict:
             heredocs.append("")
     heredocs = [h for h in heredocs if h]
     text, inner = substitutions("\n".join(lines))
-    segments = [segment for command in inner for segment in split_command(command, cwd)["segments"]]
+    segments = [segment for command in inner for segment in split_command(command, cwd, files)["segments"]]
     try:
         lexer = shlex.shlex(text, posix=True, punctuation_chars=PUNCTUATION)
         lexer.whitespace = " \t\r"
@@ -43,35 +49,54 @@ def split_command(command: str, cwd: str) -> dict:
         tokens = list(lexer)
     except ValueError:
         tokens = text.split()
-    tokens = [token.replace(PLACEHOLDER, "$(...)") for token in tokens]
+    # A word that is one whole substitution keeps its number, to be expanded once its cwd is known.
+    numbered, k = [], 0
+    for token in tokens:
+        numbered.append(f"{MARK}{k}" if token == PLACEHOLDER else token.replace(PLACEHOLDER, "$(...)"))
+        k += token.count(PLACEHOLDER)
+    tokens = numbered
 
-    words, writes, i = [], [], 0
+    def expand(token, cwd):
+        if not token.startswith(MARK):
+            return [token]
+        printed = find_output([s["words"] for s in split_command(inner[int(token[1:])], cwd)["segments"]], cwd, files)
+        return ["$(...)"] if printed is None else printed
 
-    def close():
-        nonlocal words, writes, cwd
-        if words and words[0] == "cd" and len(words) > 1:
-            cwd = resolve_path(words[1], cwd)
-        if words or writes:
-            segments.append({"words": words, "cwd": cwd, "writes": writes})
-        words, writes = [], []
+    def walk(tokens, cwd):
+        # Segments up to each separator; a for loop's body is walked once per word.
+        out, words, writes, i = [], [], [], 0
+        while i < len(tokens):
+            token = tokens[i]
+            if token and set(token) <= set(PUNCTUATION):
+                if "<" in token or ">" in token:
+                    if words and words[-1].isdigit():
+                        words.pop()
+                    target = tokens[i + 1] if i + 1 < len(tokens) else ""
+                    if token in WRITE_REDIRECTS and target != "/dev/null":
+                        writes.append(resolve_path(target, cwd))
+                    i += 2
+                    continue
+                if words[:1] == ["for"] and words[2:3] == ["in"] and (end := loop_end(tokens, i)):
+                    body = tokens[end[0]:end[1]]
+                    pattern = re.compile(r"\$(?:{0}\b|\{{{0}\}})".format(re.escape(words[1])))
+                    for value in words[3:]:
+                        unrolled, cwd = walk([pattern.sub(lambda _: value, t) for t in body] + [";"], cwd)
+                        out += unrolled
+                    words, writes, i = [], [], end[1] + 1
+                    continue
+                if words and words[0] == "cd" and len(words) > 1:
+                    cwd = resolve_path(words[1], cwd)
+                if words or writes:
+                    out.append({"words": words, "cwd": cwd, "writes": writes})
+                words, writes = [], []
+            else:
+                words += expand(token, cwd)
+            i += 1
+        return out, cwd
 
-    while i < len(tokens):
-        token = tokens[i]
-        if token and set(token) <= set(PUNCTUATION):
-            if "<" in token or ">" in token:
-                if words and words[-1].isdigit():
-                    words.pop()
-                target = tokens[i + 1] if i + 1 < len(tokens) else ""
-                if token in WRITE_REDIRECTS and target != "/dev/null":
-                    writes.append(resolve_path(target, cwd))
-                i += 2
-                continue
-            close()
-        else:
-            words.append(token)
-        i += 1
-    close()
+    segments += walk(tokens + [";"], cwd)[0]
     for segment in segments:
         if segment["words"] and segment["words"][0] == "tee":
             segment["writes"] += [resolve_path(w, segment["cwd"]) for w in segment["words"][1:] if not w.startswith("-")]
     return {"segments": segments, "heredocs": heredocs}
+

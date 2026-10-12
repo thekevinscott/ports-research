@@ -39,7 +39,7 @@ def describe_measure_transcript():
         }
 
     def it_counts_reads_of_the_reference_and_its_suites(report):
-        assert (report["read_source"], report["read_source_tests"], report["read_target_tests"]) == (3, 3, 10)
+        assert (report["read_source"], report["read_source_tests"], report["read_target_tests"]) == (2, 2, 3)
         assert (report["touched_source_tests"], report["touched_target_tests"]) == (True, True)
 
     def it_lists_suite_runs_with_their_class_and_counts(report):
@@ -81,15 +81,22 @@ def describe_measure_transcript():
 def describe_reading_order():
     def it_names_the_first_read_and_the_source_read_order(report):
         assert (report["first_read_path"], report["first_read_class"]) == ("/input/*.md", "other")
-        assert report["read_order"] == ["/input/javascript/README.md", "/input/javascript/package.json", "/input/javascript/src/$f"]
-        # The source is read through a `for f in ...; do cat $f` loop: no code file is named.
-        assert report["first_read_is_entry_point"] is None
+        # The source is read through `for f in $(find . -name '*.ts' | sort); do cat $f; done`: the find is
+        # answered from the manifest's listing, and the loop reads each file it prints.
+        assert report["read_order"][:4] == [
+            "/input/javascript/README.md",
+            "/input/javascript/package.json",
+            "/input/javascript/src/gbnf.ts",
+            "/input/javascript/src/grammar-graph/colorize.ts",
+        ]
+        assert len(report["read_order"]) == 34
+        assert report["first_read_is_entry_point"] is False
 
     def it_counts_files_read_before_the_first_write(report):
-        assert (report["files_read_before_first_write"], report["source_files_read_before_first_write"]) == (15, 3)
+        assert (report["files_read_before_first_write"], report["source_files_read_before_first_write"]) == (50, 34)
 
     def it_counts_rereads(report):
-        assert (report["reread_count"], report["max_rereads_of_one_file"]) == (12, 3)
+        assert (report["reread_count"], report["max_rereads_of_one_file"]) == (16, 5)
         assert report["max_rereads_path"] == "/tmp/claude-1000/-target/*/tasks/bxqix6v8j.output"
 
     def it_relates_searches_and_late_reads(report):

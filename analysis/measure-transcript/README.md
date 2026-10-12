@@ -8,7 +8,7 @@ Mechanical per-run measures from a V2 run's Claude Code transcript: tool counts,
 measure-transcript --run <run dir>
 ```
 
-Reads `<run>/manifest.json` (`condition.source_language`) and every `*.jsonl` under `<run>/transcript/`, subagent transcripts included, merged by timestamp. Prints one JSON object to stdout. Exits non-zero with a message when the run has no transcript or its source language is not `python` or `javascript`.
+Reads `<run>/manifest.json` (`condition.source_language`, and `reference_implementation.included` as the listing of `/input`) and every `*.jsonl` under `<run>/transcript/`, subagent transcripts included, merged by timestamp. Prints one JSON object to stdout. Exits non-zero with a message when the run has no transcript or its source language is not `python` or `javascript`.
 
 V2 layout only: the reference at `/input/python` and `/input/javascript`, the port at `/target`.
 
@@ -27,7 +27,7 @@ Copies are followed. A `cp` maps its destination back to its origin, so a path i
 
 - `turns`: assistant messages, counted by distinct message id.
 - `bash_calls`, `read_calls`, `write_calls`, `edit_calls`: calls of each tool. `search_calls`: Glob and Grep calls.
-- `read_source`, `read_source_tests`, `read_target_tests`: per call, one per class among the paths read. Reads are Read calls and `cat`, `head`, `less`, `grep`, `sed -n` in Bash; grep's pattern and sed's script are not paths.
+- `read_source`, `read_source_tests`, `read_target_tests`: per call, one per class among the paths read. Reads are Read calls and `cat`, `head`, `tail`, `less`, `grep`, `awk`, `sed -n` in Bash, also after a shell keyword (`do`, `then`, `{`, ...); grep's pattern, sed's and awk's script, and option values (`head -n 5`, `grep -A 3`, `grep -e x`) are not paths.
 - `touched_source_tests`, `touched_target_tests`: whether any Read, Write, Edit, Glob or Grep path, Bash argument, or suite run reached the class.
 - `suite_runs`: per suite run, `turn`, `command` (the segment's words joined by spaces), `suite`, `passed`, `failed`. A suite run is pytest (also `python -m pytest`), vitest, jest, `node --test`, `npm`/`pnpm test` or `run test*`, or `just test*`, after env assignments, `timeout`, `time`, `uv run`, `npx` or `pnpm exec`.
   - `suite`: `source_tests`, `target_tests`, `own_tests`, or `unknown` when the run's paths (the cwd when none are given) reach more than one. A directory reaches every shipped suite under it or copied into it, and the agent's own tests when its written test files are under it. A path the reference reaches nowhere is the agent's own.
@@ -44,7 +44,12 @@ Copies are followed. A `cp` maps its destination back to its origin, so a path i
 
 ## Reading order
 
-Every path a read names is one read, in call order: a Read call's file, and each distinct path argument of a reading command (see `read_*` above). A path is as written, resolved against the cwd: globs and variables are not expanded, so a `for f in ...; do cat $f` loop is one read of `.../$f`, and a directory given to `grep -r` is one read. A path under a copy is named by its origin. A write into the port is any write counted by `first_write_turn`.
+Every path a read names is one read, in call order: a Read call's file, and each distinct path argument of a reading command (see `read_*` above), resolved against the cwd. A path under a copy is named by its origin. A directory given to `grep -r` is one read. A write into the port is any write counted by `first_write_turn`.
+
+- A `for VAR in WORDS; do ...; done` loop is unrolled: its body once per word, `$VAR` and `${VAR}` replaced.
+- A glob names the `/input` files it matches in the manifest's listing, in sorted order, under the reference or a copy of it; a glob matching none stays as written.
+- A `$(find ...)` word is replaced by the paths the find prints, worked out from the listing, when its start directories are under `/input`, it tests only `-name`, `-path` and `-type f` (each possibly negated), and it is piped through `sort` and otherwise only `grep [-v]` with fixed-string patterns. An unsorted find stays as written: the transcript does not record the order it prints in.
+- Other variables and substitutions are not expanded.
 
 - `first_read_path`, `first_read_class`: the first read and its class; null without reads.
 - `read_order`: distinct `source` paths in order of first read.

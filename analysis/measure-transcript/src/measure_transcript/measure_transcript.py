@@ -6,9 +6,11 @@ from measure_transcript.absolute_paths import absolute_paths
 from measure_transcript.classify_path import OTHER, classify_path
 from measure_transcript.command_word import command_word
 from measure_transcript.copy_targets import copy_targets
+from measure_transcript.expand_glob import expand_glob
 from measure_transcript.is_fetch import is_fetch
 from measure_transcript.is_test_path import is_test_path
 from measure_transcript.read_transcript import read_transcript
+from measure_transcript.reader_paths import reader_paths
 from measure_transcript.reading_order import reading_order
 from measure_transcript.reference_path import reference_path
 from measure_transcript.resolve_path import resolve_path
@@ -19,19 +21,19 @@ from measure_transcript.suite_runner import suite_runner
 from measure_transcript.summary_counts import summary_counts
 from measure_transcript.text_runtimes import text_runtimes
 
-READERS = {"cat", "head", "less", "grep", "sed"}
-# grep's and sed's first argument is a pattern or a script, not a path.
-FIRST_ARGUMENT_NOT_A_PATH = {"grep", "sed"}
 SEARCH_TOOLS = {"Glob", "Grep"}
 WEB_TOOLS = {"WebFetch", "WebSearch"}
 
 
 def measure_transcript(run: Path) -> dict:
     """Counts and quoted commands from one run's transcript. See the README for each field."""
-    source_language = json.loads((run / "manifest.json").read_text())["condition"]["source_language"]
+    manifest = json.loads((run / "manifest.json").read_text())
+    source_language = manifest["condition"]["source_language"]
     if source_language not in OTHER:
         raise ValueError(f"source_language must be python or javascript, not {source_language!r}")
     transcript = read_transcript(run)
+    # What is mounted at /input, to expand globs and finds against.
+    files = {f"/input/{path}" for path in manifest["reference_implementation"]["included"]}
 
     copies: dict[str, str] = {}
     directories = {"/target", "/tmp", "/input"}
@@ -89,9 +91,10 @@ def measure_transcript(run: Path) -> dict:
                 evidence = {"turn": turn, "path": path}
         elif name == "Bash":
             command = tool_input.get("command") or ""
-            parsed = split_command(command, call["cwd"])
+            parsed = split_command(command, call["cwd"], files)
             runtimes = set()
             runs = []
+            read_classes = set()
             for body in parsed["heredocs"]:
                 runtimes |= text_runtimes(body)
             scripts_name_both = any(names_both(body) for body in parsed["heredocs"])
@@ -101,10 +104,11 @@ def measure_transcript(run: Path) -> dict:
                 program = posixpath.basename(words[i]) if i < len(words) else ""
                 args = [w for w in words[i + 1:] if not w.startswith("-")]
                 touched |= {classify(resolve_path(a, cwd)) for a in args}
-                if program in READERS and (program != "sed" or "-n" in words[i + 1:]):
-                    paths = list(dict.fromkeys(resolve_path(p, cwd) for p in (args[1:] if program in FIRST_ARGUMENT_NOT_A_PATH else args)))
-                    for cls in {classify(p) for p in paths}:
-                        reads[cls] += 1
+                operands = reader_paths(program, words[i + 1:])
+                if operands is not None:
+                    # A glob names the reference files it matches, under the reference or a copy of it.
+                    paths = list(dict.fromkeys(e for p in operands for e in expand_glob(reference_path(resolve_path(p, cwd), copies), files)))
+                    read_classes |= {classify(p) for p in paths}
                     for path in paths:
                         read(path)
                 for path in segment["writes"]:
@@ -137,6 +141,8 @@ def measure_transcript(run: Path) -> dict:
                         "failed": None,
                     })
                     touched.add(runs[-1]["suite"])
+            for cls in read_classes:
+                reads[cls] += 1
             summaries = summary_counts(call["result"])
             if len(summaries) == len(runs):
                 for run_record, counts in zip(runs, summaries):
