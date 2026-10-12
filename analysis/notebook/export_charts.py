@@ -42,6 +42,7 @@ REVERSE_GROUP = "reverse-ports"
 BEHAVIOR_GROUP = "held-out-behavior"
 V2_STATISTICS_GROUP = "v2-statistics"
 API_GROUP = "held-out-api"
+AST_GROUP = "ast-relative-to-reference"
 # A section whose lead column is charted alone needs a name for the chart of what is left.
 OTHER_COLUMNS = {
     "diff": "reference-diff-other-columns",
@@ -200,6 +201,10 @@ def charts(notebook):
         for column in v2_api_runs.columns:
             if column.startswith("api_") and column != "api_note":
                 yield f"{API_GROUP}/{slug(column)}", notebook["api_chart"](v2_api_runs, column)
+
+    if v2_runs.height:
+        for column in notebook["AST_TITLES"]:
+            yield f"{AST_GROUP}/{slug(column)}", notebook["ast_chart"](v2_runs, column)
 
 
 def write(chart, stem):

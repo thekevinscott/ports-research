@@ -112,6 +112,7 @@ def uncached(monkeypatch):
         codebase_module.reference_diff_cache,
         codebase_module.behavior_cache,
         codebase_module.api_cache,
+        codebase_module.ast_cache,
     ):
         monkeypatch.setattr(store, "read", False)
         monkeypatch.setattr(store, "write", False)
@@ -1145,3 +1146,181 @@ def describe_api():
             second = Codebase.from_run(twin).api_agreement_pct
         assert (first, second) == (50.0, 50.0)
         assert m.run.call_count == 2
+
+
+AST_COMPARE_REPORT = {
+    "language": "python",
+    "port": "/run/ported_implementation",
+    "reference": "/reference/packages/gbnf/python",
+    "delta": {"node_count": {"delta": -20, "port": 80, "reference": 100}},
+    "functions": {"matched_count": 3, "matched_fraction": 0.75},
+    "tree_edit_distance": {"mean_normalised": 0.3, "median_normalised": 0.25},
+    "branching": {"port": [1, 2], "reference": [1, 3], "wasserstein": 0.5},
+    "api_surface": {"shared": ["GBNF/1"], "port_only": [], "reference_only": ["RuleChar"]},
+}
+
+
+@pytest.fixture
+def pinned_reference(monkeypatch, tmp_path):
+    checkout = tmp_path / "pinned"
+    for language in ("python", "javascript"):
+        (checkout / "packages" / "gbnf" / language).mkdir(parents=True)
+    monkeypatch.setattr(codebase_module, "REFERENCE_CHECKOUT", checkout)
+    return checkout
+
+
+@pytest.fixture
+def ast_compare_process(uncached, pinned_reference):
+    with patch("src.Codebase.subprocess", autospec=True) as m:
+        m.run.return_value = Mock(returncode=0, stdout=json.dumps(AST_COMPARE_REPORT), stderr="")
+        yield m
+
+
+def measure_ast_compare_argv(process) -> list[str]:
+    argv = process.run.call_args.args[0]
+    return argv[argv.index("measure-ast") :]
+
+
+def describe_ast_compare():
+    def it_reports_the_compare_json(python_port, ast_compare_process):
+        assert Codebase.from_run(python_port).ast_report == AST_COMPARE_REPORT
+
+    def it_has_no_note_when_compare_ran(python_port, ast_compare_process):
+        assert Codebase.from_run(python_port).ast_note is None
+
+    def it_runs_measure_ast_compare_from_its_own_package(python_port, ast_compare_process):
+        Codebase.from_run(python_port).ast_report
+        argv = ast_compare_process.run.call_args.args[0]
+        assert argv[:4] == ["uv", "run", "--directory", str(codebase_module.MEASURE_AST_DIR)]
+
+    def it_compares_a_python_port_with_the_pinned_python_reference(
+        python_port, ast_compare_process, pinned_reference
+    ):
+        Codebase.from_run(python_port, ["__pycache__"]).ast_report
+        assert measure_ast_compare_argv(ast_compare_process) == [
+            "measure-ast",
+            "compare",
+            "--language",
+            "python",
+            "--port",
+            str(Path(python_port["run_dir"]) / "ported_implementation"),
+            "--reference",
+            str(pinned_reference / "packages" / "gbnf" / "python"),
+            "--exclude",
+            "__pycache__",
+        ]
+
+    def it_compares_a_javascript_port_as_typescript_with_the_pinned_javascript_reference(
+        javascript_port, ast_compare_process, pinned_reference
+    ):
+        Codebase.from_run(javascript_port, ["node_modules"]).ast_report
+        argv = measure_ast_compare_argv(ast_compare_process)
+        assert argv[argv.index("--language") + 1] == "typescript"
+        assert argv[argv.index("--reference") + 1] == str(
+            pinned_reference / "packages" / "gbnf" / "javascript"
+        )
+
+    def it_leaves_out_the_javascript_references_build_tooling_on_both_sides(
+        javascript_port, ast_compare_process
+    ):
+        Codebase.from_run(javascript_port, ["node_modules"]).ast_report
+        argv = measure_ast_compare_argv(ast_compare_process)
+        excluded = [argv[i + 1] for i, arg in enumerate(argv) if arg == "--exclude"]
+        assert excluded == ["node_modules", "builder", "dev"]
+
+    def it_notes_the_error_and_reports_nothing_when_compare_exits_non_zero(
+        python_port, ast_compare_process
+    ):
+        ast_compare_process.run.return_value = Mock(
+            returncode=1, stdout="", stderr="no python file parsed under /port\n"
+        )
+        codebase = Codebase.from_run(python_port)
+        assert codebase.ast_report is None
+        assert codebase.ast_note == "no python file parsed under /port"
+
+    def it_runs_measure_ast_compare_once_for_the_report_and_the_note(
+        python_port, ast_compare_process
+    ):
+        codebase = Codebase.from_run(python_port)
+        codebase.ast_report
+        codebase.ast_note
+        assert ast_compare_process.run.call_count == 1
+
+    def it_caches_under_codebases_ast_by_the_ports_contents():
+        assert str(codebase_module.ast_cache.path("abc")).endswith("codebases/ast/abc.pkl")
+
+    def it_serves_a_port_with_the_same_contents_from_the_cache(
+        monkeypatch, tmp_path, python_port, pinned_reference
+    ):
+        monkeypatch.setattr(
+            codebase_module.ast_cache,
+            "path",
+            lambda contents, **kwargs: tmp_path / "ast" / f"{contents}.pkl",
+        )
+        twin = v2_run(tmp_path, "20261012T000000Z_py000004", "python")
+        shutil.copytree(
+            Path(python_port["run_dir"]) / "ported_implementation",
+            Path(twin["run_dir"]) / "ported_implementation",
+            dirs_exist_ok=True,
+        )
+        with patch("src.Codebase.subprocess", autospec=True) as m:
+            m.run.return_value = Mock(
+                returncode=0, stdout=json.dumps(AST_COMPARE_REPORT), stderr=""
+            )
+            first = Codebase.from_run(python_port).ast_report
+            second = Codebase.from_run(twin).ast_report
+        assert first == second == AST_COMPARE_REPORT
+        assert m.run.call_count == 1
+
+
+def describe_pinned_reference():
+    def it_keeps_one_checkout_per_gbnf_commit_beside_the_other_caches():
+        assert codebase_module.REFERENCE_CHECKOUT == (
+            Path.home()
+            / ".cache"
+            / "ports"
+            / "analysis"
+            / "codebases"
+            / "reference"
+            / codebase_module.GBNF_COMMIT
+        )
+
+    def it_pins_the_commit_the_experiment_derives_from():
+        config = (
+            codebase_module.ANALYSIS.parent
+            / "packages"
+            / "gbnf_experiment"
+            / "src"
+            / "gbnf_experiment"
+            / "config.py"
+        )
+        assert f'gbnf_commit: str = "{codebase_module.GBNF_COMMIT}"' in config.read_text()
+
+    def it_fetches_the_pin_and_applies_every_gbnf_prepare_patch(monkeypatch, tmp_path):
+        monkeypatch.setattr(codebase_module, "REFERENCE_CHECKOUT", tmp_path / "pinned")
+        with patch("src.Codebase.subprocess", autospec=True) as m:
+            m.run.return_value = Mock(returncode=0, stdout="", stderr="")
+            assert codebase_module.pinned_reference() == tmp_path / "pinned"
+        commands = [call.args[0] for call in m.run.call_args_list]
+        assert [command[:2] for command in commands] == [["git", "-C"]] * 4
+        assert [command[3] for command in commands] == ["init", "fetch", "checkout", "apply"]
+        assert commands[1][-2:] == ["https://github.com/thekevinscott/gbnf", codebase_module.GBNF_COMMIT]
+        patches = sorted(str(p) for p in codebase_module.PATCHES.glob("*.patch"))
+        assert patches
+        assert commands[-1][-len(patches) :] == patches
+        assert (tmp_path / "pinned").is_dir()
+
+    def it_reuses_an_existing_checkout(monkeypatch, tmp_path):
+        (tmp_path / "pinned").mkdir()
+        monkeypatch.setattr(codebase_module, "REFERENCE_CHECKOUT", tmp_path / "pinned")
+        with patch("src.Codebase.subprocess", autospec=True) as m:
+            codebase_module.pinned_reference()
+        assert m.run.call_count == 0
+
+    def it_raises_and_leaves_no_checkout_when_git_fails(monkeypatch, tmp_path):
+        monkeypatch.setattr(codebase_module, "REFERENCE_CHECKOUT", tmp_path / "pinned")
+        with patch("src.Codebase.subprocess", autospec=True) as m:
+            m.run.return_value = Mock(returncode=128, stdout="", stderr="fatal: unreachable")
+            with pytest.raises(RuntimeError, match="unreachable"):
+                codebase_module.pinned_reference()
+        assert not (tmp_path / "pinned").exists()

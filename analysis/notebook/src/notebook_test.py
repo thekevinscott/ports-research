@@ -103,6 +103,9 @@ CHART_NAMES = (
     "API_LEAD",
     "API_OUTCOME_TITLES",
     "api_title",
+    "AST_LEADS",
+    "AST_TITLES",
+    "ast_title",
     "DOT_STROKE",
     "IQR_OPACITY",
     "IQR_WIDTH",
@@ -156,6 +159,9 @@ def v2_row(
         "reference_accept_port_crash": 0,
         "behavior_note": note,
         "api_agreement_pct": api,
+        "ast_matched_fraction": None,
+        "ast_tree_edit_median": None,
+        "ast_branching_wasserstein": None,
     }
 
 
@@ -588,3 +594,211 @@ def test_the_notebook_renders_the_api_section_right_after_the_behavior_section()
 
 def test_the_chart_export_takes_the_api_chart_from_the_notebook():
     assert 'notebook["api_chart"]' in (NOTEBOOK.parent / "export_charts.py").read_text()
+
+
+AST_LEAD_NAMES = ["ast_matched_fraction", "ast_tree_edit_median", "ast_branching_wasserstein"]
+AST_NAMES = (*CHART_NAMES, "ast_chart", "ast_runs")
+ONE_TREE_FIELDS = (
+    "node_count",
+    "max_depth",
+    "function_count",
+    "mean_function_lines",
+    "max_function_lines",
+    "mean_cyclomatic",
+    "max_cyclomatic",
+)
+AST_REPORT = {
+    "language": "typescript",
+    "port": "/run/ported_implementation",
+    "reference": "/reference/packages/gbnf/javascript",
+    # compare also reports parsed_file_count, which is not one of the seven delta columns.
+    "delta": {
+        "parsed_file_count": {"delta": 4, "port": 12, "reference": 8},
+        **{
+            field: {"delta": index - 3, "port": index, "reference": 3}
+            for index, field in enumerate(ONE_TREE_FIELDS)
+        },
+    },
+    "functions": {
+        "matched_count": 30,
+        "port_only_count": 12,
+        "reference_only_count": 10,
+        "matched": [],
+        "port_only": [],
+        "reference_only": [],
+        "matched_fraction": 0.75,
+        "median_line_drift": -2.5,
+    },
+    "tree_edit_distance": {"mean_normalised": 0.41, "median_normalised": 0.38},
+    "branching": {"port": [1, 1, 2], "reference": [1, 3], "wasserstein": 0.6},
+    "api_surface": {
+        "shared": ["GBNF/2", "RuleChar"],
+        "port_only": ["parse/1"],
+        "reference_only": ["RuleRef", "RuleEnd", "default"],
+    },
+}
+AST_COLUMNS = [
+    *AST_LEAD_NAMES,
+    "ast_matched_count",
+    "ast_port_only_count",
+    "ast_reference_only_count",
+    "ast_median_line_drift",
+    "ast_tree_edit_mean",
+    "ast_api_shared",
+    "ast_api_port_only",
+    "ast_api_reference_only",
+    *(f"ast_delta_{field}" for field in ONE_TREE_FIELDS),
+]
+
+
+def with_ast(runs, matched, tree_edit, wasserstein, note=None):
+    return [
+        {
+            **run,
+            "ast_matched_fraction": m,
+            "ast_tree_edit_median": t,
+            "ast_branching_wasserstein": w,
+            "ast_matched_count": None if m is None else round(40 * m),
+            "ast_note": note if m is None else None,
+        }
+        for run, m, t, w in zip(runs, matched, tree_edit, wasserstein)
+    ]
+
+
+AST_RUNS = with_ast(
+    V2_RUNS,
+    [0.8, 0.7, 0.6, None],
+    [0.2, 0.3, 0.4, None],
+    [0.5, 0.25, 1.0, None],
+    "no typescript file parsed under /run/ported_implementation",
+)
+
+
+def test_a_v2_run_carries_every_ast_column_from_the_compare_report():
+    from types import SimpleNamespace
+
+    ast_columns = definitions("AST_TITLES", "ast_columns")["ast_columns"]
+    columns = ast_columns(SimpleNamespace(ast_report=AST_REPORT, ast_note=None))
+    assert list(columns) == [*AST_COLUMNS, "ast_note"]
+    assert [columns[lead] for lead in AST_LEAD_NAMES] == [0.75, 0.38, 0.6]
+    assert (
+        columns["ast_matched_count"],
+        columns["ast_port_only_count"],
+        columns["ast_reference_only_count"],
+    ) == (30, 12, 10)
+    assert (columns["ast_median_line_drift"], columns["ast_tree_edit_mean"]) == (-2.5, 0.41)
+    assert (
+        columns["ast_api_shared"],
+        columns["ast_api_port_only"],
+        columns["ast_api_reference_only"],
+    ) == (2, 1, 3)
+    assert [columns[f"ast_delta_{field}"] for field in ONE_TREE_FIELDS] == [-3, -2, -1, 0, 1, 2, 3]
+    assert columns["ast_note"] is None
+
+
+def test_a_port_compare_could_not_measure_has_null_ast_columns_and_the_error_as_its_note():
+    from types import SimpleNamespace
+
+    ast_columns = definitions("AST_TITLES", "ast_columns")["ast_columns"]
+    note = "no typescript file parsed under /run/ported_implementation"
+    columns = ast_columns(SimpleNamespace(ast_report=None, ast_note=note))
+    assert list(columns) == [*AST_COLUMNS, "ast_note"]
+    assert [columns[column] for column in AST_COLUMNS] == [None] * len(AST_COLUMNS)
+    assert columns["ast_note"] == note
+
+
+def test_v2_runs_carry_the_ast_columns():
+    assert "**ast_columns(codebase)" in assigned("v2_runs")
+
+
+def test_v2_runs_read_median_line_drift_as_a_float_whether_compare_wrote_an_int_or_a_float():
+    assert "'ast_median_line_drift': pl.Float64" in assigned("v2_runs")
+
+
+def test_the_v2_statistics_compare_flags_on_the_three_ast_leads():
+    import polars as pl
+
+    namespace = definitions(*CHART_NAMES)
+    assert namespace["V2_LEADS"][2:5] == AST_LEAD_NAMES
+    assert set(AST_LEAD_NAMES) <= set(namespace["v2_measures"](pl.DataFrame(AST_RUNS)))
+    table = namespace["flag_comparison"](pl.DataFrame(AST_RUNS), "ast_matched_fraction")
+    pooled = table.filter(
+        (pl.col("flag") == "include_unit_tests") & (pl.col("source_language") == "pooled")
+    ).row(0, named=True)
+    assert (pooled["n_on"], pooled["n_off"]) == (1, 2)
+    assert round(pooled["gap"], 9) == round(0.6 - 0.75, 9)
+
+
+def test_the_spearman_table_ranks_the_ast_leads_against_behavior_agreement():
+    import polars as pl
+
+    table = definitions(*CHART_NAMES)["spearman_table"](pl.DataFrame(AST_RUNS))
+    assert set(AST_LEAD_NAMES) <= set(table["measure"].to_list())
+    # Three runs carry both: the failed port has no AST measure.
+    assert table.filter(pl.col("measure") == "ast_matched_fraction")["n"][0] == 3
+
+
+def test_the_ast_leads_are_titled_in_prose():
+    ast_title = definitions(*CHART_NAMES)["ast_title"]
+    assert [ast_title(lead) for lead in AST_LEAD_NAMES] == [
+        "Share of the reference's functions the port has a counterpart for",
+        "Median tree edit distance between paired functions, normalised",
+        "Distance between the port's and the reference's branching distributions",
+    ]
+
+
+def test_every_ast_column_has_a_prose_title():
+    titles = definitions(*CHART_NAMES)["AST_TITLES"]
+    assert list(titles) == AST_COLUMNS
+    assert len(set(titles.values())) == len(AST_COLUMNS)
+    assert not any("_" in title for title in titles.values())
+
+
+def test_the_ast_chart_draws_dots_a_median_tick_and_the_interquartile_range_per_condition():
+    import polars as pl
+
+    namespace = definitions(*AST_NAMES)
+    spec = namespace["ast_chart"](pl.DataFrame(AST_RUNS), "ast_tree_edit_median").to_dict()
+    assert spec["title"]["text"] == "Median tree edit distance between paired functions, normalised"
+    panels = spec["concat"]
+    assert [panel["title"]["text"] for panel in panels] == [
+        "python → javascript",
+        "javascript → python",
+    ]
+    iqr, median, points = panels[0]["layer"]
+    assert [layer["mark"]["type"] for layer in (iqr, median, points)] == ["rule", "tick", "point"]
+    assert (iqr["encoding"]["y"]["aggregate"], iqr["encoding"]["y2"]["aggregate"]) == ("q1", "q3")
+    assert median["encoding"]["y"]["aggregate"] == "median"
+    assert points["encoding"]["x"]["scale"]["domain"] == [
+        label for label, *_ in namespace["V2_CONDITIONS"]
+    ]
+    assert "'source + target': 'n=2'" in points["encoding"]["x"]["axis"]["labelExpr"]
+    # Not a percentage: the axis starts at zero instead of spanning 0 to 100.
+    assert points["encoding"]["y"]["scale"] == {"zero": True}
+
+
+def test_the_ast_chart_leads_with_the_matched_fraction():
+    import polars as pl
+
+    spec = definitions(*AST_NAMES)["ast_chart"](pl.DataFrame(AST_RUNS)).to_dict()
+    assert spec["title"]["text"] == "Share of the reference's functions the port has a counterpart for"
+
+
+def test_the_ast_run_table_shows_the_note_of_a_port_compare_could_not_measure():
+    import polars as pl
+
+    runs = definitions(*AST_NAMES)["ast_runs"](pl.DataFrame(AST_RUNS))
+    assert runs.columns[:6] == ["run_id", "source_language", "condition", *AST_LEAD_NAMES]
+    assert runs.columns[-1] == "ast_note"
+    row = runs.filter(pl.col("run_id") == "d").row(0, named=True)
+    assert row["condition"] == "none"
+    assert row["ast_matched_fraction"] is None
+    assert row["ast_note"] == "no typescript file parsed under /run/ported_implementation"
+
+
+def test_the_notebook_renders_the_ast_section_right_after_the_api_section():
+    assert rendered_cell("ast_report()") == rendered_cell("api_report()") + 2
+
+
+def test_the_chart_export_takes_the_ast_chart_from_the_notebook():
+    assert 'notebook["ast_chart"]' in (NOTEBOOK.parent / "export_charts.py").read_text()

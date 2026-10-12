@@ -114,6 +114,53 @@ def _():
     def size_columns(codebase):
         return {"file_count": codebase.file_count, "loc": codebase.loc}
 
+    # Every AST column, in table order, with the title its chart carries.
+    AST_TITLES = {
+        "ast_matched_fraction": "Share of the reference's functions the port has a counterpart for",
+        "ast_tree_edit_median": "Median tree edit distance between paired functions, normalised",
+        "ast_branching_wasserstein": "Distance between the port's and the reference's branching distributions",
+        "ast_matched_count": "Functions paired with a reference function",
+        "ast_port_only_count": "Port functions with no reference counterpart",
+        "ast_reference_only_count": "Reference functions with no port counterpart",
+        "ast_median_line_drift": "Median length difference of paired functions in lines, port minus reference",
+        "ast_tree_edit_mean": "Mean tree edit distance between paired functions, normalised",
+        "ast_api_shared": "Public API entries the port shares with the reference",
+        "ast_api_port_only": "Public API entries only the port exports",
+        "ast_api_reference_only": "Public API entries only the reference exports",
+        "ast_delta_node_count": "AST nodes, port minus reference",
+        "ast_delta_max_depth": "Deepest AST node, port minus reference",
+        "ast_delta_function_count": "Functions, port minus reference",
+        "ast_delta_mean_function_lines": "Mean function length in lines, port minus reference",
+        "ast_delta_max_function_lines": "Longest function in lines, port minus reference",
+        "ast_delta_mean_cyclomatic": "Mean cyclomatic complexity, port minus reference",
+        "ast_delta_max_cyclomatic": "Highest cyclomatic complexity, port minus reference",
+    }
+
+    def ast_columns(codebase):
+        report = codebase.ast_report
+        if report is None:
+            return {**dict.fromkeys(AST_TITLES), "ast_note": codebase.ast_note}
+        functions = report["functions"]
+        tree_edit = report["tree_edit_distance"]
+        api = report["api_surface"]
+        return {
+            "ast_matched_fraction": functions["matched_fraction"],
+            "ast_tree_edit_median": tree_edit["median_normalised"],
+            "ast_branching_wasserstein": report["branching"]["wasserstein"],
+            "ast_matched_count": functions["matched_count"],
+            "ast_port_only_count": functions["port_only_count"],
+            "ast_reference_only_count": functions["reference_only_count"],
+            "ast_median_line_drift": functions["median_line_drift"],
+            "ast_tree_edit_mean": tree_edit["mean_normalised"],
+            **{f"ast_api_{side}": len(api[side]) for side in ("shared", "port_only", "reference_only")},
+            **{
+                column: report["delta"][column.removeprefix("ast_delta_")]["delta"]
+                for column in AST_TITLES
+                if column.startswith("ast_delta_")
+            },
+            "ast_note": None,
+        }
+
     V2_STRINGS = {"completed_at": pl.String, "error": pl.String, "terminal_reason": pl.String}
     v2_runs = pl.DataFrame(
         [
@@ -122,10 +169,17 @@ def _():
                 **size_columns(codebase),
                 **behavior_columns(codebase),
                 "api_agreement_pct": codebase.api_agreement_pct,
+                **ast_columns(codebase),
             }
             for codebase in v2_codebases
         ],
-        schema_overrides={**V2_STRINGS, "behavior_note": pl.String},
+        # measure-ast's median line drift is an int or a float run to run.
+        schema_overrides={
+            **V2_STRINGS,
+            "behavior_note": pl.String,
+            "ast_note": pl.String,
+            "ast_median_line_drift": pl.Float64,
+        },
     )
     # Every finished V2 attempt, the non-zero exits the tables above exclude among them.
     v2_attempts = pl.DataFrame(
@@ -152,6 +206,7 @@ def _():
     port_pairs = within_direction_similarity(codebases)
     cell_pairs = within_cell(port_pairs)
     return (
+        AST_TITLES,
         Codebase,
         DIFF_METRICS,
         EMBEDDING_METRICS,
@@ -233,6 +288,7 @@ def _(Codebase, EXCLUDE_BY_LANGUAGE, REFERENCE, mo, pl):
 
 @app.cell(hide_code=True)
 def _(
+    AST_TITLES,
     DIFF_METRICS,
     EMBEDDING_METRICS,
     FORWARD_FLAGS,
@@ -798,7 +854,69 @@ def _(
             ]
         )
 
-    V2_LEADS = [BEHAVIOR_LEAD, API_LEAD, "total_tokens", "loc"]
+    AST_LEADS = ["ast_matched_fraction", "ast_tree_edit_median", "ast_branching_wasserstein"]
+
+    def ast_title(metric):
+        return AST_TITLES[metric]
+
+    def ast_chart(frame, metric=AST_LEADS[0]):
+        # No AST column is a percentage, so every axis starts at zero.
+        return behavior_chart(frame, metric, lead=None, title=ast_title)
+
+    def ast_runs(frame):
+        return with_v2_conditions(frame).select(
+            "run_id",
+            "source_language",
+            "condition",
+            *AST_LEADS,
+            pl.col("^ast_.+$").exclude(*AST_LEADS, "ast_note"),
+            "ast_note",
+        )
+
+    def ast_report():
+        if v2_runs.height == 0:
+            return mo.md("No completed V2 runs.")
+        labelled = ast_runs(v2_runs)
+        labels = [label for label, *_ in V2_CONDITIONS]
+        summary_table = (
+            labelled.group_by("source_language", "condition")
+            .agg(
+                pl.len().alias("n"),
+                *(
+                    getattr(pl.col(lead), statistic)().alias(f"{statistic}_{lead}")
+                    for lead in AST_LEADS
+                    for statistic in ("min", "median", "max")
+                ),
+            )
+            .sort(
+                pl.col("source_language").cast(pl.Enum(BEHAVIOR_SOURCES)),
+                pl.col("condition").cast(pl.Enum(labels)),
+            )
+            .with_columns(pl.col(pl.Float64).round(3))
+        )
+        others = [column for column in AST_TITLES if column not in AST_LEADS]
+        return mo.vstack(
+            [
+                mo.ui.table(summary_table, freeze_columns_left=["source_language", "condition"]),
+                *(ast_chart(v2_runs, lead) for lead in AST_LEADS),
+                mo.accordion(
+                    {
+                        "Other AST columns": mo.vstack(
+                            [ast_chart(v2_runs, column) for column in others]
+                        )
+                    }
+                ),
+                mo.accordion(
+                    {
+                        f"Runs (n={labelled.height})": mo.ui.table(
+                            labelled.with_columns(pl.col(pl.Float64).round(3))
+                        )
+                    }
+                ),
+            ]
+        )
+
+    V2_LEADS = [BEHAVIOR_LEAD, API_LEAD, *AST_LEADS, "total_tokens", "loc"]
     V2_SCOPES = ["pooled", *BEHAVIOR_SOURCES]
     # Per-run measures besides held-out behavior; the confusion counts join them from the frame.
     V2_MEASURES = ["total_tokens", "api_calls", "duration_ms", "file_count", "loc"]
@@ -827,6 +945,8 @@ def _(
     def lead_title(measure):
         if measure == BEHAVIOR_LEAD:
             return behavior_title(measure)
+        if measure in AST_LEADS:
+            return ast_title(measure)
         return api_title(measure) if measure == API_LEAD else metric_title(measure)
 
     def v2_summary(frame, attempts):
@@ -887,9 +1007,9 @@ def _(
         return pl.DataFrame(rows, schema_overrides={column: pl.Float64 for column in ("median_on", "median_off", "gap", "low", "high", "p", "minimum_detectable_gap")})
 
     def v2_measures(frame):
-        """Every per-run measure the frame carries: both agreements, behavior's confusion counts, cost and size."""
+        """Every per-run measure the frame carries: both agreements, the AST leads, behavior's confusion counts, cost and size."""
         confusion = [column for column in frame.columns if column.startswith("reference_") and "_port_" in column]
-        return [m for m in [BEHAVIOR_LEAD, API_LEAD, *confusion, *V2_MEASURES] if m in frame.columns]
+        return [m for m in [BEHAVIOR_LEAD, API_LEAD, *AST_LEADS, *confusion, *V2_MEASURES] if m in frame.columns]
 
     def varied_measures(frame):
         """The measures that take more than one value; a rank correlation needs a spread."""
@@ -1898,6 +2018,8 @@ def _(
 
     return (
         api_report,
+        ast_chart,
+        ast_report,
         behavior_report,
         pair_report,
         report,
@@ -1927,7 +2049,7 @@ def _(mo):
             mo.accordion(
                 {
                     "How to read": mo.md("""
-                    V2 is the current study: 16 cells, 2 source languages (python → javascript, javascript → python) × 3 test flags (`include_unit_tests`, `include_source_integration_tests`, `include_target_integration_tests`), 12 runs per cell, claude-opus-5-5 at medium effort. A run that exited non-zero (killed with 137, or an api_error) is left out of every V2 table and chart and counted in the failure table. The V2 sections are the last two: Held-out behavior and V2 statistics. Every V2 chart draws each run as a dot, the cell's median as a tick, its interquartile range as a faint bar, and n under each label.
+                    V2 is the current study: 16 cells, 2 source languages (python → javascript, javascript → python) × 3 test flags (`include_unit_tests`, `include_source_integration_tests`, `include_target_integration_tests`), 12 runs per cell, claude-opus-5-5 at medium effort. A run that exited non-zero (killed with 137, or an api_error) is left out of every V2 table and chart and counted in the failure table. The V2 sections are the last four: Held-out behavior, Held-out API, AST relative to the reference and V2 statistics. Every V2 chart draws each run as a dot, the cell's median as a tick, its interquartile range as a faint bar, and n under each label.
 
                     The sections in between are V1: 40 runs in eight cells (source language, python reference tests in the sandbox or not, typescript reference tests in the sandbox or not). Each V1 port is measured against the hand-written reference in its own target language, under the same excludes: the reference diff, the port-to-port diff, cost, size, test pass rates. They are read off the runs and the files, with no model involved.
                     """)
@@ -2301,6 +2423,42 @@ def _(api_report):
 def _(mo):
     mo.vstack(
         [
+            mo.md("## AST relative to the reference"),
+            mo.md("V2 runs only: a python port is compared with the pinned python reference, a javascript port with the pinned javascript reference; reverse ports have no reference here beyond that pin and are not measured."),
+            mo.accordion(
+                {
+                    "Glossary": mo.md("""
+                    measure-ast `compare` parses the port and the reference at the gbnf pin (with the gbnf-prepare patches) with tree-sitter, under the same excludes, a javascript port with the typescript grammar. Every number measures structural drift from the reference, not fidelity.
+
+                    - `ast_matched_fraction`: reference functions paired with a port function, over the reference's named functions. Functions pair by name, normalised (`_`, `#` and case dropped), and arity.
+                    - `ast_tree_edit_median`, `ast_tree_edit_mean`: median and mean over pairs of the Zhang-Shasha tree edit distance between the two functions' syntax trees, labelled by node type alone, over the larger tree's node count. 0 is the same shape; renaming is free.
+                    - `ast_branching_wasserstein`: Wasserstein-1 distance between the port's and the reference's per-function cyclomatic numbers.
+                    - `ast_matched_count`, `ast_port_only_count`, `ast_reference_only_count`: functions paired, and named functions on one side only.
+                    - `ast_median_line_drift`: median over pairs of port lines minus reference lines.
+                    - `ast_api_shared`, `ast_api_port_only`, `ast_api_reference_only`: public API entries (`name/arity`) on both sides or one.
+                    - `ast_delta_<field>`: port minus reference for each one-tree measure (node count, depth, function count, function lines, cyclomatic).
+                    - `ast_note`: measure-ast's error when compare exited non-zero, such as a port with no parsable file; the other columns are empty.
+                    """),
+                    "How to read": mo.md("""
+                    The x axis is test inclusion, as in the held-out sections. Each dot is a run, the tick the condition's median, the faint bar its interquartile range, and n sits under each label. One chart per lead; the rest are under "Other AST columns".
+                    """),
+                }
+            ),
+        ]
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(ast_report):
+    ast_report()
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.vstack(
+        [
             mo.md("## V2 statistics"),
             mo.accordion(
                 {
@@ -2313,7 +2471,7 @@ def _(mo):
                     - `rho`: Spearman rank correlation, the Pearson correlation of the two measures' ranks (ties share their average rank), from −1 to 1. `n`: runs with both measures present.
                     """),
                     "How to read": mo.md("""
-                    V2 exit-0 runs only. The lead measures are held-out behavior agreement, held-out API agreement, total tokens and LOC. The rank correlation table sets every per-run measure against held-out behavior agreement, so a cheap measure can be checked against it on this data; the heatmap shows every pair.
+                    V2 exit-0 runs only. The lead measures are held-out behavior agreement, held-out API agreement, the three AST leads, total tokens and LOC. The rank correlation table sets every per-run measure against held-out behavior agreement, so a cheap measure can be checked against it on this data; the heatmap shows every pair.
                     """),
                 }
             ),
