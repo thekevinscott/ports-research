@@ -1,0 +1,3 @@
+root ::= (atom* "A9")+
+item ::= atom+ [a-\x7A]+ atom* | atom | [y一-丏] [a-zα-ω\\] atom ([(x] | [^A-F] | atom)
+atom ::= [^Za-\x7A]

@@ -1,0 +1,6 @@
+root ::= ([α-ω] "-;]" ")B" |
+  [Z] | ",[ 9")?  # a comment | with ::= inside
+
+nest ::= [^9\u4E00-丏] nest "λZ:z" | [中\ta]
+
+word ::= [\x41-\x46\u4E00-丏0-9]

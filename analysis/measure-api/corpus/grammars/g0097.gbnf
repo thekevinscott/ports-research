@@ -1,0 +1,7 @@
+# a comment | with ::= inside
+root ::= chunk chunk
+
+chunk ::= [一-\u4E0F]
+atom ::= "'(中" [*a-\x7A]
+
+extra ::= *"a"

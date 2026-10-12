@@ -1,0 +1,9 @@
+# a comment | with ::= inside
+pair ::= "\x5B\x29c"
+
+root ::= tail-part | ([0-\x39] | ";😀" | tail-part)*
+
+tail-part ::= [(α-ω] [A-F\x2A]* "x"
+nest ::= [α-ωa-z] nest [b'=] | [A-F]
+word ::= "*\u03BB" [\x41-FZc]
+

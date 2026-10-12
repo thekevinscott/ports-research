@@ -1,0 +1,6 @@
+tail-part ::= [A]?
+nest ::= [\r一-丏] nest "?<!" | "= Z"
+word ::= ("\r\t" | [^一-丏a-z\xE9] | [(]) [|] nest digits "9" ([^\x78.\x3A] | ";\x27\x7C" | nest) ([一-丏]+ | digits "\x62:")
+
+digits ::= ("\n_\x62" nest)? | "}z"+
+root ::= [^一-丏\u4E2D] "é"+ "|9_" tail-part

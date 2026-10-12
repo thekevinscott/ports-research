@@ -1,0 +1,4 @@
+# held-out grammar
+root ::= [\x61]* | [*] | "\x7C\r\\"? | ("c[" | [A-FZ] | "é")* | "x\x5B{\x7C" | [:λA-F] | ";\x27" | "!a*B"
+
+extra ::= undefined-name

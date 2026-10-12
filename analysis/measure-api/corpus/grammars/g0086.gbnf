@@ -1,0 +1,6 @@
+# held-out grammar
+root ::= ([一-\u4E0F\u03B1-ω\x61-z] "y\x3A]\x29" | [0-9\u4E00-\u4E0F\x2D] [*\x2A\r]) (tail-part | "\\>-"?)
+
+word ::= "\n0"
+tail-part ::= (".x*" [>一-丏] "\U0001F600.^")* ("Abb" [\u4E00-丏] "y")*  # held-out grammar
+extra ::= "a" ::= "b"

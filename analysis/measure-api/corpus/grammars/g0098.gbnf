@@ -1,0 +1,8 @@
+# held-out grammar
+root ::= chunk (pair | ")+A") word "x/ß" [\x61中\x78]?
+pair ::= ("9." (nest | "\rZ="))?
+
+chunk ::= [\u03B1-\u03C9]
+word ::= ".}" (
+  "\\"* | "-1λ\\") nest  # a comment | with ::= inside
+nest ::= "ß" nest [1=] | "y\r"

@@ -1,0 +1,7 @@
+root ::= ("0'b" (head-part | "\x3D\n\"^" | digits) [+] ":\x39中a" head-part)?
+
+digits ::= [ya-z\u03B1-\u03C9] [^'] ("\x3B" | [\\] | head-part) ([\]\U0001F600] | " !A'")
+head-part ::= nest+ [)a-\x7A] | "é\r\x2Ea"*
+nest ::= "0\\0" nest [^A-FA-F] |
+  [^\x39!\x22]  # a comment | with ::= inside
+extra ::= "a" ::= "b"

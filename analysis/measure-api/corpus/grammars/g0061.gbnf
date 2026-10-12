@@ -1,0 +1,4 @@
+root ::= word "\x41"+ "\x629,+" nest nest? "^^_"* [!\n] atom [中]  # held-out grammar
+atom ::= [^)]
+nest ::= "y=\"=" nest [^}] | [\x7A]
+word ::= ("/\x2A\"\xE9" | [^a-z一-丏A-\x46] | [0]) [^9] "1{" nest [\t\u4E2DA-\x46] "λ" [^+\n]* nest [^\x3C<] [0-9a-z] nest nest*

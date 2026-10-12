@@ -1,0 +1,3 @@
+root ::= word (atom [中])+ ([9\x5F] [<0-9\u4E00-丏] | word)  # held-out grammar
+word ::= atom
+atom ::= [\x78a-z] "?*" [^ 一-丏.] ":A\x29" [0-9一-丏]+ ("\u4E2Db.y" | [^B/])* "[\x28"

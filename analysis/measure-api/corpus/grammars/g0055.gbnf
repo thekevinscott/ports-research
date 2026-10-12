@@ -1,0 +1,5 @@
+word ::= "Z\x63中"
+root ::= "y\n\"Z" |
+  "\x3C"
+chunk ::= (word ";\x30λ\x2C" word |
+  [+0-9.] | word?) [A] ("_]zz" [α-ω>] "\x63B")+
