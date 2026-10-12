@@ -33,7 +33,7 @@ def _():
     all_codebases = codebases_under(DATA, runs_table())
     # The sections below measure V1 runs: V2 runs carry other flags and another target name.
     codebases = [codebase for codebase in all_codebases if not is_v2(codebase.run)]
-    # The held-out behavior section measures V2 runs only.
+    # The held-out behavior and API sections measure V2 runs only.
     v2_codebases = [codebase for codebase in all_codebases if is_v2(codebase.run)]
     reverse_codebases = codebases_under(REVERSE, reverse_runs_table())
 
@@ -62,11 +62,6 @@ def _():
     # report, so asking for one there re-runs the suite.
     PRESHIM_METRICS = ["integration_pass_pct"]
     EMBEDDING_METRICS = ["chamfer_distance", "chamfer_a_to_b", "chamfer_b_to_a"]
-    PERFORMANCE_METRICS = ["ladder_ref_ratio", "ladder_rungs_completed", "ladder_total_ms"]
-    # The reference is timed once per port run, so its total is a run column, not a table column.
-    LADDER_REFERENCE_TOTAL = "ladder_reference_total_ms"
-    # Read by the performance notes below as prose, so they stay out of the summary tables.
-    LADDER_NOTE_METRICS = ["ladder_slope", "ladder_reference_slope", "ladder_reference_rungs"]
     DIFF_METRICS = [
         "reference_diff_similarity_pct",
         "reference_diff_kept_pct",
@@ -86,9 +81,6 @@ def _():
         *SHARED_METRICS,
         *PRESHIM_METRICS,
         *DIFF_METRICS,
-        *PERFORMANCE_METRICS,
-        LADDER_REFERENCE_TOTAL,
-        *LADDER_NOTE_METRICS,
     ]
 
     def metrics_frame(codebases, metrics, flags):
@@ -125,7 +117,12 @@ def _():
     V2_STRINGS = {"completed_at": pl.String, "error": pl.String, "terminal_reason": pl.String}
     v2_runs = pl.DataFrame(
         [
-            {**codebase.run, **size_columns(codebase), **behavior_columns(codebase)}
+            {
+                **codebase.run,
+                **size_columns(codebase),
+                **behavior_columns(codebase),
+                "api_agreement_pct": codebase.api_agreement_pct,
+            }
             for codebase in v2_codebases
         ],
         schema_overrides={**V2_STRINGS, "behavior_note": pl.String},
@@ -135,6 +132,23 @@ def _():
         [run for run in runs_under(DATA, runs_table(), include_nonzero_exit=True) if is_v2(run)],
         schema_overrides=V2_STRINGS,
     )
+
+    def api_columns(codebase):
+        return {
+            "api_agreement_pct": codebase.api_agreement_pct,
+            **{f"api_{outcome}": count for outcome, count in codebase.api_outcomes.items()},
+            **{
+                f"api_reference_{reference}_port_{port}": count
+                for reference, ports in codebase.api_confusion.items()
+                for port, count in ports.items()
+            },
+            "api_note": codebase.api_note,
+        }
+
+    v2_api_runs = pl.DataFrame(
+        [{**codebase.run, **api_columns(codebase)} for codebase in v2_codebases],
+        schema_overrides={"completed_at": pl.String, "error": pl.String, "api_note": pl.String},
+    )
     port_pairs = within_direction_similarity(codebases)
     cell_pairs = within_cell(port_pairs)
     return (
@@ -143,10 +157,8 @@ def _():
         EMBEDDING_METRICS,
         EXCLUDE_BY_LANGUAGE,
         FORWARD_FLAGS,
-        LADDER_REFERENCE_TOTAL,
         LAYOUT_LABELS,
         LAYOUT_RULE,
-        PERFORMANCE_METRICS,
         REFERENCE,
         REFERENCE_ID,
         TEST_METRICS,
@@ -167,6 +179,7 @@ def _():
         runs,
         similarity_matrix,
         spearman,
+        v2_api_runs,
         v2_attempts,
         v2_runs,
     )
@@ -223,10 +236,8 @@ def _(
     DIFF_METRICS,
     EMBEDDING_METRICS,
     FORWARD_FLAGS,
-    LADDER_REFERENCE_TOTAL,
     LAYOUT_LABELS,
     LAYOUT_RULE,
-    PERFORMANCE_METRICS,
     REFERENCE_ID,
     TEST_METRICS,
     V2_FLAGS,
@@ -247,6 +258,7 @@ def _(
     runs,
     similarity_matrix,
     spearman,
+    v2_api_runs,
     v2_attempts,
     v2_runs,
 ):
@@ -298,9 +310,6 @@ def _(
         "chamfer_distance": "Embedding distance (chamfer)",
         "chamfer_a_to_b": "Embedding, port to reference",
         "chamfer_b_to_a": "Embedding, reference to port",
-        "ladder_ref_ratio": "Ladder time ÷ reference",
-        "ladder_rungs_completed": "Ladder rungs completed",
-        "ladder_total_ms": "Ladder total (ms)",
     }
     CALIBRATION = {
         "chamfer_distance": [
@@ -625,7 +634,7 @@ def _(
             x=x, y=alt.Y("q1(value):Q", title=None, scale=scale), y2=alt.Y2("q3(value)")
         )
 
-    def behavior_chart(frame, metric=BEHAVIOR_LEAD):
+    def behavior_chart(frame, metric=BEHAVIOR_LEAD, *, lead=BEHAVIOR_LEAD, title=behavior_title):
         labels = [label for label, *_ in V2_CONDITIONS]
         labelled = with_v2_conditions(frame)
         centre = BEHAVIOR_PANEL_WIDTH / len(labels) * (1 - BAND_PADDING) / 2
@@ -644,7 +653,7 @@ def _(
             )
             base = alt.Chart(rows)
             # Agreement is a percentage, so every panel shares 0 to 100; counts start at zero.
-            scale = alt.Scale(domain=[0, 100]) if metric == BEHAVIOR_LEAD else alt.Scale(zero=True)
+            scale = alt.Scale(domain=[0, 100]) if metric == lead else alt.Scale(zero=True)
             iqr = iqr_bar(base, x, scale)
             median = median_tick(base, x=x, y=alt.Y("median(value):Q", title=None, scale=scale))
             points = base.mark_point(
@@ -660,7 +669,7 @@ def _(
         present = set(labelled["source_language"])
         return alt.concat(
             *(panel(source) for source in BEHAVIOR_SOURCES if source in present), columns=2
-        ).properties(title=alt.TitleParams(behavior_title(metric), anchor="start"))
+        ).properties(title=alt.TitleParams(title(metric), anchor="start"))
 
     def behavior_runs(frame):
         return with_v2_conditions(frame).select(
@@ -713,7 +722,83 @@ def _(
             ]
         )
 
-    V2_LEADS = [BEHAVIOR_LEAD, "total_tokens", "loc"]
+    API_LEAD = "api_agreement_pct"
+    API_OUTCOME_TITLES = {
+        "match": "Cases where every step matches and none raised",
+        "mismatch": "Cases where the first differing step returned rules on both sides",
+        "error_match": "Cases where every step matches and one raised",
+        "error_mismatch": "Cases where the first differing step raised on one side",
+        "crash": "Cases where either side crashed",
+    }
+
+    def api_title(metric):
+        if metric == API_LEAD:
+            return "Held-out API agreement with the reference (%)"
+        if not metric.startswith("api_reference_"):
+            return API_OUTCOME_TITLES[metric.removeprefix("api_")]
+        _, _, reference_status, _, port_status = metric.split("_")
+        verbs = {"ok": "runs without raising", "error": "raises on", "crash": "crashes on"}
+        return f"Cases the reference {verbs[reference_status]} and the port {verbs[port_status]}"
+
+    def api_chart(frame, metric=API_LEAD):
+        return behavior_chart(frame, metric, lead=API_LEAD, title=api_title)
+
+    def api_runs(frame):
+        return with_v2_conditions(frame).select(
+            "run_id",
+            "source_language",
+            "condition",
+            API_LEAD,
+            pl.col("^api_.+$").exclude(API_LEAD, "api_note"),
+            "api_note",
+        )
+
+    def api_report():
+        if v2_api_runs.height == 0:
+            return mo.md("No completed V2 runs.")
+        labelled = api_runs(v2_api_runs)
+        labels = [label for label, *_ in V2_CONDITIONS]
+        summary_table = (
+            labelled.group_by("source_language", "condition")
+            .agg(
+                pl.len().alias("n"),
+                pl.col(API_LEAD).min().alias(f"min_{API_LEAD}"),
+                pl.col(API_LEAD).median().alias(f"median_{API_LEAD}"),
+                pl.col(API_LEAD).max().alias(f"max_{API_LEAD}"),
+            )
+            .sort(
+                pl.col("source_language").cast(pl.Enum(BEHAVIOR_SOURCES)),
+                pl.col("condition").cast(pl.Enum(labels)),
+            )
+            .with_columns(pl.col(pl.Float64).round(2))
+        )
+        others = [
+            column
+            for column in labelled.columns
+            if column.startswith("api_") and column not in (API_LEAD, "api_note")
+        ]
+        return mo.vstack(
+            [
+                mo.ui.table(summary_table, freeze_columns_left=["source_language", "condition"]),
+                api_chart(v2_api_runs),
+                mo.accordion(
+                    {
+                        "Other API columns": mo.vstack(
+                            [api_chart(v2_api_runs, column) for column in others]
+                        )
+                    }
+                ),
+                mo.accordion(
+                    {
+                        f"Runs (n={labelled.height})": mo.ui.table(
+                            labelled.with_columns(pl.col(pl.Float64).round(2))
+                        )
+                    }
+                ),
+            ]
+        )
+
+    V2_LEADS = [BEHAVIOR_LEAD, API_LEAD, "total_tokens", "loc"]
     V2_SCOPES = ["pooled", *BEHAVIOR_SOURCES]
     # Per-run measures besides held-out behavior; the confusion counts join them from the frame.
     V2_MEASURES = ["total_tokens", "api_calls", "duration_ms", "file_count", "loc"]
@@ -740,7 +825,9 @@ def _(
         return cells.join(counted, on=["source_language", "condition"], how="left", maintain_order="left")
 
     def lead_title(measure):
-        return behavior_title(measure) if measure == BEHAVIOR_LEAD else metric_title(measure)
+        if measure == BEHAVIOR_LEAD:
+            return behavior_title(measure)
+        return api_title(measure) if measure == API_LEAD else metric_title(measure)
 
     def v2_summary(frame, attempts):
         codes = sorted(attempts.filter(pl.col("exit_code") != 0)["exit_code"].unique().to_list())
@@ -800,9 +887,9 @@ def _(
         return pl.DataFrame(rows, schema_overrides={column: pl.Float64 for column in ("median_on", "median_off", "gap", "low", "high", "p", "minimum_detectable_gap")})
 
     def v2_measures(frame):
-        """Every per-run measure the frame carries: agreement, its confusion counts, cost and size."""
+        """Every per-run measure the frame carries: both agreements, behavior's confusion counts, cost and size."""
         confusion = [column for column in frame.columns if column.startswith("reference_") and "_port_" in column]
-        return [m for m in [BEHAVIOR_LEAD, *confusion, *V2_MEASURES] if m in frame.columns]
+        return [m for m in [BEHAVIOR_LEAD, API_LEAD, *confusion, *V2_MEASURES] if m in frame.columns]
 
     def varied_measures(frame):
         """The measures that take more than one value; a rank correlation needs a spread."""
@@ -881,10 +968,9 @@ def _(
         " with this n, never as no effect."
     )
     V2_NOT_MEASURED = (
-        "`api_agreement_pct` (held-out API, `analysis/measure-api`) joins these tables once the"
-        " notebook carries that column. Reference diff similarity and test pass rates are not"
-        " measured on V2 runs: `measure-code-distance` takes no javascript target and"
-        " `execute-test-suite` finds no V2 suite in the derivation cache."
+        "Reference diff similarity and test pass rates are not measured on V2 runs:"
+        " `measure-code-distance` takes no javascript target and `execute-test-suite` finds no V2"
+        " suite in the derivation cache."
     )
 
     def rounded(frame):
@@ -1509,153 +1595,6 @@ def _(
             ]
         )
 
-    def ratio_rows(source_language):
-        return (
-            with_conditions(
-                runs.filter(pl.col("source_language") == source_language), source_language
-            )
-            .select(
-                "run_id",
-                "condition",
-                "ladder_rungs_completed",
-                "ladder_total_ms",
-                pl.col("ladder_ref_ratio").alias("value"),
-                pl.lit(1.0).alias("reference"),
-            )
-            .with_columns(port=pl.col("run_id").str.slice(-8))
-        )
-
-    RATIO_TOLERANCE = 0.01
-    # Plot width that fills half the blog's 757px body (minus the 1rem gap) once the
-    # y-axis and margins join in: the exported ladder renders exactly 370.5px wide.
-    RATIO_WIDTH = 326.25
-    # Speed charts sit 10 degrees closer to horizontal than the rest of the blog's charts.
-    LADDER_LABEL_ANGLE = -27.5
-
-
-    def nudges(values, tolerance=RATIO_TOLERANCE):
-        """Dots within `tolerance` of each other spread sideways; a dot on its own stays centred."""
-        slots = [0.0] * len(values)
-        cluster = []
-
-        def spread(cluster):
-            for position, index in enumerate(cluster):
-                slots[index] = position - (len(cluster) - 1) / 2
-
-        for index in sorted(range(len(values)), key=lambda index: values[index]):
-            if cluster and values[index] - values[cluster[-1]] > tolerance:
-                spread(cluster)
-                cluster = []
-            cluster.append(index)
-        spread(cluster)
-        return slots
-
-    def with_nudges(rows):
-        placed = {
-            run_id: nudge
-            for group in rows.partition_by("condition")
-            for run_id, nudge in zip(group["run_id"], nudges(group["value"].to_list()))
-        }
-        return rows.with_columns(
-            nudge=pl.col("run_id").replace_strict(placed, return_dtype=pl.Float64)
-        )
-
-    def ratio_domain():
-        # One domain for both directions, so the panels can be read against each other.
-        return metric_domain(
-            runs.select(pl.col("ladder_ref_ratio").alias("value"), pl.lit(1.0).alias("reference"))
-        )
-
-    def ratio_chart(source_language, rows):
-        rows = with_nudges(rows)
-        domain = ratio_domain()
-        scale = (
-            alt.Scale(zero=False) if domain is None else alt.Scale(domain=list(domain), nice=False)
-        )
-        y = alt.Y(
-            "value:Q",
-            title=None,
-            scale=scale,
-            axis=alt.Axis(labelFontSize=AXIS_LABEL_PX),
-        )
-        parity = pl.DataFrame({"value": [1.0], "label": ["reference"]})
-        x = alt.X(
-            "condition:N",
-            sort=[label for label, *_ in conditions(source_language)],
-            title=TEST_AXIS_TITLE,
-            axis=alt.Axis(
-                labelFontSize=AXIS_LABEL_PX,
-                labelExpr=CONDITION_LABEL_EXPR,
-                labelAngle=LADDER_LABEL_ANGLE,
-                titleFontSize=AXIS_TITLE_PX,
-            ),
-        )
-        # A continuous offset scale is measured from the band's left edge, so half a band
-        # re-centres the dots under their label. The band scale keeps Vega-Lite's padding
-        # defaults (0.2 inner, 0.2 outer), so a band spans width / (n + 0.2) * 0.8 pixels.
-        centre = RATIO_WIDTH * 0.8 / (2 * (len(conditions(source_language)) + 0.2))
-        offset = alt.XOffset(
-            "nudge:Q",
-            scale=alt.Scale(domain=[-2, 2], range=[centre - 24, centre + 24]),
-            title=None,
-        )
-        dots = (
-            alt.Chart(rows)
-            # Dots: a full-strength ring around a half-strength fill stays readable
-            # where the fan's points overlap.
-            .mark_point(filled=True, size=136, fillOpacity=0.5, stroke="#4c78a8", strokeWidth=2, strokeOpacity=1)
-            .encode(
-                x=x,
-                xOffset=offset,
-                y=y,
-                tooltip=[
-                    alt.Tooltip("port:N", title="run"),
-                    alt.Tooltip("value:Q", title="ladder time ÷ reference", format=".2f"),
-                    alt.Tooltip("ladder_rungs_completed:Q", title="rungs completed"),
-                    alt.Tooltip("ladder_total_ms:Q", title="total ms", format=",.1f"),
-                ],
-            )
-        )
-        # The median rides the same offset scale as the dots, which is anchored to the band's edge.
-        medians = median_tick(
-            alt.Chart(
-                rows.group_by("condition", maintain_order=True).agg(
-                    pl.col("value").median(), nudge=pl.lit(0.0)
-                )
-            ),
-            size=56,
-            x=x,
-            xOffset=offset,
-            y=y,
-        )
-        rule = alt.Chart(parity).mark_rule(color=REFERENCE_GREY, strokeWidth=2).encode(y=y)
-        rule_label = (
-            alt.Chart(parity)
-            .mark_text(align="left", baseline="bottom", dy=-2, fontSize=9, color=REFERENCE_GREY)
-            .encode(y=y, x=alt.value(2), text="label:N")
-        )
-        return alt.layer(medians, dots, rule, rule_label).properties(
-            width=RATIO_WIDTH,
-            height=300,
-            title=panel_title(direction(), MAIN_TITLE_PX),
-        )
-
-    def performance_panel(source_language):
-        by_source = runs.filter(pl.col("source_language") == source_language)
-        rows = ratio_rows(source_language)
-        failed = rows.filter(pl.col("value").is_null())["port"].sort().to_list()
-        reference_total = by_source[LADDER_REFERENCE_TOTAL].median()
-        parts = [
-            mo.md(
-                f"Reference ladder total: {reference_total:,.1f} ms "
-                f"(median over {by_source.height} runs)."
-            ),
-            ratio_chart(source_language, rows.filter(pl.col("value").is_not_null())),
-        ]
-        if failed:
-            parts.append(mo.md(f"Failed every rung: {len(failed)} ({', '.join(failed)})."))
-        return mo.vstack(parts)
-
     def shim_rules(frame, source_language):
         fired = pl.col("adapt_rules").str.len_chars() > 0
         return pl.concat(
@@ -1783,11 +1722,6 @@ def _(
         "tests": (TEST_COLUMNS, ["timestamp", *TEST_METRICS], tests_panel),
         "diff": (DIFF_METRICS, ["timestamp", *DIFF_METRICS], None),
         "embeddings": (EMBEDDING_METRICS, ["timestamp", *EMBEDDING_METRICS], None),
-        "performance": (
-            PERFORMANCE_METRICS,
-            ["timestamp", *PERFORMANCE_METRICS],
-            performance_panel,
-        ),
     }
 
     def report(section):
@@ -1963,6 +1897,7 @@ def _(
         return mo.vstack(parts)
 
     return (
+        api_report,
         behavior_report,
         pair_report,
         report,
@@ -2221,126 +2156,6 @@ def _(codebases, mo):
 def _(mo):
     mo.vstack(
         [
-            mo.md("""
-            ## Performance
-
-            The timing ladder from exercise-api, run over the forward ports only.
-
-            ### performance ladder
-            """),
-            mo.accordion(
-                {
-                    "Glossary": mo.md("""
-                    A rung is one of the 22 cases in `cases/ladder.jsonl`: eight grammars, each with inputs of growing size, from a one-character literal up to a 64 KB JSON object and JSON nested at six depths.
-
-                    What is timed is `.add(input)` on a freshly constructed `GBNF(grammar)`, with `perf_counter_ns` / `process.hrtime.bigint()`, in one driver process per port.
-
-                    The statistic per rung is the median of that rung's timed passes, in milliseconds. Each case carries its own budget: 3 warm-up and 100 timed passes for the sixteen cases the typescript reference parses in under 100 ms, 1 and 5 for the five that cost it seconds, and a single cold pass for nested depth 8192.
-
-                    The reference is the hand-written library in the port's target language, timed on the same rungs in the same process run as the port it is compared against; it is the black rule at 1.0.
-
-                    Each dot is one port. A rung the port failed (`driver_failed`, timeout, or a raise) carries no timing and drops out of its statistics; a port that failed every rung has no ratio and no dot.
-
-                    - `ladder_ref_ratio`: the median across rungs of the port's per-rung medians, divided by the same median for the reference.
-                    - `ladder_rungs_completed`: how many of the 22 rungs produced a timing.
-                    - `ladder_total_ms`: the sum of the per-rung medians over the rungs the port completed, in milliseconds.
-                    """)
-                }
-            ),
-        ]
-    )
-    return
-
-
-@app.cell(hide_code=True)
-def _(report):
-    report("performance")
-    return
-
-
-@app.cell(hide_code=True)
-def _(pl, reverse_runs, runs):
-    DIRECTIONS = [("python", "typescript"), ("typescript", "python")]
-    SIMILARITY_FLOOR = 25
-
-    def forward(source_language):
-        return runs.filter(pl.col("source_language") == source_language)
-
-    def reference_rungs(frame):
-        return [rungs for rungs in frame["ladder_reference_rungs"].to_list() if rungs]
-
-    def median(values):
-        return pl.Series(values, dtype=pl.Float64).median()
-
-    def named(frame, column="run_id"):
-        # A run is named by the tail of its id here, as it is in the plot above.
-        return ", ".join(sorted(value[-8:] for value in frame[column].to_list()))
-
-    def scaling(source_language, target_language):
-        frame = forward(source_language)
-        slopes = frame["ladder_slope"].drop_nulls()
-        reference = frame["ladder_reference_slope"].drop_nulls().median()
-        return (
-            f"- {source_language} → {target_language}: ports {slopes.min():.2f} to "
-            f"{slopes.max():.2f}, reference {reference:.2f}"
-        )
-
-    def envelope(source_language, target_language):
-        frame = forward(source_language)
-        count = median([len(rungs) for rungs in reference_rungs(frame)])
-        timed = frame.filter(pl.col("ladder_rungs_completed").is_not_null())
-        gaps = sorted(
-            completed - count
-            for completed in timed["ladder_rungs_completed"].to_list()
-            if completed != count
-        )
-        line = (
-            f"- {source_language} → {target_language}: {timed.height - len(gaps)} of "
-            f"{timed.height} timed ports completed the reference's {count:.0f} rungs"
-        )
-        if gaps:
-            line += f", {len(gaps)} differed by " + ", ".join(f"{gap:+.0f}" for gap in gaps)
-        missing = frame.filter(pl.col("ladder_rungs_completed").is_null())
-        if missing.height:
-            line += f". No timings at all: {named(missing)}"
-        return f"{line}."
-
-    def open_question():
-        failed = runs.filter(pl.col("ladder_rungs_completed").is_null())
-        weak = reverse_runs.filter(pl.col("reference_diff_similarity_pct") < SIMILARITY_FLOOR)
-        both = set(failed["run_id"].to_list()) & set(weak["forward_run_id"].to_list())
-        return (
-            f"Does speed track fidelity? Failed every rung: {named(failed)}. "
-            f"Reverse leg below {SIMILARITY_FLOOR}% `reference_diff_similarity_pct`, "
-            f"named by their forward run: {named(weak, 'forward_run_id')}. "
-            f"In both: {', '.join(sorted(run_id[-8:] for run_id in both)) or 'none'}."
-        )
-
-    performance_notes = "\n\n".join(
-        [
-            "**Scaling.** The rung-8 log-log slope, the port against the reference timed in "
-            "the same run (`ladder_slope`, on `Codebase` and not in the tables above). The "
-            "reference figure is the median over the runs in that direction.",
-            "\n".join(scaling(*direction) for direction in DIRECTIONS),
-            "**Failure envelope.** Rungs completed, the port against the reference's own "
-            "count on the same run.",
-            "\n".join(envelope(*direction) for direction in DIRECTIONS),
-            f"**Open question.** {open_question()}",
-        ]
-    )
-    return (performance_notes,)
-
-
-@app.cell(hide_code=True)
-def _(mo, performance_notes):
-    mo.vstack([mo.md("### notes"), mo.accordion({"Notes": mo.md(performance_notes)})])
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.vstack(
-        [
             mo.md("## Reverse ports"),
             mo.accordion(
                 {
@@ -2350,8 +2165,6 @@ def _(mo):
                     The reverse condition is constant. Both reference test suites are always placed in the sandbox, whatever the forward run's condition was, and `--model` and `--effort` are the forward run's own. The tables therefore vary only by the forward run's condition, which is what each group below is keyed on, and every row names the forward run it came from.
 
                     Each reverse port is measured against the hand-written reference library in its own target language — the same reference the forward runs into that language are measured against, and the same excludes. The columns mean exactly what they mean in the forward sections above.
-
-                    There is no performance ladder here: exercise-api has not been run over the reverse ports.
                     """)
                 }
             ),
@@ -2451,6 +2264,43 @@ def _(behavior_report):
 def _(mo):
     mo.vstack(
         [
+            mo.md("## Held-out API"),
+            mo.accordion(
+                {
+                    "Glossary": mo.md("""
+                    Held out: the measure-api corpus, 100 generated grammars and 999 cases, never mounted into any agent container. Not either test suite.
+
+                    measure-api steps each case through the port's public API, one process per case: `construct` is `GBNF(grammar)`, `whole` is `add(input)`, then the input added one code point at a time for its first 16. Each step records the rules returned or the class and `pos` of what it raised. The hand-written reference in the same language ran the same cases. A javascript port loads through the typescript driver from `src/index.ts`; a port without one crashes on every case.
+
+                    - `api_agreement_pct`: percent of cases where every step equals the reference's (`match` plus `error_match`).
+                    - `api_match`: every step equal, none raised.
+                    - `api_mismatch`: the first unequal step returned rules on both sides.
+                    - `api_error_match`: every step equal, at least one raised.
+                    - `api_error_mismatch`: the first unequal step raised on at least one side, or is missing on one side.
+                    - `api_crash`: either side crashed.
+                    - `api_reference_<a>_port_<b>`: cases where the reference's status is `a` and the port's is `b`; a status is `crash`, `error` when any step raised, else `ok`.
+                    - `api_note`: the first crash, when every case crashed.
+                    """),
+                    "How to read": mo.md("""
+                    V2 runs only. The x axis is test inclusion: `unit` is the source language's unit suite, `source` and `target` the integration suites in the source and target language. Each dot is a run; the tick is the condition's median.
+                    """),
+                }
+            ),
+        ]
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(api_report):
+    api_report()
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.vstack(
+        [
             mo.md("## V2 statistics"),
             mo.accordion(
                 {
@@ -2463,7 +2313,7 @@ def _(mo):
                     - `rho`: Spearman rank correlation, the Pearson correlation of the two measures' ranks (ties share their average rank), from −1 to 1. `n`: runs with both measures present.
                     """),
                     "How to read": mo.md("""
-                    V2 exit-0 runs only. The lead measures are held-out behavior agreement, total tokens and LOC. The rank correlation table sets every per-run measure against held-out behavior agreement, so a cheap measure can be checked against it on this data; the heatmap shows every pair.
+                    V2 exit-0 runs only. The lead measures are held-out behavior agreement, held-out API agreement, total tokens and LOC. The rank correlation table sets every per-run measure against held-out behavior agreement, so a cheap measure can be checked against it on this data; the heatmap shows every pair.
                     """),
                 }
             ),

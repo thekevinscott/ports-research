@@ -22,7 +22,6 @@ CHARTS = Path(__file__).resolve().parent / "charts"
 BODY_WIDTH = 757
 HALF_WIDTH = (BODY_WIDTH - 16) / 2
 SLOT_WIDTHS = {
-    "performance/ladder-ref-ratio-": HALF_WIDTH,
     "statistical-analysis/size-": HALF_WIDTH,
     "statistical-analysis/port-to-port-matrix-": BODY_WIDTH,
 }
@@ -35,13 +34,14 @@ SIZE_LABEL_ANGLE = -32.5  # 5 degrees closer to horizontal than the blog's defau
 SIZE_OUTLIER = (pl.col("file_count") > 100) | (pl.col("loc") > 2000)
 MATRIX_SIDE = 598
 LANGUAGES = ("python", "typescript")
-# The notebook renders reverse_report for these two sections only: there is no reverse ladder.
+# The notebook renders reverse_report for these two sections only.
 REVERSE_SECTIONS = ("diff", "embeddings")
-GROUPS = {"embeddings": "embeddings", "performance": "performance"}
+GROUPS = {"embeddings": "embeddings"}
 FORWARD_GROUP = "statistical-analysis"
 REVERSE_GROUP = "reverse-ports"
 BEHAVIOR_GROUP = "held-out-behavior"
 V2_STATISTICS_GROUP = "v2-statistics"
+API_GROUP = "held-out-api"
 # A section whose lead column is charted alone needs a name for the chart of what is left.
 OTHER_COLUMNS = {
     "diff": "reference-diff-other-columns",
@@ -120,15 +120,6 @@ def charts(notebook):
         direction = f"{source_language}-to-{target_language}"
         for section, (metrics, _display, _extra) in sections.items():
             group = GROUPS.get(section, FORWARD_GROUP)
-            if section == "performance":
-                rows = notebook["ratio_rows"](source_language)
-                yield (
-                    f"{group}/ladder-ref-ratio-{direction}",
-                    notebook["ratio_chart"](
-                        source_language, rows.filter(pl.col("value").is_not_null())
-                    ),
-                )
-                continue
             for name, built in section_charts(
                 section,
                 metrics,
@@ -203,6 +194,12 @@ def charts(notebook):
             if column == notebook["BEHAVIOR_LEAD"] or column.startswith("reference_"):
                 yield f"{BEHAVIOR_GROUP}/{slug(column)}", notebook["behavior_chart"](v2_runs, column)
         yield f"{V2_STATISTICS_GROUP}/spearman-matrix", notebook["spearman_chart"](v2_runs)
+
+    v2_api_runs = notebook["v2_api_runs"]
+    if v2_api_runs.height:
+        for column in v2_api_runs.columns:
+            if column.startswith("api_") and column != "api_note":
+                yield f"{API_GROUP}/{slug(column)}", notebook["api_chart"](v2_api_runs, column)
 
 
 def write(chart, stem):
