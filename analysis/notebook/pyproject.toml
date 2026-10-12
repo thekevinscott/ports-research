@@ -8,6 +8,7 @@ dependencies = [
     "dirsql>=0.4.39",
     "gbnf_experiment",
     "marimo>=0.24.0",
+    "numpy>=2.5.3",
     "measure-embedding",
     "polars>=1.44.1",
     "pygount>=3.2.0",

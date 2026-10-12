@@ -41,6 +41,7 @@ GROUPS = {"embeddings": "embeddings", "performance": "performance"}
 FORWARD_GROUP = "statistical-analysis"
 REVERSE_GROUP = "reverse-ports"
 BEHAVIOR_GROUP = "held-out-behavior"
+V2_STATISTICS_GROUP = "v2-statistics"
 # A section whose lead column is charted alone needs a name for the chart of what is left.
 OTHER_COLUMNS = {
     "diff": "reference-diff-other-columns",
@@ -201,6 +202,7 @@ def charts(notebook):
         for column in v2_runs.columns:
             if column == notebook["BEHAVIOR_LEAD"] or column.startswith("reference_"):
                 yield f"{BEHAVIOR_GROUP}/{slug(column)}", notebook["behavior_chart"](v2_runs, column)
+        yield f"{V2_STATISTICS_GROUP}/spearman-matrix", notebook["spearman_chart"](v2_runs)
 
 
 def write(chart, stem):

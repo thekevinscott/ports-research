@@ -26,8 +26,9 @@ def _():
 
 
     from src.corpus import (
-        DATA, REVERSE, REFERENCE, EXCLUDE_BY_LANGUAGE, codebases_under,
+        DATA, REVERSE, REFERENCE, EXCLUDE_BY_LANGUAGE, codebases_under, runs_under,
     )
+    from src.stats import compare, spearman
 
     all_codebases = codebases_under(DATA, runs_table())
     # The sections below measure V1 runs: V2 runs carry other flags and another target name.
@@ -118,9 +119,21 @@ def _():
             "behavior_note": codebase.behavior_note,
         }
 
+    def size_columns(codebase):
+        return {"file_count": codebase.file_count, "loc": codebase.loc}
+
+    V2_STRINGS = {"completed_at": pl.String, "error": pl.String, "terminal_reason": pl.String}
     v2_runs = pl.DataFrame(
-        [{**codebase.run, **behavior_columns(codebase)} for codebase in v2_codebases],
-        schema_overrides={"completed_at": pl.String, "error": pl.String, "behavior_note": pl.String},
+        [
+            {**codebase.run, **size_columns(codebase), **behavior_columns(codebase)}
+            for codebase in v2_codebases
+        ],
+        schema_overrides={**V2_STRINGS, "behavior_note": pl.String},
+    )
+    # Every finished V2 attempt, the non-zero exits the tables above exclude among them.
+    v2_attempts = pl.DataFrame(
+        [run for run in runs_under(DATA, runs_table(), include_nonzero_exit=True) if is_v2(run)],
+        schema_overrides=V2_STRINGS,
     )
     port_pairs = within_direction_similarity(codebases)
     cell_pairs = within_cell(port_pairs)
@@ -140,6 +153,7 @@ def _():
         V2_FLAGS,
         alt,
         cell_pairs,
+        compare,
         focused_layout,
         layout_flag,
         mds_layout,
@@ -152,6 +166,8 @@ def _():
         ring_points,
         runs,
         similarity_matrix,
+        spearman,
+        v2_attempts,
         v2_runs,
     )
 
@@ -216,6 +232,7 @@ def _(
     V2_FLAGS,
     alt,
     cell_pairs,
+    compare,
     focused_layout,
     layout_flag,
     mds_layout,
@@ -229,6 +246,8 @@ def _(
     ring_points,
     runs,
     similarity_matrix,
+    spearman,
+    v2_attempts,
     v2_runs,
 ):
     CONDITION_FLAGS = ["include_python_tests", "include_typescript_tests"]
@@ -590,31 +609,49 @@ def _(
         verbs = {"accept": "accepts", "reject": "rejects", "error": "errors on", "crash": "crashes on"}
         return f"Pairs the reference {verbs[reference_outcome]} and the port {verbs[port_outcome]}"
 
+    DOT_STROKE = "#4c78a8"
+    IQR_OPACITY = 0.25
+    IQR_WIDTH = 8
+
+    def n_label_expr(rows, labels):
+        """Each band's label over its run count, so every panel says how many runs it holds."""
+        counts = dict(rows.group_by("condition").len().iter_rows())
+        lookup = ", ".join(f"'{label}': 'n={counts.get(label, 0)}'" for label in labels)
+        return f"[datum.label, {{{lookup}}}[datum.label]]"
+
+    def iqr_bar(base, x, scale):
+        """The middle half of the cell's runs, drawn behind its dots."""
+        return base.mark_rule(strokeWidth=IQR_WIDTH, color=DOT_STROKE, opacity=IQR_OPACITY).encode(
+            x=x, y=alt.Y("q1(value):Q", title=None, scale=scale), y2=alt.Y2("q3(value)")
+        )
+
     def behavior_chart(frame, metric=BEHAVIOR_LEAD):
         labels = [label for label, *_ in V2_CONDITIONS]
         labelled = with_v2_conditions(frame)
         centre = BEHAVIOR_PANEL_WIDTH / len(labels) * (1 - BAND_PADDING) / 2
-        x = alt.X(
-            "condition:N",
-            sort=labels,
-            scale=alt.Scale(
-                domain=labels, paddingInner=BAND_PADDING, paddingOuter=BAND_PADDING / 2
-            ),
-            title=TEST_AXIS_TITLE,
-        )
 
         def panel(source_language):
             by_source = labelled.filter(pl.col("source_language") == source_language)
             rows = fan_out(by_source.select("condition", pl.col(metric).cast(pl.Float64).alias("value")))
+            x = alt.X(
+                "condition:N",
+                sort=labels,
+                scale=alt.Scale(
+                    domain=labels, paddingInner=BAND_PADDING, paddingOuter=BAND_PADDING / 2
+                ),
+                title=TEST_AXIS_TITLE,
+                axis=alt.Axis(labelExpr=n_label_expr(rows, labels)),
+            )
             base = alt.Chart(rows)
             # Agreement is a percentage, so every panel shares 0 to 100; counts start at zero.
             scale = alt.Scale(domain=[0, 100]) if metric == BEHAVIOR_LEAD else alt.Scale(zero=True)
+            iqr = iqr_bar(base, x, scale)
             median = median_tick(base, x=x, y=alt.Y("median(value):Q", title=None, scale=scale))
             points = base.mark_point(
-                filled=True, size=96, fillOpacity=0.5, stroke="#4c78a8", strokeWidth=2, strokeOpacity=1
+                filled=True, size=96, fillOpacity=0.5, stroke=DOT_STROKE, strokeWidth=2, strokeOpacity=1
             ).encode(x=x, xOffset=dot_offset(rows, centre), y=alt.Y("value:Q", title=None, scale=scale))
             target_language = by_source["target_language"][0]
-            return alt.layer(median, points).properties(
+            return alt.layer(iqr, median, points).properties(
                 width=BEHAVIOR_PANEL_WIDTH,
                 height=140,
                 title=panel_title(f"{source_language} → {target_language}"),
@@ -675,6 +712,221 @@ def _(
                 ),
             ]
         )
+
+    V2_LEADS = [BEHAVIOR_LEAD, "total_tokens", "loc"]
+    V2_SCOPES = ["pooled", *BEHAVIOR_SOURCES]
+    # Per-run measures besides held-out behavior; the confusion counts join them from the frame.
+    V2_MEASURES = ["total_tokens", "api_calls", "duration_ms", "file_count", "loc"]
+    SPEARMAN_CELL_PX = 26
+    # red, neutral grey, blue: a diverging ramp whose midpoint reads as no correlation.
+    DIVERGING = ["#e34948", "#f0efec", "#2a78d6"]
+
+    def v2_cells():
+        """The 16 V2 cells, source language first."""
+        labels = [label for label, *_ in V2_CONDITIONS]
+        return pl.DataFrame(
+            {
+                "source_language": [source for source in BEHAVIOR_SOURCES for _ in labels],
+                "condition": labels * len(BEHAVIOR_SOURCES),
+            }
+        )
+
+    def by_cell(frame, *aggregations):
+        """One row per V2 cell, every cell present whether or not it has runs."""
+        cells = v2_cells()
+        if frame.height == 0:
+            return cells
+        counted = with_v2_conditions(frame).group_by("source_language", "condition").agg(*aggregations)
+        return cells.join(counted, on=["source_language", "condition"], how="left", maintain_order="left")
+
+    def lead_title(measure):
+        return behavior_title(measure) if measure == BEHAVIOR_LEAD else metric_title(measure)
+
+    def v2_summary(frame, attempts):
+        codes = sorted(attempts.filter(pl.col("exit_code") != 0)["exit_code"].unique().to_list())
+        excluded = [f"excluded_exit_{code}" for code in codes]
+        quartiles = by_cell(
+            frame,
+            pl.len().alias("n"),
+            *(
+                expr
+                for lead in V2_LEADS
+                for expr in (
+                    pl.col(lead).quantile(0.25, "linear").alias(f"q1_{lead}"),
+                    pl.col(lead).median().alias(f"median_{lead}"),
+                    pl.col(lead).quantile(0.75, "linear").alias(f"q3_{lead}"),
+                )
+            ),
+        )
+        exits = by_cell(
+            attempts,
+            *((pl.col("exit_code") == code).sum().alias(name) for code, name in zip(codes, excluded)),
+        )
+        return (
+            quartiles.join(exits, on=["source_language", "condition"], maintain_order="left")
+            .with_columns(pl.col("n", *excluded).fill_null(0))
+            .select("source_language", "condition", "n", *excluded, pl.exclude("source_language", "condition", "n", *excluded))
+        )
+
+    def v2_failures(attempts):
+        exits = ["attempts", "exit_0", "exit_137", "api_error"]
+        return (
+            by_cell(
+                attempts,
+                pl.len().alias("attempts"),
+                (pl.col("exit_code") == 0).sum().alias("exit_0"),
+                (pl.col("exit_code") == 137).sum().alias("exit_137"),
+                (pl.col("terminal_reason") == "api_error").sum().alias("api_error"),
+                pl.col("total_tokens").sum().alias("tokens"),
+            )
+            .with_columns(pl.col(exits).fill_null(0))
+            .with_columns(
+                tokens_per_success=pl.when(pl.col("exit_0") > 0).then(
+                    pl.col("tokens") / pl.col("exit_0")
+                )
+            )
+            .drop("tokens")
+        )
+
+    def flag_comparison(frame, measure):
+        """Each flag's on runs against its off runs, pooled and within each source language."""
+        rows = []
+        for flag in V2_FLAGS:
+            on = pl.col(flag).cast(pl.Boolean)
+            for scope in V2_SCOPES:
+                scoped = frame if scope == "pooled" else frame.filter(pl.col("source_language") == scope)
+                result = compare(scoped.filter(on)[measure].to_list(), scoped.filter(~on)[measure].to_list())
+                rows.append({"flag": flag, "source_language": scope, **result})
+        return pl.DataFrame(rows, schema_overrides={column: pl.Float64 for column in ("median_on", "median_off", "gap", "low", "high", "p", "minimum_detectable_gap")})
+
+    def v2_measures(frame):
+        """Every per-run measure the frame carries: agreement, its confusion counts, cost and size."""
+        confusion = [column for column in frame.columns if column.startswith("reference_") and "_port_" in column]
+        return [m for m in [BEHAVIOR_LEAD, *confusion, *V2_MEASURES] if m in frame.columns]
+
+    def varied_measures(frame):
+        """The measures that take more than one value; a rank correlation needs a spread."""
+        return [m for m in v2_measures(frame) if frame[m].drop_nulls().n_unique() > 1]
+
+    def spearman_table(frame):
+        measures = [measure for measure in varied_measures(frame) if measure != BEHAVIOR_LEAD]
+        lead = frame[BEHAVIOR_LEAD].to_list()
+        return pl.DataFrame(
+            {
+                "measure": measures,
+                "rho": [spearman(frame[measure].to_list(), lead) for measure in measures],
+                "n": [
+                    frame.filter(pl.col(measure).is_not_null() & pl.col(BEHAVIOR_LEAD).is_not_null()).height
+                    for measure in measures
+                ],
+            },
+            schema={"measure": pl.String, "rho": pl.Float64, "n": pl.Int64},
+        ).sort(pl.col("rho").abs(), descending=True, nulls_last=True)
+
+    def spearman_matrix(frame):
+        measures = varied_measures(frame)
+        return pl.DataFrame(
+            [
+                {"measure_a": a, "measure_b": b, "rho": spearman(frame[a].to_list(), frame[b].to_list())}
+                for b in measures
+                for a in measures
+            ],
+            schema={"measure_a": pl.String, "measure_b": pl.String, "rho": pl.Float64},
+        )
+
+    def spearman_chart(frame):
+        measures = varied_measures(frame)
+        side = SPEARMAN_CELL_PX * len(measures)
+        x = alt.X("measure_a:N", sort=measures, title=None, axis=alt.Axis(labelAngle=-90, ticks=False, domain=False))
+        y = alt.Y("measure_b:N", sort=measures, title=None, axis=alt.Axis(ticks=False, domain=False))
+        base = alt.Chart(spearman_matrix(frame))
+        cells = base.mark_rect(stroke=SURFACE, strokeWidth=1).encode(
+            x=x,
+            y=y,
+            color=alt.Color(
+                "rho:Q",
+                title="Spearman ρ",
+                # Lab keeps each side on its own hue; the default hcl swings blue through pink.
+                scale=alt.Scale(domain=[-1, 0, 1], range=DIVERGING, interpolate="lab"),
+                legend=alt.Legend(values=[-1, -0.5, 0, 0.5, 1], format=".1f"),
+            ),
+            tooltip=[
+                alt.Tooltip("measure_a:N", title="measure"),
+                alt.Tooltip("measure_b:N", title="against"),
+                alt.Tooltip("rho:Q", title="ρ", format=".2f"),
+            ],
+        )
+        # Printed values flip to the page colour where the cell is dark.
+        numbers = [
+            base.transform_filter(test)
+            .mark_text(fontSize=9, color=colour)
+            .encode(x=x, y=y, text=alt.Text("rho:Q", format=".2f"))
+            for test, colour in (("abs(datum.rho) < 0.6", INK), ("abs(datum.rho) >= 0.6", SURFACE))
+        ]
+        return alt.layer(cells, *numbers).properties(
+            width=side,
+            height=side,
+            title=alt.TitleParams(
+                "How per-run measures rank against each other on V2 runs (Spearman)", anchor="start"
+            ),
+        )
+
+    FLAG_READING = (
+        "Each row sets the runs with the flag on against the runs with it off, pooled over both"
+        " source languages and then within each. `gap` is the on median minus the off median."
+        " `p` is the share of 10,000 shuffles of the on/off labels (seed 0) whose gap is at least"
+        " as far from zero. `low` to `high` is a 95% bootstrap interval on the gap (10,000"
+        " resamples, seed 0). A gap has to be larger than `minimum_detectable_gap` for the same"
+        " shuffles to give p < 0.05 at this n. A row with p ≥ 0.05 reads as a gap too small to see"
+        " with this n, never as no effect."
+    )
+    V2_NOT_MEASURED = (
+        "`api_agreement_pct` (held-out API, `analysis/measure-api`) joins these tables once the"
+        " notebook carries that column. Reference diff similarity and test pass rates are not"
+        " measured on V2 runs: `measure-code-distance` takes no javascript target and"
+        " `execute-test-suite` finds no V2 suite in the derivation cache."
+    )
+
+    def rounded(frame):
+        return frame.with_columns(pl.col(pl.Float64).round(2))
+
+    def v2_statistics_report():
+        if v2_runs.height == 0:
+            return mo.md("No completed V2 runs.")
+        cell_columns = ["source_language", "condition"]
+        varied = varied_measures(v2_runs)
+        constant = [m for m in v2_measures(v2_runs) if m not in varied]
+        parts = [
+            mo.md("### n, median and interquartile range by cell"),
+            mo.ui.table(rounded(v2_summary(v2_runs, v2_attempts)), freeze_columns_left=cell_columns),
+            mo.md("### Failures and tokens per successful run"),
+            mo.ui.table(rounded(v2_failures(v2_attempts)), freeze_columns_left=cell_columns),
+            mo.md("### Per-flag comparison"),
+            mo.md(FLAG_READING),
+        ]
+        for measure in V2_LEADS:
+            parts.extend(
+                [
+                    mo.md(f"#### {lead_title(measure)}"),
+                    mo.ui.table(
+                        flag_comparison(v2_runs, measure).with_columns(
+                            pl.col(pl.Float64).exclude("p").round(2), pl.col("p").round(4)
+                        ),
+                        freeze_columns_left=["flag", "source_language"],
+                    ),
+                ]
+            )
+        parts.extend(
+            [
+                mo.md(V2_NOT_MEASURED),
+                mo.md("### Rank correlation with held-out behavior"),
+                mo.ui.table(spearman_table(v2_runs).with_columns(pl.col("rho").round(3))),
+                spearman_chart(v2_runs),
+            ]
+        )
+        if constant:
+            parts.append(mo.md(f"One value across every V2 run, so no rank correlation: {', '.join(constant)}."))
+        return mo.vstack(parts)
 
     PAIR_SERIES = "port vs port"
     REFERENCE_SERIES = "port vs reference"
@@ -1710,7 +1962,14 @@ def _(
                 )
         return mo.vstack(parts)
 
-    return behavior_report, pair_report, report, reverse_report
+    return (
+        behavior_report,
+        pair_report,
+        report,
+        reverse_report,
+        spearman_chart,
+        v2_statistics_report,
+    )
 
 
 @app.cell(hide_code=True)
@@ -1733,9 +1992,9 @@ def _(mo):
             mo.accordion(
                 {
                     "How to read": mo.md("""
-                    A forward run ports one hand-written reference library into the other language. The 40 runs cover eight cells: source language, python reference tests placed in the sandbox or not, typescript reference tests placed in the sandbox or not. Every port is measured against the hand-written reference in its own target language, under the same excludes.
+                    V2 is the current study: 16 cells, 2 source languages (python → javascript, javascript → python) × 3 test flags (`include_unit_tests`, `include_source_integration_tests`, `include_target_integration_tests`), 12 runs per cell, claude-opus-5-5 at medium effort. A run that exited non-zero (killed with 137, or an api_error) is left out of every V2 table and chart and counted in the failure table. The V2 sections are the last two: Held-out behavior and V2 statistics. Every V2 chart draws each run as a dot, the cell's median as a tick, its interquartile range as a faint bar, and n under each label.
 
-                    The sections below are the mechanical measurements — the reference diff, the port-to-port diff, what the run cost, the size of what it produced, test pass rates. They are read off the runs and the files themselves, with no model involved.
+                    The sections in between are V1: 40 runs in eight cells (source language, python reference tests in the sandbox or not, typescript reference tests in the sandbox or not). Each V1 port is measured against the hand-written reference in its own target language, under the same excludes: the reference diff, the port-to-port diff, cost, size, test pass rates. They are read off the runs and the files, with no model involved.
                     """)
                 }
             ),
@@ -2173,7 +2432,7 @@ def _(mo):
                     - `behavior_note`: the first error, when every pair crashed.
                     """),
                     "How to read": mo.md("""
-                    V2 runs only. The x axis is test inclusion: `unit` is the source language's unit suite, `source` and `target` the integration suites in the source and target language. Each dot is a run; the tick is the condition's median.
+                    V2 runs only. The x axis is test inclusion: `unit` is the source language's unit suite, `source` and `target` the integration suites in the source and target language. Each dot is a run; the tick is the condition's median, the faint bar its interquartile range, and the number under each label its n.
                     """),
                 }
             ),
@@ -2185,6 +2444,37 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(behavior_report):
     behavior_report()
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.vstack(
+        [
+            mo.md("## V2 statistics"),
+            mo.accordion(
+                {
+                    "Glossary": mo.md("""
+                    - `n`: exit-0 runs in the cell. `excluded_exit_<code>`: runs in the cell that exited with that code, left out of every V2 table and chart.
+                    - `q1_`, `median_`, `q3_`: the 25th, 50th and 75th percentiles over the cell's runs; `q1` to `q3` is the interquartile range, the middle half of the runs.
+                    - `attempts`: every finished run in the cell. `exit_0`, `exit_137`: runs that exited with that code. `api_error`: runs whose result has `terminal_reason` `api_error`.
+                    - `tokens_per_success`: every token the cell spent, failed attempts included, divided by its exit-0 runs.
+                    - `n_on`, `n_off`, `median_on`, `median_off`, `gap`, `p`, `low`, `high`, `minimum_detectable_gap`: see the per-flag comparison.
+                    - `rho`: Spearman rank correlation, the Pearson correlation of the two measures' ranks (ties share their average rank), from −1 to 1. `n`: runs with both measures present.
+                    """),
+                    "How to read": mo.md("""
+                    V2 exit-0 runs only. The lead measures are held-out behavior agreement, total tokens and LOC. The rank correlation table sets every per-run measure against held-out behavior agreement, so a cheap measure can be checked against it on this data; the heatmap shows every pair.
+                    """),
+                }
+            ),
+        ]
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(v2_statistics_report):
+    v2_statistics_report()
     return
 
 

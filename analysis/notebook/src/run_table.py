@@ -22,6 +22,7 @@ RUNS_COLUMNS = {
     "effort": "TEXT",
     "error": "TEXT",
     "is_error": "INTEGER",
+    "terminal_reason": "TEXT",
     "total_tokens": "INTEGER",
     "api_calls": "INTEGER",
     "duration_ms": "INTEGER",
@@ -38,6 +39,9 @@ REVERSE_RUNS_COLUMNS = {
 COMPLETED = "is_error = 0 AND error IS NULL AND completed_at IS NOT NULL"
 # V1 manifests carry no exit code.
 EXIT_ZERO = "COALESCE(exit_code, 0) = 0"
+# A killed run writes no result.json and an api_error result has is_error set, so a
+# finished V2 run that exited non-zero is known by its exit code alone.
+EXIT_NONZERO = "COALESCE(exit_code, 0) != 0"
 V1_FLAGS = ["include_python_tests", "include_typescript_tests"]
 V2_FLAGS = [
     "include_unit_tests",
@@ -68,6 +72,7 @@ def _row(manifest_path: Path, manifest: dict) -> dict:
         "effort": condition["effort"],
         "error": manifest.get("error"),
         "is_error": result.get("is_error"),
+        "terminal_reason": result.get("terminal_reason"),
         "total_tokens": tokens.get("total_tokens"),
         "api_calls": tokens.get("api_calls"),
         "duration_ms": result.get("duration_ms"),
@@ -121,5 +126,7 @@ def is_v2(run: dict) -> bool:
 
 
 def completed_runs(db, table: str, *, include_nonzero_exit: bool = False) -> list[dict]:
-    where = COMPLETED if include_nonzero_exit else f"{COMPLETED} AND {EXIT_ZERO}"
+    where = f"{COMPLETED} AND {EXIT_ZERO}"
+    if include_nonzero_exit:
+        where = f"({where}) OR {EXIT_NONZERO}"
     return db.query(f"SELECT * FROM {table} WHERE {where} ORDER BY run_id")
