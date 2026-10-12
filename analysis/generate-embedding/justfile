@@ -3,3 +3,6 @@ test-unit:
 
 test-integration:
     uv run pytest tests/integration -x -q
+
+lint:
+    uv run ruff check src

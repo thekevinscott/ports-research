@@ -39,6 +39,10 @@ jobs:
       - name: Install just
         uses: extractions/setup-just@v2
 
+      - name: Lint
+        run: just lint
+        working-directory: ${{ inputs.package }}
+
       - name: Run unit tests
         run: just test-unit
         working-directory: ${{ inputs.package }}
