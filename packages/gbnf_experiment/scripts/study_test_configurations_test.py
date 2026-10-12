@@ -1,12 +1,21 @@
 import json
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from itertools import islice
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
-from study_test_configurations import MODELS, cell_name, cells, main, study_test_configurations, schedule
+from study_test_configurations import (
+    MODELS,
+    cell_key,
+    cell_name,
+    cells,
+    main,
+    schedule,
+    study_test_configurations,
+)
 
 API_KEY = "sk-ant-test"
 NAMES = (
@@ -22,6 +31,24 @@ def run_directory(tmp_path):
     (directory / "manifest.json").write_text(json.dumps({"exit_code": 0}))
     (directory / "result.json").write_text(json.dumps({"usage": {"output_tokens": 7}}))
     return directory
+
+
+CREDIT = {"is_error": True, "terminal_reason": "api_error", "result": "Credit balance is too low"}
+
+
+def failed_run(tmp_path: Path, name: str, result: dict | None = None, stderr: str = "") -> Path:
+    directory = tmp_path / "runs" / name
+    directory.mkdir(parents=True)
+    (directory / "manifest.json").write_text(json.dumps({"exit_code": 1}))
+    if result is not None:
+        (directory / "result.json").write_text(json.dumps(result))
+    (directory / "stderr.txt").write_text(stderr)
+    return directory
+
+
+def write_jsonl(path: Path, records: list[tuple[dict, int]]) -> Path:
+    path.write_text("".join(json.dumps({"cell": cell, "exit_code": code}) + "\n" for cell, code in records))
+    return path
 
 
 @pytest.fixture
@@ -169,6 +196,7 @@ def describe_run_matrix():
 def matrix(monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", API_KEY)
     with patch("study_test_configurations.study_test_configurations", autospec=True) as m:
+        m.return_value = None
         yield m
 
 
@@ -220,3 +248,149 @@ def describe_main():
         main(["--efforts", "low,xhigh", "--cells", NAMES[1]])
         [cell] = matrix.call_args.args[0]
         assert cell["effort"] == "xhigh"
+
+
+def describe_resume():
+    def it_runs_each_cell_up_to_n_counting_prior_successes():
+        everything = cells()[:3]
+        prior = Counter({cell_key(everything[0]): 3, cell_key(everything[1]): 5})
+        runs = Counter(cell_name(cell) for _, cell in schedule(everything, n=5, prior=prior))
+        assert runs == {cell_name(everything[0]): 2, cell_name(everything[2]): 5}
+
+    def it_drops_a_cell_out_of_the_round_robin_once_it_reaches_its_target():
+        everything = cells()[:3]
+        prior = Counter({cell_key(everything[0]): 3})
+        runs = list(schedule(everything, n=5, prior=prior))
+        assert [r for r, _ in runs] == [1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5]
+
+    def it_counts_exit_code_zero_per_full_cell_across_every_file(tmp_path, matrix):
+        opus, sonnet = (
+            next(cell for cell in cells() if cell["model"] == model) for model in ("claude-opus-5-5", "claude-sonnet-5-5")
+        )
+        first = write_jsonl(tmp_path / "a.jsonl", [(opus, 0), (opus, 1), (opus, 137), (sonnet, 0)])
+        second = write_jsonl(tmp_path / "b.jsonl", [(opus, 0), (opus, None)])
+        main(["--resume", str(first), str(second)])
+        assert matrix.call_args.kwargs["prior"] == {cell_key(opus): 2, cell_key(sonnet): 1}
+
+    def it_prints_each_cell_s_shortfall_and_the_total(tmp_path, matrix, capsys):
+        [opus] = [cell for cell in cells() if cell["model"] == "claude-opus-5-5"][:1]
+        path = write_jsonl(tmp_path / "a.jsonl", [(opus, 0)] * 5)
+        main(["--resume", str(path)])
+        err = capsys.readouterr().err
+        assert f"{cell_name(opus)}=7" in err
+        assert "total 187" in err
+
+
+def describe_runs():
+    def it_stops_submitting_after_n_runs_in_round_robin_order(tmp_path, gbnf_experiment):
+        out = tmp_path / "matrix.jsonl"
+        study_test_configurations(cells(), n=2, parallel=2, api_key=API_KEY, out=out, runs=5)
+        lines = read(out)
+        assert len(lines) == 5
+        assert {line["round"] for line in lines} == {1}
+
+    def it_passes_runs_from_the_command_line(matrix):
+        main(["--runs", "4"])
+        assert matrix.call_args.kwargs["runs"] == 4
+
+    def it_is_unlimited_by_default(matrix):
+        main([])
+        assert matrix.call_args.kwargs["runs"] is None
+
+
+def describe_record():
+    def it_writes_utc_start_and_finish_times(tmp_path, gbnf_experiment):
+        out = tmp_path / "matrix.jsonl"
+        study_test_configurations(cells()[:1], n=1, parallel=1, api_key=API_KEY, out=out)
+        [line] = read(out)
+        started, finished = (datetime.fromisoformat(line[key]) for key in ("started_at", "finished_at"))
+        assert started.utcoffset().total_seconds() == 0
+        assert started <= finished
+
+    def it_writes_the_terminal_reason_and_the_first_300_characters_of_the_result(tmp_path, gbnf_experiment):
+        gbnf_experiment.return_value = failed_run(
+            tmp_path, "long", {"is_error": False, "terminal_reason": "completed", "result": "x" * 1000}
+        )
+        out = tmp_path / "matrix.jsonl"
+        study_test_configurations(cells()[:1], n=1, parallel=1, api_key=API_KEY, out=out)
+        [line] = read(out)
+        assert line["terminal_reason"] == "completed"
+        assert line["result"] == "x" * 300
+
+    def it_writes_none_without_a_result_json(tmp_path, gbnf_experiment):
+        gbnf_experiment.return_value = failed_run(tmp_path, "none")
+        out = tmp_path / "matrix.jsonl"
+        study_test_configurations(cells()[:1], n=1, parallel=1, api_key=API_KEY, out=out)
+        [line] = read(out)
+        assert (line["terminal_reason"], line["result"], line["usage"]) == (None, None, None)
+
+
+def describe_fail_fast():
+    @pytest.mark.parametrize(
+        ("result", "stderr"),
+        [
+            (CREDIT, ""),
+            ({"is_error": True, "terminal_reason": "completed", "result": "OAuth token has expired"}, ""),
+            ({"is_error": True, "terminal_reason": "completed", "result": "API Error: 401"}, ""),
+            (None, "Not logged in · Please run /login"),
+            (None, "Invalid authentication credentials"),
+        ],
+    )
+    def it_stops_at_the_first_credit_or_auth_failure(tmp_path, gbnf_experiment, capsys, result, stderr):
+        exhausted = failed_run(tmp_path, "exhausted", result, stderr)
+        gbnf_experiment.return_value = exhausted
+        out = tmp_path / "matrix.jsonl"
+        stopped = study_test_configurations(cells(), n=2, parallel=1, api_key=API_KEY, out=out)
+        [line] = read(out)
+        assert stopped == line
+        assert f"STOPPED: round 1 {cell_name(line['cell'])} {exhausted}: " in capsys.readouterr().err
+
+    def it_lets_the_in_flight_runs_finish_and_names_the_first(tmp_path, gbnf_experiment, capsys):
+        gbnf_experiment.return_value = failed_run(tmp_path, "exhausted", CREDIT)
+        out = tmp_path / "matrix.jsonl"
+        stopped = study_test_configurations(cells(), n=2, parallel=4, api_key=API_KEY, out=out)
+        lines = read(out)
+        assert len(lines) == 4
+        assert stopped == lines[0]
+        err = capsys.readouterr().err.splitlines()
+        [stop] = [index for index, text in enumerate(err) if text.startswith("STOPPED:")]
+        assert err[stop].endswith(": Credit balance is too low")
+        assert len(err) == stop + 2
+
+    def it_keeps_going_on_other_failures(tmp_path, gbnf_experiment):
+        gbnf_experiment.return_value = failed_run(
+            tmp_path, "other", {"is_error": True, "terminal_reason": "max_turns", "result": "too many turns"}
+        )
+        out = tmp_path / "matrix.jsonl"
+        assert study_test_configurations(cells(), n=1, parallel=2, api_key=API_KEY, out=out) is None
+        assert len(read(out)) == 64
+
+    def it_exits_non_zero_when_stopped(matrix):
+        matrix.return_value = {"round": 1}
+        with pytest.raises(SystemExit) as exit:
+            main([])
+        assert exit.value.code != 0
+
+
+def describe_auth():
+    def it_gives_each_agent_no_key_on_subscription(tmp_path, gbnf_experiment, claude_agent):
+        study_test_configurations(cells()[:1], n=1, parallel=1, api_key=None, out=tmp_path / "m")
+        assert claude_agent.call_args.kwargs["api_key"] is None
+
+    def it_passes_no_key_on_subscription(monkeypatch, matrix):
+        monkeypatch.delenv("ANTHROPIC_API_KEY")
+        main(["--auth", "subscription"])
+        assert matrix.call_args.kwargs["api_key"] is None
+
+    def it_refuses_subscription_while_an_api_key_is_set(matrix):
+        with pytest.raises(SystemExit) as exit:
+            main(["--auth", "subscription"])
+        assert "ANTHROPIC_API_KEY" in str(exit.value.code)
+        matrix.assert_not_called()
+
+    @pytest.mark.parametrize("auth", ["api-key", "subscription"])
+    def it_names_the_auth_mode_at_startup(auth, monkeypatch, matrix, capsys):
+        if auth == "subscription":
+            monkeypatch.delenv("ANTHROPIC_API_KEY")
+        main(["--auth", auth])
+        assert f"auth {auth}" in capsys.readouterr().err
