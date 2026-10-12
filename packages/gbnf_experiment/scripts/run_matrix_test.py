@@ -9,6 +9,10 @@ from click.testing import CliRunner
 from run_matrix import MODELS, cell_name, cells, cli, run_matrix, schedule
 
 API_KEY = "sk-ant-test"
+NAMES = (
+    f"source-python_effort-low_model-{MODELS[0]}",
+    f"source-python_effort-xhigh_model-{MODELS[0]}",
+)
 
 
 @pytest.fixture
@@ -58,6 +62,14 @@ def describe_cells():
     def it_covers_every_model():
         assert {cell["model"] for cell in cells()} == set(MODELS)
 
+    def it_leaves_effort_to_the_cli_by_default():
+        assert {cell["effort"] for cell in cells()} == {None}
+
+    def it_multiplies_the_cells_by_each_effort():
+        both = cells(efforts=("low", "xhigh"))
+        assert len(both) == 128
+        assert len({cell_name(cell) for cell in both}) == 128
+
 
 def describe_schedule():
     def it_runs_every_cell_once_per_round():
@@ -83,17 +95,18 @@ def describe_schedule():
 def describe_run_matrix():
     def it_writes_one_line_per_run(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
-        run_matrix(cells(), n=2, parallel=2, effort=None, api_key=API_KEY, out=out)
+        run_matrix(cells(), n=2, parallel=2, api_key=API_KEY, out=out)
         assert len(read(out)) == 128
 
     def it_writes_the_cell_round_run_directory_exit_code_wall_time_and_usage(
         tmp_path, gbnf_experiment, run_directory
     ):
         out = tmp_path / "matrix.jsonl"
-        [cell] = [c for c in cells() if c["model"] == MODELS[0]][:1]
-        run_matrix([cell], n=1, parallel=1, effort="high", api_key=API_KEY, out=out)
+        [cell] = cells(efforts=("high",))[:1]
+        run_matrix([cell], n=1, parallel=1, api_key=API_KEY, out=out)
         [line] = read(out)
-        assert line["cell"] == {**cell, "effort": "high"}
+        assert line["cell"] == cell
+        assert line["cell"]["effort"] == "high"
         assert line["round"] == 1
         assert line["run_directory"] == str(run_directory)
         assert line["error"] is None
@@ -104,7 +117,7 @@ def describe_run_matrix():
     def it_keeps_going_when_a_run_raises(tmp_path, gbnf_experiment, run_directory):
         gbnf_experiment.side_effect = [RuntimeError("boom"), *[run_directory] * 63]
         out = tmp_path / "matrix.jsonl"
-        run_matrix(cells(), n=1, parallel=1, effort=None, api_key=API_KEY, out=out)
+        run_matrix(cells(), n=1, parallel=1, api_key=API_KEY, out=out)
         lines = read(out)
         assert len(lines) == 64
         assert lines[0]["error"] == "boom"
@@ -113,20 +126,24 @@ def describe_run_matrix():
 
     def it_writes_runs_in_round_order(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
-        run_matrix(cells(), n=2, parallel=1, effort=None, api_key=API_KEY, out=out)
+        run_matrix(cells(), n=2, parallel=1, api_key=API_KEY, out=out)
         rounds = [line["round"] for line in read(out)]
         assert rounds == [1] * 64 + [2] * 64
 
-    def it_passes_the_key_model_and_effort_to_the_agent(tmp_path, gbnf_experiment, claude_agent):
-        [cell] = cells()[:1]
-        run_matrix([cell], n=1, parallel=1, effort="low", api_key=API_KEY, out=tmp_path / "m")
-        claude_agent.assert_called_once_with(model=cell["model"], effort="low", api_key=API_KEY)
+    def it_gives_each_agent_the_key_and_its_cell_s_model_and_effort(
+        tmp_path, gbnf_experiment, claude_agent
+    ):
+        two = [cell for cell in cells(efforts=("low", "xhigh")) if cell_name(cell) in NAMES]
+        run_matrix(two, n=1, parallel=1, api_key=API_KEY, out=tmp_path / "m")
+        assert sorted(c.kwargs["effort"] for c in claude_agent.call_args_list) == ["low", "xhigh"]
+        for c in claude_agent.call_args_list:
+            assert c.kwargs == {"model": MODELS[0], "effort": c.kwargs["effort"], "api_key": API_KEY}
 
     def it_warms_every_condition_before_the_first_run(tmp_path, gbnf_experiment, prepare):
         order = Mock()
         order.attach_mock(prepare, "prepare")
         order.attach_mock(gbnf_experiment, "run")
-        run_matrix(cells(), n=1, parallel=2, effort=None, api_key=API_KEY, out=tmp_path / "m")
+        run_matrix(cells(), n=1, parallel=2, api_key=API_KEY, out=tmp_path / "m")
         names = [name for name, _, _ in order.mock_calls]
         assert names[:16] == ["prepare"] * 16
         assert "prepare" not in names[16:]
@@ -144,3 +161,19 @@ def describe_cli():
         prepare.assert_not_called()
         gbnf_experiment.assert_not_called()
         claude_agent.assert_not_called()
+
+    def it_runs_every_cell_at_every_effort_given(monkeypatch):
+        monkeypatch.setenv("ANTHROPIC_API_KEY", API_KEY)
+        with patch("run_matrix.run_matrix", autospec=True) as matrix:
+            result = CliRunner().invoke(cli, ["--efforts", "low,xhigh"])
+        assert result.exit_code == 0, result.output
+        selected = matrix.call_args.args[0]
+        assert len(selected) == 128
+        assert {cell["effort"] for cell in selected} == {"low", "xhigh"}
+
+    def it_selects_cells_by_name_including_effort(monkeypatch):
+        monkeypatch.setenv("ANTHROPIC_API_KEY", API_KEY)
+        with patch("run_matrix.run_matrix", autospec=True) as matrix:
+            CliRunner().invoke(cli, ["--efforts", "low,xhigh", "--cells", NAMES[1]])
+        [cell] = matrix.call_args.args[0]
+        assert cell["effort"] == "xhigh"

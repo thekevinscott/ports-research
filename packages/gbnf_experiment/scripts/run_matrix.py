@@ -13,7 +13,7 @@ from time import monotonic
 import click
 from botbox import ClaudeAgent
 
-from gbnf_experiment.condition_name import LABELS
+from gbnf_experiment.condition_name import LABELS, condition_name
 from gbnf_experiment.config import settings
 from gbnf_experiment.prepare_filesystem.prepare_reference_implementation import (
     prepare_reference_implementation,
@@ -30,18 +30,24 @@ MODELS = (
 )
 
 
-def cells() -> list[dict]:
+def cells(efforts: tuple[str | None, ...] = (None,)) -> list[dict]:
+    """None leaves effort to the claude CLI's default."""
     return [
-        {"source_language": source_language, **dict(zip(FLAGS, flags)), "model": model}
-        for source_language, flags, model in product(
-            SOURCE_LANGUAGES, product((False, True), repeat=len(FLAGS)), MODELS
+        {
+            "source_language": source_language,
+            **dict(zip(FLAGS, flags)),
+            "model": model,
+            "effort": effort,
+        }
+        for source_language, flags, model, effort in product(
+            SOURCE_LANGUAGES, product((False, True), repeat=len(FLAGS)), MODELS, efforts
         )
     ]
 
 
 def cell_name(cell: dict) -> str:
-    suites = [label for key, label in LABELS.items() if cell[key]]
-    return "_".join([f"source-{cell['source_language']}", *suites, f"model-{cell['model']}"])
+    """The manifest's condition name."""
+    return condition_name(**cell)
 
 
 def schedule(cells: list[dict], n: int | None):
@@ -50,11 +56,11 @@ def schedule(cells: list[dict], n: int | None):
             yield round_number, cell
 
 
-def run_cell(round_number: int, cell: dict, *, effort: str | None, api_key: str) -> dict:
+def run_cell(round_number: int, cell: dict, *, api_key: str) -> dict:
     start = monotonic()
     record = {
         "round": round_number,
-        "cell": {**cell, "effort": effort},
+        "cell": cell,
         "run_directory": None,
         "error": None,
         "exit_code": None,
@@ -62,7 +68,7 @@ def run_cell(round_number: int, cell: dict, *, effort: str | None, api_key: str)
     }
     try:
         run_directory = run_gbnf_experiment(
-            agent=ClaudeAgent(model=cell["model"], effort=effort, api_key=api_key),
+            agent=ClaudeAgent(model=cell["model"], effort=cell["effort"], api_key=api_key),
             source_language=cell["source_language"],
             **{flag: cell[flag] for flag in FLAGS},
             debug=False,
@@ -84,7 +90,7 @@ def ignore_interrupts() -> None:
 
 
 def run_matrix(
-    cells: list[dict], *, n: int | None, parallel: int, effort: str | None, api_key: str, out: Path
+    cells: list[dict], *, n: int | None, parallel: int, api_key: str, out: Path
 ) -> None:
     # Concurrent prepares of one condition collide in its shared staging directory.
     for condition in {tuple((key, cell[key]) for key in ("source_language", *FLAGS)) for cell in cells}:
@@ -99,7 +105,7 @@ def run_matrix(
                 if run is None:
                     stopping = True
                 else:
-                    in_flight.add(pool.submit(run_cell, *run, effort=effort, api_key=api_key))
+                    in_flight.add(pool.submit(run_cell, *run, api_key=api_key))
             if not in_flight:
                 return
             try:
@@ -122,14 +128,18 @@ def run_matrix(
 @click.command()
 @click.option("--n", type=click.IntRange(min=1), help="Rounds. Default: until stopped.")
 @click.option("--parallel", type=click.IntRange(min=1), default=2, show_default=True)
-@click.option("--effort", help="Passed to every ClaudeAgent. Default: the claude CLI's.")
+@click.option(
+    "--efforts",
+    callback=lambda _, __, value: tuple(value.split(",")) if value else (None,),
+    help="Comma-separated, e.g. low,xhigh. Default: the claude CLI's.",
+)
 @click.option("--models", multiple=True, type=click.Choice(MODELS))
 @click.option("--source-languages", multiple=True, type=click.Choice(SOURCE_LANGUAGES))
 @click.option("--cells", "names", multiple=True, help="Cell names, as printed per run.")
 def cli(
     n: int | None,
     parallel: int,
-    effort: str | None,
+    efforts: tuple[str | None, ...],
     models: tuple[str, ...],
     source_languages: tuple[str, ...],
     names: tuple[str, ...],
@@ -141,7 +151,7 @@ def cli(
         )
     selected = [
         cell
-        for cell in cells()
+        for cell in cells(efforts)
         if (not models or cell["model"] in models)
         and (not source_languages or cell["source_language"] in source_languages)
         and (not names or cell_name(cell) in names)
@@ -151,7 +161,7 @@ def cli(
     settings.data_directory.mkdir(parents=True, exist_ok=True)
     out = settings.data_directory / f"matrix-{datetime.now(UTC):%Y%m%dT%H%M%SZ}.jsonl"
     click.echo(f"{len(selected)} cells; writing {out}", err=True)
-    run_matrix(selected, n=n, parallel=parallel, effort=effort, api_key=api_key, out=out)
+    run_matrix(selected, n=n, parallel=parallel, api_key=api_key, out=out)
 
 
 if __name__ == "__main__":

@@ -33,10 +33,10 @@ Depends on port_codebase and botbox.
 
 ## Running the matrix
 
-`scripts/run_matrix.py` runs `run_gbnf_experiment` through the SDK over 64 cells: source language × the three test flags × four models (Opus 5.5, Sonnet 5.5, Fable 5.1, Haiku 4.5).
+`scripts/run_matrix.py` runs `run_gbnf_experiment` through the SDK over cells: source language × the 8 combinations of the three test flags × four models (Opus 5.5, Sonnet 5.5, Fable 5.1, Haiku 4.5) × each effort in `--efforts`. 64 cells per effort.
 
 ```
-uv run --env-file ../../.env python scripts/run_matrix.py --parallel 2
+uv run --env-file ../../.env python scripts/run_matrix.py --parallel 2 --efforts low,xhigh
 ```
 
 It exits before doing anything if `ANTHROPIC_API_KEY` is unset or empty. The key goes to `ClaudeAgent(api_key=)`; subscription credentials are never used.
@@ -47,4 +47,4 @@ Each finished run appends one line to `data/runs/matrix-<UTC timestamp>.jsonl`: 
 
 Ctrl-C starts no new runs and waits for the in-flight ones to finish and be recorded. Runs ignore SIGINT, as do their docker subprocesses.
 
-`--effort` applies to every model; unset, the claude CLI's default. `--models`, `--source-languages` and `--cells` (names as printed per run, e.g. `source-python_unit-tests_model-claude-haiku-4-5-20251001`) restrict the cells.
+`--efforts` is comma-separated; omitted, every cell runs at the claude CLI's default effort. `--models`, `--source-languages` and `--cells` (the manifest's condition name, as printed per run, e.g. `source-python_unit-tests_effort-low_model-claude-haiku-4-5-20251001`) restrict the cells.
