@@ -846,8 +846,9 @@ def _(
             color=alt.Color(
                 "rho:Q",
                 title="Spearman ρ",
-                scale=alt.Scale(domain=[-1, 0, 1], range=DIVERGING),
-                legend=alt.Legend(values=[-1, -0.5, 0, 0.5, 1]),
+                # Lab keeps each side on its own hue; the default hcl swings blue through pink.
+                scale=alt.Scale(domain=[-1, 0, 1], range=DIVERGING, interpolate="lab"),
+                legend=alt.Legend(values=[-1, -0.5, 0, 0.5, 1], format=".1f"),
             ),
             tooltip=[
                 alt.Tooltip("measure_a:N", title="measure"),

@@ -366,6 +366,16 @@ def test_the_spearman_heatmap_is_titled_in_prose_and_draws_every_pair():
     assert len(spec["datasets"][spec["data"]["name"]]) == 3 * 3
 
 
+def test_the_spearman_heatmap_diverges_through_grey_without_passing_through_another_hue():
+    import polars as pl
+
+    spec = definitions(*CHART_NAMES)["spearman_chart"](pl.DataFrame(V2_RUNS)).to_dict()
+    color = spec["layer"][0]["encoding"]["color"]
+    assert color["scale"]["domain"] == [-1, 0, 1]
+    assert color["scale"]["interpolate"] == "lab"
+    assert color["legend"]["format"] == ".1f"
+
+
 def test_v2_runs_carry_their_size():
     from types import SimpleNamespace
 
