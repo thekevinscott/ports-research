@@ -48,7 +48,8 @@ One row per run, one column per measure, all in the runs notebook ([analysis/not
 ### Not this cycle
 
 - LLM judge over the code itself.
-- Fidelity scale, internal-state parity script, grader validation by mutation. Catalogued in the fidelity notebook (PR #121).
+- Fidelity scale, internal-state parity script (Mistral), grader validation by mutation, post-hoc cheating judge beyond the transcript rubric above.
+- Literature only: property-based and metamorphic relations, differential symbolic execution, doc-as-spec judging, security gate. See [literature/SYNTHESIS.md](../literature/SYNTHESIS.md).
 
 ## Statistics
 
