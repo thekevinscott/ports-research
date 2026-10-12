@@ -7,6 +7,7 @@ import pytest
 from execute_test_suite.coverage_result import CoverageResult
 from execute_test_suite.run_vitest_suite import (
     ALL_TESTS_GLOB,
+    ALLOW_BUILD_FLAG,
     COVERAGE_PACKAGE,
     INTEGRATION_TEST_GLOB,
     PORT_ENTRY_FILE,
@@ -294,6 +295,18 @@ def describe_run_vitest_suite():
             assert install[install.index("--dir") + 1] == str(cwd)
             assert f"vitest@{VITEST_VERSION}" in install
             assert f"{COVERAGE_PACKAGE}@{VITEST_VERSION}" in install
+
+        def it_allow_lists_esbuilds_build_script_so_pnpm_does_not_refuse_the_install(
+            subprocess_module,
+            parse_vitest_report_function,
+            parse_coverage_summary_function,
+            test_suite_directory,
+            captured,
+        ):
+            run_vitest_suite(
+                test_suite_directory=test_suite_directory, target=TARGET, coverage=True
+            )
+            assert ALLOW_BUILD_FLAG in captured["install_argv"]
 
         def it_runs_the_scratch_installed_vitest_rather_than_dlx(
             subprocess_module,

@@ -36,9 +36,9 @@ SCRATCH_PACKAGE_JSON = '{"name": "execute-test-suite-scratch", "private": true}'
 # extends a path outside its own tree fails to transform, and otherwise each target grades
 # under whichever tsconfig happens to sit above it. These are the fields esbuild reads.
 TSCONFIG_RAW = '{"compilerOptions": {"target": "esnext", "useDefineForClassFields": true}}'
-# pnpm 11 exits 1 when a dependency's build script is ignored, and esbuild's is
-# (it comes in under vite). The provider runs fine without it.
-STRICT_BUILDS_FLAG = "--config.strict-dep-builds=false"
+# pnpm 10+ exits 1 (ERR_PNPM_IGNORED_BUILDS) when a dependency's build script is not
+# allow-listed, and esbuild has one (it comes in under vite).
+ALLOW_BUILD_FLAG = "--allow-build=esbuild"
 
 CONFIG_TEMPLATE = """export default {{
   test: {{
@@ -132,7 +132,7 @@ def run_vitest_suite(
                     str(scratch),
                     "add",
                     "--save-dev",
-                    STRICT_BUILDS_FLAG,
+                    ALLOW_BUILD_FLAG,
                     f"vitest@{VITEST_VERSION}",
                     f"{COVERAGE_PACKAGE}@{VITEST_VERSION}",
                 ],
