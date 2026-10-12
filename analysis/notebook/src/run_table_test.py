@@ -57,6 +57,8 @@ def write_run(
     completed: bool = True,
     is_error: bool = False,
     exit_code: int | None = None,
+    terminal_reason: str | None = None,
+    killed: bool = False,
 ) -> Path:
     run_dir.mkdir(parents=True)
     manifest = {
@@ -71,7 +73,12 @@ def write_run(
     if exit_code is not None:
         manifest["exit_code"] = exit_code
     (run_dir / "manifest.json").write_text(json.dumps(manifest))
-    (run_dir / "result.json").write_text(json.dumps({"is_error": is_error, "duration_ms": 560157}))
+    result = {"is_error": is_error, "duration_ms": 560157}
+    if terminal_reason is not None:
+        result["terminal_reason"] = terminal_reason
+    # A run killed with exit 137 never gets to write its result.
+    if not killed:
+        (run_dir / "result.json").write_text(json.dumps(result))
     transcript = run_dir / "transcript"
     transcript.mkdir()
     (transcript / "session.jsonl").write_text(
@@ -111,6 +118,18 @@ def describe_run_rows():
         assert row["include_source_integration_tests"] is True
         assert row["include_target_integration_tests"] is True
         assert row["exit_code"] == 0
+
+    def it_reads_the_terminal_reason_from_the_result(tmp_path):
+        run_dir = write_run(
+            tmp_path / "run", V2_CONDITION, exit_code=1, is_error=True, terminal_reason="api_error"
+        )
+        (row,) = run_rows(str(run_dir / "manifest.json"))
+        assert row["terminal_reason"] == "api_error"
+
+    def it_leaves_the_terminal_reason_null_without_a_result(tmp_path):
+        run_dir = write_run(tmp_path / "run", V2_CONDITION, exit_code=137, killed=True)
+        (row,) = run_rows(str(run_dir / "manifest.json"))
+        assert row["terminal_reason"] is None
 
     def it_leaves_the_v1_flags_null_on_a_v2_run(tmp_path):
         run_dir = write_run(tmp_path / "run", V2_CONDITION, exit_code=0)
@@ -207,3 +226,26 @@ def describe_completed_runs():
         db = DirSQL(str(tmp_path), tables=[runs_table()])
         rows = completed_runs(db, "runs", include_nonzero_exit=True)
         assert [row["run_id"] for row in rows] == ["killed", "ok"]
+
+    def it_keeps_a_killed_run_without_a_result_when_asked(tmp_path):
+        write_run(tmp_path / "ok", V2_CONDITION, exit_code=0)
+        write_run(tmp_path / "killed", V2_CONDITION, exit_code=137, killed=True)
+        db = DirSQL(str(tmp_path), tables=[runs_table()])
+        rows = completed_runs(db, "runs", include_nonzero_exit=True)
+        assert [row["run_id"] for row in rows] == ["killed", "ok"]
+
+    def it_keeps_an_api_error_run_when_asked(tmp_path):
+        write_run(tmp_path / "ok", V2_CONDITION, exit_code=0)
+        write_run(
+            tmp_path / "failed", V2_CONDITION, exit_code=1, is_error=True, terminal_reason="api_error"
+        )
+        db = DirSQL(str(tmp_path), tables=[runs_table()])
+        rows = completed_runs(db, "runs", include_nonzero_exit=True)
+        assert [row["run_id"] for row in rows] == ["failed", "ok"]
+
+    def it_still_drops_an_unfinished_v2_run_when_asked(tmp_path):
+        write_run(tmp_path / "ok", V2_CONDITION, exit_code=0)
+        write_run(tmp_path / "running", V2_CONDITION, completed=False, killed=True)
+        db = DirSQL(str(tmp_path), tables=[runs_table()])
+        rows = completed_runs(db, "runs", include_nonzero_exit=True)
+        assert [row["run_id"] for row in rows] == ["ok"]

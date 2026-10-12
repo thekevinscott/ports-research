@@ -37,15 +37,19 @@ EXCLUDE_BY_LANGUAGE = {
     "javascript": EXCLUDE,
 }
 
-def codebases_under(root, table):
+def runs_under(root, table, *, include_nonzero_exit=False):
     # A fresh DirSQL scan every run, so a run banked since the last refresh is picked up.
     db = DirSQL(str(root), tables=[table])
+    return completed_runs(db, table.name, include_nonzero_exit=include_nonzero_exit)
+
+
+def codebases_under(root, table):
     return [
         Codebase.from_run(
             row,
             exclude=EXCLUDE_BY_LANGUAGE[row["target_language"]],
             reference=REFERENCE / row["target_language"],
         )
-        for row in completed_runs(db, table.name)
+        for row in runs_under(root, table)
     ]
 
