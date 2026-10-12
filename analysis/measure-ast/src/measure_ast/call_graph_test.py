@@ -77,6 +77,22 @@ def describe_python_call_graph():
         graph = python(b"def g(x):\n    pass\n\ndef f(xs):\n    return map(g, xs)\n")
         assert adjacency(graph)["f"] == []
 
+    def it_does_not_resolve_a_method_call_on_a_receiver_bound_to_a_builtin():
+        graph = python(
+            b"class A:\n    def add(self, x):\n        pass\n\n    def get(self, x):\n        pass\n\n"
+            b"def f(registry, cache: dict[str, int]):\n    seen = set()\n    out = []\n    other = registry.list()\n"
+            b"    seen.add(1)\n    cache.get(1)\n    out.add(1)\n    {}.get(1)\n    other.add(1)\n"
+        )
+        assert adjacency(graph)["f"] == ["A.add"]
+
+    def it_does_not_resolve_a_method_call_on_an_attribute_the_class_binds_to_a_builtin():
+        graph = python(
+            b"class A:\n    def __init__(self):\n        self.seen = set()\n        self.child = B()\n\n"
+            b"    def run(self):\n        self.seen.add(1)\n        self.child.put(1)\n\n"
+            b"class B:\n    def __init__(self):\n        pass\n\n    def add(self, x):\n        pass\n\n    def put(self, x):\n        pass\n"
+        )
+        assert adjacency(graph)["A.run"] == ["B.put"]
+
 
 def describe_typescript_call_graph():
     def it_links_bare_member_and_new_calls():
@@ -111,6 +127,15 @@ def describe_typescript_call_graph():
     def it_charges_calls_in_an_arrow_callback_to_the_enclosing_function():
         graph = typescript(b"const g = (x: number) => x;\nfunction f(xs: number[]) { return xs.map(x => g(x)); }\n")
         assert adjacency(graph)["f"] == ["g"]
+
+    def it_does_not_resolve_a_method_call_on_a_receiver_bound_to_a_builtin():
+        graph = typescript(
+            b"class Graph {\n  private cache = new Map<string, number>();\n  private next: Graph;\n"
+            b"  has(x: string) { return this.cache.get(x) || this.next.has(x); }\n  get(x: string) { return x; }\n}\n"
+            b"function f(graph: Graph, names: string[], index: Set<string>) {\n"
+            b"  const seen = new Set<string>();\n  seen.get('a');\n  names.get('a');\n  index.get('a');\n  graph.has('a');\n}\n"
+        )
+        assert (adjacency(graph)["Graph.has"], adjacency(graph)["f"]) == (["Graph.has"], ["Graph.has"])
 
 
 def describe_trace():

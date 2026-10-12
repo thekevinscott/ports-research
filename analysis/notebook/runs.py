@@ -89,16 +89,37 @@ def _():
                 {**codebase.run, **{metric: getattr(codebase, metric) for metric in metrics}}
                 for codebase in codebases
             ],
-            schema_overrides={"completed_at": pl.String, "error": pl.String},
+            # Float even when every value is null, as with no V1 reference below.
+            schema_overrides={
+                "completed_at": pl.String,
+                "error": pl.String,
+                **dict.fromkeys(EMBEDDING_METRICS, pl.Float64),
+            },
         ).with_columns(
             pl.col(flags).cast(pl.Boolean),
             duration=pl.duration(milliseconds=pl.col("duration_ms")),
         )
 
-    runs = metrics_frame(codebases, METRICS, FLAGS)
-    reverse_runs = metrics_frame(
-        reverse_codebases, REVERSE_METRICS, [*FLAGS, *FORWARD_FLAGS]
-    )
+    def v1_frames():
+        return (
+            metrics_frame(codebases, METRICS, FLAGS),
+            metrics_frame(reverse_codebases, REVERSE_METRICS, [*FLAGS, *FORWARD_FLAGS]),
+        )
+
+    v1_reference_missing = False
+    try:
+        runs, reverse_runs = v1_frames()
+    except RuntimeError as error:
+        v1_reference_missing = True
+        # The V1 reference source is a cache that can be missing. Without it the V1
+        # reference-relative columns are left empty, so the V2 sections still render.
+        mo.output.append(mo.callout(mo.md(
+            f"V1 reference-relative columns (embeddings, reference diff) are empty: "
+            f"`{str(error).splitlines()[0][:300]}`"
+        ), kind="warn"))
+        for codebase in [*codebases, *reverse_codebases]:
+            codebase.reference = None
+        runs, reverse_runs = v1_frames()
 
     def behavior_columns(codebase):
         return {
@@ -317,6 +338,7 @@ def _():
         runs,
         similarity_matrix,
         spearman,
+        v1_reference_missing,
         v2_api_runs,
         v2_ast_explainers,
         v2_attempts,
@@ -400,6 +422,7 @@ def _(
     runs,
     similarity_matrix,
     spearman,
+    v1_reference_missing,
     v2_api_runs,
     v2_ast_explainers,
     v2_attempts,
@@ -895,7 +918,8 @@ def _(
             "source_language",
             "condition",
             API_LEAD,
-            pl.col("^api_.+$").exclude(API_LEAD, "api_note"),
+            # api_calls is the run's own count of model calls, not a measure-api column.
+            pl.col("^api_.+$").exclude(API_LEAD, "api_note", "api_calls"),
             "api_note",
         )
 
@@ -1310,10 +1334,19 @@ def _(
         " source languages and then within each. `gap` is the on median minus the off median."
         " `p` is the share of 10,000 shuffles of the on/off labels (seed 0) whose gap is at least"
         " as far from zero. `low` to `high` is a 95% bootstrap interval on the gap (10,000"
-        " resamples, seed 0). A gap has to be larger than `minimum_detectable_gap` for the same"
-        " shuffles to give p < 0.05 at this n. A row with p ≥ 0.05 reads as a gap too small to see"
-        " with this n, never as no effect."
+        " resamples, seed 0). `minimum_detectable_gap` is the critical value: an observed gap larger"
+        " than it gives p < 0.05 against the same shuffles at this n. A true gap of exactly that size"
+        " lands above it only about half the time, so only gaps well beyond it are reliably seen."
+        " A row with p ≥ 0.05 reads as a gap too small to see with this n, never as no effect."
     )
+
+    def multiplicity_note(tests):
+        """How many flag comparisons this section runs and how many fall below 0.05 by chance alone."""
+        return (
+            f"This section runs {tests} comparisons with a p, none corrected for the others. If no flag"
+            f" changed any measure, about {round(tests * 0.05)} of them would still give p < 0.05."
+            " Every p here is exploratory: a lead for a later test, not a confirmed effect."
+        )
     V2_NOT_MEASURED = (
         "Reference diff similarity and test pass rates are not measured on V2 runs:"
         " `measure-code-distance` takes no javascript target and `execute-test-suite` finds no V2"
@@ -1334,17 +1367,16 @@ def _(
             mo.ui.table(rounded(v2_summary(v2_runs, v2_attempts)), freeze_columns_left=cell_columns),
             mo.md("### Failures and tokens per successful run"),
             mo.ui.table(rounded(v2_failures(v2_attempts)), freeze_columns_left=cell_columns),
-            mo.md("### Per-flag comparison"),
-            mo.md(FLAG_READING),
         ]
-        for measure in V2_LEADS:
+        comparisons = {measure: flag_comparison(v2_runs, measure) for measure in V2_LEADS}
+        tests = sum(table["p"].is_not_null().sum() for table in comparisons.values())
+        parts.extend([mo.md("### Per-flag comparison"), mo.md(FLAG_READING), mo.md(multiplicity_note(tests))])
+        for measure, table in comparisons.items():
             parts.extend(
                 [
                     mo.md(f"#### {lead_title(measure)}"),
                     mo.ui.table(
-                        flag_comparison(v2_runs, measure).with_columns(
-                            pl.col(pl.Float64).exclude("p").round(2), pl.col("p").round(4)
-                        ),
+                        table.with_columns(pl.col(pl.Float64).exclude("p").round(2), pl.col("p").round(4)),
                         freeze_columns_left=["flag", "source_language"],
                     ),
                 ]
@@ -1934,9 +1966,13 @@ def _(
                     freeze_columns_left=["direction"],
                 ),
                 pair_chart(),
+                # The port maps place each port by its similarity to the V1 reference.
                 *(
                     build(source_language)
-                    for build in (focused_chart, anchor_chart, mds_chart, pair_matrix_chart)
+                    for build in (
+                        () if v1_reference_missing
+                        else (focused_chart, anchor_chart, mds_chart, pair_matrix_chart)
+                    )
                     for source_language in ("python", "typescript")
                 ),
             ]
@@ -2494,8 +2530,15 @@ def _(codebases, mo):
     from export_embedding_pairs import pair_chart as embedding_pair_chart
     from src.embedding_pairs import compare_corpus
 
-    embedding_pair_report = compare_corpus(codebases)
+    skipped = []
+    try:
+        embedding_pair_report = compare_corpus(codebases)
+    except (TypeError, ValueError, OSError) as error:
+        # The V1 reference source is missing (see the warning at the top); no pairs.
+        skipped = [mo.callout(mo.md(f"Embedding pairs skipped: `{str(error)[:300]}`"), kind="warn")]
+        embedding_pair_report = {"comparisons": []}
     mo.vstack([
+        *skipped,
         mo.md("### Every port to every port\nAll pairs within each direction, across test conditions. Lower distance means closer. Pairs share ports and are not independent observations."),
         *[embedding_pair_chart(embedding_pair_report["comparisons"], source, target)
           for source, target in (("python", "typescript"), ("typescript", "python"))],

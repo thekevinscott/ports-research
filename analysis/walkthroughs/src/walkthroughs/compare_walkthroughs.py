@@ -32,6 +32,7 @@ def compare_walkthroughs(reference: dict, port: dict, similarity: dict) -> dict:
     return {
         "similarity": similarity["name"],
         "threshold": similarity["threshold"],
+        "embeddings": similarity["embeddings"],
         **averages("happy_path"),
         "error_paths": averages("error_paths"),
         "invariants": averages("invariants"),

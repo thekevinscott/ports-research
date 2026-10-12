@@ -7,7 +7,7 @@ from click.testing import CliRunner
 
 from walkthroughs.cli import cli
 
-SIMILARITY = {"name": "fake", "threshold": 0.8, "score": None}
+SIMILARITY = {"name": "fake", "threshold": 0.8, "score": None, "embeddings": None}
 
 
 @pytest.fixture
@@ -25,6 +25,12 @@ def pick_similarity():
 @pytest.fixture
 def compare_walkthroughs():
     with patch("walkthroughs.cli.compare_walkthroughs", return_value={"mean_coverage": 0.5}) as m:
+        yield m
+
+
+@pytest.fixture(autouse=True)
+def sweep_thresholds():
+    with patch("walkthroughs.cli.sweep_thresholds", return_value=[{"threshold": 0.7}]) as m:
         yield m
 
 
@@ -51,14 +57,15 @@ def describe_write():
 
 
 def describe_compare():
-    def it_compares_the_two_walkthroughs_and_prints_json(tmp_path, pick_similarity, compare_walkthroughs):
+    def it_compares_the_two_walkthroughs_and_prints_json_with_the_threshold_sweep(tmp_path, pick_similarity, compare_walkthroughs, sweep_thresholds):
         (tmp_path / "r.json").write_text(json.dumps({"walkthrough": {"entry_points": ["r"]}}))
         (tmp_path / "p.json").write_text(json.dumps({"walkthrough": {"entry_points": ["p"]}}))
         result = invoke("compare", "--reference", tmp_path / "r.json", "--port", tmp_path / "p.json", "--embeddings-url", "http://host/v1")
         assert result.exit_code == 0, result.output
         pick_similarity.assert_called_once_with(url="http://host/v1", no_embeddings=False, threshold=None)
         compare_walkthroughs.assert_called_once_with({"entry_points": ["r"]}, {"entry_points": ["p"]}, SIMILARITY)
-        assert json.loads(result.output) == {"reference": str(tmp_path / "r.json"), "port": str(tmp_path / "p.json"), "mean_coverage": 0.5}
+        sweep_thresholds.assert_called_once_with({"entry_points": ["r"]}, {"entry_points": ["p"]}, SIMILARITY)
+        assert json.loads(result.output) == {"reference": str(tmp_path / "r.json"), "port": str(tmp_path / "p.json"), "mean_coverage": 0.5, "sweep": [{"threshold": 0.7}]}
 
     def it_passes_the_fallback_and_threshold(tmp_path, pick_similarity, compare_walkthroughs):
         for name in ("r.json", "p.json"):

@@ -6,6 +6,7 @@ import click
 from walkthroughs.compare_walkthroughs import compare_walkthroughs
 from walkthroughs.pick_similarity import pick_similarity
 from walkthroughs.reference_lines import reference_lines
+from walkthroughs.sweep_thresholds import sweep_thresholds
 from walkthroughs.write_walkthrough import write_walkthrough
 
 DIRECTORY = click.Path(exists=True, file_okay=False, path_type=Path, resolve_path=True)
@@ -51,7 +52,8 @@ def compare(reference: Path, port: Path, embeddings_url: str | None, no_embeddin
     similarity = similarity_or_fail(embeddings_url, no_embeddings, threshold)
     walkthroughs = [json.loads(path.read_text())["walkthrough"] for path in (reference, port)]
     compared = compare_walkthroughs(*walkthroughs, similarity)
-    click.echo(json.dumps({"reference": str(reference), "port": str(port), **compared}, indent=2))
+    swept = sweep_thresholds(*walkthroughs, similarity)
+    click.echo(json.dumps({"reference": str(reference), "port": str(port), **compared, "sweep": swept}, indent=2))
 
 
 @cli.command("reference-lines")
