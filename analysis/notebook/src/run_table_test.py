@@ -5,6 +5,7 @@ from dirsql._dirsql import DirSQL
 
 from src.run_table import (
     completed_runs,
+    is_v2,
     reverse_run_rows,
     reverse_runs_table,
     run_rows,
@@ -29,6 +30,16 @@ REVERSE_CONDITION = {
     "effort": "high",
     "model": "claude-opus-5",
 }
+V2_CONDITION = {
+    "name": "source-python_source-integration-tests_target-integration-tests_effort-medium_model-claude-opus-5-5",
+    "source_language": "python",
+    "target_language": "javascript",
+    "include_unit_tests": False,
+    "include_source_integration_tests": True,
+    "include_target_integration_tests": True,
+    "effort": "medium",
+    "model": "claude-opus-5-5",
+}
 FORWARD = {"run_id": "20260909T004354Z_a47a3057", "condition": FORWARD_CONDITION}
 USAGE = {
     "input_tokens": 100,
@@ -45,6 +56,7 @@ def write_run(
     forward: dict | None = None,
     completed: bool = True,
     is_error: bool = False,
+    exit_code: int | None = None,
 ) -> Path:
     run_dir.mkdir(parents=True)
     manifest = {
@@ -56,6 +68,8 @@ def write_run(
         manifest["completed_at"] = "2026-09-10T04:50:25Z"
     if forward is not None:
         manifest["forward"] = forward
+    if exit_code is not None:
+        manifest["exit_code"] = exit_code
     (run_dir / "manifest.json").write_text(json.dumps(manifest))
     (run_dir / "result.json").write_text(json.dumps({"is_error": is_error, "duration_ms": 560157}))
     transcript = run_dir / "transcript"
@@ -88,6 +102,35 @@ def describe_run_rows():
         assert row["duration_ms"] == 560157
         assert row["total_tokens"] == 260
         assert row["api_calls"] == 2
+
+    def it_reads_the_three_v2_flags_and_the_exit_code(tmp_path):
+        run_dir = write_run(tmp_path / "run", V2_CONDITION, exit_code=0)
+        (row,) = run_rows(str(run_dir / "manifest.json"))
+        assert row["target_language"] == "javascript"
+        assert row["include_unit_tests"] is False
+        assert row["include_source_integration_tests"] is True
+        assert row["include_target_integration_tests"] is True
+        assert row["exit_code"] == 0
+
+    def it_leaves_the_v1_flags_null_on_a_v2_run(tmp_path):
+        run_dir = write_run(tmp_path / "run", V2_CONDITION, exit_code=0)
+        (row,) = run_rows(str(run_dir / "manifest.json"))
+        assert row["include_python_tests"] is None
+        assert row["include_typescript_tests"] is None
+
+    def it_leaves_the_v2_flags_and_the_exit_code_null_on_a_v1_run(tmp_path):
+        run_dir = write_run(tmp_path / "run", FORWARD_CONDITION)
+        (row,) = run_rows(str(run_dir / "manifest.json"))
+        assert row["include_unit_tests"] is None
+        assert row["include_source_integration_tests"] is None
+        assert row["include_target_integration_tests"] is None
+        assert row["exit_code"] is None
+
+    def it_tells_a_v2_run_from_a_v1_run(tmp_path):
+        v1 = write_run(tmp_path / "v1", FORWARD_CONDITION)
+        v2 = write_run(tmp_path / "v2", V2_CONDITION, exit_code=0)
+        assert not is_v2(run_rows(str(v1 / "manifest.json"))[0])
+        assert is_v2(run_rows(str(v2 / "manifest.json"))[0])
 
     def it_carries_no_forward_columns(tmp_path):
         run_dir = write_run(tmp_path / "run", FORWARD_CONDITION)
@@ -145,3 +188,22 @@ def describe_completed_runs():
         write_run(tmp_path / "f2" / "r2", REVERSE_CONDITION, forward=FORWARD)
         later = DirSQL(str(tmp_path), tables=[reverse_runs_table()])
         assert [row["run_id"] for row in completed_runs(later, "reverse_runs")] == ["r1", "r2"]
+
+    def it_keeps_v1_and_v2_runs_side_by_side(tmp_path):
+        write_run(tmp_path / "v1", FORWARD_CONDITION)
+        write_run(tmp_path / "v2", V2_CONDITION, exit_code=0)
+        db = DirSQL(str(tmp_path), tables=[runs_table()])
+        assert [row["run_id"] for row in completed_runs(db, "runs")] == ["v1", "v2"]
+
+    def it_drops_a_v2_run_that_exited_nonzero(tmp_path):
+        write_run(tmp_path / "ok", V2_CONDITION, exit_code=0)
+        write_run(tmp_path / "killed", V2_CONDITION, exit_code=137)
+        db = DirSQL(str(tmp_path), tables=[runs_table()])
+        assert [row["run_id"] for row in completed_runs(db, "runs")] == ["ok"]
+
+    def it_keeps_a_nonzero_exit_when_asked(tmp_path):
+        write_run(tmp_path / "ok", V2_CONDITION, exit_code=0)
+        write_run(tmp_path / "killed", V2_CONDITION, exit_code=137)
+        db = DirSQL(str(tmp_path), tables=[runs_table()])
+        rows = completed_runs(db, "runs", include_nonzero_exit=True)
+        assert [row["run_id"] for row in rows] == ["killed", "ok"]
