@@ -22,17 +22,18 @@ def _():
     )
     from src.port_pairs import within_cell, within_direction_similarity
     from src.rebuilt_layout import LAYOUT_LABELS, LAYOUT_RULE, layout_flag
-    from src.run_table import is_v2, reverse_runs_table, runs_table
+    from src.run_table import V2_FLAGS, is_v2, reverse_runs_table, runs_table
 
 
     from src.corpus import (
         DATA, REVERSE, REFERENCE, EXCLUDE_BY_LANGUAGE, codebases_under,
     )
 
+    all_codebases = codebases_under(DATA, runs_table())
     # The sections below measure V1 runs: V2 runs carry other flags and another target name.
-    codebases = [
-        codebase for codebase in codebases_under(DATA, runs_table()) if not is_v2(codebase.run)
-    ]
+    codebases = [codebase for codebase in all_codebases if not is_v2(codebase.run)]
+    # The held-out behavior section measures V2 runs only.
+    v2_codebases = [codebase for codebase in all_codebases if is_v2(codebase.run)]
     reverse_codebases = codebases_under(REVERSE, reverse_runs_table())
 
     FLAGS = ["include_python_tests", "include_typescript_tests", "is_error"]
@@ -105,6 +106,22 @@ def _():
     reverse_runs = metrics_frame(
         reverse_codebases, REVERSE_METRICS, [*FLAGS, *FORWARD_FLAGS]
     )
+
+    def behavior_columns(codebase):
+        return {
+            "behavior_agreement_pct": codebase.behavior_agreement_pct,
+            **{
+                f"reference_{reference}_port_{port}": count
+                for reference, ports in codebase.behavior_confusion.items()
+                for port, count in ports.items()
+            },
+            "behavior_note": codebase.behavior_note,
+        }
+
+    v2_runs = pl.DataFrame(
+        [{**codebase.run, **behavior_columns(codebase)} for codebase in v2_codebases],
+        schema_overrides={"completed_at": pl.String, "error": pl.String, "behavior_note": pl.String},
+    )
     port_pairs = within_direction_similarity(codebases)
     cell_pairs = within_cell(port_pairs)
     return (
@@ -120,6 +137,7 @@ def _():
         REFERENCE,
         REFERENCE_ID,
         TEST_METRICS,
+        V2_FLAGS,
         alt,
         cell_pairs,
         focused_layout,
@@ -134,6 +152,7 @@ def _():
         ring_points,
         runs,
         similarity_matrix,
+        v2_runs,
     )
 
 
@@ -194,6 +213,7 @@ def _(
     PERFORMANCE_METRICS,
     REFERENCE_ID,
     TEST_METRICS,
+    V2_FLAGS,
     alt,
     cell_pairs,
     focused_layout,
@@ -209,6 +229,7 @@ def _(
     ring_points,
     runs,
     similarity_matrix,
+    v2_runs,
 ):
     CONDITION_FLAGS = ["include_python_tests", "include_typescript_tests"]
 
@@ -537,6 +558,123 @@ def _(
         # shim_chart draws SHIM_COLUMNS before and after, so the section leaves them to it.
         others = [metric for metric in metrics if metric not in (lead, *SHIM_COLUMNS)]
         return mo.vstack([build([lead]), mo.accordion({LEAD_COLUMNS[lead]: build(others)})])
+
+    # V2 conditions name which reference suites sat in the sandbox: unit is the source
+    # language's unit suite, source and target the integration suites in each language.
+    V2_CONDITIONS = [
+        ("none", False, False, False),
+        ("unit", True, False, False),
+        ("source", False, True, False),
+        ("target", False, False, True),
+        ("unit + source", True, True, False),
+        ("unit + target", True, False, True),
+        ("source + target", False, True, True),
+        ("all", True, True, True),
+    ]
+    BEHAVIOR_LEAD = "behavior_agreement_pct"
+    BEHAVIOR_PANEL_WIDTH = 320
+    BEHAVIOR_SOURCES = ["python", "javascript"]
+
+    def with_v2_conditions(frame):
+        return pl.concat(
+            frame.filter(
+                *(pl.col(flag).cast(pl.Boolean) == value for flag, value in zip(V2_FLAGS, values))
+            ).with_columns(pl.lit(label).alias("condition"))
+            for label, *values in V2_CONDITIONS
+        )
+
+    def behavior_title(metric):
+        if metric == BEHAVIOR_LEAD:
+            return "Held-out behavior agreement with the reference (%)"
+        _, reference_outcome, _, port_outcome = metric.split("_")
+        verbs = {"accept": "accepts", "reject": "rejects", "error": "errors on", "crash": "crashes on"}
+        return f"Pairs the reference {verbs[reference_outcome]} and the port {verbs[port_outcome]}"
+
+    def behavior_chart(frame, metric=BEHAVIOR_LEAD):
+        labels = [label for label, *_ in V2_CONDITIONS]
+        labelled = with_v2_conditions(frame)
+        centre = BEHAVIOR_PANEL_WIDTH / len(labels) * (1 - BAND_PADDING) / 2
+        x = alt.X(
+            "condition:N",
+            sort=labels,
+            scale=alt.Scale(
+                domain=labels, paddingInner=BAND_PADDING, paddingOuter=BAND_PADDING / 2
+            ),
+            title=TEST_AXIS_TITLE,
+        )
+
+        def panel(source_language):
+            by_source = labelled.filter(pl.col("source_language") == source_language)
+            rows = fan_out(by_source.select("condition", pl.col(metric).cast(pl.Float64).alias("value")))
+            base = alt.Chart(rows)
+            # Agreement is a percentage, so every panel shares 0 to 100; counts start at zero.
+            scale = alt.Scale(domain=[0, 100]) if metric == BEHAVIOR_LEAD else alt.Scale(zero=True)
+            median = median_tick(base, x=x, y=alt.Y("median(value):Q", title=None, scale=scale))
+            points = base.mark_point(
+                filled=True, size=96, fillOpacity=0.5, stroke="#4c78a8", strokeWidth=2, strokeOpacity=1
+            ).encode(x=x, xOffset=dot_offset(rows, centre), y=alt.Y("value:Q", title=None, scale=scale))
+            target_language = by_source["target_language"][0]
+            return alt.layer(median, points).properties(
+                width=BEHAVIOR_PANEL_WIDTH,
+                height=140,
+                title=panel_title(f"{source_language} → {target_language}"),
+            )
+
+        present = set(labelled["source_language"])
+        return alt.concat(
+            *(panel(source) for source in BEHAVIOR_SOURCES if source in present), columns=2
+        ).properties(title=alt.TitleParams(behavior_title(metric), anchor="start"))
+
+    def behavior_runs(frame):
+        return with_v2_conditions(frame).select(
+            "run_id",
+            "source_language",
+            "condition",
+            BEHAVIOR_LEAD,
+            pl.col("^reference_.+_port_.+$"),
+            "behavior_note",
+        )
+
+    def behavior_report():
+        if v2_runs.height == 0:
+            return mo.md("No completed V2 runs.")
+        labelled = behavior_runs(v2_runs)
+        labels = [label for label, *_ in V2_CONDITIONS]
+        summary_table = (
+            labelled.group_by("source_language", "condition")
+            .agg(
+                pl.len().alias("n"),
+                pl.col(BEHAVIOR_LEAD).min().alias(f"min_{BEHAVIOR_LEAD}"),
+                pl.col(BEHAVIOR_LEAD).median().alias(f"median_{BEHAVIOR_LEAD}"),
+                pl.col(BEHAVIOR_LEAD).max().alias(f"max_{BEHAVIOR_LEAD}"),
+            )
+            .sort(
+                pl.col("source_language").cast(pl.Enum(BEHAVIOR_SOURCES)),
+                pl.col("condition").cast(pl.Enum(labels)),
+            )
+            .with_columns(pl.col(pl.Float64).round(2))
+        )
+        confusion = [column for column in labelled.columns if column.startswith("reference_")]
+        return mo.vstack(
+            [
+                mo.ui.table(summary_table, freeze_columns_left=["source_language", "condition"]),
+                behavior_chart(v2_runs),
+                mo.accordion(
+                    {
+                        "Other behavior columns": mo.vstack(
+                            [behavior_chart(v2_runs, column) for column in confusion]
+                        )
+                    }
+                ),
+                mo.accordion(
+                    {
+                        f"Runs (n={labelled.height})": mo.ui.table(
+                            labelled.with_columns(pl.col(pl.Float64).round(2))
+                        )
+                    }
+                ),
+            ]
+        )
 
     PAIR_SERIES = "port vs port"
     REFERENCE_SERIES = "port vs reference"
@@ -1572,7 +1710,7 @@ def _(
                 )
         return mo.vstack(parts)
 
-    return pair_report, report, reverse_report
+    return behavior_report, pair_report, report, reverse_report
 
 
 @app.cell(hide_code=True)
@@ -2015,6 +2153,38 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(reverse_report):
     reverse_report("embeddings")
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.vstack(
+        [
+            mo.md("## Held-out behavior"),
+            mo.accordion(
+                {
+                    "Glossary": mo.md("""
+                    Held out: the measure-behavior corpus, 100 generated grammars and 799 inputs, never mounted into any agent container. Not either test suite.
+
+                    measure-behavior loads the port, runs every grammar and input pair through it, one process per pair, and records `accept`, `reject`, `error` or `crash`. The hand-written reference in the same language ran the same pairs. A javascript port loads through the typescript driver from `src/index.ts`; a port without one crashes on every pair.
+
+                    - `behavior_agreement_pct`: percent of pairs where the port's outcome matches the reference's.
+                    - `reference_<a>_port_<b>`: pairs where the reference's outcome is `a` and the port's is `b`.
+                    - `behavior_note`: the first error, when every pair crashed.
+                    """),
+                    "How to read": mo.md("""
+                    V2 runs only. The x axis is test inclusion: `unit` is the source language's unit suite, `source` and `target` the integration suites in the source and target language. Each dot is a run; the tick is the condition's median.
+                    """),
+                }
+            ),
+        ]
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(behavior_report):
+    behavior_report()
     return
 
 

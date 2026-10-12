@@ -1,11 +1,12 @@
 import json
+import shutil
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
 
 import src.Codebase as codebase_module
-from src.Codebase import Codebase
+from src.Codebase import Codebase, content_hash
 
 EXCLUDE = ["__pycache__", "*_test.py"]
 SOURCE = "x = 1\n\n# note\ny = 2\n"
@@ -148,6 +149,7 @@ def uncached(monkeypatch):
         codebase_module.test_runs_cache,
         codebase_module.exercise_api_cache,
         codebase_module.reference_diff_cache,
+        codebase_module.behavior_cache,
     ):
         monkeypatch.setattr(store, "read", False)
         monkeypatch.setattr(store, "write", False)
@@ -942,3 +944,238 @@ def describe_performance_ladder():
         assert str(codebase_module.exercise_api_cache.path("ladder", "abc")).endswith(
             "codebases/exercise-api/ladder/abc.pkl"
         )
+
+
+OUTCOMES = ["accept", "reject", "error", "crash"]
+REFERENCE_OUTCOMES = ["accept", "reject", "error", "accept"]
+
+
+def read_jsonl(path: str) -> list[dict]:
+    return [json.loads(line) for line in Path(path).read_text().splitlines()]
+
+
+def outcome_lines(outcomes: list[str], error: str | None = None) -> str:
+    return "".join(
+        json.dumps({"grammar": "g0000", "input": i, "outcome": outcome, "error": error}) + "\n"
+        for i, outcome in enumerate(outcomes)
+    )
+
+
+def respond_to_measure_behavior(port_outcomes: list[str], error: str | None = None):
+    def respond(argv, **kwargs):
+        out = Path(argv[argv.index("--out") + 1])
+        if "compare" in argv:
+            reference = read_jsonl(argv[argv.index("--reference") + 1])
+            port = read_jsonl(argv[argv.index("--port") + 1])
+            confusion = {a: {b: 0 for b in OUTCOMES} for a in OUTCOMES}
+            for r, p in zip(reference, port):
+                confusion[r["outcome"]][p["outcome"]] += 1
+            agreements = sum(confusion[o][o] for o in OUTCOMES)
+            report = {
+                "pairs": len(reference),
+                "agreements": agreements,
+                "agreement_rate": agreements / len(reference),
+                "confusion": confusion,
+            }
+            out.write_text(json.dumps(report))
+        else:
+            out.write_text(outcome_lines(port_outcomes, error))
+        return Mock(returncode=0, stdout="", stderr="")
+
+    return respond
+
+
+def v2_run(tmp_path: Path, name: str, target: str) -> dict:
+    run_dir = tmp_path / name
+    (run_dir / "ported_implementation").mkdir(parents=True)
+    return {
+        "run_id": name,
+        "run_dir": str(run_dir),
+        "source_language": "javascript" if target == "python" else "python",
+        "target_language": target,
+    }
+
+
+@pytest.fixture
+def behavior_corpus(monkeypatch, tmp_path):
+    corpus = tmp_path / "corpus"
+    corpus.mkdir()
+    for driver in ("python", "typescript"):
+        (corpus / f"reference-{driver}.jsonl").write_text(outcome_lines(REFERENCE_OUTCOMES))
+    monkeypatch.setattr(codebase_module, "BEHAVIOR_CORPUS", corpus)
+    return corpus
+
+
+@pytest.fixture
+def python_port(tmp_path):
+    run = v2_run(tmp_path, "20261012T000000Z_py000001", "python")
+    package = Path(run["run_dir"]) / "ported_implementation" / "gbnf"
+    package.mkdir()
+    (package / "__init__.py").write_text("GBNF = None\n")
+    return run
+
+
+@pytest.fixture
+def javascript_port(tmp_path):
+    run = v2_run(tmp_path, "20261012T000000Z_js000001", "javascript")
+    src = Path(run["run_dir"]) / "ported_implementation" / "src"
+    src.mkdir()
+    (src / "index.ts").write_text("export default {};\n")
+    return run
+
+
+@pytest.fixture
+def behavior_process(uncached, behavior_corpus):
+    with patch("src.Codebase.subprocess", autospec=True) as m:
+        m.run.side_effect = respond_to_measure_behavior(["accept", "reject", "error", "reject"])
+        yield m
+
+
+@pytest.fixture
+def behavior_cached(monkeypatch, tmp_path):
+    monkeypatch.setattr(
+        codebase_module.behavior_cache,
+        "path",
+        lambda contents, **kwargs: tmp_path / "behavior" / f"{contents}.pkl",
+    )
+
+
+def measure_behavior_argv(process, command: str) -> list[str]:
+    for call in process.run.call_args_list:
+        argv = call.args[0]
+        if argv[argv.index("measure-behavior") + 1] == command:
+            return argv[argv.index("measure-behavior") :]
+    raise AssertionError(f"measure-behavior {command} never ran")
+
+
+def describe_behavior():
+    def it_reports_agreement_with_the_reference_as_a_percentage(python_port, behavior_process):
+        assert Codebase.from_run(python_port).behavior_agreement_pct == 75.0
+
+    def it_reports_the_confusion_counts_by_reference_and_port_outcome(
+        python_port, behavior_process
+    ):
+        confusion = Codebase.from_run(python_port).behavior_confusion
+        assert confusion["accept"] == {"accept": 1, "reject": 1, "error": 0, "crash": 0}
+        assert confusion["error"]["error"] == 1
+
+    def it_runs_a_python_port_against_the_held_out_corpus_with_the_python_driver(
+        python_port, behavior_process, behavior_corpus
+    ):
+        Codebase.from_run(python_port).behavior_agreement_pct
+        argv = measure_behavior_argv(behavior_process, "run")
+        assert argv[:6] == [
+            "measure-behavior",
+            "run",
+            "--corpus",
+            str(behavior_corpus),
+            "--implementation",
+            str(Path(python_port["run_dir"]) / "ported_implementation"),
+        ]
+        assert argv[argv.index("--language") + 1] == "python"
+
+    def it_runs_a_javascript_port_that_ships_src_index_ts_with_the_typescript_driver(
+        javascript_port, behavior_process
+    ):
+        Codebase.from_run(javascript_port).behavior_agreement_pct
+        argv = measure_behavior_argv(behavior_process, "run")
+        assert argv[argv.index("--language") + 1] == "typescript"
+
+    def it_compares_the_port_with_the_reference_outcomes_of_its_driver(
+        javascript_port, behavior_process, behavior_corpus
+    ):
+        Codebase.from_run(javascript_port).behavior_agreement_pct
+        argv = measure_behavior_argv(behavior_process, "compare")
+        assert argv[argv.index("--reference") + 1] == str(
+            behavior_corpus / "reference-typescript.jsonl"
+        )
+
+    def it_runs_measure_behavior_from_its_own_package(python_port, behavior_process):
+        Codebase.from_run(python_port).behavior_agreement_pct
+        argv = behavior_process.run.call_args.args[0]
+        assert argv[:4] == ["uv", "run", "--directory", str(codebase_module.MEASURE_BEHAVIOR_DIR)]
+
+    def it_gives_a_javascript_port_without_src_index_ts_zero_agreement_and_a_note(
+        tmp_path, behavior_process
+    ):
+        run = v2_run(tmp_path, "20261012T000000Z_js000002", "javascript")
+        (Path(run["run_dir"]) / "ported_implementation" / "index.js").write_text("")
+        codebase = Codebase.from_run(run)
+        assert codebase.behavior_agreement_pct == 0.0
+        assert codebase.behavior_confusion["accept"]["crash"] == 2
+        assert codebase.behavior_note == "every pair crashed: no src/index.ts"
+        assert [call.args[0][5] for call in behavior_process.run.call_args_list] == ["compare"]
+
+    def it_notes_the_first_error_when_every_pair_crashed(python_port, behavior_process):
+        behavior_process.run.side_effect = respond_to_measure_behavior(
+            ["crash"] * 4, "ModuleNotFoundError: No module named 'gbnf'"
+        )
+        codebase = Codebase.from_run(python_port)
+        assert codebase.behavior_agreement_pct == 0.0
+        assert codebase.behavior_note == (
+            "every pair crashed: ModuleNotFoundError: No module named 'gbnf'"
+        )
+
+    def it_has_no_note_when_a_pair_ran(python_port, behavior_process):
+        assert Codebase.from_run(python_port).behavior_note is None
+
+    def it_runs_measure_behavior_once_for_every_column(python_port, behavior_process):
+        codebase = Codebase.from_run(python_port)
+        codebase.behavior_agreement_pct
+        codebase.behavior_confusion
+        codebase.behavior_note
+        assert behavior_process.run.call_count == 2
+
+    def it_raises_when_measure_behavior_fails(python_port, behavior_process):
+        behavior_process.run.side_effect = None
+        behavior_process.run.return_value = Mock(returncode=1, stdout="", stderr="boom")
+        with pytest.raises(RuntimeError, match="boom"):
+            Codebase.from_run(python_port).behavior_agreement_pct
+
+    def it_serves_a_port_with_the_same_contents_from_the_cache(
+        tmp_path, python_port, behavior_corpus, behavior_cached
+    ):
+        twin = v2_run(tmp_path, "20261012T000000Z_py000002", "python")
+        shutil.copytree(
+            Path(python_port["run_dir"]) / "ported_implementation",
+            Path(twin["run_dir"]) / "ported_implementation",
+            dirs_exist_ok=True,
+        )
+        with patch("src.Codebase.subprocess", autospec=True) as m:
+            m.run.side_effect = respond_to_measure_behavior(["accept", "reject", "error", "reject"])
+            first = Codebase.from_run(python_port).behavior_agreement_pct
+            second = Codebase.from_run(twin).behavior_agreement_pct
+        assert (first, second) == (75.0, 75.0)
+        assert m.run.call_count == 2
+
+
+def describe_content_hash():
+    def it_matches_for_two_ports_with_the_same_files(tmp_path):
+        make_tree(tmp_path / "a")
+        make_tree(tmp_path / "b")
+        assert content_hash(tmp_path / "a") == content_hash(tmp_path / "b")
+
+    def it_changes_when_a_file_changes(tmp_path):
+        make_tree(tmp_path / "a")
+        before = content_hash(tmp_path / "a")
+        (tmp_path / "a" / "pkg" / "a.py").write_text("x = 2\n")
+        assert content_hash(tmp_path / "a") != before
+
+    def it_changes_when_a_file_moves(tmp_path):
+        make_tree(tmp_path / "a")
+        before = content_hash(tmp_path / "a")
+        (tmp_path / "a" / "pkg" / "a.py").rename(tmp_path / "a" / "pkg" / "b.py")
+        assert content_hash(tmp_path / "a") != before
+
+    def it_ignores_installed_dependencies_caches_and_dot_directories(tmp_path):
+        make_tree(tmp_path / "a")
+        before = content_hash(tmp_path / "a")
+        for directory in ("node_modules/x", ".vite", "pkg/__pycache__"):
+            (tmp_path / "a" / directory).mkdir(parents=True, exist_ok=True)
+            (tmp_path / "a" / directory / "f").write_text("changed\n")
+        assert content_hash(tmp_path / "a") == before
+
+    def it_does_not_follow_a_symlink_back_into_the_port(tmp_path):
+        make_tree(tmp_path / "a")
+        (tmp_path / "a" / "pkg" / "loop").symlink_to(tmp_path / "a")
+        assert len(content_hash(tmp_path / "a")) == 64

@@ -1,5 +1,6 @@
 import json
 import math
+import os
 import statistics
 import subprocess
 from datetime import timedelta
@@ -8,6 +9,7 @@ from hashlib import sha256
 from functools import cached_property, lru_cache
 from itertools import chain
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import polars as pl
 from cachetta import Cachetta
@@ -22,6 +24,13 @@ MEASURE_AST_DIR = ANALYSIS / "measure-ast"
 MEASURE_EMBEDDING_DIR = ANALYSIS / "measure-embedding"
 ROUND_TRIP_DIR = ANALYSIS / "round-trip-experiment"
 EXERCISE_API_DIR = ANALYSIS / "exercise-api"
+MEASURE_BEHAVIOR_DIR = ANALYSIS / "measure-behavior"
+# The held-out corpus: generated grammars and inputs no agent container ever mounts.
+BEHAVIOR_CORPUS = MEASURE_BEHAVIOR_DIR / "corpus"
+# measure-behavior loads a javascript port through its typescript driver.
+BEHAVIOR_DRIVERS = {"python": "python", "javascript": "typescript"}
+# Installed dependencies and caches are not the port's own code.
+CONTENT_SKIP = {"node_modules", "__pycache__"}
 CASES = {
     "generated": EXERCISE_API_DIR / "cases" / "generated-seed0-500.jsonl",
     "fixtures": EXERCISE_API_DIR / "cases" / "fixtures.jsonl",
@@ -48,6 +57,8 @@ reference_diff_cache = disk_cache / (
         f"codebases/reference-diff/{sha256(f'{reference}\n{target}'.encode()).hexdigest()}.pkl"
     )
 )
+
+behavior_cache = disk_cache / (lambda contents, **kwargs: f"codebases/behavior/{contents}.pkl")
 
 
 def exclude_args(exclude: list[str]) -> list[str]:
@@ -125,6 +136,73 @@ def run_git_diff(reference: Path, target: Path, *, language: str, exclude: list[
         str(target),
         *exclude,
     )
+
+
+def content_hash(path: Path) -> str:
+    digest = sha256()
+    for directory, dirnames, filenames in os.walk(path):
+        dirnames[:] = sorted(
+            name for name in dirnames if name not in CONTENT_SKIP and not name.startswith(".")
+        )
+        for name in sorted(filenames):
+            file = Path(directory) / name
+            if file.is_symlink():
+                continue
+            digest.update(f"{file.relative_to(path)}\n".encode())
+            digest.update(sha256(file.read_bytes()).digest())
+    return digest.hexdigest()
+
+
+def run_measure_behavior_cli(*argv: str) -> None:
+    process = subprocess.run(
+        ["uv", "run", "--directory", str(MEASURE_BEHAVIOR_DIR), "measure-behavior", *argv],
+        capture_output=True,
+        text=True,
+    )
+    if process.returncode != 0:
+        raise RuntimeError(
+            f"measure-behavior {' '.join(argv)} failed (exit {process.returncode}): {process.stderr}"
+        )
+
+
+@behavior_cache
+def run_measure_behavior(contents: str, *, implementation: Path, language: str) -> dict:
+    driver = BEHAVIOR_DRIVERS[language]
+    reference = BEHAVIOR_CORPUS / f"reference-{driver}.jsonl"
+    with TemporaryDirectory() as scratch:
+        outcomes = Path(scratch) / "outcomes.jsonl"
+        report = Path(scratch) / "report.json"
+        if driver == "typescript" and not (implementation / "src" / "index.ts").is_file():
+            # The typescript driver has no module to load: every pair crashes, as a load failure does.
+            outcomes.write_text(
+                "".join(
+                    json.dumps({**json.loads(line), "outcome": "crash", "error": "no src/index.ts"})
+                    + "\n"
+                    for line in reference.read_text().splitlines()
+                )
+            )
+        else:
+            run_measure_behavior_cli(
+                "run",
+                "--corpus",
+                str(BEHAVIOR_CORPUS),
+                "--implementation",
+                str(implementation),
+                "--language",
+                driver,
+                "--out",
+                str(outcomes),
+            )
+        run_measure_behavior_cli(
+            "compare", "--reference", str(reference), "--port", str(outcomes), "--out", str(report)
+        )
+        port = [json.loads(line) for line in outcomes.read_text().splitlines()]
+        note = (
+            f"every pair crashed: {port[0]['error']}"
+            if all(pair["outcome"] == "crash" for pair in port)
+            else None
+        )
+        return {**json.loads(report.read_text()), "note": note}
 
 
 @test_runs_cache
@@ -469,6 +547,24 @@ class Codebase:
         if not lines:
             return None
         return 100 * (lines - self._reference_diff["deletions"]) / lines
+
+    @cached_property
+    def _behavior(self) -> dict:
+        return run_measure_behavior(
+            content_hash(self.path), implementation=self.path, language=self.language
+        )
+
+    @property
+    def behavior_agreement_pct(self) -> float:
+        return 100 * self._behavior["agreements"] / self._behavior["pairs"]
+
+    @property
+    def behavior_confusion(self) -> dict[str, dict[str, int]]:
+        return self._behavior["confusion"]
+
+    @property
+    def behavior_note(self) -> str | None:
+        return self._behavior["note"]
 
     def _api(self, case_set: str) -> dict | None:
         if self.run is None or self.reference is None:
