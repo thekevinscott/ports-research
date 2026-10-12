@@ -53,7 +53,7 @@ TRANSCRIPT = {
 }
 PROXY_LOG = "CONNECT api.anthropic.com:443\n"
 RUN_RESULT = RunResult(
-    stdout=RESULT_JSON, stderr="", exit_code=0, transcript=TRANSCRIPT, proxy=PROXY_LOG
+    stdout=RESULT_JSON, stderr="", exit_code=0, transcript=TRANSCRIPT, proxy=PROXY_LOG, container="container", image="image"
 )
 
 
@@ -470,7 +470,7 @@ def describe_the_result():
         port_codebase,
     ):
         port_codebase.return_value = RunResult(
-            stdout=RESULT_JSON, stderr="", exit_code=1, transcript={}, proxy=""
+            stdout=RESULT_JSON, stderr="", exit_code=1, transcript={}, proxy="", container="container", image="image"
         )
         run_directory = experiment()
         assert (run_directory / "result.json").read_text() == RESULT_JSON
@@ -494,7 +494,7 @@ def describe_the_result():
         write_manifest,
     ):
         port_codebase.return_value = RunResult(
-            stdout=RESULT_JSON, stderr="", exit_code=1, transcript={}, proxy=""
+            stdout=RESULT_JSON, stderr="", exit_code=1, transcript={}, proxy="", container="container", image="image"
         )
         experiment()
         assert write_manifest.call_args.kwargs["exit_code"] == 1
@@ -505,7 +505,7 @@ def describe_the_result():
         port_codebase,
     ):
         port_codebase.return_value = RunResult(
-            stdout=RESULT_JSON, stderr="Error: rate limited\n", exit_code=1, transcript={}, proxy=""
+            stdout=RESULT_JSON, stderr="Error: rate limited\n", exit_code=1, transcript={}, proxy="", container="container", image="image"
         )
         run_directory = experiment()
         assert (run_directory / "stderr.txt").read_text() == "Error: rate limited\n"
