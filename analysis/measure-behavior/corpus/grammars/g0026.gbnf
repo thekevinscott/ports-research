@@ -1,0 +1,9 @@
+atom ::= [a\t😀] | ["] | " B}" |
+  "😀\n1" | "\x39"
+
+digits ::= "\u03BB"  # a comment | with ::= inside
+pair ::= "\"\"\x7A"*
+root ::= "[_\\" | [^!}] |
+  atom | "a/_/" |
+  "[yéa"? | digits "é]"
+extra ::= *"a"

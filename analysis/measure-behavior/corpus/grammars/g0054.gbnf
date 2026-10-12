@@ -1,0 +1,5 @@
+root ::= "Aab("? | ("\\\x62<" |
+  [<α-\u03C9\\]) [\x7B\x61-z'] | digits [一-丏] "\"" head-part*
+head-part ::= digits
+chunk ::= [A-F]  # a comment | with ::= inside
+digits ::= [b]

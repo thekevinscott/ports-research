@@ -1,0 +1,5 @@
+root ::= (
+  "a\n" ")}\xDF\n" "[x")+ |
+  [\x30-9]? "/\x39"? (
+  "\x62\x5F" | "'Z")  # held-out grammar
+

@@ -1,0 +1,3 @@
+root ::= [α-ω一-\u4E0F] tail-part
+atom ::= ("中++" "\nA," tail-part | [一-丏]+) (">" | "\x2B\n" | "[\\," | ">9]]" tail-part "\x2C\t" | [=_b] | [^0-9!])
+tail-part ::= ("\x61"? | "cB" | "1\\") " :\x5A" "\x5F\""

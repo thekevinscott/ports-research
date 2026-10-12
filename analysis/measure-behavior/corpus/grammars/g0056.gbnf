@@ -1,0 +1,6 @@
+root = item
+item ::= [α-ωx\x41]
+
+chunk ::= item | item [^ZA-F)] | [α-ωα-ω,] [^\]0-\x39ß] "|é" | ("|" | item)*
+
+pair ::= [9A-F] | "\x5F9<\x2B" | [y\])] chunk ['\\] | item+ [\nZ]? | item+ | chunk chunk

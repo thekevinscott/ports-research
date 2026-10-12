@@ -1,0 +1,8 @@
+root ::= ")😀];" | [\x79] |
+  digits |
+  [\]]+ |
+  "!;?" "\x27λ" atom |
+  "😀" atom "B😀"  # held-out grammar
+digits ::= ([一-丏] "-=\\" | [α-ω \u4E00-\u4E0F]?) [b/é]
+atom ::= [^\x2E\x78b]+ | pair ":\\\t" [Z(0-9] pair pair pair
+pair ::= ([a-\x7A\x61-z\\] [\]\x39α-ω])+ | [^α-ω\x2Da-z] "b" "'1" "\x5B\xDF" | ("ß" | "\r") [*\x61-z] "\r^é" [\n\]!] ">\x2F|" "B(" [9]

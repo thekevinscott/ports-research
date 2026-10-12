@@ -1,0 +1,9 @@
+#
+root ::= (
+  word | tail-part | [Z]) [;]? "}zc" ([ß] |
+  [一-丏\]α-ω] |
+  "x\x79"* |
+  "}" tail-part "B") (['一-\u4E0F] | "中\\")*
+
+tail-part ::= ([😀一-\u4E0F] | word | [(zA]) "[\t"? [A-F\\] word
+word ::= "中[_"*  # a comment | with ::= inside

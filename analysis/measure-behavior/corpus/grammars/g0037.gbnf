@@ -1,0 +1,13 @@
+root ::= "-\x3D\x3E\""  # a comment | with ::= inside
+digits ::= [\t\x7A\t] |
+  nest | nest | [^(] |
+  [^9\u03B1-\u03C9] |
+  "("
+pair ::= (
+  "z"+)+ |
+  "^[+"+ |
+  ("xy'" | nest |
+  [0a-z]) [B]
+
+nest ::= [a-z] nest ")\x5D\x7D" | [一-丏+A-F]  # held-out grammar
+extra ::= "a" ::= "b"

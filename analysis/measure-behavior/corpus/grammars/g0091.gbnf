@@ -1,0 +1,4 @@
+root ::= (([A-F] | nest | pair)+)+
+
+pair ::= (nest [^A一-丏\x5E] "\u4E2Dz\x7D_")+ [b一-丏α-ω]
+nest ::= [^中一-丏(] nest [0-9\x27\x5E] | "\x2D"

@@ -1,0 +1,3 @@
+root ::= (atom atom | atom | head-part?) (head-part+)*
+head-part ::= atom
+atom ::= "\x3F09\x7C"

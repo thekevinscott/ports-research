@@ -1,0 +1,3 @@
+root ::= atom "z" "\rb0\n"
+atom ::= [?\ta-\x7A] "\x5A][c" | [^a-z\u4E2D)] | [a-z\]] "λA" ":<" | "\"\\"?
+

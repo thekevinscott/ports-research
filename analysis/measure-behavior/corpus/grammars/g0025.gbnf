@@ -1,0 +1,4 @@
+# held-out grammar
+root ::= "中\x79):"
+
+word ::= "\x30]"  # held-out grammar

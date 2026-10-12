@@ -1,0 +1,6 @@
+head-part = [\r}_]*
+tail-part ::= "*\x79"*
+root ::= "aé" | [/"*] nest | [^\x7B{] [0-9] head-part | "}\x31\""*
+
+nest ::= [一-丏] nest [一-丏a-z] |
+  "-b"

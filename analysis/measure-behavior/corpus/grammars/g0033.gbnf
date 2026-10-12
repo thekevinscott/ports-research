@@ -1,0 +1,2 @@
+pair ::= [^:]*
+root ::= pair (pair | "z?b" | [,x\x27])

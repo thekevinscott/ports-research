@@ -1,0 +1,7 @@
+atom ::= "λB^"
+
+nest ::= [^一-丏] nest " )*" | "\n"  # a comment | with ::= inside
+item ::= "\xE9\x42\u03BB"
+
+root ::= [']
+tail-part ::= item

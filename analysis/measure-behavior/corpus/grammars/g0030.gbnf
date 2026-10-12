@@ -1,0 +1,11 @@
+# held-out grammar
+root ::= ("\x20(\"\x2C" | [9] |
+  [^\x42一-丏\n] |
+  "9<>(" atom atom |
+  ":ß}" | [ α-ω]) (
+  "'" | [\x41-F😀] | "*\t/<")
+head-part ::= (atom "(" nest)*
+atom ::= [一-丏]  #
+digits ::= ("}" | [^一-\u4E0F0-9'] | nest | "é\tc?") (nest | "]x\x2CA" | nest) [^{A-F] "^😀bλ" [A-\x46B] "/\x39'," nest nest nest*
+
+nest ::= [^😀α-ω\x2B] nest [,] | [\x30-90-9]

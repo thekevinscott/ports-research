@@ -1,0 +1,4 @@
+root ::= nest
+pair ::= [!] "é中*" "." nest "=é'<" nest
+
+nest ::= "ß/" nest "by=" | "-1'a"

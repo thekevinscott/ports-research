@@ -1,0 +1,3 @@
+#
+root ::= [\u4E00-丏\n]
+tail-part ::= [一-丏] [一-丏] [ x] ("<\n;\t" | "\u4E2D\t\t1" | "]9z") ")\x3E\\" "y"  # held-out grammar

@@ -1,0 +1,12 @@
+# a comment | with ::= inside
+chunk ::= [;] "\x3A;'\x28"? nest+
+item ::= ([中] | "'" | "x\n-b") ([y] | nest | chunk) [_\u4E00-丏a-z] [α-ω\u03BB] | chunk+ | "\x29_ '" | [^)a-\x7A\x28] | "_\n" | "\x7D>=" ",😀+-" "\x63" nest
+nest ::= "\x27A,}" nest "\t\x7A" | "![{"
+root ::= [_{]? [^?一-丏] (
+  [\x41-F\x30-9] |
+  [😀0-9]) (chunk |
+  [za-z] |
+  item) (
+  [^\x3C\x41-F\x41-F] |
+  [α-\u03C90-\x39]) [=,]
+extra ::= "\q"

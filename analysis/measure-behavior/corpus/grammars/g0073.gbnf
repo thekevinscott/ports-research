@@ -1,0 +1,2 @@
+# held-out grammar
+root ::= "_\\" [^A-F|A] "\U0001F600a-x" ([/一-丏α-ω] | [\x5F] | "Z-B") ("_![" | "9b\x2B|")  # held-out grammar

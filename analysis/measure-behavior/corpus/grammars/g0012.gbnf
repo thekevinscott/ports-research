@@ -1,0 +1,5 @@
+root ::= [^.] | "[[" item "*b" tail-part+ item
+tail-part ::= "?)bB"
+pair ::= "0=,"* ("_\\," [一-丏])*
+item ::= [\x2D(]?
+
