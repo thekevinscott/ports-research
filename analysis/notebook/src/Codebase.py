@@ -117,8 +117,9 @@ MEASURE_AST_VERSION = content_hash(MEASURE_AST_DIR / "src")
 
 
 def transcript_hash(run_dir: Path) -> str:
-    """The run's transcripts, hidden directories included, and the source language that classes their paths."""
+    """The run's transcripts, hidden directories included, the source language that classes their paths, and measure-transcript's source, so a changed measure is rerun."""
     digest = sha256()
+    digest.update(f"{content_hash(MEASURE_TRANSCRIPT_DIR / 'src')}\n".encode())
     condition = json.loads((run_dir / "manifest.json").read_text())["condition"]
     digest.update(f"{condition['source_language']}\n".encode())
     for file in sorted((run_dir / "transcript").rglob("*.jsonl")):

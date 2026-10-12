@@ -1430,6 +1430,17 @@ def describe_transcript_hash():
         write_transcript(b)
         assert transcript_hash(Path(a["run_dir"])) != transcript_hash(Path(b["run_dir"]))
 
+    def it_changes_with_measure_transcripts_source(monkeypatch, tmp_path):
+        run = v2_run(tmp_path, "a", "python")
+        write_transcript(run)
+        package = tmp_path / "measure-transcript"
+        (package / "src").mkdir(parents=True)
+        (package / "src" / "measure.py").write_text("x = 1\n")
+        monkeypatch.setattr(codebase_module, "MEASURE_TRANSCRIPT_DIR", package)
+        before = transcript_hash(Path(run["run_dir"]))
+        (package / "src" / "measure.py").write_text("x = 2\n")
+        assert transcript_hash(Path(run["run_dir"])) != before
+
     def it_ignores_the_port(tmp_path):
         run = v2_run(tmp_path, "a", "python")
         write_transcript(run)

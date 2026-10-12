@@ -175,6 +175,8 @@ def v2_row(
         "read_target_tests": 0,
         "suite_run_count": suites,
         "own_tests_written": 0,
+        "files_read_before_first_write": 6,
+        "reread_count": 2,
     }
 
 
@@ -870,7 +872,14 @@ def test_the_notebook_renders_the_ast_section_right_after_the_api_section():
 
 def test_the_chart_export_takes_the_ast_chart_from_the_notebook():
     assert 'notebook["ast_chart"]' in (NOTEBOOK.parent / "export_charts.py").read_text()
-TRANSCRIPT_LEAD_NAMES = ["read_source_tests", "read_target_tests", "suite_run_count", "own_tests_written"]
+TRANSCRIPT_LEAD_NAMES = [
+    "read_source_tests",
+    "read_target_tests",
+    "suite_run_count",
+    "own_tests_written",
+    "files_read_before_first_write",
+    "reread_count",
+]
 TRANSCRIPT_REPORT = {
     "turns": 21,
     "bash_calls": 21,
@@ -900,6 +909,17 @@ TRANSCRIPT_REPORT = {
     "tokens_after_first_write": 837467,
     "first_write_turn": 11,
     "last_suite_run_turn": 18,
+    "first_read_path": "/input/python/README.md",
+    "first_read_class": "source",
+    "first_read_is_entry_point": True,
+    "files_read_before_first_write": 7,
+    "source_files_read_before_first_write": 3,
+    "reread_count": 4,
+    "max_rereads_of_one_file": 2,
+    "max_rereads_path": "/input/python/gbnf/graph.py",
+    "search_calls_per_file_read": 0.5,
+    "read_order": ["/input/python/README.md", "/input/python/gbnf/__init__.py"],
+    "reads_after_last_write": 1,
 }
 TRANSCRIPT_NAMES = (
     *CHART_NAMES,
@@ -907,6 +927,10 @@ TRANSCRIPT_NAMES = (
     "transcript_chart",
     "transcript_counts",
     "transcript_runs",
+    "TRANSCRIPT_FIRST_READ",
+    "TRANSCRIPT_QUOTED",
+    "FIRST_READ_CLASSES",
+    "first_read_counts",
 )
 
 
@@ -917,7 +941,9 @@ def transcript_columns(report=TRANSCRIPT_REPORT):
     return namespace["transcript_columns"](SimpleNamespace(transcript=report))
 
 
-def transcript_row(run_id, source, flags, *, suites, touched=False, differential=False, first_write=11):
+def transcript_row(
+    run_id, source, flags, *, suites, touched=False, differential=False, first_write=11, entry=True, first_class="source"
+):
     return {
         "run_id": run_id,
         "source_language": source,
@@ -928,6 +954,8 @@ def transcript_row(run_id, source, flags, *, suites, touched=False, differential
         "touched_target_tests": touched,
         "differential_script": differential,
         "first_write_turn": first_write,
+        "first_read_is_entry_point": entry,
+        "first_read_class": first_class,
     }
 
 
@@ -937,8 +965,8 @@ def transcript_frame():
     return pl.DataFrame(
         [
             transcript_row("a", "python", (0, 1, 1), suites=3, touched=True, differential=True),
-            transcript_row("b", "python", (0, 1, 1), suites=5, touched=True),
-            transcript_row("c", "python", (1, 1, 1), suites=0, first_write=None),
+            transcript_row("b", "python", (0, 1, 1), suites=5, touched=True, entry=None, first_class="other"),
+            transcript_row("c", "python", (1, 1, 1), suites=0, first_write=None, entry=False),
             transcript_row("d", "javascript", (0, 0, 0), suites=1),
         ]
     )
@@ -984,7 +1012,7 @@ def test_every_charted_transcript_column_has_a_prose_title():
     charted = [
         column
         for column in transcript_columns()
-        if column not in (*namespace["TRANSCRIPT_COUNTED"], "differential_evidence")
+        if column not in (*namespace["TRANSCRIPT_COUNTED"], *namespace["TRANSCRIPT_FIRST_READ"], *namespace["TRANSCRIPT_QUOTED"])
     ]
     titles = [namespace["transcript_title"](column) for column in charted]
     assert len(set(titles)) == len(charted)
@@ -1029,6 +1057,23 @@ def test_the_transcript_table_counts_runs_that_touched_the_target_tests_or_ran_a
     assert (empty["n"], empty["touched_target_tests"], empty["differential_script"]) == (0, 0, 0)
 
 
+def test_a_v2_run_quotes_the_source_read_order_as_one_string():
+    assert transcript_columns()["read_order"] == "/input/python/README.md → /input/python/gbnf/__init__.py"
+    assert transcript_columns({**TRANSCRIPT_REPORT, "read_order": []})["read_order"] == ""
+
+
+def test_the_first_read_table_counts_entry_point_starts_and_first_read_classes_by_condition():
+    import polars as pl
+
+    table = definitions(*TRANSCRIPT_NAMES)["first_read_counts"](transcript_frame())
+    assert table.height == 16
+    row = summary_row(table, "python", "source + target")
+    assert (row["n"], row["entry_point"], row["not_entry_point"], row["no_code_file_read"]) == (2, 1, 0, 1)
+    assert (row["first_read_source"], row["first_read_other"], row["first_read_port"]) == (1, 1, 0)
+    empty = summary_row(table, "python", "none")
+    assert (empty["n"], empty["entry_point"], empty["first_read_source"]) == (0, 0, 0)
+
+
 def test_the_transcript_run_table_quotes_the_differential_evidence():
     import polars as pl
 
@@ -1036,14 +1081,16 @@ def test_the_transcript_run_table_quotes_the_differential_evidence():
     row = runs.filter(pl.col("run_id") == "a").row(0, named=True)
     assert row["condition"] == "source + target"
     assert row["differential_evidence"] == "python3 a.py && node b.js"
-    assert runs.columns[:7] == ["run_id", "source_language", "condition", *TRANSCRIPT_LEAD_NAMES]
+    assert runs.columns[:9] == ["run_id", "source_language", "condition", *TRANSCRIPT_LEAD_NAMES]
+    assert row["read_order"] == "/input/python/README.md → /input/python/gbnf/__init__.py"
+    assert row["max_rereads_path"] == "/input/python/gbnf/graph.py"
 
 
 def test_the_per_flag_comparison_and_the_rank_correlations_take_the_transcript_leads():
     import polars as pl
 
     namespace = definitions(*CHART_NAMES)
-    assert namespace["V2_LEADS"][-4:] == TRANSCRIPT_LEAD_NAMES
+    assert namespace["V2_LEADS"][-6:] == TRANSCRIPT_LEAD_NAMES
     assert set(TRANSCRIPT_LEAD_NAMES) <= set(namespace["v2_measures"](pl.DataFrame(V2_RUNS)))
     assert namespace["lead_title"]("own_tests_written") == "Test files the agent wrote itself"
 
