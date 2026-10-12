@@ -38,12 +38,20 @@ One row per run, one column per measure, all in the runs notebook ([analysis/not
 - [ ] Package `analysis/measure-api`: seeded corpus, per-step rule-set comparison against the reference, outcomes match, mismatch, error_match, error_mismatch, crash; agreement rate and confusion table (PR in flight).
 - [ ] Notebook section, same shape as the behavior section.
 
-### Transcripts
+### Transcripts, mechanical
 
-- [ ] Tier 1, mechanical: a parser from transcript jsonl to per-run columns. What the agent read (source, shipped tests, both, neither); how often it ran which suite and the pass counts it saw; whether it wrote its own tests or a differential script against the reference; Bash calls, turns, tokens per phase.
-- [ ] Tier 1 notebook section, charted by test inclusion.
-- [ ] Tier 2 rubric, written before any V2 transcript is read: did the agent cheat; why did it keep or change the file structure (the two open questions from the [V2 plan](PLAN_2026-09-16-v2.md)).
-- [ ] Tier 2 run once over every exit-0 run: compressed transcript (commands and assistant text, tool output dropped) to a stronger model, verdict with quoted evidence per item, uncertain runs escalated to Kevin.
+- [ ] A parser from transcript jsonl to per-run columns. What the agent read (source, shipped tests, both, neither); how often it ran which suite and the pass counts it saw; whether it wrote its own tests or a differential script against the reference; Bash calls, turns, tokens per phase.
+- [ ] Notebook section, charted by test inclusion.
+
+### LLM judges
+
+Kevin, 2026-10-12: "we should run the judge suite against the base ports without telling them, so we can measure a baseline of what they say by default." The base ports are the two hand-written gbnf implementations judged against each other, in both directions. They enter the suite as ordinary items; the judge is never told which items are agent ports and which are the human pair.
+
+- [ ] Code judge rubric, written before any V2 port is read: API parity, structure kept or changed and why, semantic divergences with quoted lines, idiom versus transliteration. Output per item: a verdict per rubric line with quoted evidence, plus one ordinal fidelity score.
+- [ ] Transcript judge rubric, written before any V2 transcript is read: did the agent cheat; why did it keep or change the file structure (the two open questions from the [V2 plan](PLAN_2026-09-16-v2.md)). Input is the compressed transcript: commands and assistant text, tool output dropped.
+- [ ] Baseline: the human pair, both directions, judged blind. Its scores are the default reading of the code judge for a faithful port.
+- [ ] One pass over every exit-0 run with a stronger model than the one under test, uncertain items escalated to Kevin. Each item judged once; the judge sees items in shuffled order.
+- [ ] Notebook section: fidelity score and verdict counts by test inclusion, with the human pair drawn as a reference line.
 
 ### Not this cycle
 
