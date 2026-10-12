@@ -9,6 +9,7 @@ from measure_transcript.copy_targets import copy_targets
 from measure_transcript.is_fetch import is_fetch
 from measure_transcript.is_test_path import is_test_path
 from measure_transcript.read_transcript import read_transcript
+from measure_transcript.reading_order import reading_order
 from measure_transcript.reference_path import reference_path
 from measure_transcript.resolve_path import resolve_path
 from measure_transcript.segment_runtime import segment_runtime
@@ -37,17 +38,23 @@ def measure_transcript(run: Path) -> dict:
     calls = {"Bash": 0, "Read": 0, "Write": 0, "Edit": 0, "search": 0}
     reads = {"source": 0, "source_tests": 0, "target_tests": 0, "port": 0, "other": 0}
     touched: set[str] = set()
-    suite_runs, own_files, fetches = [], [], []
+    suite_runs, own_files, fetches, read_log = [], [], [], []
+    port_writes = 0
     first_write, evidence = None, None
 
     def classify(path):
         return classify_path(path, source_language, copies)
 
+    def read(path):
+        # A copy is read as its origin.
+        read_log.append((reference_path(path, copies), classify(path), port_writes))
+
     def wrote(path, turn, whole=True):
         # A file the agent writes whole is its own, even inside a copy of the reference.
-        nonlocal first_write
+        nonlocal first_write, port_writes
         if classify_path(path, source_language, {}) != "port":
             return
+        port_writes += 1
         if whole:
             copies[path] = path
         first_write = first_write or turn
@@ -71,6 +78,8 @@ def measure_transcript(run: Path) -> dict:
             cls = classify(tool_input.get("file_path"))
             reads[cls] += 1
             touched.add(cls)
+            if tool_input.get("file_path"):
+                read(tool_input["file_path"])
         elif name in ("Write", "Edit"):
             path = tool_input.get("file_path") or ""
             touched.add(classify(path))
@@ -93,9 +102,11 @@ def measure_transcript(run: Path) -> dict:
                 args = [w for w in words[i + 1:] if not w.startswith("-")]
                 touched |= {classify(resolve_path(a, cwd)) for a in args}
                 if program in READERS and (program != "sed" or "-n" in words[i + 1:]):
-                    paths = args[1:] if program in FIRST_ARGUMENT_NOT_A_PATH else args
-                    for cls in {classify(resolve_path(p, cwd)) for p in paths}:
+                    paths = list(dict.fromkeys(resolve_path(p, cwd) for p in (args[1:] if program in FIRST_ARGUMENT_NOT_A_PATH else args)))
+                    for cls in {classify(p) for p in paths}:
                         reads[cls] += 1
+                    for path in paths:
+                        read(path)
                 for path in segment["writes"]:
                     wrote(path, turn)
                 for destination, origin in copy_targets(words[i:], cwd, directories):
@@ -173,4 +184,5 @@ def measure_transcript(run: Path) -> dict:
         "tokens_after_first_write": sum(totals[first_write - 1:]) if first_write else None,
         "first_write_turn": first_write,
         "last_suite_run_turn": suite_runs[-1]["turn"] if suite_runs else None,
+        **reading_order(read_log, port_writes, calls["search"], source_language),
     }

@@ -41,3 +41,16 @@ Copies are followed. A `cp` maps its destination back to its origin, so a path i
 - `first_write_turn`: the first turn that writes under `/target` by Write, Edit, redirect or `tee`; null without one.
 - `tokens_before_first_write`, `tokens_after_first_write`: input plus cache creation plus cache read plus output, summed over the turns before it and from it on; null without a write.
 - `last_suite_run_turn`: turn of the last suite run; null without one.
+
+## Reading order
+
+Every path a read names is one read, in call order: a Read call's file, and each distinct path argument of a reading command (see `read_*` above). A path is as written, resolved against the cwd: globs and variables are not expanded, so a `for f in ...; do cat $f` loop is one read of `.../$f`, and a directory given to `grep -r` is one read. A path under a copy is named by its origin. A write into the port is any write counted by `first_write_turn`.
+
+- `first_read_path`, `first_read_class`: the first read and its class; null without reads.
+- `read_order`: distinct `source` paths in order of first read.
+- `first_read_is_entry_point`: whether the first code file in `read_order` is the package's entry point; null when it names none. A code file ends in `.py` (python) or `.ts`/`.js` (javascript) and holds no `*`, `?`, `[` or `$`. The entry points: python `/input/python/gbnf/__init__.py`, the package pyproject's `packages.find` includes; javascript `/input/javascript/src/index.ts`, the source of package.json's `main` and `exports["."]` (its `./builder` export is not shipped).
+- `files_read_before_first_write`, `source_files_read_before_first_write`: distinct paths read, and distinct `source` paths read, before the first write into the port; null without a write.
+- `reread_count`: reads of a path already read.
+- `max_rereads_of_one_file`, `max_rereads_path`: the most rereads of one path and that path, the earlier read on a tie; the path is null without a reread.
+- `search_calls_per_file_read`: `search_calls` over distinct paths read; null without reads.
+- `reads_after_last_write`: reads after the last write into the port; null without a write.
