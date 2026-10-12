@@ -2,11 +2,11 @@
 
 2026-10-12
 
-The question, in Kevin’s words: “what effect does test inclusion have on produced output”.
+The question, in Kevin's words: “what effect does test inclusion have on produced output”. Each section below asks one part of it.
 
-An agent (`claude-opus-5-5`, effort medium) ports the gbnf library between Python and JavaScript. Three flags control the supplied suites: `include_unit_tests`, `include_source_integration_tests`, and `include_target_integration_tests`. Two source languages × eight flag combinations = 16 cells × 12 successful runs = 192 ports. Unit tests describe internals, source integration tests describe behaviour in the source language, and target integration tests describe the expected interface in the target language.
+An agent (`claude-opus-5-5`, effort medium) ports the gbnf library between Python and JavaScript. Three flags control which test suites it is given: `include_unit_tests` (unit tests, which describe internals), `include_source_integration_tests` (integration tests in the source language, which describe behaviour), and `include_target_integration_tests` (integration tests in the target language, which describe the expected interface). 2 source languages × 8 flag combinations = 16 cells × 12 runs = 192 ports.
 
-“unit” means source unit tests, “source” means source integration tests, “target” means target integration tests, and “all” means all three. Counts below come from the five matrix logs dated 2026-10-12 at 02:13:10Z, 09:49:53Z, 10:09:20Z, 11:03:50Z, and 12:08:14Z; their `cell` objects are mapped to the notebook’s condition labels. Nonzero exits are excluded from every chart and successful-port summary.
+Condition labels name the suites given: “unit”, “source”, “target”, “all” (all three), “none”. Runs per cell, from the five matrix logs of 2026-10-12 (`matrix-20261012T{021310,094953,100920,110350,120814}Z.jsonl`); only exit-0 runs appear in the charts and tables below.
 
 | Source | Given tests | Successful ports | Exit 1 | Exit 137 |
 | --- | --- | --- | --- | --- |
@@ -27,79 +27,81 @@ An agent (`claude-opus-5-5`, effort medium) ports the gbnf library between Pytho
 | javascript | source + target | 12 | 4 | 1 |
 | javascript | all | 12 | 4 | 1 |
 
+Every per-run chart has one dot per port, a tick at the condition's median, a faint bar over the interquartile range (IQR, the middle half of the ports), one panel per source language (titled source → target), and n under each label counting ports with a value. Captions abbreviate this as “Dots: ports; tick: median; bar: IQR; panels: source language.”
+
 ## Does including tests change what the port does?
 
-**Why.** Each port and the reference in its target language run the same held-out corpus: 100 grammars and 799 grammar–input pairs, never supplied to the agent. We count agreement on accept, reject, error, or crash, then divide by 799. A high percentage means more equal outcomes, including equal errors; a low percentage means more different outcomes. The hypothesis is that source and target integration tests increase agreement by giving behavioural examples; unit tests may increase agreement on internal cases. A difference would establish different agreement on this corpus, not correctness on all inputs or whether the reference’s behaviour is desirable. The confusion counts show which outcomes were compared. [Measure definition](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/analysis/measure-behavior/README.md).
+**Why.** Counted: 100 held-out grammars and 799 grammar–input pairs, never given to the agent, are run through the port and through the reference in the target language; each pair ends in accept, reject, error or crash on each side. Agreement is the share of the 799 pairs with the same outcome on both sides. High (near 100%) means the port behaves like the reference on these inputs, errors included; low means it accepts, rejects, errors or crashes where the reference does not. Hypothesis: source and target integration tests raise agreement because they show behaviour by example; unit tests may raise it on internal cases. A difference between conditions would show the given tests changed behaviour on this corpus; it would not show correctness on other inputs, or that the reference's behaviour is right. Why it matters: this is the direct check of whether the port does what the original does. [Measure definition](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/analysis/measure-behavior/README.md).
 
-![Held-out behavior agreement with the reference (%)](charts/behavior-agreement-pct.png)
+![Held-out behaviour agreement with the reference (%)](charts/behavior-agreement-pct.png)
 
-Held-out behavior agreement with the reference (%): each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Share of the 799 held-out pairs on which the port's outcome equals the reference's, in percent. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference accepts and the port accepts](charts/reference-accept-port-accept.png)
 
-Pairs the reference accepts and the port accepts: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference accepts the input and the port accepts it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference accepts and the port crashes on](charts/reference-accept-port-crash.png)
 
-Pairs the reference accepts and the port crashes on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference accepts the input and the port crashes on it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference accepts and the port errors on](charts/reference-accept-port-error.png)
 
-Pairs the reference accepts and the port errors on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference accepts the input and the port raises an error on it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference accepts and the port rejects](charts/reference-accept-port-reject.png)
 
-Pairs the reference accepts and the port rejects: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference accepts the input and the port rejects it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference crashes on and the port accepts](charts/reference-crash-port-accept.png)
 
-Pairs the reference crashes on and the port accepts: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference crashes on the input and the port accepts it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference crashes on and the port crashes on](charts/reference-crash-port-crash.png)
 
-Pairs the reference crashes on and the port crashes on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference crashes on the input and the port crashes on it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference crashes on and the port errors on](charts/reference-crash-port-error.png)
 
-Pairs the reference crashes on and the port errors on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference crashes on the input and the port raises an error on it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference crashes on and the port rejects](charts/reference-crash-port-reject.png)
 
-Pairs the reference crashes on and the port rejects: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference crashes on the input and the port rejects it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference errors on and the port accepts](charts/reference-error-port-accept.png)
 
-Pairs the reference errors on and the port accepts: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference raises an error on the input and the port accepts it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference errors on and the port crashes on](charts/reference-error-port-crash.png)
 
-Pairs the reference errors on and the port crashes on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference raises an error on the input and the port crashes on it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference errors on and the port errors on](charts/reference-error-port-error.png)
 
-Pairs the reference errors on and the port errors on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference raises an error on the input and the port raises an error on it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference errors on and the port rejects](charts/reference-error-port-reject.png)
 
-Pairs the reference errors on and the port rejects: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference raises an error on the input and the port rejects it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference rejects and the port accepts](charts/reference-reject-port-accept.png)
 
-Pairs the reference rejects and the port accepts: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference rejects the input and the port accepts it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference rejects and the port crashes on](charts/reference-reject-port-crash.png)
 
-Pairs the reference rejects and the port crashes on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference rejects the input and the port crashes on it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference rejects and the port errors on](charts/reference-reject-port-error.png)
 
-Pairs the reference rejects and the port errors on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference rejects the input and the port raises an error on it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Pairs the reference rejects and the port rejects](charts/reference-reject-port-reject.png)
 
-Pairs the reference rejects and the port rejects: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 799 pairs on which the reference rejects the input and the port rejects it. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-Notebook medians [25th, 75th percentiles] by condition; n counts successful ports, and missing values are omitted from each measure.
+Median [25th, 75th percentile] per condition, from the notebook; n counts successful ports.
 
 | Source | Given tests | n | Behaviour agreement (%) |
 | --- | --- | --- | --- |
@@ -120,7 +122,7 @@ Notebook medians [25th, 75th percentiles] by condition; n counts successful port
 | javascript | source + target | 12 | 99.37 [99.37, 99.37] |
 | javascript | all | 12 | 99.37 [99.37, 99.37] |
 
-Counts summed over the ports in each condition: each outcome column names reference outcome → port outcome; the denominator is 799 pairs per port.
+Pairs summed over each condition's ports (12 × 799 = 9,588); each column is reference outcome → port outcome.
 
 | Source | Given tests | Ports | accept → accept | accept → reject | accept → error | accept → crash | reject → accept | reject → reject | reject → error | reject → crash | error → accept | error → reject | error → error | error → crash | crash → accept | crash → reject | crash → error | crash → crash |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -143,69 +145,69 @@ Counts summed over the ports in each condition: each outcome column names refere
 
 ## Does including tests change the port's public interface?
 
-**Why.** Each port and the target-language reference execute 999 held-out API cases over 100 grammars: construction, adding a whole input, and adding up to 16 code points one at a time. A case agrees only when every compared step returns the same rule set or the same error class and position under the comparison rules. A high agreement percentage means more complete matching cases; a low percentage means more cases with a differing step or a crash. The hypothesis is that target integration tests increase agreement by specifying the target interface, with source integration tests providing behavioural constraints. A difference would show agreement on these exercised calls, not completeness of every public API or compatibility for all callers. Matching errors count as agreement. [Measure definition](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/analysis/measure-api/README.md).
+**Why.** Counted: 999 held-out API cases over the same 100 grammars, each a short call sequence (build the grammar, add a whole input, then add up to 16 characters one at a time) run on the port and the reference. A case agrees when every step returns the same set of next grammar rules, or raises the same error class at the same position. Agreement is the share of the 999 cases. High means a caller gets the same answers from the port's interface as from the reference's; low means steps differ or crash. Hypothesis: target integration tests raise agreement because they spell out the target-language interface; source integration tests may raise it through behaviour. A difference would show the given tests changed answers on these calls; it would not show that the whole public API matches or that every caller would work. Why it matters: a port with the right behaviour behind a different interface is not a drop-in replacement. [Measure definition](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/analysis/measure-api/README.md).
 
 ![Held-out API agreement with the reference (%)](charts/api-agreement-pct.png)
 
-Held-out API agreement with the reference (%): each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Share of the 999 held-out API cases on which every step returns what the reference returns, matching errors included, in percent. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Cases where either side crashed](charts/api-crash.png)
 
-Cases where either side crashed: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of cases where the port or the reference crashes (10 s timeout, non-zero exit, or no output). Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Cases where every step matches and one raised](charts/api-error-match.png)
+![Cases where every step matches with an error](charts/api-error-match.png)
 
-Cases where every step matches and one raised: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of cases where every step matches and at least one step raises the same error on both sides. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Cases where the first differing step raised on one side](charts/api-error-mismatch.png)
+![Cases whose first differing step raised an error](charts/api-error-mismatch.png)
 
-Cases where the first differing step raised on one side: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of cases whose first unequal step raises on at least one side, or is missing on one side. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Cases where every step matches and none raised](charts/api-match.png)
+![Cases where every step matches with no error](charts/api-match.png)
 
-Cases where every step matches and none raised: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 999 cases where every step returns the same rules on both sides and none raises. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Cases where the first differing step returned rules on both sides](charts/api-mismatch.png)
+![Cases whose first differing step returned different rules](charts/api-mismatch.png)
 
-Cases where the first differing step returned rules on both sides: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of cases whose first unequal step returns rules on both sides, but different ones. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Cases the reference crashes on and the port crashes on](charts/api-reference-crash-port-crash.png)
+![Cases where the reference crashes and the port crashes](charts/api-reference-crash-port-crash.png)
 
-Cases the reference crashes on and the port crashes on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 999 cases where the reference crashes and the port crashes. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Cases the reference crashes on and the port raises on](charts/api-reference-crash-port-error.png)
+![Cases where the reference crashes and the port raises an error](charts/api-reference-crash-port-error.png)
 
-Cases the reference crashes on and the port raises on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 999 cases where the reference crashes and the port raises an error. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Cases the reference crashes on and the port runs without raising](charts/api-reference-crash-port-ok.png)
+![Cases where the reference crashes and the port runs without error](charts/api-reference-crash-port-ok.png)
 
-Cases the reference crashes on and the port runs without raising: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 999 cases where the reference crashes and the port runs without error. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Cases the reference raises on and the port crashes on](charts/api-reference-error-port-crash.png)
+![Cases where the reference raises an error and the port crashes](charts/api-reference-error-port-crash.png)
 
-Cases the reference raises on and the port crashes on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 999 cases where the reference raises an error and the port crashes. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Cases the reference raises on and the port raises on](charts/api-reference-error-port-error.png)
+![Cases where the reference raises an error and the port raises an error](charts/api-reference-error-port-error.png)
 
-Cases the reference raises on and the port raises on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 999 cases where the reference raises an error and the port raises an error. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Cases the reference raises on and the port runs without raising](charts/api-reference-error-port-ok.png)
+![Cases where the reference raises an error and the port runs without error](charts/api-reference-error-port-ok.png)
 
-Cases the reference raises on and the port runs without raising: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 999 cases where the reference raises an error and the port runs without error. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Cases the reference runs without raising and the port crashes on](charts/api-reference-ok-port-crash.png)
+![Cases where the reference runs without error and the port crashes](charts/api-reference-ok-port-crash.png)
 
-Cases the reference runs without raising and the port crashes on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 999 cases where the reference runs without error and the port crashes. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Cases the reference runs without raising and the port raises on](charts/api-reference-ok-port-error.png)
+![Cases where the reference runs without error and the port raises an error](charts/api-reference-ok-port-error.png)
 
-Cases the reference runs without raising and the port raises on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 999 cases where the reference runs without error and the port raises an error. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Cases the reference runs without raising and the port runs without raising](charts/api-reference-ok-port-ok.png)
+![Cases where the reference runs without error and the port runs without error](charts/api-reference-ok-port-ok.png)
 
-Cases the reference runs without raising and the port runs without raising: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of the 999 cases where the reference runs without error and the port runs without error. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-Notebook medians [25th, 75th percentiles] by condition; n counts successful ports, and missing values are omitted from each measure.
+Median [25th, 75th percentile] per condition, from the notebook; n counts successful ports.
 
 | Source | Given tests | n | API agreement (%) |
 | --- | --- | --- | --- |
@@ -226,7 +228,7 @@ Notebook medians [25th, 75th percentiles] by condition; n counts successful port
 | javascript | source + target | 12 | 94.89 [94.89, 94.89] |
 | javascript | all | 12 | 94.89 [94.89, 94.89] |
 
-API outcome counts summed over the ports in each condition, over 999 cases per port: match means all steps agree without errors; error match means all steps agree with at least one error; mismatch and error mismatch name the first unequal step; crash means either side crashed.
+API cases summed over each condition's ports (12 × 999 = 11,988), by outcome as in the charts above.
 
 | Source | Given tests | Ports | match | mismatch | error match | error mismatch | crash |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -247,7 +249,7 @@ API outcome counts summed over the ports in each condition, over 999 cases per p
 | javascript | source + target | 12 | 5904 | 0 | 5472 | 612 | 0 |
 | javascript | all | 12 | 5904 | 0 | 5472 | 612 | 0 |
 
-API confusion counts summed over the same cases: each column names reference status → port status; “ok” means no step raised and “error” means at least one step raised.
+API cases summed over the same ports, by reference status → port status: “ok” no step raised, “error” at least one step raised.
 
 | Source | Given tests | ok → ok | ok → error | ok → crash | error → ok | error → error | error → crash | crash → ok | crash → error | crash → crash |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -270,105 +272,105 @@ API confusion counts summed over the same cases: each column names reference sta
 
 ## Does including tests change how closely the port mirrors the reference's structure?
 
-**Why.** We compare each port with the hand-written reference in its target language, pairing named functions by normalized name and declared parameter count, comparing their syntax trees, comparing branching distributions, and following resolved package calls from shared public entry points. A high matched fraction means more reference functions have counterparts; a high edge recall means more reference call edges are present. Small normalized tree or trace distances mean more similar shapes or ordered call paths; larger distances mean more changes. A zero port-minus-reference delta means equal counts, not identical code. The hypothesis is that unit tests preserve internal function structure, raising matching and lowering distances, while target integration tests may preserve exported signatures and entry-point paths. Differences measure structural drift, not quality or functional correctness; static name-and-arity call resolution can miss or overmatch calls, and identifiers and literals are abstracted in tree comparison. [Measure definition](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/analysis/measure-ast/README.md); [analysis plan](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/notes/ANALYSIS_PLAN_2026-10-12.md).
+**Why.** Counted: the port's code against the reference in the target language, by structure only. Functions pair when their names match (ignoring case and underscores) and they take the same number of parameters; the paired share is the share of the reference's functions with a partner. Paired functions are compared by tree edit distance: the syntax-tree nodes that must be inserted, deleted or relabelled to turn one into the other, over the larger tree's size (0 same shape, 1 nothing shared; names ignored). Branching distance compares the spread of branch counts (if, loop, catch, and/or) per function on each side (0 same spread). Call paths start from each public function both sides export and follow calls inside the package: edge recall is the share of the reference's caller→callee links the port also has (1 all); trace distance is how far the order of functions visited differs (0 same, 1 entirely different); reachable share is the share of a side's functions some entry point reaches. Public API entries are exported names with their parameter counts. “Port minus reference” charts subtract the reference's count from the port's (0 means equal size, not equal code); cyclomatic complexity is 1 plus a function's branch count. Hypothesis: unit tests, which name internal functions, raise the paired share and edge recall and lower the distances; target integration tests preserve exported names and entry-point paths. A difference would show the given tests changed how far the port's structure drifts from the reference; per the analysis plan this measures structure drift, not quality or correctness, and name-and-parameter call matching can miss or overcount calls. Why it matters: it shows whether tests pull the agent toward the reference's design or away from it. [Measure definition](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/analysis/measure-ast/README.md); [analysis plan](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/notes/ANALYSIS_PLAN_2026-10-12.md).
 
 ![Public API entries only the port exports](charts/ast-api-port-only.png)
 
-Public API entries only the port exports: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of exported names (with parameter count) the port has and the reference lacks. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Public API entries only the reference exports](charts/ast-api-reference-only.png)
 
-Public API entries only the reference exports: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of exported names (with parameter count) the reference has and the port lacks. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Public API entries the port shares with the reference](charts/ast-api-shared.png)
+![Public API entries both export](charts/ast-api-shared.png)
 
-Public API entries the port shares with the reference: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of exported names (with parameter count) present on both sides. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Distance between the port's and the reference's branching distributions](charts/ast-branching-wasserstein.png)
+![Difference in branching between port and reference](charts/ast-branching-wasserstein.png)
 
-Distance between the port's and the reference's branching distributions: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+How far apart the two sides' spreads of per-function branch counts are (Wasserstein distance; 0 same spread). Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Functions, port minus reference](charts/ast-delta-function-count.png)
 
-Functions, port minus reference: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Port's function count minus the reference's; 0 equal count. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Highest cyclomatic complexity, port minus reference](charts/ast-delta-max-cyclomatic.png)
+![Most branches in one function, port minus reference](charts/ast-delta-max-cyclomatic.png)
 
-Highest cyclomatic complexity, port minus reference: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Highest cyclomatic complexity (1 plus a function's branch count) in the port minus that in the reference. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Deepest AST node, port minus reference](charts/ast-delta-max-depth.png)
+![Deepest nesting, port minus reference](charts/ast-delta-max-depth.png)
 
-Deepest AST node, port minus reference: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Deepest syntax-tree nesting in the port minus that in the reference. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Longest function in lines, port minus reference](charts/ast-delta-max-function-lines.png)
 
-Longest function in lines, port minus reference: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Lines of the port's longest function minus lines of the reference's longest. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Mean cyclomatic complexity, port minus reference](charts/ast-delta-mean-cyclomatic.png)
+![Mean branches per function, port minus reference](charts/ast-delta-mean-cyclomatic.png)
 
-Mean cyclomatic complexity, port minus reference: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Mean cyclomatic complexity (1 plus a function's branch count) in the port minus that in the reference. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Mean function length in lines, port minus reference](charts/ast-delta-mean-function-lines.png)
 
-Mean function length in lines, port minus reference: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Mean lines per function in the port minus that in the reference. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![AST nodes, port minus reference](charts/ast-delta-node-count.png)
+![Syntax-tree size, port minus reference](charts/ast-delta-node-count.png)
 
-AST nodes, port minus reference: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Syntax-tree nodes in the port minus nodes in the reference; a size measure. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Public entry points traced](charts/ast-entry-point-count.png)
+![Public functions both sides export (call-path starting points)](charts/ast-entry-point-count.png)
 
-Public entry points traced: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of shared public functions and class methods from which call paths are traced. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Functions paired with a reference function](charts/ast-matched-count.png)
+![Port functions paired with a reference function](charts/ast-matched-count.png)
 
-Functions paired with a reference function: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of functions paired across sides by name and parameter count. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Share of the reference's functions the port has a counterpart for](charts/ast-matched-fraction.png)
 
-Share of the reference's functions the port has a counterpart for: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Paired functions over the reference's named functions; 1 every reference function has a partner. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Share of the reference's call edges the port also makes, mean over entry points](charts/ast-mean-edge-recall.png)
+![Share of the reference's call links the port also makes](charts/ast-mean-edge-recall.png)
 
-Share of the reference's call edges the port also makes, mean over entry points: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Per entry point, the share of the reference's caller→callee links present in the port, averaged over entry points; 1 all present. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Median length difference of paired functions in lines, port minus reference](charts/ast-median-line-drift.png)
+![Length difference of paired functions in lines](charts/ast-median-line-drift.png)
 
-Median length difference of paired functions in lines, port minus reference: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Median over paired functions of port lines minus reference lines; 0 same length. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Edit distance between the reference's and the port's call traces, median over entry points](charts/ast-median-trace-normalised.png)
+![Difference in call order from each entry point](charts/ast-median-trace-normalised.png)
 
-Edit distance between the reference's and the port's call traces, median over entry points: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Edit distance between the orders in which each side visits functions from an entry point, over the longer order, median over entry points; 0 same order, 1 entirely different. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Port functions with no reference counterpart](charts/ast-port-only-count.png)
 
-Port functions with no reference counterpart: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of port functions no reference function pairs with. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Share of the port's functions reachable from an entry point](charts/ast-reachable-fraction-port.png)
 
-Share of the port's functions reachable from an entry point: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Port functions some shared entry point calls, directly or indirectly, over all port functions. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Share of the reference's functions reachable from an entry point](charts/ast-reachable-fraction-reference.png)
 
-Share of the reference's functions reachable from an entry point: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Reference functions some shared entry point calls, directly or indirectly, over all reference functions. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Reference functions with no port counterpart](charts/ast-reference-only-count.png)
 
-Reference functions with no port counterpart: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of reference functions no port function pairs with. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Mean tree edit distance between paired functions, normalised](charts/ast-tree-edit-mean.png)
+![Shape difference of paired functions (mean)](charts/ast-tree-edit-mean.png)
 
-Mean tree edit distance between paired functions, normalised: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Tree edit distance over the larger tree's size, mean over paired functions; 0 same shape, 1 nothing shared. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Median tree edit distance between paired functions, normalised](charts/ast-tree-edit-median.png)
+![Shape difference of paired functions (median)](charts/ast-tree-edit-median.png)
 
-Median tree edit distance between paired functions, normalised: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Tree edit distance over the larger tree's size, median over paired functions; 0 same shape, 1 nothing shared. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Port functions reachable from no entry point](charts/ast-unreachable-port-only.png)
+![Port functions no entry point reaches](charts/ast-unreachable-port-only.png)
 
-Port functions reachable from no entry point: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Count of port functions no shared entry point calls, directly or indirectly. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-Notebook medians [25th, 75th percentiles] by condition; n counts successful ports, and missing values are omitted from each measure.
+Median [25th, 75th percentile] per condition, from the notebook; n counts successful ports.
 
 | Source | Given tests | n | Reference functions paired (share) | Paired tree distance | Branching distribution distance |
 | --- | --- | --- | --- | --- | --- |
@@ -389,7 +391,7 @@ Notebook medians [25th, 75th percentiles] by condition; n counts successful port
 | javascript | source + target | 12 | 0.75 [0.72, 0.76] | 0.31 [0.28, 0.32] | 0.24 [0.22, 0.27] |
 | javascript | all | 12 | 0.76 [0.76, 0.79] | 0.3 [0.29, 0.31] | 0.24 [0.22, 0.27] |
 
-Notebook medians [25th, 75th percentiles] by condition; n counts successful ports, and missing values are omitted from each measure.
+Median [25th, 75th percentile] per condition, from the notebook; n counts successful ports.
 
 | Source | Given tests | n | Reference call edges retained (mean share) | Call-trace distance (median) |
 | --- | --- | --- | --- | --- |
@@ -412,45 +414,45 @@ Notebook medians [25th, 75th percentiles] by condition; n counts successful port
 
 ## Does including tests change how the agent reads the reference?
 
-**Why.** Mechanical transcript measures count recognized source and test reads, distinct paths read before the first write, rereads, searches per distinct path, and reads after the last write; counts include subagent transcripts. First-read tables distinguish the first read’s file class from whether the first source code file read is the package entry point. High counts mean more recognized reading or revisiting; low counts mean less, and missing means the required event was not observed. The hypothesis is that unit and source integration tests increase source-test reading, target integration tests increase target-test reading, and giving tests increases reading before implementation. A difference would show changed recorded actions, not comprehension, a better strategy, or reads the parser cannot recognize. A recursive directory search counts as one path read. [Measure definition](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/analysis/measure-transcript/README.md).
+**Why.** Counted, per run, from the transcript (subagents included): files read, in order. A read is a Read call or a reading shell command (`cat`, `head`, `grep`, ...); each file is classed as source code, source-language tests, target-language tests, the port, or other. Measures: reads per class; distinct files read before the first write into the port; rereads (reads of a file already read) and the most rereads of one file; Glob and Grep calls per distinct file read; reads after the last write; the class of the first file read; whether the first source file read is the package's entry point; and whether the run touched each supplied suite at all. High means more reading or rereading; low means less; no dot means the event never happened (for example, no write). Hypothesis: unit and source integration tests raise reads of source-language tests; target integration tests raise reads of target-language tests; any given suite raises reading before the first write. A difference would show the given tests changed what the agent did; it would not show understanding or a better strategy, and reads the parser cannot recognise are missed (a recursive grep of a directory counts as one read). Why it matters: reading is the route by which tests could reach the port. [Measure definition](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/analysis/measure-transcript/README.md).
 
 ![Files read before the first write into the port](charts/files-read-before-first-write.png)
 
-Files read before the first write into the port: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Distinct files read before the agent first writes into the port. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Most rereads of one file](charts/max-rereads-of-one-file.png)
 
-Most rereads of one file: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Rereads of the single most reread file. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Reads of the source language's shipped tests](charts/read-source-tests.png)
+![Reads of the source language's tests](charts/read-source-tests.png)
 
-Reads of the source language's shipped tests: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Reads of files in the source language's shipped test suites. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Reads of the source implementation](charts/read-source.png)
+![Reads of the source code](charts/read-source.png)
 
-Reads of the source implementation: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Reads of source-language files other than its tests. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Reads of the target language's shipped tests](charts/read-target-tests.png)
+![Reads of the target language's tests](charts/read-target-tests.png)
 
-Reads of the target language's shipped tests: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Reads of files in the target language's shipped integration tests. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Reads after the last write into the port](charts/reads-after-last-write.png)
 
-Reads after the last write into the port: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Reads after the agent's last write into the port. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Reads of a file already read](charts/reread-count.png)
+![Rereads](charts/reread-count.png)
 
-Reads of a file already read: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Reads of a file already read earlier in the run. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Glob and Grep calls per file read](charts/search-calls-per-file-read.png)
+![Searches per file read](charts/search-calls-per-file-read.png)
 
-Glob and Grep calls per file read: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Glob and Grep calls over distinct files read. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Source files read before the first write into the port](charts/source-files-read-before-first-write.png)
 
-Source files read before the first write into the port: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Distinct source-language files read before the agent first writes into the port. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-Notebook medians [25th, 75th percentiles] by condition; n counts successful ports, and missing values are omitted from each measure.
+Median [25th, 75th percentile] per condition, from the notebook; n counts successful ports.
 
 | Source | Given tests | n | Source-test reads | Target-test reads | Paths read before first write | Rereads |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -471,7 +473,7 @@ Notebook medians [25th, 75th percentiles] by condition; n counts successful port
 | javascript | source + target | 12 | 2.0 [1.0, 2.0] | 3.0 [3.0, 4.0] | 43.0 [42.5, 44.0] | 9.0 [8.0, 14.5] |
 | javascript | all | 12 | 10.5 [9.0, 12.0] | 3.5 [3.0, 4.25] | 50.5 [45.25, 64.5] | 39.5 [29.5, 54.25] |
 
-First-read counts from the notebook, in runs: the first three categories concern the first source code file; the remaining categories concern the first read of any class.
+Runs per condition, from the notebook: the first three columns classify the first source code file read; the rest classify the first file read of any kind.
 
 | Source | Given tests | Runs | Entry point first | Other source code first | No source code read | First read: source | First read: source tests | First read: target tests | First read: port | First read: other |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -492,7 +494,7 @@ First-read counts from the notebook, in runs: the first three categories concern
 | javascript | source + target | 12 | 7 | 3 | 2 | 0 | 0 | 0 | 0 | 12 |
 | javascript | all | 12 | 5 | 7 | 0 | 1 | 0 | 0 | 0 | 11 |
 
-Runs that touched supplied suites or contained a recognized differential script; “touched” includes reads, writes, edits, searches, shell arguments, and suite execution, so it is broader than reading.
+Runs per condition that touched each supplied suite (read, wrote, edited, searched, named in a shell command, or ran it) or contained a script running both the source and the port (differential script).
 
 | Source | Given tests | Runs | Touched source tests | Touched target tests | Differential script |
 | --- | --- | --- | --- | --- | --- |
@@ -515,93 +517,93 @@ Runs that touched supplied suites or contained a recognized differential script;
 
 ## Does including tests change how much work the port takes?
 
-**Why.** Per run, we count tokens, assistant turns, tool calls, test-suite executions, newly written test files, and elapsed wall time. The token charts split usage before the first write and from that write onward, counting input, output, cache creation, and cache reads; suite charts count the last observed passed or failed tests when a summary is recognized. High values mean more recorded activity or elapsed time; low values mean less, and missing suite counts mean no usable summary, not zero tests. The hypothesis is that any supplied suite adds reading and test execution, increasing those counts, while target integration tests could reduce revision work, tokens, and elapsed time by clarifying the required interface. Differences would describe resource use and recorded testing, not productivity or port quality; elapsed time also includes waits. The notebook includes model-call counts and wall time in its rank statistics, but does not export separate V2 charts for them.
+**Why.** Counted, per run: tokens before the first write into the port and from it on (input, output and cache tokens summed); assistant turns; calls per tool; network fetch or install attempts; the turn of the first write and of the last test run; test-suite runs; test files the agent wrote itself; and passed and failed counts from the last run of each suite. High means more activity; low means less; no dot means the event did not occur or no test summary was readable (not zero tests). Hypothesis: any given suite adds reading and test runs, raising these counts; target integration tests may lower tokens and turns by making the required interface explicit. A difference would show the given tests changed the effort spent; it would not show productivity or port quality. Why it matters: tests may cost effort even where they change nothing else. Total tokens, model calls and wall time have no per-condition chart; total tokens is in the table below and all three are in the statistics section.
 
-![Bash calls](charts/bash-calls.png)
+![Shell commands](charts/bash-calls.png)
 
-Bash calls: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Bash tool calls. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Edit calls](charts/edit-calls.png)
+![File edits](charts/edit-calls.png)
 
-Edit calls: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Edit tool calls. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Network fetch and install attempts](charts/fetch-attempts.png)
 
-Network fetch and install attempts: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+WebFetch and WebSearch calls plus `curl`, `wget`, `pip install` and `npm install` commands. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Turn of the first write into the port](charts/first-write-turn.png)
 
-Turn of the first write into the port: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Assistant turn at which the agent first writes into the port. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Failed tests in the last run of the agent's own tests](charts/last-own-tests-failed.png)
 
-Failed tests in the last run of the agent's own tests: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Tests reported failed by the last run of the agent's own tests; no dot when no run or no readable summary. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Passed tests in the last run of the agent's own tests](charts/last-own-tests-passed.png)
 
-Passed tests in the last run of the agent's own tests: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Tests reported passed by the last run of the agent's own tests; no dot when no run or no readable summary. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Failed tests in the last run of the source language's shipped tests](charts/last-source-tests-failed.png)
+![Failed tests in the last run of the source language's tests](charts/last-source-tests-failed.png)
 
-Failed tests in the last run of the source language's shipped tests: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Tests reported failed by the last run of the source language's tests; no dot when no run or no readable summary. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Passed tests in the last run of the source language's shipped tests](charts/last-source-tests-passed.png)
+![Passed tests in the last run of the source language's tests](charts/last-source-tests-passed.png)
 
-Passed tests in the last run of the source language's shipped tests: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Tests reported passed by the last run of the source language's tests; no dot when no run or no readable summary. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Turn of the last test suite run](charts/last-suite-run-turn.png)
+![Turn of the last test run](charts/last-suite-run-turn.png)
 
-Turn of the last test suite run: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Assistant turn of the last test-suite run. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Failed tests in the last run of the target language's shipped tests](charts/last-target-tests-failed.png)
+![Failed tests in the last run of the target language's tests](charts/last-target-tests-failed.png)
 
-Failed tests in the last run of the target language's shipped tests: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Tests reported failed by the last run of the target language's tests; no dot when no run or no readable summary. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Passed tests in the last run of the target language's shipped tests](charts/last-target-tests-passed.png)
+![Passed tests in the last run of the target language's tests](charts/last-target-tests-passed.png)
 
-Passed tests in the last run of the target language's shipped tests: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Tests reported passed by the last run of the target language's tests; no dot when no run or no readable summary. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Failed tests in the last run of a suite of more than one class](charts/last-unknown-failed.png)
+![Failed tests in the last test run covering more than one of source tests, target tests and own tests](charts/last-unknown-failed.png)
 
-Failed tests in the last run of a suite of more than one class: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Tests reported failed by the last test run covering more than one of source tests, target tests and own tests; no dot when no run or no readable summary. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Passed tests in the last run of a suite of more than one class](charts/last-unknown-passed.png)
+![Passed tests in the last test run covering more than one of source tests, target tests and own tests](charts/last-unknown-passed.png)
 
-Passed tests in the last run of a suite of more than one class: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Tests reported passed by the last test run covering more than one of source tests, target tests and own tests; no dot when no run or no readable summary. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Test files the agent wrote itself](charts/own-tests-written.png)
 
-Test files the agent wrote itself: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Test files written into the port that were not copied from the supplied suites. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Read calls](charts/read-calls.png)
+![File reads by the Read tool](charts/read-calls.png)
 
-Read calls: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Read tool calls (shell reads such as `cat` are not included). Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Glob and Grep calls](charts/search-calls.png)
+![File searches](charts/search-calls.png)
 
-Glob and Grep calls: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Glob and Grep tool calls. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Test suite runs](charts/suite-run-count.png)
+![Test-suite runs](charts/suite-run-count.png)
 
-Test suite runs: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Runs of pytest, vitest, jest, `node --test` or a package test script. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Tokens from the first write into the port on](charts/tokens-after-first-write.png)
 
-Tokens from the first write into the port on: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Input, output and cache tokens summed over turns from the first write on. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Tokens before the first write into the port](charts/tokens-before-first-write.png)
 
-Tokens before the first write into the port: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Input, output and cache tokens summed over turns before the first write. Dots: ports; tick: median; bar: IQR; panels: source language.
 
 ![Assistant turns](charts/turns.png)
 
-Assistant turns: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Assistant messages in the run. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-![Write calls](charts/write-calls.png)
+![Whole-file writes](charts/write-calls.png)
 
-Write calls: each dot is one port, the tick is its condition’s median, the faint bar spans its interquartile range, and one panel represents each source language; n counts nonmissing values.
+Write tool calls. Dots: ports; tick: median; bar: IQR; panels: source language.
 
-Notebook medians [25th, 75th percentiles] by condition; n counts successful ports, and missing values are omitted from each measure.
+Median [25th, 75th percentile] per condition, from the notebook; n counts successful ports.
 
 | Source | Given tests | n | Total tokens | Suite runs | Own test files |
 | --- | --- | --- | --- | --- | --- |
@@ -622,7 +624,7 @@ Notebook medians [25th, 75th percentiles] by condition; n counts successful port
 | javascript | source + target | 12 | 1254455.5 [1188150.0, 1543225.0] | 3.0 [2.75, 4.0] | 1.0 [0.75, 1.0] |
 | javascript | all | 12 | 3085734.5 [2993864.0, 3363053.0] | 10.0 [10.0, 11.0] | 23.0 [23.0, 24.0] |
 
-The notebook’s failure and token table below counts all selected attempts; tokens per success divides total recorded tokens across those attempts by successful ports. `api_error` is a recorded terminal reason and is distinct from the exit-1 count above.
+All attempts per condition, failed ones included, from the notebook; tokens per success is all attempts' tokens over successful ports; API errors counts attempts whose result records `api_error`.
 
 | Source | Given tests | Attempts | Exit 0 | Exit 137 | API errors | Tokens per success |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -645,19 +647,15 @@ The notebook’s failure and token table below counts all selected attempts; tok
 
 ## Does including tests change the port's similarity in embedding space?
 
-**Why.** The intended comparison embeds code files and averages nearest-file distances, weighted by file length, between a port and the reference or another port. Low distance means nearby representations and high distance means separated representations. The hypothesis is that unit and source integration tests constrain implementation choices, lowering distances between ports receiving the same suites; target integration tests may similarly constrain interface code. Such a difference would concern this representation and weighting, not prove behavioural agreement or correctness.
+**Why.** Would count: each code file embedded as a vector; for a port and the reference, or two ports, each file's distance to its nearest file on the other side, averaged with longer files weighted more. Low distance means the code reads alike to the embedding model; high means it does not. Hypothesis: unit and source integration tests constrain implementation choices, lowering distance between ports given the same suites; target integration tests do the same for interface code. A difference would concern this model's representation only; it would not show agreement in behaviour or correctness. Why it matters: it is a whole-codebase similarity that needs no hand-written comparison rules.
 
-The separate embedding-pair export failed validation: `ValueError: cached file selection differs from source` for the Python reference embedding cache. No V2 embedding chart is emitted by this notebook revision. Its embedding charts and the separate embedding-pair export select V1 runs, so they are not included as measurements of this study. [Export selection](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/analysis/notebook/export_embedding_pairs.py).
+**No V2 embedding charts exist.** The notebook's embedding charts select V1 runs only, so `export_charts.py` produced none for this study. The separate [embedding-pair export](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/analysis/notebook/export_embedding_pairs.py), also V1 only, failed: `compare_corpus → validate_cache → ValueError: cached file selection differs from source` for the Python reference.
 
 ## Which differences are larger than chance?
 
-**Why.** For each lead measure, the notebook compares the median with each flag on against its median with that flag off, both pooled and within source language; it also correlates per-run ranks. A large positive gap means a larger on median, a negative gap a smaller one, and a gap near zero similar medians. A small permutation p means few shuffled labels give as large an absolute gap; a wide bootstrap interval means less precise estimation. A rank correlation near +1 or −1 means consistent same-order or reverse-order ranks; near zero means little monotonic association. These screen the directional hypotheses above for each flag, and test whether structural or process measures track held-out agreement. They do not establish a mechanism, validate a proxy as correctness, or establish absence of an effect. This study is exploratory and runs many tests without correction, so these are screening numbers, not confirmations.
+**Why.** For each lead measure and each flag, runs with the flag on are compared with runs with it off, pooled over both source languages and within each. `gap` is the on median minus the off median: positive means the on runs' median is higher, negative lower, near zero alike. `p` is the share of 10,000 random reshuffles of the on/off labels (seed 0) giving a gap at least as far from zero; small p means few reshuffles do. `low` to `high` is a 95% bootstrap interval on the gap (10,000 resamples, seed 0); wide means imprecise. `minimum_detectable_gap` is the smallest gap the same reshuffles could give p < 0.05 at this n; a row with p ≥ 0.05 reads as a gap too small to see at this n, never as no effect. Spearman ρ ranks runs on two measures and asks whether the orders agree: +1 same order, −1 reverse, 0 unrelated. Hypothesis: each flag moves its measures in the directions stated in the sections above, and structure and process measures that track held-out agreement rank with it. A small p flags a gap for review; it does not establish a mechanism, make a structural measure a stand-in for correctness, or, when large, show absence of an effect. Why it matters: this is the screen for which charts above deserve a closer look. The study is exploratory and runs many tests without correction, so these are screening numbers, not confirmations. Tables keep the notebook's rows, columns and rounding; `pooled` combines both directions.
 
-Each row sets the runs with the flag on against the runs with it off, pooled over both source languages and then within each. `gap` is the on median minus the off median. `p` is the share of 10,000 shuffles of the on/off labels (seed 0) whose gap is at least as far from zero. `low` to `high` is a 95% bootstrap interval on the gap (10,000 resamples, seed 0). A gap has to be larger than `minimum_detectable_gap` for the same shuffles to give p < 0.05 at this n. A row with p ≥ 0.05 reads as a gap too small to see with this n, never as no effect.
-
-The following per-flag permutation and bootstrap tables retain the notebook’s rows, columns, and rounding; `source_language = pooled` combines both directions.
-
-### Held-out behavior agreement with the reference (%)
+### Held-out behaviour agreement with the reference (%)
 
 | flag | source_language | n_on | n_off | median_on | median_off | gap | low | high | p | minimum_detectable_gap |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -699,7 +697,7 @@ The following per-flag permutation and bootstrap tables retain the notebook’s 
 | include_target_integration_tests | python | 48 | 48 | 0.77 | 0.79 | -0.02 | -0.03 | 0 | 0.0331 | 0.01 |
 | include_target_integration_tests | javascript | 48 | 48 | 0.76 | 0.75 | 0.01 | 0 | 0.02 | 0.0523 | 0.01 |
 
-### Median tree edit distance between paired functions, normalised
+### Shape difference of paired functions (median)
 
 | flag | source_language | n_on | n_off | median_on | median_off | gap | low | high | p | minimum_detectable_gap |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -713,7 +711,7 @@ The following per-flag permutation and bootstrap tables retain the notebook’s 
 | include_target_integration_tests | python | 48 | 48 | 0.25 | 0.27 | -0.02 | -0.02 | -0.01 | 0.0021 | 0.01 |
 | include_target_integration_tests | javascript | 48 | 48 | 0.3 | 0.34 | -0.04 | -0.04 | -0.02 | 0.0001 | 0.02 |
 
-### Distance between the port's and the reference's branching distributions
+### Difference in branching between port and reference
 
 | flag | source_language | n_on | n_off | median_on | median_off | gap | low | high | p | minimum_detectable_gap |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -727,7 +725,7 @@ The following per-flag permutation and bootstrap tables retain the notebook’s 
 | include_target_integration_tests | python | 48 | 48 | 0.36 | 0.28 | 0.07 | 0.05 | 0.1 | 0.0001 | 0.03 |
 | include_target_integration_tests | javascript | 48 | 48 | 0.23 | 0.23 | 0 | -0.02 | 0.02 | 0.7338 | 0.02 |
 
-### Share of the reference's call edges the port also makes, mean over entry points
+### Share of the reference's call links the port also makes
 
 | flag | source_language | n_on | n_off | median_on | median_off | gap | low | high | p | minimum_detectable_gap |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -741,7 +739,7 @@ The following per-flag permutation and bootstrap tables retain the notebook’s 
 | include_target_integration_tests | python | 48 | 48 | 0.47 | 0.47 | 0 | 0 | 0.05 | 1 | 0 |
 | include_target_integration_tests | javascript | 48 | 48 | 0.73 | 0.72 | 0.01 | -0.02 | 0.06 | 0.372 | 0.04 |
 
-### Edit distance between the reference's and the port's call traces, median over entry points
+### Difference in call order from each entry point
 
 | flag | source_language | n_on | n_off | median_on | median_off | gap | low | high | p | minimum_detectable_gap |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -769,7 +767,7 @@ The following per-flag permutation and bootstrap tables retain the notebook’s 
 | include_target_integration_tests | python | 48 | 48 | 1860776 | 1960712 | -99936 | -1456272.04 | 1079213.22 | 0.9336 | 1200375 |
 | include_target_integration_tests | javascript | 48 | 48 | 2296659 | 2016821.5 | 279837.5 | -929054 | 1045305 | 0.6957 | 866518 |
 
-### LOC
+### Lines of code in the port
 
 | flag | source_language | n_on | n_off | median_on | median_off | gap | low | high | p | minimum_detectable_gap |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -783,7 +781,7 @@ The following per-flag permutation and bootstrap tables retain the notebook’s 
 | include_target_integration_tests | python | 48 | 48 | 984 | 980 | 4 | -18.5 | 22 | 0.5024 | 16.5 |
 | include_target_integration_tests | javascript | 48 | 48 | 1017.5 | 941.5 | 76 | 41 | 102 | 0.0001 | 40 |
 
-### Reads of the source language's shipped tests
+### Reads of the source language's tests
 
 | flag | source_language | n_on | n_off | median_on | median_off | gap | low | high | p | minimum_detectable_gap |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -797,7 +795,7 @@ The following per-flag permutation and bootstrap tables retain the notebook’s 
 | include_target_integration_tests | python | 48 | 48 | 3 | 4 | -1 | -3.5 | 4 | 0.4638 | 2.5 |
 | include_target_integration_tests | javascript | 48 | 48 | 3 | 4.5 | -1.5 | -3.5 | 4 | 0.4677 | 3 |
 
-### Reads of the target language's shipped tests
+### Reads of the target language's tests
 
 | flag | source_language | n_on | n_off | median_on | median_off | gap | low | high | p | minimum_detectable_gap |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -811,7 +809,7 @@ The following per-flag permutation and bootstrap tables retain the notebook’s 
 | include_target_integration_tests | python | 48 | 48 | 4 | 0 | 4 | 3 | 4 | 0.0001 | 3 |
 | include_target_integration_tests | javascript | 48 | 48 | 3 | 0 | 3 | 3 | 4 | 0.3095 | 3 |
 
-### Test suite runs
+### Test-suite runs
 
 | flag | source_language | n_on | n_off | median_on | median_off | gap | low | high | p | minimum_detectable_gap |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -853,7 +851,7 @@ The following per-flag permutation and bootstrap tables retain the notebook’s 
 | include_target_integration_tests | python | 48 | 48 | 49 | 45 | 4 | -12.5 | 7.5 | 0.2695 | 5 |
 | include_target_integration_tests | javascript | 48 | 48 | 44 | 39.5 | 4.5 | 0.5 | 12 | 0.0016 | 3 |
 
-### Reads of a file already read
+### Rereads
 
 | flag | source_language | n_on | n_off | median_on | median_off | gap | low | high | p | minimum_detectable_gap |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -869,70 +867,68 @@ The following per-flag permutation and bootstrap tables retain the notebook’s 
 
 ### Rank correlation with held-out behaviour
 
-The notebook’s Spearman table correlates each listed measure with held-out behaviour agreement over paired nonmissing runs; n is the number of such pairs, and coefficients retain the notebook’s three-decimal rounding.
+Spearman ρ between each measure and held-out behaviour agreement, over the n runs with both values; the notebook's three-decimal rounding.
 
 | Measure | Spearman ρ | n |
 | --- | --- | --- |
-| api_agreement_pct | 0.977 | 192 |
-| reference_accept_port_accept | 0.959 | 192 |
-| reference_error_port_error | 0.622 | 192 |
-| reference_accept_port_crash | -0.621 | 192 |
-| reference_reject_port_crash | -0.621 | 192 |
-| reference_error_port_crash | -0.621 | 192 |
-| reference_error_port_reject | 0.617 | 192 |
-| read_target_tests | 0.458 | 192 |
-| reference_reject_port_error | -0.447 | 192 |
-| reference_reject_port_reject | 0.442 | 192 |
-| reference_accept_port_error | -0.427 | 192 |
-| loc | 0.403 | 192 |
-| ast_median_trace_normalised | -0.316 | 192 |
-| ast_mean_edge_recall | 0.303 | 192 |
-| duration_ms | -0.292 | 192 |
-| suite_run_count | 0.153 | 192 |
-| reference_accept_port_reject | -0.152 | 192 |
-| ast_tree_edit_median | 0.132 | 192 |
-| reread_count | 0.108 | 192 |
-| read_source_tests | -0.087 | 192 |
-| api_calls | 0.081 | 192 |
-| file_count | -0.078 | 192 |
-| reference_reject_port_accept | 0.058 | 192 |
-| total_tokens | -0.048 | 192 |
-| own_tests_written | 0.028 | 192 |
-| files_read_before_first_write | -0.026 | 192 |
-| ast_branching_wasserstein | 0 | 192 |
-| ast_matched_fraction | 0 | 192 |
+| Held-out API agreement (%) (`api_agreement_pct`) | 0.977 | 192 |
+| Pairs the reference accepts, the port accepts (`reference_accept_port_accept`) | 0.959 | 192 |
+| Pairs the reference errors, the port errors (`reference_error_port_error`) | 0.622 | 192 |
+| Pairs the reference accepts, the port crashes (`reference_accept_port_crash`) | -0.621 | 192 |
+| Pairs the reference rejects, the port crashes (`reference_reject_port_crash`) | -0.621 | 192 |
+| Pairs the reference errors, the port crashes (`reference_error_port_crash`) | -0.621 | 192 |
+| Pairs the reference errors, the port rejects (`reference_error_port_reject`) | 0.617 | 192 |
+| Reads of target-language tests (`read_target_tests`) | 0.458 | 192 |
+| Pairs the reference rejects, the port errors (`reference_reject_port_error`) | -0.447 | 192 |
+| Pairs the reference rejects, the port rejects (`reference_reject_port_reject`) | 0.442 | 192 |
+| Pairs the reference accepts, the port errors (`reference_accept_port_error`) | -0.427 | 192 |
+| Lines of code in the port (`loc`) | 0.403 | 192 |
+| Call-order difference from entry points (`ast_median_trace_normalised`) | -0.316 | 192 |
+| Share of reference call links kept (`ast_mean_edge_recall`) | 0.303 | 192 |
+| Wall time (`duration_ms`) | -0.292 | 192 |
+| Test-suite runs (`suite_run_count`) | 0.153 | 192 |
+| Pairs the reference accepts, the port rejects (`reference_accept_port_reject`) | -0.152 | 192 |
+| Shape difference of paired functions (median) (`ast_tree_edit_median`) | 0.132 | 192 |
+| Rereads (`reread_count`) | 0.108 | 192 |
+| Reads of source-language tests (`read_source_tests`) | -0.087 | 192 |
+| Model calls (`api_calls`) | 0.081 | 192 |
+| Files in the port (`file_count`) | -0.078 | 192 |
+| Pairs the reference rejects, the port accepts (`reference_reject_port_accept`) | 0.058 | 192 |
+| Total tokens (`total_tokens`) | -0.048 | 192 |
+| Own test files written (`own_tests_written`) | 0.028 | 192 |
+| Files read before first write (`files_read_before_first_write`) | -0.026 | 192 |
+| Branching difference (`ast_branching_wasserstein`) | 0 | 192 |
+| Share of reference functions paired (`ast_matched_fraction`) | 0 | 192 |
 
 ![How per-run measures rank against each other on V2 runs (Spearman)](charts/spearman-matrix.png)
 
-Each square plots the Spearman rank correlation between two per-run measures across the successful ports, with color and a printed coefficient from −1 to +1.
+Spearman rank correlation between every pair of per-run measures over the 192 successful ports; each square's colour (red −1, white 0, blue +1) and printed number give ρ. Axis labels are notebook column names; the table above gives plain names for those paired with behaviour agreement.
 
-Reference diff similarity and test pass rates are not measured on V2 runs: `measure-code-distance` takes no javascript target and `execute-test-suite` finds no V2 suite in the derivation cache.
+Not measured on V2 runs: reference diff similarity (`measure-code-distance` takes no JavaScript target) and test pass rates (`execute-test-suite` finds no V2 suite).
 
 ## Does a judge see a difference?
 
-**Why.** The code rubric judges API parity, structure, semantic divergences, idiom, and an ordinal fidelity score; the transcript rubric judges cheating, structure decisions, and reading strategy. Higher fidelity scores would mean greater rubric-rated fidelity, while lower scores would mean less. The hypothesis is that source integration tests improve judged semantic parity, unit tests preserve judged structure, and target integration tests improve judged API parity. A difference would show what these judges rate under the rubrics, not establish correctness or agreement with human review; the human reference pair is judged blind as a baseline. [Rubric design](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/notes/ANALYSIS_PLAN_2026-10-12.md).
+**Why.** Counted: an LLM judge scores each port under two rubrics. The code rubric rates API parity, structure, semantic divergences and idiom against the reference, plus a fidelity score on an ordered scale; the transcript rubric rates cheating, structure decisions and reading strategy. A high fidelity score means the judge rates the port as faithful to the reference; low, unfaithful. Hypothesis: source integration tests raise judged semantic parity, unit tests raise judged structural fidelity, target integration tests raise judged API parity. A difference would show what this judge rates under these rubrics; it would not establish correctness or agreement with human review (the human-written reference pair is judged blind as a baseline). Why it matters: a judge can see differences no mechanical measure was written for. [Rubric design](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/notes/ANALYSIS_PLAN_2026-10-12.md).
 
-In progress; both rubrics are being judged, results will be added here: the code rubric and the transcript rubric.
+In progress; both rubrics (code and transcript) are being judged, results will be added here.
 
 ## Do LLM walkthroughs of the port cover the reference's?
 
-**Why.** Independent LLM walkthroughs describe each implementation’s public entry points, happy paths, error paths, and invariants; embedding alignment then counts the share of reference steps matched, their order agreement, and extra port steps. High coverage would mean more reference explanation steps have aligned port steps; low coverage would mean fewer. The hypothesis is that source integration tests increase coverage of behavioural and error paths, while target integration tests increase coverage of public interface steps. A difference would show agreement between generated explanations and their alignment, not prove code equivalence; repeated-reference and cross-language-reference comparisons provide comparison lines for explanation variability. [Walkthrough design](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/notes/ANALYSIS_PLAN_2026-10-12.md).
+**Why.** Counted: an LLM writes a step-by-step walkthrough of each implementation's public entry points, normal paths, error paths and invariants; steps are matched across port and reference by embedding similarity. Coverage is the share of the reference walkthrough's steps with a matching port step; also counted are order agreement and extra port steps. High coverage means the port's walkthrough explains most of what the reference's does; low means it leaves steps out. Hypothesis: source integration tests raise coverage of behaviour and error paths; target integration tests raise coverage of public-interface steps. A difference would show agreement between generated explanations, not code equivalence; repeated walkthroughs of the reference, and of the reference in the other language, give the spread expected from explanation alone. Why it matters: it compares what the code does in prose, independent of names and structure. [Walkthrough design](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/notes/ANALYSIS_PLAN_2026-10-12.md).
 
 In progress; port and reference walkthroughs are being generated and compared, results will be added here.
 
-## What this report does not do.
+## What this report does not do
 
-No conclusions are drawn here; results are reviewed with Kevin. The [methodology review](https://github.com/thekevinscott/ports-research/blob/methodology-review/notes/REVIEW_2026-10-12-methodology.md) records the measurement limits; [PR #153](https://github.com/thekevinscott/ports-research/pull/153) is open at report generation.
+No conclusions are drawn here; results are reviewed with Kevin. The [methodology review](https://github.com/thekevinscott/ports-research/blob/methodology-review/notes/REVIEW_2026-10-12-methodology.md) ([PR #153](https://github.com/thekevinscott/ports-research/pull/153)) records the measurement limits.
 
-## How this was made.
+## How this was made
 
-Every chart is a direct export of the [analysis notebook](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/analysis/notebook/runs.py) at commit `8999c36b8d8ed765f20682fc54f9799a317750ad`. The embedding server is `qwen3-embedding-0.6b-q8_0`, last-token pooling, llama.cpp on tower (`http://100.124.147.77:8180/v1`). The [notebook README](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/analysis/notebook/README.md) describes both exports.
-
-`PORTS_RUNS_DIR` selects an input directory containing the five matrices’ run directories plus the V1 inputs required by the unchanged exporter. The report copies only V2 PNGs. The input directories use hardlinked files; no port or transcript was inspected for this report. The initial directory-symlink selection was skipped by the scanner and failed in the notebook’s first cell with `ColumnNotFoundError: "include_python_tests" not found`; the directory selection was corrected without editing the notebook.
+Every chart is a direct export of the [analysis notebook](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/analysis/notebook/runs.py) at commit `8999c36`, with embeddings from `qwen3-embedding-0.6b-q8_0` (last-token pooling, llama.cpp on tower). `PORTS_RUNS_DIR` pointed the notebook at a directory holding only the five matrices' run directories and the V1 inputs the exporter requires. Commands, from the [notebook README](https://github.com/thekevinscott/ports-research/blob/8999c36b8d8ed765f20682fc54f9799a317750ad/analysis/notebook/README.md):
 
 ```sh
-GENERATE_EMBEDDING_BASE_URL=http://100.124.147.77:8180/v1 UV_NO_CONFIG=1 uv run --directory analysis/notebook python export_charts.py
-UV_NO_CONFIG=1 uv run --directory analysis/notebook python export_embedding_pairs.py
+PORTS_RUNS_DIR=<selected runs> GENERATE_EMBEDDING_BASE_URL=<tower>/v1 UV_NO_CONFIG=1 uv run --directory analysis/notebook python export_charts.py
+PORTS_RUNS_DIR=<selected runs> UV_NO_CONFIG=1 uv run --directory analysis/notebook python export_embedding_pairs.py
 ```
 
-This report includes 87 light PNG charts; their combined size is below 20 MB, with no downscaling. Summary medians and quartiles, first-read and touched-test counts, failure/token tables, flag comparisons, and Spearman coefficients come from the notebook’s own table functions; confusion counts sum the notebook’s per-run counts by condition.
+87 light PNG charts, under 20 MB, not downscaled. Medians, quartiles, first-read and touched-suite counts, failure and token counts, flag comparisons and Spearman coefficients are the notebook's own tables; confusion counts sum the notebook's per-run counts by condition.
