@@ -67,7 +67,15 @@ def definitions(*names: str) -> dict:
     ]
     # Constants first: a function reads them when it runs, a constant when it is defined.
     nodes.sort(key=lambda node: isinstance(node, ast.FunctionDef))
-    namespace = {"alt": alt, "pl": pl, "V2_FLAGS": V2_FLAG_NAMES}
+    from src.stats import compare, spearman
+
+    namespace = {
+        "alt": alt,
+        "pl": pl,
+        "V2_FLAGS": V2_FLAG_NAMES,
+        "compare": compare,
+        "spearman": spearman,
+    }
     module = ast.Module(body=nodes, type_ignores=[])
     exec(compile(ast.fix_missing_locations(module), str(NOTEBOOK), "exec"), namespace)
     return namespace
@@ -92,15 +100,45 @@ CHART_NAMES = (
     "behavior_title",
     "behavior_chart",
     "behavior_runs",
+    "DOT_STROKE",
+    "IQR_OPACITY",
+    "IQR_WIDTH",
+    "SURFACE",
+    "V2_LEADS",
+    "V2_SCOPES",
+    "V2_MEASURES",
+    "SPEARMAN_CELL_PX",
+    "DIVERGING",
+    "n_label_expr",
+    "iqr_bar",
+    "v2_cells",
+    "by_cell",
+    "v2_measures",
+    "v2_summary",
+    "v2_failures",
+    "flag_comparison",
+    "varied_measures",
+    "spearman_table",
+    "spearman_matrix",
+    "spearman_chart",
 )
 
 
-def v2_row(run_id, source, flags, agreement, note=None):
+def v2_row(
+    run_id, source, flags, agreement, note=None, *, tokens=1000, loc=500, exit_code=0, reason=None
+):
     return {
         "run_id": run_id,
         "source_language": source,
         "target_language": "javascript" if source == "python" else "python",
         **dict(zip(V2_FLAG_NAMES, flags)),
+        "exit_code": exit_code,
+        "terminal_reason": reason,
+        "total_tokens": tokens,
+        "api_calls": 10,
+        "duration_ms": 60_000,
+        "file_count": 5,
+        "loc": loc,
         "behavior_agreement_pct": agreement,
         "reference_accept_port_crash": 0,
         "behavior_note": note,
@@ -108,10 +146,16 @@ def v2_row(run_id, source, flags, agreement, note=None):
 
 
 V2_RUNS = [
-    v2_row("a", "python", (0, 1, 1), 99.0),
-    v2_row("b", "python", (0, 1, 1), 97.0),
-    v2_row("c", "python", (1, 1, 1), 96.0),
-    v2_row("d", "javascript", (0, 0, 0), 0.0, "every pair crashed: no src/index.ts"),
+    v2_row("a", "python", (0, 1, 1), 99.0, tokens=1000, loc=400),
+    v2_row("b", "python", (0, 1, 1), 97.0, tokens=3000, loc=600),
+    v2_row("c", "python", (1, 1, 1), 96.0, tokens=2000, loc=700),
+    v2_row("d", "javascript", (0, 0, 0), 0.0, "every pair crashed: no src/index.ts", tokens=4000, loc=900),
+]
+# Every finished attempt: the exit-0 runs above plus the ones the forward tables exclude.
+V2_ATTEMPTS = [
+    *V2_RUNS,
+    v2_row("killed", "python", (0, 1, 1), None, tokens=500, exit_code=137),
+    v2_row("failed", "javascript", (0, 0, 0), None, tokens=None, exit_code=1, reason="api_error"),
 ]
 
 
@@ -154,10 +198,10 @@ def test_the_behavior_chart_draws_a_dot_per_run_and_a_median_tick_per_condition(
         "javascript → python",
     ]
     marks = [layer["mark"]["type"] for layer in panels[0]["layer"]]
-    assert marks == ["tick", "point"]
-    assert panels[0]["layer"][0]["encoding"]["y"]["field"] == "value"
-    assert panels[0]["layer"][0]["encoding"]["y"]["aggregate"] == "median"
-    x = panels[0]["layer"][1]["encoding"]["x"]
+    assert marks == ["rule", "tick", "point"]
+    assert panels[0]["layer"][1]["encoding"]["y"]["field"] == "value"
+    assert panels[0]["layer"][1]["encoding"]["y"]["aggregate"] == "median"
+    x = panels[0]["layer"][2]["encoding"]["x"]
     assert x["title"] == "test inclusion"
     assert x["scale"]["domain"] == [label for label, *_ in namespace["V2_CONDITIONS"]]
     datasets = spec["datasets"]
@@ -197,3 +241,163 @@ def test_the_notebook_renders_the_behavior_section():
 
 def test_the_chart_export_takes_the_behavior_chart_from_the_notebook():
     assert 'notebook["behavior_chart"]' in (NOTEBOOK.parent / "export_charts.py").read_text()
+
+
+def test_the_behavior_chart_draws_the_interquartile_range_behind_the_dots():
+    import polars as pl
+
+    namespace = definitions(*CHART_NAMES)
+    spec = namespace["behavior_chart"](pl.DataFrame(V2_RUNS)).to_dict()
+    iqr = spec["concat"][0]["layer"][0]
+    assert iqr["mark"]["type"] == "rule"
+    assert iqr["mark"]["color"] == namespace["DOT_STROKE"]
+    assert iqr["mark"]["opacity"] < 0.5
+    assert iqr["encoding"]["y"]["aggregate"] == "q1"
+    assert iqr["encoding"]["y2"]["aggregate"] == "q3"
+
+
+def test_every_behavior_panel_labels_each_condition_with_its_n():
+    import polars as pl
+
+    namespace = definitions(*CHART_NAMES)
+    for metric in ("behavior_agreement_pct", "reference_accept_port_crash"):
+        spec = namespace["behavior_chart"](pl.DataFrame(V2_RUNS), metric).to_dict()
+        python, javascript = (panel["layer"][2]["encoding"]["x"]["axis"]["labelExpr"] for panel in spec["concat"])
+        assert "'source + target': 'n=2'" in python
+        assert "'all': 'n=1'" in python
+        assert "'none': 'n=0'" in python
+        assert "'none': 'n=1'" in javascript
+
+
+def summary_row(table, source, condition):
+    import polars as pl
+
+    return table.filter(
+        (pl.col("source_language") == source) & (pl.col("condition") == condition)
+    ).row(0, named=True)
+
+
+def test_the_v2_summary_has_n_exclusions_and_the_quartiles_of_every_lead():
+    import polars as pl
+
+    namespace = definitions(*CHART_NAMES)
+    table = namespace["v2_summary"](pl.DataFrame(V2_RUNS), pl.DataFrame(V2_ATTEMPTS))
+    assert table.height == 16
+    row = summary_row(table, "python", "source + target")
+    assert row["n"] == 2
+    assert row["excluded_exit_137"] == 1
+    assert row["excluded_exit_1"] == 0
+    assert row["median_behavior_agreement_pct"] == 98.0
+    assert row["q1_behavior_agreement_pct"] == 97.5
+    assert row["q3_behavior_agreement_pct"] == 98.5
+    assert (row["q1_total_tokens"], row["median_total_tokens"], row["q3_total_tokens"]) == (
+        1500.0,
+        2000.0,
+        2500.0,
+    )
+    assert row["median_loc"] == 500.0
+    empty = summary_row(table, "python", "none")
+    assert (empty["n"], empty["excluded_exit_137"]) == (0, 0)
+    assert summary_row(table, "javascript", "none")["excluded_exit_1"] == 1
+
+
+def test_the_failure_table_counts_exits_and_tokens_per_successful_run():
+    import polars as pl
+
+    table = definitions(*CHART_NAMES)["v2_failures"](pl.DataFrame(V2_ATTEMPTS))
+    assert table.height == 16
+    python = summary_row(table, "python", "source + target")
+    assert (python["attempts"], python["exit_0"], python["exit_137"], python["api_error"]) == (
+        3,
+        2,
+        1,
+        0,
+    )
+    # Every token the cell spent, the killed run's included, over its two exit-0 runs.
+    assert python["tokens_per_success"] == (1000 + 3000 + 500) / 2
+    javascript = summary_row(table, "javascript", "none")
+    assert (javascript["exit_0"], javascript["api_error"]) == (1, 1)
+    assert javascript["tokens_per_success"] == 4000
+    assert summary_row(table, "python", "none")["tokens_per_success"] is None
+
+
+def test_the_flag_comparison_has_a_row_per_flag_pooled_and_per_source():
+    import polars as pl
+
+    table = definitions(*CHART_NAMES)["flag_comparison"](
+        pl.DataFrame(V2_RUNS), "behavior_agreement_pct"
+    )
+    assert table.height == 9
+    assert table.columns[:2] == ["flag", "source_language"]
+    for column in ("n_on", "n_off", "gap", "p", "low", "high", "minimum_detectable_gap"):
+        assert column in table.columns
+    pooled = table.filter(
+        (pl.col("flag") == "include_unit_tests") & (pl.col("source_language") == "pooled")
+    ).row(0, named=True)
+    assert (pooled["n_on"], pooled["n_off"]) == (1, 3)
+    assert pooled["gap"] == 96.0 - 97.0
+    python = table.filter(
+        (pl.col("flag") == "include_unit_tests") & (pl.col("source_language") == "python")
+    ).row(0, named=True)
+    assert (python["n_on"], python["n_off"]) == (1, 2)
+
+
+def test_the_spearman_table_ranks_every_varied_measure_against_behavior_agreement():
+    import polars as pl
+
+    table = definitions(*CHART_NAMES)["spearman_table"](pl.DataFrame(V2_RUNS))
+    measures = table["measure"].to_list()
+    assert "behavior_agreement_pct" not in measures
+    # Constant over these runs, so its rank correlation is undefined.
+    assert "reference_accept_port_crash" not in measures
+    assert set(measures) == {"total_tokens", "loc"}
+    # agreement 99, 97, 96, 0 against loc 400, 600, 700, 900: a reversed order.
+    assert round(table.filter(pl.col("measure") == "loc")["rho"][0], 9) == -1.0
+    assert table["rho"].abs().to_list() == sorted(table["rho"].abs().to_list(), reverse=True)
+
+
+def test_the_spearman_heatmap_is_titled_in_prose_and_draws_every_pair():
+    import polars as pl
+
+    spec = definitions(*CHART_NAMES)["spearman_chart"](pl.DataFrame(V2_RUNS)).to_dict()
+    assert spec["title"]["text"] == "How per-run measures rank against each other on V2 runs (Spearman)"
+    cells = spec["layer"][0]
+    assert cells["mark"]["type"] == "rect"
+    assert len(spec["datasets"][spec["data"]["name"]]) == 3 * 3
+
+
+def test_v2_runs_carry_their_size():
+    from types import SimpleNamespace
+
+    size_columns = definitions("size_columns")["size_columns"]
+    assert size_columns(SimpleNamespace(file_count=5, loc=500)) == {"file_count": 5, "loc": 500}
+
+
+def test_the_v2_attempts_keep_runs_that_exited_nonzero():
+    assert "include_nonzero_exit=True" in assigned("v2_attempts")
+
+
+def test_how_to_read_describes_the_v2_study_and_marks_the_v1_sections():
+    (cell,) = [
+        cell
+        for cell in ast.parse(SOURCE).body
+        if isinstance(cell, ast.FunctionDef) and "## Statistical analysis" in ast.unparse(cell)
+    ]
+    text = ast.unparse(cell)
+    assert "16 cells" in text
+    assert "12 runs" in text
+    assert "V1" in text
+
+
+def test_the_notebook_renders_the_v2_statistics_section():
+    rendered = [
+        cell
+        for cell in ast.parse(SOURCE).body
+        if isinstance(cell, ast.FunctionDef)
+        and any(ast.unparse(node) == "v2_statistics_report()" for node in cell.body)
+    ]
+    assert len(rendered) == 1
+
+
+def test_the_chart_export_takes_the_spearman_heatmap_from_the_notebook():
+    assert 'notebook["spearman_chart"]' in (NOTEBOOK.parent / "export_charts.py").read_text()
