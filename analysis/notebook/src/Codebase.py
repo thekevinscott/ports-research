@@ -59,7 +59,10 @@ reference_diff_cache = disk_cache / (
 
 behavior_cache = disk_cache / (lambda contents, **kwargs: f"codebases/behavior/{contents}.pkl")
 api_cache = disk_cache / (lambda contents, **kwargs: f"codebases/api/{contents}.pkl")
-ast_cache = disk_cache / (lambda contents, **kwargs: f"codebases/ast/{contents}.pkl")
+# A change to measure-ast's source changes its report, so the source hash keys the cache too.
+ast_cache = disk_cache / (
+    lambda contents, **kwargs: f"codebases/ast/{MEASURE_AST_VERSION}/{contents}.pkl"
+)
 transcript_cache = disk_cache / (lambda contents, **kwargs: f"codebases/transcript/{contents}.pkl")
 
 
@@ -108,6 +111,9 @@ def content_hash(path: Path) -> str:
             digest.update(f"{file.relative_to(path)}\n".encode())
             digest.update(sha256(file.read_bytes()).digest())
     return digest.hexdigest()
+
+
+MEASURE_AST_VERSION = content_hash(MEASURE_AST_DIR / "src")
 
 
 def transcript_hash(run_dir: Path) -> str:

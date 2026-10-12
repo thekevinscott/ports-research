@@ -1247,8 +1247,9 @@ def describe_ast_compare():
         codebase.ast_note
         assert ast_compare_process.run.call_count == 1
 
-    def it_caches_under_codebases_ast_by_the_ports_contents():
-        assert str(codebase_module.ast_cache.path("abc")).endswith("codebases/ast/abc.pkl")
+    def it_caches_under_codebases_ast_by_measure_asts_source_and_the_ports_contents():
+        version = codebase_module.content_hash(codebase_module.MEASURE_AST_DIR / "src")
+        assert str(codebase_module.ast_cache.path("abc")).endswith(f"codebases/ast/{version}/abc.pkl")
 
     def it_serves_a_port_with_the_same_contents_from_the_cache(
         monkeypatch, tmp_path, python_port, pinned_reference
