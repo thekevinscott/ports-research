@@ -1,0 +1,29 @@
+[[python.exempt]]
+path = "judge/__init__.py"
+rules = ["colocated-test"]
+reason = "empty package marker; the CLI is tested in cli_test.py"
+
+[[python.exempt]]
+path = "judge/cli.py"
+rules = ["one-function-per-file"]
+reason = "run and report are click subcommands registered on the one group; each is a wiring shim over a function tested in its own module"
+
+[[python.exempt]]
+path = "judge/cli_test.py"
+rules = ["unmocked-collaborator", "no-first-party-patch"]
+reason = "click's CliRunner is the harness driving the unit; run_judge and report are patched at their cli import binding to test argument wiring"
+
+[[python.exempt]]
+path = "judge/code_item_test.py"
+rules = ["unmocked-collaborator"]
+reason = "which files appear is part of the item text under test; source_files is that selection"
+
+[[python.exempt]]
+path = "judge/run_judge_test.py"
+rules = ["no-first-party-patch"]
+reason = "build_items, find_runs, shuffle_items, clone_reference and judge_item are patched at their run_judge import binding; the orchestration is the unit"
+
+[[python.exempt]]
+path = "judge/build_items_test.py"
+rules = ["no-first-party-patch"]
+reason = "code_item and transcript_item are patched at their build_items import binding to assert which trees and files each item is built from"
