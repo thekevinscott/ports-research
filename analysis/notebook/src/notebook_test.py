@@ -106,6 +106,12 @@ CHART_NAMES = (
     "AST_LEADS",
     "AST_TITLES",
     "ast_title",
+    "TRANSCRIPT_LEADS",
+    "TRANSCRIPT_TITLES",
+    "transcript_title",
+    "metric_title",
+    "METRIC_TITLES",
+    "lead_title",
     "DOT_STROKE",
     "IQR_OPACITY",
     "IQR_WIDTH",
@@ -142,6 +148,7 @@ def v2_row(
     loc=500,
     exit_code=0,
     reason=None,
+    suites=0,
 ):
     return {
         "run_id": run_id,
@@ -162,12 +169,16 @@ def v2_row(
         "ast_matched_fraction": None,
         "ast_tree_edit_median": None,
         "ast_branching_wasserstein": None,
+        "read_source_tests": 0,
+        "read_target_tests": 0,
+        "suite_run_count": suites,
+        "own_tests_written": 0,
     }
 
 
 V2_RUNS = [
-    v2_row("a", "python", (0, 1, 1), 99.0, api=90.0, tokens=1000, loc=400),
-    v2_row("b", "python", (0, 1, 1), 97.0, api=95.0, tokens=3000, loc=600),
+    v2_row("a", "python", (0, 1, 1), 99.0, api=90.0, tokens=1000, loc=400, suites=3),
+    v2_row("b", "python", (0, 1, 1), 97.0, api=95.0, tokens=3000, loc=600, suites=5),
     v2_row("c", "python", (1, 1, 1), 96.0, api=80.0, tokens=2000, loc=700),
     v2_row(
         "d", "javascript", (0, 0, 0), 0.0, "every pair crashed: no src/index.ts", api=0.0, tokens=4000, loc=900
@@ -319,6 +330,7 @@ def test_the_v2_summary_has_n_exclusions_and_the_quartiles_of_every_lead():
         2500.0,
     )
     assert row["median_loc"] == 500.0
+    assert row["median_suite_run_count"] == 4.0
     empty = summary_row(table, "python", "none")
     assert (empty["n"], empty["excluded_exit_137"]) == (0, 0)
     assert summary_row(table, "javascript", "none")["excluded_exit_1"] == 1
@@ -373,7 +385,7 @@ def test_the_spearman_table_ranks_every_varied_measure_against_behavior_agreemen
     assert "behavior_agreement_pct" not in measures
     # Constant over these runs, so its rank correlation is undefined.
     assert "reference_accept_port_crash" not in measures
-    assert set(measures) == {"api_agreement_pct", "total_tokens", "loc"}
+    assert set(measures) == {"api_agreement_pct", "total_tokens", "loc", "suite_run_count"}
     # agreement 99, 97, 96, 0 against loc 400, 600, 700, 900: a reversed order.
     assert round(table.filter(pl.col("measure") == "loc")["rho"][0], 9) == -1.0
     assert table["rho"].abs().to_list() == sorted(table["rho"].abs().to_list(), reverse=True)
@@ -386,7 +398,7 @@ def test_the_spearman_heatmap_is_titled_in_prose_and_draws_every_pair():
     assert spec["title"]["text"] == "How per-run measures rank against each other on V2 runs (Spearman)"
     cells = spec["layer"][0]
     assert cells["mark"]["type"] == "rect"
-    assert len(spec["datasets"][spec["data"]["name"]]) == 4 * 4
+    assert len(spec["datasets"][spec["data"]["name"]]) == 5 * 5
 
 
 def test_the_spearman_heatmap_diverges_through_grey_without_passing_through_another_hue():
@@ -802,3 +814,188 @@ def test_the_notebook_renders_the_ast_section_right_after_the_api_section():
 
 def test_the_chart_export_takes_the_ast_chart_from_the_notebook():
     assert 'notebook["ast_chart"]' in (NOTEBOOK.parent / "export_charts.py").read_text()
+TRANSCRIPT_LEAD_NAMES = ["read_source_tests", "read_target_tests", "suite_run_count", "own_tests_written"]
+TRANSCRIPT_REPORT = {
+    "turns": 21,
+    "bash_calls": 21,
+    "read_calls": 0,
+    "write_calls": 0,
+    "edit_calls": 0,
+    "search_calls": 0,
+    "read_source": 4,
+    "read_source_tests": 2,
+    "read_target_tests": 9,
+    "touched_source_tests": True,
+    "touched_target_tests": True,
+    "suite_runs": [{"turn": 18, "command": "pytest", "suite": "unknown", "passed": 320, "failed": 0}],
+    "suite_run_count": 2,
+    "last_suite_counts": {"target_tests": {"passed": 320, "failed": 1}},
+    "own_tests_written": 1,
+    "own_test_files": ["/target/tests/conftest.py"],
+    "differential_script": True,
+    "differential_evidence": {"turn": 16, "command": "python3 a.py && node b.js"},
+    "fetch_attempts": 0,
+    "fetch_commands": [],
+    "input_tokens": 42,
+    "output_tokens": 30559,
+    "cache_read_tokens": 1176607,
+    "cache_creation_tokens": 73505,
+    "tokens_before_first_write": 443246,
+    "tokens_after_first_write": 837467,
+    "first_write_turn": 11,
+    "last_suite_run_turn": 18,
+}
+TRANSCRIPT_NAMES = (
+    *CHART_NAMES,
+    "TRANSCRIPT_COUNTED",
+    "transcript_chart",
+    "transcript_counts",
+    "transcript_runs",
+)
+
+
+def transcript_columns(report=TRANSCRIPT_REPORT):
+    from types import SimpleNamespace
+
+    namespace = definitions("transcript_columns", "TRANSCRIPT_DROPPED", "SUITE_CLASSES")
+    return namespace["transcript_columns"](SimpleNamespace(transcript=report))
+
+
+def transcript_row(run_id, source, flags, *, suites, touched=False, differential=False, first_write=11):
+    return {
+        "run_id": run_id,
+        "source_language": source,
+        "target_language": "javascript" if source == "python" else "python",
+        **dict(zip(V2_FLAG_NAMES, flags)),
+        **transcript_columns(),
+        "suite_run_count": suites,
+        "touched_target_tests": touched,
+        "differential_script": differential,
+        "first_write_turn": first_write,
+    }
+
+
+def transcript_frame():
+    import polars as pl
+
+    return pl.DataFrame(
+        [
+            transcript_row("a", "python", (0, 1, 1), suites=3, touched=True, differential=True),
+            transcript_row("b", "python", (0, 1, 1), suites=5, touched=True),
+            transcript_row("c", "python", (1, 1, 1), suites=0, first_write=None),
+            transcript_row("d", "javascript", (0, 0, 0), suites=1),
+        ]
+    )
+
+
+def test_v2_runs_carry_the_transcript_leads_for_the_statistics():
+    assert ast.literal_eval(assigned("TRANSCRIPT_LEADS")) == TRANSCRIPT_LEAD_NAMES
+    assert "codebase.transcript[lead] for lead in TRANSCRIPT_LEADS" in assigned("v2_runs")
+
+
+def test_the_transcript_section_measures_v2_runs_only():
+    assert "for codebase in v2_codebases" in assigned("v2_transcript_runs")
+
+
+def test_a_v2_run_carries_every_transcript_count_but_the_cache_split_of_its_tokens():
+    columns = transcript_columns()
+    for dropped in ("input_tokens", "output_tokens", "cache_read_tokens", "cache_creation_tokens"):
+        assert dropped not in columns
+    assert (columns["tokens_before_first_write"], columns["tokens_after_first_write"]) == (443246, 837467)
+    assert [column for column in TRANSCRIPT_LEAD_NAMES if column not in columns] == []
+    assert (columns["touched_target_tests"], columns["differential_script"]) == (True, True)
+
+
+def test_a_v2_run_carries_the_last_pass_and_fail_counts_of_each_suite_class():
+    columns = transcript_columns()
+    assert (columns["last_target_tests_passed"], columns["last_target_tests_failed"]) == (320, 1)
+    assert columns["last_own_tests_passed"] is None
+    assert len([column for column in columns if column.startswith("last_") and column != "last_suite_run_turn"]) == 8
+
+
+def test_a_v2_run_quotes_the_differential_evidence_and_holds_no_lists():
+    columns = transcript_columns()
+    assert columns["differential_evidence"] == "python3 a.py && node b.js"
+    written = transcript_columns({**TRANSCRIPT_REPORT, "differential_evidence": {"turn": 4, "path": "/target/diff.py"}})
+    assert written["differential_evidence"] == "/target/diff.py"
+    absent = transcript_columns({**TRANSCRIPT_REPORT, "differential_evidence": None})
+    assert absent["differential_evidence"] is None
+    assert not any(isinstance(value, (list, dict)) for value in columns.values())
+
+
+def test_every_charted_transcript_column_has_a_prose_title():
+    namespace = definitions(*TRANSCRIPT_NAMES)
+    charted = [
+        column
+        for column in transcript_columns()
+        if column not in (*namespace["TRANSCRIPT_COUNTED"], "differential_evidence")
+    ]
+    titles = [namespace["transcript_title"](column) for column in charted]
+    assert len(set(titles)) == len(charted)
+    assert not any("_" in title for title in titles)
+    assert set(namespace["TRANSCRIPT_TITLES"]) == set(charted)
+
+
+def test_the_transcript_chart_draws_a_dot_per_run_a_median_tick_and_an_interquartile_bar_from_zero():
+    import polars as pl
+
+    namespace = definitions(*TRANSCRIPT_NAMES)
+    spec = namespace["transcript_chart"](transcript_frame(), "suite_run_count").to_dict()
+    assert spec["title"]["text"] == "Test suite runs"
+    panels = spec["concat"]
+    assert [panel["title"]["text"] for panel in panels] == ["python → javascript", "javascript → python"]
+    layers = panels[0]["layer"]
+    assert [layer["mark"]["type"] for layer in layers] == ["rule", "tick", "point"]
+    assert layers[0]["encoding"]["y"]["aggregate"] == "q1"
+    assert layers[1]["encoding"]["y"]["aggregate"] == "median"
+    assert layers[2]["encoding"]["y"]["scale"] == {"zero": True}
+    assert "'source + target': 'n=2'" in layers[2]["encoding"]["x"]["axis"]["labelExpr"]
+
+
+def test_the_transcript_chart_leaves_a_run_without_a_value_out_of_the_dots_and_the_n():
+    import polars as pl
+
+    namespace = definitions(*TRANSCRIPT_NAMES)
+    spec = namespace["transcript_chart"](transcript_frame(), "first_write_turn").to_dict()
+    python = spec["concat"][0]
+    assert len(spec["datasets"][python["data"]["name"]]) == 2
+    assert "'all': 'n=0'" in python["layer"][2]["encoding"]["x"]["axis"]["labelExpr"]
+
+
+def test_the_transcript_table_counts_runs_that_touched_the_target_tests_or_ran_a_differential_script():
+    import polars as pl
+
+    table = definitions(*TRANSCRIPT_NAMES)["transcript_counts"](transcript_frame())
+    assert table.height == 16
+    row = summary_row(table, "python", "source + target")
+    assert (row["n"], row["touched_target_tests"], row["differential_script"]) == (2, 2, 1)
+    empty = summary_row(table, "python", "none")
+    assert (empty["n"], empty["touched_target_tests"], empty["differential_script"]) == (0, 0, 0)
+
+
+def test_the_transcript_run_table_quotes_the_differential_evidence():
+    import polars as pl
+
+    runs = definitions(*TRANSCRIPT_NAMES)["transcript_runs"](transcript_frame())
+    row = runs.filter(pl.col("run_id") == "a").row(0, named=True)
+    assert row["condition"] == "source + target"
+    assert row["differential_evidence"] == "python3 a.py && node b.js"
+    assert runs.columns[:7] == ["run_id", "source_language", "condition", *TRANSCRIPT_LEAD_NAMES]
+
+
+def test_the_per_flag_comparison_and_the_rank_correlations_take_the_transcript_leads():
+    import polars as pl
+
+    namespace = definitions(*CHART_NAMES)
+    assert namespace["V2_LEADS"][-4:] == TRANSCRIPT_LEAD_NAMES
+    assert set(TRANSCRIPT_LEAD_NAMES) <= set(namespace["v2_measures"](pl.DataFrame(V2_RUNS)))
+    assert namespace["lead_title"]("own_tests_written") == "Test files the agent wrote itself"
+
+
+def test_the_notebook_renders_the_transcript_section_between_the_ast_section_and_the_statistics():
+    assert rendered_cell("transcript_report()") == rendered_cell("ast_report()") + 2
+    assert rendered_cell("v2_statistics_report()") == rendered_cell("transcript_report()") + 2
+
+
+def test_the_chart_export_takes_the_transcript_chart_from_the_notebook():
+    assert 'notebook["transcript_chart"]' in (NOTEBOOK.parent / "export_charts.py").read_text()

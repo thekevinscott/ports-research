@@ -43,6 +43,7 @@ BEHAVIOR_GROUP = "held-out-behavior"
 V2_STATISTICS_GROUP = "v2-statistics"
 API_GROUP = "held-out-api"
 AST_GROUP = "ast-relative-to-reference"
+TRANSCRIPT_GROUP = "transcripts"
 # A section whose lead column is charted alone needs a name for the chart of what is left.
 OTHER_COLUMNS = {
     "diff": "reference-diff-other-columns",
@@ -205,6 +206,14 @@ def charts(notebook):
     if v2_runs.height:
         for column in notebook["AST_TITLES"]:
             yield f"{AST_GROUP}/{slug(column)}", notebook["ast_chart"](v2_runs, column)
+
+    v2_transcript_runs = notebook["v2_transcript_runs"]
+    if v2_transcript_runs.height:
+        for column in notebook["TRANSCRIPT_TITLES"]:
+            yield (
+                f"{TRANSCRIPT_GROUP}/{slug(column)}",
+                notebook["transcript_chart"](v2_transcript_runs, column),
+            )
 
 
 def write(chart, stem):
