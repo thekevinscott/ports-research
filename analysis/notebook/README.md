@@ -19,6 +19,8 @@ Edit: `uv run --directory analysis/notebook marimo edit runs.py`. Unit tests: `j
 Charts to disk: `GENERATE_EMBEDDING_BASE_URL=http://127.0.0.1:8089/v1 uv run --directory analysis/notebook python export_charts.py`
 writes every chart the notebook renders to `charts/` as SVG, PNG and Vega-Lite JSON, built from the notebook's own chart functions.
 
+Embedding vectors are cached under `~/.cache/ports/analysis/embeddings-stripped/qwen3-embedding-0.6b-q8_0-pooling-last/`, keyed on the model file and pooling. Before embedding, the notebook reads the server's `GET <url>/models` entry for the model (a llama.cpp router lists `--model` and `--pooling` under `status.args`) and refuses a server that reports another file or pooling, or reports neither.
+
 Embedding comparisons only: `uv run --directory analysis/notebook python export_embedding_pairs.py`.
 Validates existing stripped caches against the source, then exports all 380 forward
 port pairs (within direction, across conditions) and 40 port/reference comparisons,
