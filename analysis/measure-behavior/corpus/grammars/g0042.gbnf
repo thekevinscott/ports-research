@@ -1,0 +1,4 @@
+root ::= ":" | tail-part "\x3E(\\" "B" tail-part [+] [^0-\x39{] [^a-z\]] ":c\x5A" [^'一-丏0-9]
+word ::= tail-part  # held-out grammar
+tail-part ::= [\x2Da-z一-丏] | ("\r_{"+)? | "\r\x3B0" | "_\tA_" | ";Z"
+extra ::= *"a"

@@ -1,0 +1,5 @@
+#
+root ::= ".\x7B"
+head-part ::= chunk
+chunk ::= ("\x78B" | "[];"+) "\x62\r|😀" "\x78x😀!" [^*{] [^c] [A-F\]>] [一-\u4E0F]+
+item ::= [*|]

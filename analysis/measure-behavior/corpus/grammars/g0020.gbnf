@@ -1,0 +1,5 @@
+root ::= tail-part
+atom ::= "yxé\U0001F600"  # held-out grammar
+
+tail-part ::= ("\x2B" "!<\x63")?
+

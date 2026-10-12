@@ -1,0 +1,3 @@
+root ::= [0-9中] chunk | "\x63\n"  # held-out grammar
+chunk ::= [;]?
+pair ::= "}\x62" "/1 "* | [λ] [0] "\x62_|_" | [}}] | "!\xDFZ"* | [1] "\x30" (")\x419" | "<\né" | "(\n>")  # held-out grammar

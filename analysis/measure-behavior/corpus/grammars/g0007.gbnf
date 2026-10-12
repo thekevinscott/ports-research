@@ -1,0 +1,2 @@
+root ::= ("," | "b\rc*")* (item | "\x3Ca!^" | [^c"λ] | "x\x62:\x63" | item)
+item ::= [\u03BB]?  # a comment | with ::= inside

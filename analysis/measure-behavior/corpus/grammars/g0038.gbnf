@@ -1,0 +1,6 @@
+root ::= [\r]
+atom ::= "(\x5E[ "?
+tail-part ::= (pair | [\[A-F']) [a-z\\0-9] "\x2D\x5AA" | ",xA"*  #
+pair ::= "\n\x62\xDF" "中'"? "\x3F\x7C" "<"
+
+extra ::= "\q"

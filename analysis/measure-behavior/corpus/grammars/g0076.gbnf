@@ -1,0 +1,12 @@
+# held-out grammar
+nest ::= [0-90-9 ] nest ";=" | [^z;]
+tail-part ::= [^a-z>]
+
+chunk ::= [\\]
+head-part ::= chunk* nest (
+  "[\n\\" |
+  nest) (
+  nest |
+  [{]) chunk  # a comment | with ::= inside
+root ::= "\t\x30" ([^α-ω] "-x")?  # a comment | with ::= inside
+extra ::= ("a"

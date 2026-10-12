@@ -1,0 +1,799 @@
+{"grammar": "g0000", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0000", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0000", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0000", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0000", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n*ßé中*ßé中*ß\"é中\n          ^"}
+{"grammar": "g0000", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n*ß中\n  ^"}
+{"grammar": "g0000", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n*ßé中*ßé中*ß中\n          ^"}
+{"grammar": "g0000", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nßé中\n^"}
+{"grammar": "g0001", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0001", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0001", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0001", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0001", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0001", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0001", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n😀λ\">ß😀c1\t\rzb:Z0λ,\"c中/\n                    ^"}
+{"grammar": "g0001", "input": 7, "outcome": "reject", "error": null}
+{"grammar": "g0001", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n']\tac\rzb:Z0λ,\"c中\n^"}
+{"grammar": "g0001", "input": 9, "outcome": "reject", "error": null}
+{"grammar": "g0001", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n😀!\rzb:Z0λ,\"c中é\n             ^"}
+{"grammar": "g0002", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0002", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0002", "input": 2, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n [\n ^"}
+{"grammar": "g0002", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n {\n ^"}
+{"grammar": "g0003", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 24\n\n# held-out grammar\nroot := \"0é\" \"|)^\" \"λ\" \"/\" atom \"\\t\\\\_\\x62\"\n      ^"}
+{"grammar": "g0003", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 24\n\n# held-out grammar\nroot := \"0é\" \"|)^\" \"λ\" \"/\" atom \"\\t\\\\_\\x62\"\n      ^"}
+{"grammar": "g0003", "input": 2, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 24\n\n# held-out grammar\nroot := \"0é\" \"|)^\" \"λ\" \"/\" atom \"\\t\\\\_\\x62\"\n      ^"}
+{"grammar": "g0004", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0004", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0004", "input": 2, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n'a\n ^"}
+{"grammar": "g0004", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n'\t\n ^"}
+{"grammar": "g0004", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n'=\n ^"}
+{"grammar": "g0004", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n'b\n ^"}
+{"grammar": "g0005", "input": 0, "outcome": "error", "error": "KeyError: 'root'"}
+{"grammar": "g0005", "input": 1, "outcome": "error", "error": "KeyError: 'root'"}
+{"grammar": "g0005", "input": 2, "outcome": "error", "error": "KeyError: 'root'"}
+{"grammar": "g0006", "input": 0, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0006", "input": 1, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0006", "input": 2, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0007", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0007", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0007", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0007", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0007", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0007", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nb\rc*b\rc*b\rc*xb:ca\n                ^"}
+{"grammar": "g0007", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nb\rc*<\rc*b\rc*xb:c\n     ^"}
+{"grammar": "g0007", "input": 7, "outcome": "accept", "error": null}
+{"grammar": "g0007", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nb\rc*\r,,x\n     ^"}
+{"grammar": "g0007", "input": 9, "outcome": "reject", "error": null}
+{"grammar": "g0008", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0008", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0008", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0008", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0008", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n中1\\=\n ^"}
+{"grammar": "g0008", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n中cx=\n  ^"}
+{"grammar": "g0008", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n中c\\=中c\\=+\n        ^"}
+{"grammar": "g0008", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\ncc\\=中c\\=\n^"}
+{"grammar": "g0008", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n中c\\=中c\\=中c\\9=\n           ^"}
+{"grammar": "g0009", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0009", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0009", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0009", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0009", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0009", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0009", "input": 6, "outcome": "reject", "error": null}
+{"grammar": "g0009", "input": 7, "outcome": "reject", "error": null}
+{"grammar": "g0009", "input": 8, "outcome": "reject", "error": null}
+{"grammar": "g0009", "input": 9, "outcome": "reject", "error": null}
+{"grammar": "g0009", "input": 10, "outcome": "accept", "error": null}
+{"grammar": "g0010", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0010", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0010", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0010", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0010", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0010", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0010", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0010", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n.ρλ\n^"}
+{"grammar": "g0010", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n中λ\t0Am/\n   ^"}
+{"grammar": "g0010", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nh-1B\tλ\n   ^"}
+{"grammar": "g0010", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n中λ\tAm\t/\n      ^"}
+{"grammar": "g0010", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nh-1中B\t中\n      ^"}
+{"grammar": "g0011", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0011", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0011", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0011", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nλ^ _\n   ^"}
+{"grammar": "g0011", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n=λ^ \n^"}
+{"grammar": "g0011", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nλ^ (\n   ^"}
+{"grammar": "g0011", "input": 6, "outcome": "reject", "error": null}
+{"grammar": "g0011", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\\λ^ \n^"}
+{"grammar": "g0012", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0012", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0012", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0012", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0012", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0012", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0012", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0012", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n[[*0?)bB\n   ^"}
+{"grammar": "g0012", "input": 8, "outcome": "reject", "error": null}
+{"grammar": "g0012", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n[[-*.?)bB(\n    ^"}
+{"grammar": "g0012", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n[[*b?|bB?)bB-\n     ^"}
+{"grammar": "g0012", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n[([-*b?)bB(\n ^"}
+{"grammar": "g0013", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 5\n\nroot := ([\\x7B] ([}\\t一-丏] | [\\x22 ] | item) [\\[\\x7Cé]+)+\n     ^"}
+{"grammar": "g0013", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 5\n\nroot := ([\\x7B] ([}\\t一-丏] | [\\x22 ] | item) [\\[\\x7Cé]+)+\n     ^"}
+{"grammar": "g0013", "input": 2, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 5\n\nroot := ([\\x7B] ([}\\t一-丏] | [\\x22 ] | item) [\\[\\x7Cé]+)+\n     ^"}
+{"grammar": "g0014", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0014", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0014", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0014", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\ny0+y0\n  ^"}
+{"grammar": "g0014", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\na\n^"}
+{"grammar": "g0014", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n}y0\n^"}
+{"grammar": "g0014", "input": 6, "outcome": "reject", "error": null}
+{"grammar": "g0014", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\ny中0y0\n ^"}
+{"grammar": "g0015", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting preceding item to */+/? at 144\n\nchunk ::= \"<\\x2E\\x28)\"+\nword ::= [ßα-ω0-9]\nextra ::= *\"a\"\n             ^"}
+{"grammar": "g0015", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting preceding item to */+/? at 144\n\nchunk ::= \"<\\x2E\\x28)\"+\nword ::= [ßα-ω0-9]\nextra ::= *\"a\"\n             ^"}
+{"grammar": "g0015", "input": 2, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting preceding item to */+/? at 144\n\nchunk ::= \"<\\x2E\\x28)\"+\nword ::= [ßα-ω0-9]\nextra ::= *\"a\"\n             ^"}
+{"grammar": "g0016", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0016", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0016", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0016", "input": 3, "outcome": "reject", "error": null}
+{"grammar": "g0016", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\né\n^"}
+{"grammar": "g0016", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n<\n^"}
+{"grammar": "g0016", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nß\n^"}
+{"grammar": "g0016", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n!\n^"}
+{"grammar": "g0017", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0017", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0017", "input": 2, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n_|\n ^"}
+{"grammar": "g0017", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n_(\n ^"}
+{"grammar": "g0017", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n<_\n^"}
+{"grammar": "g0017", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\ny_\n^"}
+{"grammar": "g0018", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting newline or end at 305\n\nroot ::= (\"0'b\" (head-part | \"\\x3D\\n\\\"^\" | digits) [+] \":\\x39中a\" head-part)?\n\n                                                                                                                                                                                                                                     ^"}
+{"grammar": "g0018", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting newline or end at 305\n\nroot ::= (\"0'b\" (head-part | \"\\x3D\\n\\\"^\" | digits) [+] \":\\x39中a\" head-part)?\n\n                                                                                                                                                                                                                                     ^"}
+{"grammar": "g0019", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0019", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0019", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0019", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0019", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nC\n\n^"}
+{"grammar": "g0019", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nD*\n ^"}
+{"grammar": "g0019", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\ny\t\n ^"}
+{"grammar": "g0019", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nya\n ^"}
+{"grammar": "g0019", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n9C\n^"}
+{"grammar": "g0020", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0020", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0020", "input": 2, "outcome": "reject", "error": null}
+{"grammar": "g0020", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n'\n^"}
+{"grammar": "g0020", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n+A<c\n ^"}
+{"grammar": "g0020", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n(\n^"}
+{"grammar": "g0020", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n/\n^"}
+{"grammar": "g0021", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0021", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0021", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0021", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0021", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0021", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0021", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nυ^υ}\n   ^"}
+{"grammar": "g0021", "input": 7, "outcome": "accept", "error": null}
+{"grammar": "g0021", "input": 8, "outcome": "accept", "error": null}
+{"grammar": "g0021", "input": 9, "outcome": "accept", "error": null}
+{"grammar": "g0021", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nυ^υ,\n   ^"}
+{"grammar": "g0022", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0022", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0022", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0022", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0022", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0022", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0022", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0022", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nλ\"\n;中λc<ßcé\n      ^"}
+{"grammar": "g0022", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nλ\")\n  ^"}
+{"grammar": "g0022", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nλ\"\n中λcacé\n ^"}
+{"grammar": "g0022", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nλ\"a;中λc\rcé\n  ^"}
+{"grammar": "g0022", "input": 11, "outcome": "reject", "error": null}
+{"grammar": "g0023", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 5\n\nroot = (\"\\x2A\"+ | tail-part \"\\x7A!}\") [a-\\x7A\\n]\n     ^"}
+{"grammar": "g0023", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 5\n\nroot = (\"\\x2A\"+ | tail-part \"\\x7A!}\") [a-\\x7A\\n]\n     ^"}
+{"grammar": "g0023", "input": 2, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 5\n\nroot = (\"\\x2A\"+ | tail-part \"\\x7A!}\") [a-\\x7A\\n]\n     ^"}
+{"grammar": "g0024", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0024", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0024", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0024", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0024", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0024", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0024", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0024", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n|ß:!!!+2(\n   ^"}
+{"grammar": "g0024", "input": 8, "outcome": "reject", "error": null}
+{"grammar": "g0024", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n|ß:;!!!;^';ßz{^*z{^1E\n               ^"}
+{"grammar": "g0024", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n|ß:😀;|ß:;!!{2(\n   ^"}
+{"grammar": "g0024", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n|ß:;!!!;^';z{^ßz{^1E\n           ^"}
+{"grammar": "g0025", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0025", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0025", "input": 2, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n|中y):\n^"}
+{"grammar": "g0025", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n中{y):\n ^"}
+{"grammar": "g0025", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n中y1:\n  ^"}
+{"grammar": "g0025", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n中y):B\n    ^"}
+{"grammar": "g0025", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n中y):b\n    ^"}
+{"grammar": "g0026", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting preceding item to */+/? at 201\n\natom ::= [a\\t😀] | [\"] | \" B}\" |\n  \"😀\\n1\" | \"\\x39\"\n\n                                                                                                                                                         ^"}
+{"grammar": "g0026", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting preceding item to */+/? at 201\n\natom ::= [a\\t😀] | [\"] | \" B}\" |\n  \"😀\\n1\" | \"\\x39\"\n\n                                                                                                                                                         ^"}
+{"grammar": "g0027", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Unknown escape at \\\n\nroot ::= ([^\\u4E2D] item item)* | ([^bß] \",\" [z])*\nitem ::= [x\\\\]\nextra ::= \"\\q\"\n             ^"}
+{"grammar": "g0027", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Unknown escape at \\\n\nroot ::= ([^\\u4E2D] item item)* | ([^bß] \",\" [z])*\nitem ::= [x\\\\]\nextra ::= \"\\q\"\n             ^"}
+{"grammar": "g0027", "input": 2, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Unknown escape at \\\n\nroot ::= ([^\\u4E2D] item item)* | ([^bß] \",\" [z])*\nitem ::= [x\\\\]\nextra ::= \"\\q\"\n             ^"}
+{"grammar": "g0028", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0028", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0028", "input": 2, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nλb\n ^"}
+{"grammar": "g0028", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\tλ\n^"}
+{"grammar": "g0028", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nλz\n ^"}
+{"grammar": "g0028", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n;\n^"}
+{"grammar": "g0029", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0029", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0029", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0029", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0029", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n-1'=\n   ^"}
+{"grammar": "g0029", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nß/-1aby=\n    ^"}
+{"grammar": "g0029", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nß/ß/-1'aby=b\n=\n^"}
+{"grammar": "g0029", "input": 7, "outcome": "reject", "error": null}
+{"grammar": "g0029", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n-1'a)\n    ^"}
+{"grammar": "g0030", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0030", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0030", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0030", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0030", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0030", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0030", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n (\",*\t/<?\n        ^"}
+{"grammar": "g0030", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n9'c\n  ^"}
+{"grammar": "g0030", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n(\",*\t/<\n ^"}
+{"grammar": "g0030", "input": 9, "outcome": "accept", "error": null}
+{"grammar": "g0030", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n-9'\n ^"}
+{"grammar": "g0031", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: No rules were found\n\n\n^"}
+{"grammar": "g0031", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: No rules were found\n\n\n^"}
+{"grammar": "g0031", "input": 2, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: No rules were found\n\n\n^"}
+{"grammar": "g0032", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0032", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0032", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0032", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0032", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0032", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0032", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\t>{{\r\n   ^"}
+{"grammar": "g0032", "input": 7, "outcome": "reject", "error": null}
+{"grammar": "g0032", "input": 8, "outcome": "reject", "error": null}
+{"grammar": "g0032", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n>\t>{.ι\n    ^"}
+{"grammar": "g0033", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0033", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0033", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0033", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0033", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0033", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0033", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0033", "input": 7, "outcome": "accept", "error": null}
+{"grammar": "g0033", "input": 8, "outcome": "accept", "error": null}
+{"grammar": "g0033", "input": 9, "outcome": "accept", "error": null}
+{"grammar": "g0033", "input": 10, "outcome": "accept", "error": null}
+{"grammar": "g0034", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0034", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0034", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0034", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0034", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0034", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0034", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\ny\tZ][cz\rb0\n ^"}
+{"grammar": "g0034", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n]λA:λ<z\rb0\n    ^"}
+{"grammar": "g0034", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\tZ][c\nz\rb0\n^"}
+{"grammar": "g0034", "input": 9, "outcome": "reject", "error": null}
+{"grammar": "g0034", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nyZ][cz}\rb0\n      ^"}
+{"grammar": "g0035", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0035", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0035", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0035", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0035", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0035", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0035", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0035", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n!;?'λzπi9y9:\\\t(l]Ab'1[ß^b'1[ß1\n                             ^"}
+{"grammar": "g0035", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n丌-=\\\rb\n    ^"}
+{"grammar": "g0035", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n!;?'λzπi9y9:\\\t(l]Ab'1[ß^b'1[ß.\n                             ^"}
+{"grammar": "g0035", "input": 10, "outcome": "reject", "error": null}
+{"grammar": "g0035", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\ny!\n ^"}
+{"grammar": "g0036", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0036", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0036", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0036", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0036", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0036", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0036", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0036", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n*{\r*{\r*{}'+\n        ^"}
+{"grammar": "g0036", "input": 8, "outcome": "reject", "error": null}
+{"grammar": "g0036", "input": 9, "outcome": "accept", "error": null}
+{"grammar": "g0036", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n*{\r*{\rz\n\n^"}
+{"grammar": "g0036", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nB(\n ^"}
+{"grammar": "g0037", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting newline or end at 273\n\n  (\"xy'\" | nest |\n  [0a-z]) [B]\n\n                                                                                         ^"}
+{"grammar": "g0037", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting newline or end at 273\n\n  (\"xy'\" | nest |\n  [0a-z]) [B]\n\n                                                                                         ^"}
+{"grammar": "g0037", "input": 2, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting newline or end at 273\n\n  (\"xy'\" | nest |\n  [0a-z]) [B]\n\n                                                                                         ^"}
+{"grammar": "g0038", "input": 0, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0038", "input": 1, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0038", "input": 2, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0039", "input": 0, "outcome": "error", "error": "IndexError: string index out of range"}
+{"grammar": "g0039", "input": 1, "outcome": "error", "error": "IndexError: string index out of range"}
+{"grammar": "g0039", "input": 2, "outcome": "error", "error": "IndexError: string index out of range"}
+{"grammar": "g0040", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: No rules were found\n\n\n^"}
+{"grammar": "g0040", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: No rules were found\n\n\n^"}
+{"grammar": "g0041", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0041", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0041", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0041", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0041", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0041", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0041", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n|\t0a\tc,cé\n        ^"}
+{"grammar": "g0041", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\tςc\n^"}
+{"grammar": "g0041", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n|\t0a\n\tc,c\n^"}
+{"grammar": "g0041", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n|\tyc^\n    ^"}
+{"grammar": "g0041", "input": 10, "outcome": "reject", "error": null}
+{"grammar": "g0042", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting preceding item to */+/? at 211\n\nword ::= tail-part  # held-out grammar\ntail-part ::= [\\x2Da-z一-丏] | (\"\\r_{\"+)? | \"\\r\\x3B0\" | \"_\\tA_\" | \";Z\"\nextra ::= *\"a\"\n             ^"}
+{"grammar": "g0042", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting preceding item to */+/? at 211\n\nword ::= tail-part  # held-out grammar\ntail-part ::= [\\x2Da-z一-丏] | (\"\\r_{\"+)? | \"\\r\\x3B0\" | \"_\\tA_\" | \";Z\"\nextra ::= *\"a\"\n             ^"}
+{"grammar": "g0042", "input": 2, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting preceding item to */+/? at 211\n\nword ::= tail-part  # held-out grammar\ntail-part ::= [\\x2Da-z一-丏] | (\"\\r_{\"+)? | \"\\r\\x3B0\" | \"_\\tA_\" | \";Z\"\nextra ::= *\"a\"\n             ^"}
+{"grammar": "g0043", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0043", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0043", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0043", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0043", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0043", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0043", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0043", "input": 7, "outcome": "reject", "error": null}
+{"grammar": "g0043", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nZ\"+/}s1B!B中_;+1.😀|1B\n    ^"}
+{"grammar": "g0043", "input": 9, "outcome": "reject", "error": null}
+{"grammar": "g0043", "input": 10, "outcome": "reject", "error": null}
+{"grammar": "g0043", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n(\"+/万n1BB1.😀1F\n            ^"}
+{"grammar": "g0044", "input": 0, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0044", "input": 1, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0045", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 10\n\nhead-part = [\\r}_]*\n          ^"}
+{"grammar": "g0045", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 10\n\nhead-part = [\\r}_]*\n          ^"}
+{"grammar": "g0045", "input": 2, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 10\n\nhead-part = [\\r}_]*\n          ^"}
+{"grammar": "g0046", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0046", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0046", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0046", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0046", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0046", "input": 5, "outcome": "reject", "error": null}
+{"grammar": "g0046", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n,/é=AZ*=AZ*丈=AZ*=AZ*丂=AZ*=AZ*\n ^"}
+{"grammar": "g0046", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n(\n^"}
+{"grammar": "g0046", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\né?\n ^"}
+{"grammar": "g0046", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nééB\n  ^"}
+{"grammar": "g0047", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0047", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0047", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0047", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0047", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0047", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0047", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0047", "input": 7, "outcome": "accept", "error": null}
+{"grammar": "g0047", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n>\n^"}
+{"grammar": "g0047", "input": 9, "outcome": "accept", "error": null}
+{"grammar": "g0047", "input": 10, "outcome": "accept", "error": null}
+{"grammar": "g0048", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0048", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0048", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0048", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0048", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0048", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0048", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0048", "input": 7, "outcome": "accept", "error": null}
+{"grammar": "g0048", "input": 8, "outcome": "accept", "error": null}
+{"grammar": "g0048", "input": 9, "outcome": "accept", "error": null}
+{"grammar": "g0049", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0049", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0049", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0049", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0049", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0049", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0049", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0049", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nbZ\n ^"}
+{"grammar": "g0049", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n-!\n ^"}
+{"grammar": "g0049", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n/\t\n ^"}
+{"grammar": "g0050", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0050", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0050", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0050", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0050", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0050", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0050", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0050", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nσ.x\n ^"}
+{"grammar": "g0050", "input": 8, "outcome": "accept", "error": null}
+{"grammar": "g0050", "input": 9, "outcome": "reject", "error": null}
+{"grammar": "g0050", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n(:Fx\n ^"}
+{"grammar": "g0050", "input": 11, "outcome": "accept", "error": null}
+{"grammar": "g0051", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0051", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0051", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0051", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0051", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0051", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0051", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0051", "input": 7, "outcome": "accept", "error": null}
+{"grammar": "g0051", "input": 8, "outcome": "accept", "error": null}
+{"grammar": "g0051", "input": 9, "outcome": "accept", "error": null}
+{"grammar": "g0051", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nx?*A\r:A)90[(u?*!:A)4-[(中i?*a:A)44丄1[(中t?*z:A)丅[(\n    ^"}
+{"grammar": "g0051", "input": 11, "outcome": "reject", "error": null}
+{"grammar": "g0052", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0052", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0052", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0052", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0052", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0052", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0052", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nZ[]: {>>\n ^"}
+{"grammar": "g0052", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n^[\n ^"}
+{"grammar": "g0052", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n[1\n ^"}
+{"grammar": "g0052", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n-_9)\n ^"}
+{"grammar": "g0052", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nZ]: {>>/\n       ^"}
+{"grammar": "g0053", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0053", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0053", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0053", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0053", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0053", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0053", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0053", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n+bA9\n ^"}
+{"grammar": "g0053", "input": 8, "outcome": "reject", "error": null}
+{"grammar": "g0053", "input": 9, "outcome": "accept", "error": null}
+{"grammar": "g0053", "input": 10, "outcome": "reject", "error": null}
+{"grammar": "g0053", "input": 11, "outcome": "reject", "error": null}
+{"grammar": "g0054", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0054", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0054", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0054", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0054", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0054", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0054", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0054", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\\'(\n  ^"}
+{"grammar": "g0054", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nb与\"b?\n    ^"}
+{"grammar": "g0054", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n]ab(\n^"}
+{"grammar": "g0054", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n0七\"b\n^"}
+{"grammar": "g0055", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0055", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0055", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0055", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n<?\n ^"}
+{"grammar": "g0055", "input": 4, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0055", "input": 5, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0055", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\n^"}
+{"grammar": "g0055", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n</\n ^"}
+{"grammar": "g0056", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 5\n\nroot = item\n     ^"}
+{"grammar": "g0056", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 5\n\nroot = item\n     ^"}
+{"grammar": "g0056", "input": 2, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 5\n\nroot = item\n     ^"}
+{"grammar": "g0057", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0057", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0057", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0057", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0057", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0057", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0057", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\n^"}
+{"grammar": "g0057", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n/中;\n^"}
+{"grammar": "g0057", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n*1\n^"}
+{"grammar": "g0057", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n;\n^"}
+{"grammar": "g0058", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Undefined rule identifier \"undefined-name\"\n\n# held-out grammar\nroot ::= [\\x61]* | [*] | \"\\x7C\\r\\\\\"? | (\"c[\" | [A-FZ] | \"é\")* | \"x\\x5B{\\x7C\" | [:λA-F] | \";\\x27\" | \"!a*B\"\n\n             ^"}
+{"grammar": "g0058", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Undefined rule identifier \"undefined-name\"\n\n# held-out grammar\nroot ::= [\\x61]* | [*] | \"\\x7C\\r\\\\\"? | (\"c[\" | [A-FZ] | \"é\")* | \"x\\x5B{\\x7C\" | [:λA-F] | \";\\x27\" | \"!a*B\"\n\n             ^"}
+{"grammar": "g0059", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0059", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0059", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0059", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0059", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0059", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0059", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n]😀x{é(\ty]9\n       ^"}
+{"grammar": "g0059", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n]😀x{é(\t<9\n        ^"}
+{"grammar": "g0059", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n|\n^"}
+{"grammar": "g0059", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n]😀x{é\t<]9\n     ^"}
+{"grammar": "g0059", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n]😀x{((\t<]9\n    ^"}
+{"grammar": "g0060", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0060", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0060", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0060", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0060", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0060", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0060", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n111,\n   ^"}
+{"grammar": "g0060", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n!\n^"}
+{"grammar": "g0060", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n111b\n   ^"}
+{"grammar": "g0060", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\r\r1*\n   ^"}
+{"grammar": "g0061", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0061", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0061", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0061", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0061", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0061", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0061", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0061", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n/*\"é\r1{z中λcy=\"=z-)ay=\"=zyAAAb9,+zz^^_^^?!a中\n                                       ^"}
+{"grammar": "g0061", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n/*\"éy1{z\tλy=\"=zß\t6y=\"=y=\"=zλxy=?=zéy=\"=y=\"=z-xAAb9,+z^^_^^_^^_!0中\n                                                   ^"}
+{"grammar": "g0061", "input": 9, "outcome": "accept", "error": null}
+{"grammar": "g0061", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n/*\"éy1{z\tλy=\"=zß\t6y=\"=y=\"=zλxy=\"=éy=\"=y=\"=z-xAAb9,+z^^_^^_^^_!0中\n                                                  ^"}
+{"grammar": "g0061", "input": 11, "outcome": "reject", "error": null}
+{"grammar": "g0062", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 5\n\nroot := [\\x2D]?  # a comment | with ::= inside\r\n     ^"}
+{"grammar": "g0062", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting ::= at 5\n\nroot := [\\x2D]?  # a comment | with ::= inside\r\n     ^"}
+{"grammar": "g0063", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0063", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0063", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0063", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0063", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0063", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0063", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0063", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\"λc\r_}\t{x?λ<{\n  ^"}
+{"grammar": "g0063", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nλλ\r_}\t{x?,λ<A\n         ^"}
+{"grammar": "g0063", "input": 9, "outcome": "reject", "error": null}
+{"grammar": "g0063", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\"λ\r_}\tb{x?λ<{\n      ^"}
+{"grammar": "g0064", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0064", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0064", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0064", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0064", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0064", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0064", "input": 6, "outcome": "reject", "error": null}
+{"grammar": "g0064", "input": 7, "outcome": "reject", "error": null}
+{"grammar": "g0064", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n};};}?\n     ^"}
+{"grammar": "g0064", "input": 9, "outcome": "reject", "error": null}
+{"grammar": "g0064", "input": 10, "outcome": "reject", "error": null}
+{"grammar": "g0065", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0065", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0065", "input": 2, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\t,\n\\z\"[ \"A\n\n        ^"}
+{"grammar": "g0065", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\t,=\n  ^"}
+{"grammar": "g0065", "input": 4, "outcome": "reject", "error": null}
+{"grammar": "g0065", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\t,\nßz\"[ \"A\n ^"}
+{"grammar": "g0065", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\t,\n\\z\"[ \"A\n\n         ^"}
+{"grammar": "g0066", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Unknown escape at \\\n\natom ::= item [1/] item\nitem ::= \"\\x5F\"\n\n                                                                     ^"}
+{"grammar": "g0066", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Unknown escape at \\\n\natom ::= item [1/] item\nitem ::= \"\\x5F\"\n\n                                                                     ^"}
+{"grammar": "g0066", "input": 2, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Unknown escape at \\\n\natom ::= item [1/] item\nitem ::= \"\\x5F\"\n\n                                                                     ^"}
+{"grammar": "g0067", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0067", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0067", "input": 2, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n=\r\n ^"}
+{"grammar": "g0067", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\n^"}
+{"grammar": "g0067", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n}=\n^"}
+{"grammar": "g0068", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0068", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0068", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0068", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0068", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0068", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0068", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0068", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\t.z<* >(\t:[^-ß(\n       ^"}
+{"grammar": "g0068", "input": 8, "outcome": "reject", "error": null}
+{"grammar": "g0068", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\t.z< >中\t:[^-ß(\n    ^"}
+{"grammar": "g0068", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\t.z<* >=中\t:\t.z<* >中\t:\t.z<* >中\t:,*[\n       ^"}
+{"grammar": "g0068", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\t.z<* >中\t:[(^-ß(\n           ^"}
+{"grammar": "g0069", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0069", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0069", "input": 2, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nB,c;\n   ^"}
+{"grammar": "g0069", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n;,c\n^"}
+{"grammar": "g0069", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nB,0\n  ^"}
+{"grammar": "g0069", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nB,<c\n  ^"}
+{"grammar": "g0069", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nB,c{\n   ^"}
+{"grammar": "g0070", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0070", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0070", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0070", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0070", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0070", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0070", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0070", "input": 7, "outcome": "reject", "error": null}
+{"grammar": "g0070", "input": 8, "outcome": "reject", "error": null}
+{"grammar": "g0070", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n丌 :Z_\"_\n      ^"}
+{"grammar": "g0070", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n1\\ :Z_\"\n^"}
+{"grammar": "g0070", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nθ1\\ :Z_b\"\n       ^"}
+{"grammar": "g0071", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0071", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0071", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0071", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0071", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0071", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0071", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0071", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\n   ^"}
+{"grammar": "g0071", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nF +丏:)A\n    ^"}
+{"grammar": "g0071", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nC +万)ß\n     ^"}
+{"grammar": "g0071", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\n  ^"}
+{"grammar": "g0071", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n{E +万)A\n^"}
+{"grammar": "g0072", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0072", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0072", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0072", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0072", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0072", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0072", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0072", "input": 7, "outcome": "accept", "error": null}
+{"grammar": "g0072", "input": 8, "outcome": "accept", "error": null}
+{"grammar": "g0072", "input": 9, "outcome": "accept", "error": null}
+{"grammar": "g0072", "input": 10, "outcome": "accept", "error": null}
+{"grammar": "g0072", "input": 11, "outcome": "accept", "error": null}
+{"grammar": "g0073", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0073", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0073", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0073", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0073", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0073", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0073", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0073", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n_\\b😀ax丁_![\n     ^"}
+{"grammar": "g0073", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n_\\0😀a-xZ-B_![9\n             ^"}
+{"grammar": "g0073", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n_\\?😀Aa-x__![\n    ^"}
+{"grammar": "g0073", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n_\\b😀a-x_![\n        ^"}
+{"grammar": "g0073", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n_\\😀a-xZ-B_![\n   ^"}
+{"grammar": "g0074", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0074", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0074", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0074", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0074", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0074", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0074", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0074", "input": 7, "outcome": "accept", "error": null}
+{"grammar": "g0074", "input": 8, "outcome": "accept", "error": null}
+{"grammar": "g0074", "input": 9, "outcome": "accept", "error": null}
+{"grammar": "g0075", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0075", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0075", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0075", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n/\n^"}
+{"grammar": "g0075", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n:)\n ^"}
+{"grammar": "g0075", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n1)\n ^"}
+{"grammar": "g0075", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n1中\n ^"}
+{"grammar": "g0075", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n;1\n^"}
+{"grammar": "g0076", "input": 0, "outcome": "error", "error": "IndexError: string index out of range"}
+{"grammar": "g0076", "input": 1, "outcome": "error", "error": "IndexError: string index out of range"}
+{"grammar": "g0076", "input": 2, "outcome": "error", "error": "IndexError: string index out of range"}
+{"grammar": "g0077", "input": 0, "outcome": "error", "error": "KeyError: 'root'"}
+{"grammar": "g0077", "input": 1, "outcome": "error", "error": "KeyError: 'root'"}
+{"grammar": "g0078", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0078", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0078", "input": 2, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n;(\\\n  ^"}
+{"grammar": "g0078", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nx;(\n^"}
+{"grammar": "g0078", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n;(Z\n  ^"}
+{"grammar": "g0078", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nB(\n^"}
+{"grammar": "g0078", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n;(\"\n  ^"}
+{"grammar": "g0079", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0079", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0079", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0079", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0079", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0079", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0079", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n?09|?09|:?09|\n        ^"}
+{"grammar": "g0079", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n?09|?09|?09|?09|B\n                ^"}
+{"grammar": "g0079", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n?09|\n\n^"}
+{"grammar": "g0079", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n?09|A\n    ^"}
+{"grammar": "g0079", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n?0\"|?09|?09|?09|\n  ^"}
+{"grammar": "g0080", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Failed to find a valid name\n\n  \"?\" |\n  \"中😀^[\")\n\n         ^"}
+{"grammar": "g0080", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Failed to find a valid name\n\n  \"?\" |\n  \"中😀^[\")\n\n         ^"}
+{"grammar": "g0080", "input": 2, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Failed to find a valid name\n\n  \"?\" |\n  \"中😀^[\")\n\n         ^"}
+{"grammar": "g0081", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0081", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0081", "input": 2, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n(.{\n^"}
+{"grammar": "g0081", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n.λ{\n ^"}
+{"grammar": "g0081", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n.a\n ^"}
+{"grammar": "g0081", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n{\n^"}
+{"grammar": "g0081", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n*.{\n^"}
+{"grammar": "g0082", "input": 0, "outcome": "error", "error": "IndexError: string index out of range"}
+{"grammar": "g0082", "input": 1, "outcome": "error", "error": "IndexError: string index out of range"}
+{"grammar": "g0082", "input": 2, "outcome": "error", "error": "IndexError: string index out of range"}
+{"grammar": "g0083", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0083", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0083", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0083", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0083", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0083", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0083", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0083", "input": 7, "outcome": "accept", "error": null}
+{"grammar": "g0083", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n七[\t\\}zcxyxy中中\\\n            ^"}
+{"grammar": "g0083", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nzcß中\\\n ^"}
+{"grammar": "g0083", "input": 10, "outcome": "accept", "error": null}
+{"grammar": "g0083", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n}zc]{中\\\n    ^"}
+{"grammar": "g0084", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0084", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0084", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0084", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0084", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0084", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0084", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0084", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n/éé|9_A:\n       ^"}
+{"grammar": "g0084", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n;é|9y_\n    ^"}
+{"grammar": "g0084", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nßéé|9_😀\n      ^"}
+{"grammar": "g0084", "input": 10, "outcome": "reject", "error": null}
+{"grammar": "g0084", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nx\né|9_A\n^"}
+{"grammar": "g0085", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0085", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0085", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0085", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0085", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0085", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0085", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0085", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n9c{_x \r\n    ^"}
+{"grammar": "g0085", "input": 8, "outcome": "reject", "error": null}
+{"grammar": "g0085", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n5c{_\r1\n     ^"}
+{"grammar": "g0085", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n3cßx \r\n  ^"}
+{"grammar": "g0085", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n5{_\r\n ^"}
+{"grammar": "g0086", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting newline or end at 244\n\n# held-out grammar\nroot ::= ([一-\\u4E0F\\u03B1-ω\\x61-z] \"y\\x3A]\\x29\" | [0-9\\u4E00-\\u4E0F\\x2D] [*\\x2A\\r]) (tail-part | \"\\\\>-\"?)\n\n                                                                                                                         ^"}
+{"grammar": "g0086", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting newline or end at 244\n\n# held-out grammar\nroot ::= ([一-\\u4E0F\\u03B1-ω\\x61-z] \"y\\x3A]\\x29\" | [0-9\\u4E00-\\u4E0F\\x2D] [*\\x2A\\r]) (tail-part | \"\\\\>-\"?)\n\n                                                                                                                         ^"}
+{"grammar": "g0086", "input": 2, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Expecting newline or end at 244\n\n# held-out grammar\nroot ::= ([一-\\u4E0F\\u03B1-ω\\x61-z] \"y\\x3A]\\x29\" | [0-9\\u4E00-\\u4E0F\\x2D] [*\\x2A\\r]) (tail-part | \"\\\\>-\"?)\n\n                                                                                                                         ^"}
+{"grammar": "g0087", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0087", "input": 1, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\ny\n^"}
+{"grammar": "g0087", "input": 2, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n中\n^"}
+{"grammar": "g0087", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n+\n^"}
+{"grammar": "g0087", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\né\n^"}
+{"grammar": "g0087", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\"\n^"}
+{"grammar": "g0088", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0088", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0088", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0088", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0088", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0088", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0088", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0088", "input": 7, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0088", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n9/b_\n  ^"}
+{"grammar": "g0088", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n9/9b_a\n     ^"}
+{"grammar": "g0088", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n_\n^"}
+{"grammar": "g0088", "input": 11, "outcome": "reject", "error": null}
+{"grammar": "g0089", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0089", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0089", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0089", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0089", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0089", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\n ^"}
+{"grammar": "g0089", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n^\n^"}
+{"grammar": "g0089", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n-\n^"}
+{"grammar": "g0089", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n一/\n ^"}
+{"grammar": "g0090", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0090", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0090", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0090", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0090", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0090", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0090", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0090", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nB\r}y}0<+(\"<!aßßy\r\n                ^"}
+{"grammar": "g0090", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\r}y}0+1é\n     ^"}
+{"grammar": "g0090", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\r}y}0<+(\"<!aßß}é\n               ^"}
+{"grammar": "g0090", "input": 10, "outcome": "accept", "error": null}
+{"grammar": "g0090", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nB\r}y}0a+νy\n      ^"}
+{"grammar": "g0091", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0091", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0091", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0091", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0091", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0091", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0091", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0091", "input": 7, "outcome": "reject", "error": null}
+{"grammar": "g0091", "input": 8, "outcome": "reject", "error": null}
+{"grammar": "g0091", "input": 9, "outcome": "accept", "error": null}
+{"grammar": "g0091", "input": 10, "outcome": "accept", "error": null}
+{"grammar": "g0091", "input": 11, "outcome": "reject", "error": null}
+{"grammar": "g0092", "input": 0, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Failed to find a valid name\n\nitem ::= (\"\\xE9\\x62\" | digits digits \"{\\x2A\" | [|\\x2D] \"b^\") [^a-z/]  # a comment | with ::= inside\r\n\r\n9extra ::= \"a\"\n      ^"}
+{"grammar": "g0092", "input": 1, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Failed to find a valid name\n\nitem ::= (\"\\xE9\\x62\" | digits digits \"{\\x2A\" | [|\\x2D] \"b^\") [^a-z/]  # a comment | with ::= inside\r\n\r\n9extra ::= \"a\"\n      ^"}
+{"grammar": "g0092", "input": 2, "outcome": "error", "error": "GrammarParseError: Failed to parse grammar: Failed to find a valid name\n\nitem ::= (\"\\xE9\\x62\" | digits digits \"{\\x2A\" | [|\\x2D] \"b^\") [^a-z/]  # a comment | with ::= inside\r\n\r\n9extra ::= \"a\"\n      ^"}
+{"grammar": "g0093", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0093", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0093", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0093", "input": 3, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n}?{+\n  ^"}
+{"grammar": "g0093", "input": 4, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nzz)😀\n   ^"}
+{"grammar": "g0093", "input": 5, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nzz)+\\\n    ^"}
+{"grammar": "g0093", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nzz)+中\n    ^"}
+{"grammar": "g0093", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n?)+\n^"}
+{"grammar": "g0094", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0094", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0094", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0094", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0094", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0094", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0094", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0094", "input": 7, "outcome": "reject", "error": null}
+{"grammar": "g0094", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\"β^^1ba\n      ^"}
+{"grammar": "g0094", "input": 9, "outcome": "accept", "error": null}
+{"grammar": "g0094", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nξ|^1+ya\n      ^"}
+{"grammar": "g0094", "input": 11, "outcome": "reject", "error": null}
+{"grammar": "g0095", "input": 0, "outcome": "accept", "error": null}
+{"grammar": "g0095", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0095", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0095", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0095", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0095", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0095", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0095", "input": 7, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0095", "input": 8, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0095", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\na)[;-.\n     ^"}
+{"grammar": "g0095", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n/)[-\n   ^"}
+{"grammar": "g0095", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n9',++\r[\"<\n     ^"}
+{"grammar": "g0096", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0096", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0096", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0096", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0096", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0096", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0096", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0096", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nA;\n^"}
+{"grammar": "g0096", "input": 8, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n;-{;\n ^"}
+{"grammar": "g0096", "input": 9, "outcome": "accept", "error": null}
+{"grammar": "g0096", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n{;;:\n   ^"}
+{"grammar": "g0097", "input": 0, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0097", "input": 1, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0097", "input": 2, "outcome": "error", "error": "IndexError: list index out of range"}
+{"grammar": "g0098", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0098", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0098", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0098", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0098", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0098", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0098", "input": 6, "outcome": "accept", "error": null}
+{"grammar": "g0098", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nα9.ßy\r=.}\\\\\\y\rx/ßxλ\n                  ^"}
+{"grammar": "g0098", "input": 8, "outcome": "reject", "error": null}
+{"grammar": "g0098", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nς.}-1x\\ßßßy\r1==x/ß\n     ^"}
+{"grammar": "g0098", "input": 10, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nζ)+A.}-1λ\\y\rx/ß\\\n               ^"}
+{"grammar": "g0098", "input": 11, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\nα9.ßy\r=.}\\\\\\yßx/ßx\n             ^"}
+{"grammar": "g0099", "input": 0, "outcome": "reject", "error": null}
+{"grammar": "g0099", "input": 1, "outcome": "accept", "error": null}
+{"grammar": "g0099", "input": 2, "outcome": "accept", "error": null}
+{"grammar": "g0099", "input": 3, "outcome": "accept", "error": null}
+{"grammar": "g0099", "input": 4, "outcome": "accept", "error": null}
+{"grammar": "g0099", "input": 5, "outcome": "accept", "error": null}
+{"grammar": "g0099", "input": 6, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n?]éAzy\n    ^"}
+{"grammar": "g0099", "input": 7, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n\":\n ^"}
+{"grammar": "g0099", "input": 8, "outcome": "reject", "error": null}
+{"grammar": "g0099", "input": 9, "outcome": "reject", "error": "InputParseError: Failed to parse input string:\n\n?]ééay\n   ^"}

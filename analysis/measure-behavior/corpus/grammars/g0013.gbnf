@@ -1,0 +1,4 @@
+root := ([\x7B] ([}\t一-丏] | [\x22 ] | item) [\[\x7Cé]+)+
+
+item ::= (nest nest [,] | [\x2E\x5A\\] [!😀=] [\x29]) "a" [\x27] [a-z1\x2D] nest ("a\t0" "(!|")?
+nest ::= [a-z\x41-F] nest [(] | "*;"  # held-out grammar

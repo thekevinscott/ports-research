@@ -1,0 +1,7 @@
+# a comment | with ::= inside
+root ::= [1\r]+  # held-out grammar
+tail-part ::= ("0a"* pair)*
+pair ::= chunk | chunk
+chunk ::= [^\x7Bα-ω]
+nest ::= "Aéé\U0001F600" nest [α-ω'一-丏] |
+  "\x5F"

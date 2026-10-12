@@ -1,0 +1,49 @@
+[[python.exempt]]
+path = "measure_behavior/__init__.py"
+rules = ["colocated-test"]
+reason = "empty package marker; the CLI is tested in cli_test.py"
+
+[[python.exempt]]
+path = "measure_behavior/pools.py"
+rules = ["colocated-test"]
+reason = "constants only; the generators that draw from them are tested in their own modules"
+
+[[python.exempt]]
+path = "measure_behavior/cli.py"
+rules = ["one-function-per-file"]
+reason = "generate, run and compare are click subcommands registered on the one group; each is a wiring shim over a function tested in its own module"
+
+[[python.exempt]]
+path = "measure_behavior/cli_test.py"
+rules = ["unmocked-collaborator", "no-first-party-patch"]
+reason = "click's CliRunner is the harness driving the unit; generate_corpus, run_corpus and compare_outcomes are patched at their cli import binding to test argument wiring"
+
+[[python.exempt]]
+path = "measure_behavior/generate_expression_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the guarantees are over the whole drawn tree (no repeated nullable, refs only from those offered); generate_atom and is_nullable are the tree's own parts"
+
+[[python.exempt]]
+path = "measure_behavior/generate_rules_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the guarantees are over the whole drawn rule set (root present, refs defined, recursion only through nest)"
+
+[[python.exempt]]
+path = "measure_behavior/generate_inputs_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the guarantee is that drawn and mutated strings both appear; a mocked sampler would only restate them"
+
+[[python.exempt]]
+path = "measure_behavior/generate_corpus_test.py"
+rules = ["unmocked-collaborator"]
+reason = "byte-identical output for a seed is the unit; it only holds over the real generators"
+
+[[python.exempt]]
+path = "measure_behavior/render_expression_test.py"
+rules = ["unmocked-collaborator"]
+reason = "render_char's escaping is part of the rendered text under test"
+
+[[python.exempt]]
+path = "measure_behavior/render_grammar_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the rendered text is the unit; render_expression is its body"
