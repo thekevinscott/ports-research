@@ -139,6 +139,9 @@ CHART_NAMES = (
     "driven_title",
     "spearman_matrix",
     "spearman_chart",
+    "DURATION_TOLERANCE",
+    "DURATION_READING",
+    "duration_discrepancies",
 )
 
 
@@ -166,6 +169,8 @@ def v2_row(
         "total_tokens": tokens,
         "api_calls": 10,
         "duration_ms": 60_000,
+        "transcript_wall_ms": 60_000,
+        "result_index": 0,
         "file_count": 5,
         "loc": loc,
         "behavior_agreement_pct": agreement,
@@ -1238,3 +1243,40 @@ def test_the_behavior_and_api_reports_show_driver_status_and_driven_charts():
         text = ast.unparse(report)
         assert "driver_status_counts(" in text
         assert "driven_title(" in text
+
+
+def test_the_v2_statistics_rank_the_transcript_wall_time_not_the_recorded_duration():
+    measures = definitions(*CHART_NAMES)["V2_MEASURES"]
+    assert "transcript_wall_ms" in measures
+    assert "duration_ms" not in measures
+
+
+def test_duration_discrepancies_list_runs_whose_recorded_duration_disagrees_with_the_transcript():
+    import polars as pl
+
+    frame = pl.DataFrame(
+        [
+            {**V2_RUNS[0], "run_id": "whole", "duration_ms": 345_089, "transcript_wall_ms": 345_086},
+            {**V2_RUNS[1], "run_id": "last_turn", "duration_ms": 16_056, "transcript_wall_ms": 395_197, "result_index": 3, "total_tokens": 2_500_000},
+            {**V2_RUNS[2], "run_id": "unrecorded", "duration_ms": None, "transcript_wall_ms": 100_000},
+        ]
+    )
+    table = definitions(*CHART_NAMES)["duration_discrepancies"](frame)
+    assert table.columns == ["run_id", "source_language", "condition", "result_index", "duration_ms", "transcript_wall_ms", "total_tokens"]
+    assert table.rows() == [("last_turn", "python", table["condition"][0], 3, 16_056, 395_197, 2_500_000)]
+
+
+def test_the_duration_reading_names_both_sources_and_the_tolerance():
+    namespace = definitions("DURATION_TOLERANCE", "DURATION_READING")
+    reading = namespace["DURATION_READING"]
+    assert "result.json" in reading and "transcript" in reading
+    assert f"{namespace['DURATION_TOLERANCE']:.0%}" in reading
+
+
+def test_the_v2_statistics_report_shows_the_duration_discrepancies():
+    (report,) = [
+        node for node in ast.walk(ast.parse(SOURCE)) if isinstance(node, ast.FunctionDef) and node.name == "v2_statistics_report"
+    ]
+    text = ast.unparse(report)
+    assert "duration_discrepancies(" in text
+    assert "DURATION_READING" in text
