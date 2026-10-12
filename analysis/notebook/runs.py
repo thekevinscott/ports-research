@@ -161,7 +161,14 @@ def _():
             "ast_note": None,
         }
 
-    TRANSCRIPT_LEADS = ["read_source_tests", "read_target_tests", "suite_run_count", "own_tests_written"]
+    TRANSCRIPT_LEADS = [
+        "read_source_tests",
+        "read_target_tests",
+        "suite_run_count",
+        "own_tests_written",
+        "files_read_before_first_write",
+        "reread_count",
+    ]
     V2_STRINGS = {"completed_at": pl.String, "error": pl.String, "terminal_reason": pl.String}
     v2_runs = pl.DataFrame(
         [
@@ -181,6 +188,7 @@ def _():
             "behavior_note": pl.String,
             "ast_note": pl.String,
             "ast_median_line_drift": pl.Float64,
+            "files_read_before_first_write": pl.Int64,
         },
     )
     # Every finished V2 attempt, the non-zero exits the tables above exclude among them.
@@ -231,6 +239,7 @@ def _():
                 for count in ("passed", "failed")
             },
             "differential_evidence": None if evidence is None else evidence.get("command", evidence.get("path")),
+            "read_order": " → ".join(report["read_order"]),
         }
 
     v2_transcript_runs = pl.DataFrame(
@@ -243,6 +252,15 @@ def _():
             "last_suite_run_turn": pl.Int64,
             "tokens_before_first_write": pl.Int64,
             "tokens_after_first_write": pl.Int64,
+            "first_read_path": pl.String,
+            "first_read_class": pl.String,
+            "first_read_is_entry_point": pl.Boolean,
+            "files_read_before_first_write": pl.Int64,
+            "source_files_read_before_first_write": pl.Int64,
+            "max_rereads_path": pl.String,
+            "search_calls_per_file_read": pl.Float64,
+            "read_order": pl.String,
+            "reads_after_last_write": pl.Int64,
         },
     )
     port_pairs = within_direction_similarity(codebases)
@@ -981,6 +999,12 @@ def _(
         "tokens_after_first_write": "Tokens from the first write into the port on",
         "first_write_turn": "Turn of the first write into the port",
         "last_suite_run_turn": "Turn of the last test suite run",
+        "files_read_before_first_write": "Files read before the first write into the port",
+        "source_files_read_before_first_write": "Source files read before the first write into the port",
+        "reread_count": "Reads of a file already read",
+        "max_rereads_of_one_file": "Most rereads of one file",
+        "search_calls_per_file_read": "Glob and Grep calls per file read",
+        "reads_after_last_write": "Reads after the last write into the port",
         **{
             f"last_{suite}_{count}": f"{count.capitalize()} tests in the last run of {name}"
             for suite, name in (
@@ -994,6 +1018,11 @@ def _(
     }
     # Booleans: the section counts the runs where each holds instead of charting them.
     TRANSCRIPT_COUNTED = ["touched_source_tests", "touched_target_tests", "differential_script"]
+    # Counted by value in the first-read table.
+    TRANSCRIPT_FIRST_READ = ["first_read_is_entry_point", "first_read_class"]
+    FIRST_READ_CLASSES = ["source", "source_tests", "target_tests", "port", "other"]
+    # Quoted in the runs table only.
+    TRANSCRIPT_QUOTED = ["differential_evidence", "first_read_path", "max_rereads_path", "read_order"]
 
     def transcript_title(metric):
         return TRANSCRIPT_TITLES[metric]
@@ -1009,6 +1038,18 @@ def _(
             *(pl.col(column).sum().alias(column) for column in TRANSCRIPT_COUNTED),
         ).with_columns(pl.col("n", *TRANSCRIPT_COUNTED).fill_null(0))
 
+    def first_read_counts(frame):
+        # A null entry point: no code file of the source was named by a read.
+        entry = pl.col("first_read_is_entry_point")
+        return by_cell(
+            frame,
+            pl.len().alias("n"),
+            entry.sum().alias("entry_point"),
+            (~entry).sum().alias("not_entry_point"),
+            entry.is_null().sum().alias("no_code_file_read"),
+            *((pl.col("first_read_class") == cls).sum().alias(f"first_read_{cls}") for cls in FIRST_READ_CLASSES),
+        ).with_columns(pl.exclude("source_language", "condition").fill_null(0))
+
     def transcript_runs(frame):
         others = [column for column in TRANSCRIPT_TITLES if column not in TRANSCRIPT_LEADS]
         return with_v2_conditions(frame).select(
@@ -1017,8 +1058,9 @@ def _(
             "condition",
             *TRANSCRIPT_LEADS,
             *TRANSCRIPT_COUNTED,
+            *TRANSCRIPT_FIRST_READ,
             *others,
-            "differential_evidence",
+            *TRANSCRIPT_QUOTED,
         )
 
     def transcript_report():
@@ -1031,6 +1073,10 @@ def _(
                 *(transcript_chart(v2_transcript_runs, lead) for lead in TRANSCRIPT_LEADS),
                 mo.ui.table(
                     transcript_counts(v2_transcript_runs),
+                    freeze_columns_left=["source_language", "condition"],
+                ),
+                mo.ui.table(
+                    first_read_counts(v2_transcript_runs),
                     freeze_columns_left=["source_language", "condition"],
                 ),
                 mo.accordion(
@@ -2606,6 +2652,7 @@ def _(mo):
                     - `tokens_before_first_write`, `tokens_after_first_write`: input, cache and output tokens summed over the turns before the first write into `/target` and from it on.
                     - `first_write_turn`, `last_suite_run_turn`: the turn of the first write into `/target` and of the last suite run.
                     - `last_<class>_passed`, `last_<class>_failed`: the pass and fail counts of the last suite run of that class whose summary line was read; `unknown` is a run that reached more than one class.
+                    - Reading order. A read is one path named by a Read call or a reading command, as written: a glob or a `for f in ...; do cat $f` loop is one read of its pattern. `first_read_path`, `first_read_class`: the first read. `read_order`: source paths in order of first read. `first_read_is_entry_point`: the first source code file read is `gbnf/__init__.py` (python) or `src/index.ts` (javascript); in the second table, `no_code_file_read` when reads name none. `files_read_before_first_write`, `source_files_read_before_first_write`: distinct paths read before the first write into `/target`. `reread_count`: reads of a path already read; `max_rereads_of_one_file`, `max_rereads_path`: the most reread one. `search_calls_per_file_read`: Glob and Grep calls per distinct path read. `reads_after_last_write`: reads after the last write into `/target`.
                     """),
                     "How to read": mo.md("""
                     V2 runs only. The x axis is test inclusion: `unit` is the source language's unit suite, `source` and `target` the integration suites in the source and target language. Each dot is a run; the tick is the condition's median, the faint bar its interquartile range, and the number under each label its n. A run without a value (no write, no suite run of that class) has no dot and is not in the n.
@@ -2639,7 +2686,7 @@ def _(mo):
                     - `rho`: Spearman rank correlation, the Pearson correlation of the two measures' ranks (ties share their average rank), from −1 to 1. `n`: runs with both measures present.
                     """),
                     "How to read": mo.md("""
-                    V2 exit-0 runs only. The lead measures are held-out behavior agreement, held-out API agreement, the three AST leads, total tokens, LOC, and four transcript counts: reads of the source language's shipped tests, reads of the target language's shipped tests, test suite runs and test files the agent wrote itself. The rank correlation table sets every per-run measure against held-out behavior agreement, so a cheap measure can be checked against it on this data; the heatmap shows every pair.
+                    V2 exit-0 runs only. The lead measures are held-out behavior agreement, held-out API agreement, the three AST leads, total tokens, LOC, and six transcript counts: reads of the source language's shipped tests, reads of the target language's shipped tests, test suite runs, test files the agent wrote itself, files read before the first write into the port, and reads of a file already read. The rank correlation table sets every per-run measure against held-out behavior agreement, so a cheap measure can be checked against it on this data; the heatmap shows every pair.
                     """),
                 }
             ),

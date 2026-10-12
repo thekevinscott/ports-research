@@ -11,7 +11,7 @@ The held-out API section measures V2 runs only: measure-api runs each port over 
 
 The AST section measures V2 runs only: measure-ast `compare` runs each port against the reference in its language at the gbnf pin, cached under `~/.cache/ports/analysis/codebases/ast/` by the port's contents. The pinned reference is checked out once, with the gbnf-prepare patches, under `~/.cache/ports/analysis/codebases/reference/<commit>/`. Uncached, a python port takes about 6 s and a javascript port about 5 s.
 
-The transcripts section measures V2 runs only: measure-transcript counts reads, suite runs, own tests, differential scripts and fetch attempts from each run's transcript, cached under `~/.cache/ports/analysis/codebases/transcript/` by the transcript's contents and the run's source language. The cache-tier token columns are left out; `tokens_before_first_write` and `tokens_after_first_write` stay.
+The transcripts section measures V2 runs only: measure-transcript counts reads, reading order, suite runs, own tests, differential scripts and fetch attempts from each run's transcript, cached under `~/.cache/ports/analysis/codebases/transcript/` by the transcript's contents, the run's source language and measure-transcript's source. The cache-tier token columns are left out; `tokens_before_first_write` and `tokens_after_first_write` stay.
 
 The V2 statistics section reads V2 runs only: n, median and IQR per cell, failures per cell, a per-flag permutation and bootstrap comparison, and Spearman rank correlations. The arithmetic is in `src/stats.py` (numpy only).
 
