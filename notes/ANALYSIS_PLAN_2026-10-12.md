@@ -69,10 +69,10 @@ Kevin, 2026-10-12: "we should run the judge suite against the base ports without
 
 Kevin, 2026-10-12: "In particular I wonder about asking an LLM to write explainers or walk through of the code- then compare those derivations". Each implementation is explained on its own, so the explainer never sees the other side, and both explanations are English, so the language difference drops out.
 
-- [ ] Fixed walkthrough format, following the article's method: for each public entry point, the happy path as ordered one-sentence steps naming what happens and what is called; then error paths; then invariants. Structured JSON.
-- [ ] One walkthrough per reference per language and one per port, each from one implementation alone, cached by content. Subscription billing, same model family as the judge.
-- [ ] Mechanical comparison: align port steps to reference steps by embedding similarity with the embedding server; per entry point, coverage (share of reference steps matched), order agreement, extra steps. A short LLM comparison of aligned pairs only if the embeddings prove too coarse.
-- [ ] Two reference lines, both free of ports: the noise floor (the same reference explained twice and compared) and the baseline (the python and javascript references explained independently and compared).
+- [x] Fixed walkthrough format, following the article's method: for each public entry point, the happy path as ordered one-sentence steps naming what happens and what is called; then error paths; then invariants. Structured JSON.
+- [x] One walkthrough per reference per language and one per port, each from one implementation alone, cached by content. Subscription billing, same model family as the judge.
+- [x] Mechanical comparison: align port steps to reference steps by embedding similarity with the embedding server; per entry point, coverage (share of reference steps matched), order agreement, extra steps. A short LLM comparison of aligned pairs only if the embeddings prove too coarse.
+- [x] Two reference lines, both free of ports: the noise floor (the same reference explained twice and compared) and the baseline (the python and javascript references explained independently and compared). Package `analysis/walkthroughs` (PR #143): `write`, `compare`, `reference-lines`; judge runner imported; embeddings through the notebook's server. Reference lines, happy-path mean coverage: noise floor python 0.63, javascript 0.70; baseline python to javascript 0.61, javascript to python 0.52. Full pass over the V2 runs in progress.
 - [ ] Notebook section: coverage lead with the noise floor and baseline drawn as lines, per-entry-point table of missing and extra steps.
 
 ### Not this cycle
