@@ -5,12 +5,14 @@ Judges ports and agent transcripts against fixed rubrics, blind, one `claude` CL
 ## Usage
 
 ```
-judge run --rubric code|transcript --runs <dir> [--runs <dir> ...] --out <dir> [--limit N] [--model M] [--effort E] [-k N]
+judge run --rubric code|transcript --runs <dir> [--runs <dir> ...] --out <dir> [--limit N] [--model M] [--effort E] [-k N] [--replicate-fraction F]
 judge report --out <dir>
 just test-e2e <out> <run dir> [<run dir> ...]
 ```
 
 `--runs` is a run directory or a directory of runs. Runs whose agent did not exit 0 are left out. `--limit` judges the first N items in shuffled order. `-k` is concurrent calls, default 2.
+
+`--replicate-fraction F`, default 0, judges a second time, independently and with the same prompt, the baselines and each item whose seeded hash of its id falls below F, into `<out>/replicates.jsonl`, same lines as `judgments.jsonl`; a rerun skips ids already there. Only items within `--limit` are replicated.
 
 ## Rubrics
 

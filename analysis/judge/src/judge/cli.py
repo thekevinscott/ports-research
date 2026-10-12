@@ -22,9 +22,10 @@ def cli() -> None:
 @click.option("--model", default="claude-opus-5-5", show_default=True)
 @click.option("--effort", default="max", show_default=True)
 @click.option("-k", "concurrency", type=int, default=2, show_default=True, help="Concurrent claude calls.")
-def run(rubric: str, runs: tuple[Path, ...], out: Path, limit: int | None, model: str, effort: str, concurrency: int) -> None:
+@click.option("--replicate-fraction", type=click.FloatRange(0, 1), default=0, show_default=True, help="Judge the baselines and this seeded fraction of items a second time, into replicates.jsonl.")
+def run(rubric: str, runs: tuple[Path, ...], out: Path, limit: int | None, model: str, effort: str, concurrency: int, replicate_fraction: float) -> None:
     try:
-        run_judge(rubric=rubric, runs=list(runs), out=out, limit=limit, model=model, effort=effort, concurrency=concurrency)
+        run_judge(rubric=rubric, runs=list(runs), out=out, limit=limit, model=model, effort=effort, concurrency=concurrency, replicate_fraction=replicate_fraction)
     except RuntimeError as e:
         raise click.ClickException(str(e))
 
