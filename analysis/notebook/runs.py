@@ -89,16 +89,37 @@ def _():
                 {**codebase.run, **{metric: getattr(codebase, metric) for metric in metrics}}
                 for codebase in codebases
             ],
-            schema_overrides={"completed_at": pl.String, "error": pl.String},
+            # Float even when every value is null, as with no V1 reference below.
+            schema_overrides={
+                "completed_at": pl.String,
+                "error": pl.String,
+                **dict.fromkeys(EMBEDDING_METRICS, pl.Float64),
+            },
         ).with_columns(
             pl.col(flags).cast(pl.Boolean),
             duration=pl.duration(milliseconds=pl.col("duration_ms")),
         )
 
-    runs = metrics_frame(codebases, METRICS, FLAGS)
-    reverse_runs = metrics_frame(
-        reverse_codebases, REVERSE_METRICS, [*FLAGS, *FORWARD_FLAGS]
-    )
+    def v1_frames():
+        return (
+            metrics_frame(codebases, METRICS, FLAGS),
+            metrics_frame(reverse_codebases, REVERSE_METRICS, [*FLAGS, *FORWARD_FLAGS]),
+        )
+
+    v1_reference_missing = False
+    try:
+        runs, reverse_runs = v1_frames()
+    except RuntimeError as error:
+        v1_reference_missing = True
+        # The V1 reference source is a cache that can be missing. Without it the V1
+        # reference-relative columns are left empty, so the V2 sections still render.
+        mo.output.append(mo.callout(mo.md(
+            f"V1 reference-relative columns (embeddings, reference diff) are empty: "
+            f"`{str(error).splitlines()[0][:300]}`"
+        ), kind="warn"))
+        for codebase in [*codebases, *reverse_codebases]:
+            codebase.reference = None
+        runs, reverse_runs = v1_frames()
 
     def behavior_columns(codebase):
         return {
@@ -317,6 +338,7 @@ def _():
         runs,
         similarity_matrix,
         spearman,
+        v1_reference_missing,
         v2_api_runs,
         v2_ast_explainers,
         v2_attempts,
@@ -400,6 +422,7 @@ def _(
     runs,
     similarity_matrix,
     spearman,
+    v1_reference_missing,
     v2_api_runs,
     v2_ast_explainers,
     v2_attempts,
@@ -895,7 +918,8 @@ def _(
             "source_language",
             "condition",
             API_LEAD,
-            pl.col("^api_.+$").exclude(API_LEAD, "api_note"),
+            # api_calls is the run's own count of model calls, not a measure-api column.
+            pl.col("^api_.+$").exclude(API_LEAD, "api_note", "api_calls"),
             "api_note",
         )
 
@@ -1934,9 +1958,13 @@ def _(
                     freeze_columns_left=["direction"],
                 ),
                 pair_chart(),
+                # The port maps place each port by its similarity to the V1 reference.
                 *(
                     build(source_language)
-                    for build in (focused_chart, anchor_chart, mds_chart, pair_matrix_chart)
+                    for build in (
+                        () if v1_reference_missing
+                        else (focused_chart, anchor_chart, mds_chart, pair_matrix_chart)
+                    )
                     for source_language in ("python", "typescript")
                 ),
             ]
@@ -2494,8 +2522,15 @@ def _(codebases, mo):
     from export_embedding_pairs import pair_chart as embedding_pair_chart
     from src.embedding_pairs import compare_corpus
 
-    embedding_pair_report = compare_corpus(codebases)
+    skipped = []
+    try:
+        embedding_pair_report = compare_corpus(codebases)
+    except (TypeError, ValueError, OSError) as error:
+        # The V1 reference source is missing (see the warning at the top); no pairs.
+        skipped = [mo.callout(mo.md(f"Embedding pairs skipped: `{str(error)[:300]}`"), kind="warn")]
+        embedding_pair_report = {"comparisons": []}
     mo.vstack([
+        *skipped,
         mo.md("### Every port to every port\nAll pairs within each direction, across test conditions. Lower distance means closer. Pairs share ports and are not independent observations."),
         *[embedding_pair_chart(embedding_pair_report["comparisons"], source, target)
           for source, target in (("python", "typescript"), ("typescript", "python"))],

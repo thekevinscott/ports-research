@@ -58,7 +58,9 @@ def slug(name):
 
 def charts(notebook):
     """Every chart runs.py renders, as (path stem, chart)."""
-    for source, target in (("python", "typescript"), ("typescript", "python")):
+    # The embedding pairs and port maps need the V1 reference; the notebook skips them without it.
+    v1_reference = not notebook["v1_reference_missing"]
+    for source, target in (("python", "typescript"), ("typescript", "python")) if v1_reference else ():
         yield (
             f"embeddings/port-pairs-{source}-to-{target}",
             notebook["embedding_pair_chart"](
@@ -135,6 +137,8 @@ def charts(notebook):
             f"{FORWARD_GROUP}/shim-integration-pass-pct-{direction}",
             notebook["shim_chart"](source_language),
         )
+        if not v1_reference:
+            continue
         yield (
             f"{FORWARD_GROUP}/port-map-focused-{direction}",
             notebook["focused_chart"](source_language),
@@ -200,7 +204,7 @@ def charts(notebook):
     v2_api_runs = notebook["v2_api_runs"]
     if v2_api_runs.height:
         for column in v2_api_runs.columns:
-            if column.startswith("api_") and column != "api_note":
+            if column.startswith("api_") and column not in ("api_note", "api_calls"):
                 yield f"{API_GROUP}/{slug(column)}", notebook["api_chart"](v2_api_runs, column)
 
     if v2_runs.height:
