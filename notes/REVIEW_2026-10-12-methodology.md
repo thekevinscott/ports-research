@@ -92,6 +92,17 @@ Why it matters: per-cell verdict counts will have n below 12 without saying so.
 What would answer it: a top-up `judge run` on the missing runs once the passes finish. `judge run` skips ids already judged.
 Severity: weakens.
 
+#### X4. **The notebook selects runs by what is in the directory, not by study.**
+Measure: the set of V2 runs every V2 table and chart is computed over.
+Evidence:
+- The notebook takes every completed run under `data/runs` (`analysis/notebook/src/corpus.py`, `runs_under`).
+- On the analysis machine that gives 196 V2 exit-0 runs, and one cell has 16 runs, not 12. Four of them are pilot runs outside the five study matrices.
+- The report (PR #162) had to build a hardlinked runs directory to get the study's 192 runs.
+Why it matters: per-cell n and every V2 number depend on which runs happen to be in the directory.
+What would answer it: select V2 runs by the study's matrix logs.
+Answer: fixed in PR #163 (`139af2e5`). `PORTS_MATRICES` names the logs, and with it set the notebook keeps only the V2 runs they list. With the five study matrices: 192 runs, 12 per cell. Unset, nothing changes; the README gives the study's value.
+Severity: weakens.
+
 ### Held-out behavior (measure-behavior)
 
 Measure: for 100 generated grammars and 799 inputs, whether the port accepts, rejects, errors or crashes. The score is the percent of pairs that match the hand-written reference in the port's target language. 100 means it agrees everywhere. A port that answers "reject" to everything scores 43-47.
@@ -365,13 +376,25 @@ Severity: cosmetic.
 Measure: the Spearman table, how each per-run measure ranks against held-out behavior agreement.
 Evidence: `v2_measures` includes the `reference_<a>_port_<b>` confusion counts (`runs.py:1236-1239`), which sum to the pairs that `behavior_agreement_pct` is computed from.
 Why it matters: some correlations with the lead hold by definition.
-What would answer it: a sentence in the Spearman reading saying so. Not yet written: the PR #160 note covers the flag tests only.
+What would answer it: a sentence in the Spearman reading saying so.
+Answer: fixed in PR #164 (`6902560d`), `SPEARMAN_READING`.
 Severity: cosmetic.
 
 #### S6. **The IQR per cell rests on 12 points.**
 Measure: the per-cell interquartile range, the middle half of a cell's runs.
 Evidence: `v2_summary` takes the 0.25 and 0.75 quantiles of n = 12.
 Severity: cosmetic (conceded).
+
+#### S7. **The Spearman table pools two source languages measured against different references.**
+Measure: the Spearman table, how each per-run measure ranks against held-out behavior agreement.
+Evidence:
+- The report QA flagged rho = 0.00 for `ast_matched_fraction` and `ast_branching_wasserstein`.
+- Both columns are complete: 192 of 192 runs, with 35 and 188 distinct values. The pooled rho is −0.00026 and 0.00044, which shows as 0.00 at three places, so there is no join or null fault.
+- Within one source language the same pairs give −0.108 and 0.153 (python source) and 0.288 and 0.249 (javascript source).
+Why it matters: a pooled rank correlation mixes the offset between the two references with the within-language relation.
+What would answer it: report rho within each source language beside the pooled value.
+Answer: fixed in PR #164 (`6902560d`). The table has `pooled`, `python` and `javascript` rows; the heatmap stays pooled.
+Severity: weakens.
 
 ### Caches and reproducibility
 
@@ -427,6 +450,7 @@ Severity: weakens (V1 only).
 | X1 | Exit-137 exclusions select on the run | weakens | control added (`v2_failures`) |
 | X2 | Duplicates or trivial ports | none | holds |
 | X3 | Judge passes miss 2 and 4 runs | weakens | needs Kevin (top-up run) |
+| X4 | Run selection by directory contents, not study | weakens | fixed in PR #163 (`139af2e5`) |
 | B1 | Behavior depends on interface and layout | blocks | needs Kevin |
 | B2 | References disagree on 25 of 799 pairs | weakens | conceded as a limit (≤ 3.1 points) |
 | B3 | Any error matches any error | cosmetic | conceded as a limit |
@@ -457,8 +481,9 @@ Severity: weakens (V1 only).
 | S2 | Detectable gap is the critical value | weakens | fixed in PR #160 (`47c9b8ed`) |
 | S3 | Pooled shuffles ignore language | cosmetic | conceded as a limit |
 | S4 | Median bootstrap coarse | cosmetic | conceded as a limit |
-| S5 | Spearman includes lead components | cosmetic | open |
+| S5 | Spearman includes lead components | cosmetic | fixed in PR #164 (`6902560d`) |
 | S6 | IQR on 12 | cosmetic | conceded as a limit |
+| S7 | Spearman pools two references | weakens | fixed in PR #164 (`6902560d`) |
 | C1 | Behavior and API caches keyed on port only | weakens | open |
 | C2 | AST key omits tree-sitter | cosmetic | open |
 | C3 | Reference checkout keyed on commit only | weakens | open |
