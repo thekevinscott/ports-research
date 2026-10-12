@@ -6,6 +6,7 @@ from tempfile import TemporaryDirectory
 from judge.clone_reference import clone_reference
 
 from walkthroughs.compare_walkthroughs import compare_walkthroughs
+from walkthroughs.sweep_thresholds import sweep_thresholds
 from walkthroughs.write_walkthrough import write_walkthrough
 
 REFERENCES = {"python": "python", "javascript": "typescript"}
@@ -27,7 +28,8 @@ def reference_lines(*, out: Path, similarity: dict, model: str, effort: str) -> 
     walkthrough = {job: json.loads(p.read_text())["walkthrough"] for job, p in path.items()}
 
     def compare(reference: tuple[str, str], port: tuple[str, str]) -> dict:
-        return compare_walkthroughs(walkthrough[reference], walkthrough[port], similarity)
+        pair = walkthrough[reference], walkthrough[port]
+        return {**compare_walkthroughs(*pair, similarity), "sweep": sweep_thresholds(*pair, similarity)}
 
     lines = {
         "walkthroughs": {name: {tag: path[name, tag].name for tag in TAGS} for name in REFERENCES},

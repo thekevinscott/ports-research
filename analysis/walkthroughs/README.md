@@ -33,6 +33,8 @@ Within a pair each section (happy path, error paths, invariants) is aligned on i
 
 Aggregates: `mean_coverage` and `mean_order_agreement` over the pairs' happy paths, the same two under `error_paths` and `invariants`, `entry_points_matched`. A section with no reference steps has no coverage and one with no matches no order; both are left out of the means.
 
+`sweep` repeats the aggregates at the threshold moved by -0.1, -0.05, 0, +0.05 and +0.1: `threshold`, `mean_coverage`, `mean_order_agreement`, `error_paths`, `invariants`. Each distinct step is still embedded once. `reference-lines` carries the same `sweep` in every comparison, so the noise floor and baseline can be read at each threshold.
+
 Similarity is the cosine of embeddings from the server at `--embeddings-url`, threshold 0.8, each distinct step embedded once through `analysis/generate-embedding`'s CLI with the notebook's model `qwen3-embedding-0.6b-q8_0`. `--no-embeddings` uses word-set Jaccard on lowercased words instead, threshold 0.5. The output records `similarity`, `threshold` and `embeddings`: the url, the requested model and the server's `GET <url>/models` entry for it (a single-model server's only entry), null under `--no-embeddings`. A llama.cpp router's entry lists the model file and `--pooling` under `status.args`; a single-model server's does not report pooling.
 
 ## reference-lines

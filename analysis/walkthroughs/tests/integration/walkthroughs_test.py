@@ -45,6 +45,8 @@ def describe_compare():
         compared = json.loads(result.stdout)
         [pair] = compared["entry_points"]
         assert (compared["similarity"], compared["threshold"]) == ("embeddings", 0.8)
+        assert [round(s["threshold"], 2) for s in compared["sweep"]] == [0.7, 0.75, 0.8, 0.85, 0.9]
+        assert compared["sweep"][2]["mean_coverage"] == compared["mean_coverage"]
         assert compared["embeddings"]["url"] == embeddings_url
         assert compared["embeddings"]["model"] == compared["embeddings"]["server"]["id"] == "qwen3-embedding-0.6b-q8_0"
         assert compared["embeddings"]["server"]["status"]["args"][1:3] == ["--pooling", "last"]
@@ -84,4 +86,5 @@ def describe_reference_lines():
         assert set(lines["noise_floor"]) == {"python", "javascript"}
         assert set(lines["baseline"]) == {"python_to_javascript", "javascript_to_python"}
         assert all(c["mean_coverage"] == 1.0 for group in ("noise_floor", "baseline") for c in lines[group].values())
+        assert all(len(c["sweep"]) == 5 for group in ("noise_floor", "baseline") for c in lines[group].values())
         assert all(c["embeddings"]["server"]["id"] == "qwen3-embedding-0.6b-q8_0" for group in ("noise_floor", "baseline") for c in lines[group].values())
