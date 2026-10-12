@@ -8,7 +8,7 @@ Scope: the V2 test-configuration study (2 source languages × 8 test-flag combin
 
 ## Summary
 
-1. **Held-out behavior and API are coupled to the target flag through interface and layout.** Their drivers need the human target port's import path and names, which only the target integration suite shows. As a result, 20 of 192 ports score 0 on layout alone, and the unloadable count differs between target-on and target-off cells (B1).
+1. **Held-out behavior and API are coupled to the target flag through interface and layout.** Their drivers need the human target port's import path, names and end-state representation, which only the target integration suite shows. As a result, 20 of 192 ports score 0 on layout alone, and the unloadable count differs between target-on and target-off cells (B1). PR #165 adds a per-port driver status and charts agreement over driven ports.
 2. **API agreement measures naming as well as behavior.** It compares rule class names (`RuleChar`) or tags (`"char"`) verbatim, so the two human references agree on only 76 of 999 cases (A1).
 3. **The per-flag statistics run 135 uncorrected tests.** Their `minimum_detectable_gap` is the critical value, where the chance of detection is about one half, not a power-based size (S1, S2). The notebook now states both (PR #160); no correction is applied.
 
@@ -115,8 +115,10 @@ Evidence:
 - `driver_can_load` checks only `src/index.ts` (`analysis/notebook/src/Codebase.py:146`).
 - 20 of 192 ports have no module at those paths and score 0 on every pair: 12 python ports use `src/gbnf/`, 1 uses `python/gbnf/`, and 7 typescript ports lack `src/index.ts`.
 - Unloadable counts by target flag: python target 1/48 with the flag on and 12/48 with it off; javascript target 7/48 on and 0/48 off. Single cells range from 0 to 8 of 12.
+- Loading is not the only gate. A probe rerun of measure-behavior on four unit-only ports: two crash on all 799 pairs (`ImportError: cannot import name 'RuleEnd' from 'gbnf'`, `ModuleNotFoundError: No module named 'gbnf'`). The other two load, match all 77 errors, and reject the other 722, because their end state is not `type: "end"`. The score then sits at fixed levels set by the interface, not by behavior.
 Why it matters: a port that is right in behavior but laid out differently scores 0. Layout and naming are what the target suite reveals (D1), so the per-flag gap on this measure contains a layout term the measure cannot separate.
 What would answer it: either a driver that finds the package by the port's own declarations (`pyproject` packages, `package.json` `main`/`exports`), or results reported only over loadable ports with the unloadable count beside them. Which layouts count as "the port" is a design decision.
+Answer: control added in PR #165 (`fc588136`). Each port gets a driver status: `not_loaded` (every pair crashed), `loaded_failing` (no reference-accepted input accepted), or `driven`. The status is counted per cell, and agreement is charted over driven ports beside the raw chart. On the four probe runs the statuses are `not_loaded` ×2 and `loaded_failing` ×2. The driver itself is unchanged; that decision is Kevin's.
 Severity: blocks (for target-flag effects on behavior).
 
 #### B2. **The two references disagree, and the score is defined against the target one.**
@@ -161,6 +163,7 @@ Severity: blocks.
 #### A2. **API has the same loader and layout coupling as B1.**
 Measure: held-out API agreement, the percent of 999 cases where every step through the port's public API returns what the human target-language port returns.
 Evidence: it uses the same `driver_can_load` and the same import paths.
+Answer: control added in PR #165 (`fc588136`): `api_driver_status` (`not_loaded` when every case crashed, `loaded_failing` when no case matches without raising). On the four probe runs it gives `not_loaded` ×1 and `loaded_failing` ×3; one port the behavior driver cannot import does load in the API driver.
 Severity: blocks (as B1).
 
 ### AST drift (measure-ast)
@@ -451,13 +454,13 @@ Severity: weakens (V1 only).
 | X2 | Duplicates or trivial ports | none | holds |
 | X3 | Judge passes miss 2 and 4 runs | weakens | needs Kevin (top-up run) |
 | X4 | Run selection by directory contents, not study | weakens | fixed in PR #163 (`139af2e5`) |
-| B1 | Behavior depends on interface and layout | blocks | needs Kevin |
+| B1 | Behavior depends on interface and layout | blocks | needs Kevin; driver-status control added in PR #165 (`fc588136`) |
 | B2 | References disagree on 25 of 799 pairs | weakens | conceded as a limit (≤ 3.1 points) |
 | B3 | Any error matches any error | cosmetic | conceded as a limit |
 | B4 | Floor near 45%, not 0 | weakens | open |
 | B5 | Corpus held out | none | holds |
 | A1 | Rule type compared as a language-specific name | blocks | needs Kevin |
-| A2 | API layout coupling | blocks | needs Kevin |
+| A2 | API layout coupling | blocks | needs Kevin; driver-status control added in PR #165 (`fc588136`) |
 | T1 | Builtin method calls pollute call graphs | weakens | fixed in PR #154 (`65e670a3`) |
 | T2 | Name pairing rewards kept names | cosmetic | conceded; titles hold |
 | T3 | AST reference is a human port | cosmetic | conceded as a limit |
