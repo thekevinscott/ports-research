@@ -72,7 +72,7 @@ Driver status per cell, from the notebook. `driven`: the port accepted at least 
 | javascript → python | source + target | 12 | 0 | 0 | 12 |
 | javascript → python | all | 12 | 0 | 0 | 12 |
 
-With target tests, 88 of 96 ports are driven. Without them: 20 of 24 with no tests, 18 of 72 with unit or source tests. The exception is python → javascript with source + target tests: 5 of 12 not loaded. This reads as: source-language tests pull the port toward a layout and names other than the target reference's, and target tests pull it back.
+With target tests, 88 of 96 ports are driven. Without them: 20 of 24 with no tests, 18 of 72 with unit or source tests. The exception is python → javascript with source + target tests: 5 of 12 not loaded.
 
 Rerunning the driver on four unit-only ports: both javascript → python ports crashed on all 799 pairs, with `ImportError: cannot import name 'RuleEnd' from 'gbnf'` and `ModuleNotFoundError: No module named 'gbnf'`. Both python → javascript ports loaded, matched all 77 grammar errors, and rejected the other 722 inputs: their end state is not the reference's `type: "end"`.
 
@@ -297,7 +297,7 @@ Spearman ρ ranks the 192 runs on two measures: +1 same order, −1 reverse, 0 u
 | Reference rejects, port errors | −0.447 |
 | Inputs both reject | 0.442 |
 
-Two measures, branching distance and the share of reference functions paired, show exactly 0; that is under review.
+Branching distance and the share of reference functions paired show 0 at three decimals; the unrounded values are −0.00026 and 0.00044.
 
 All 15 flag tables, per-direction rows and the full Spearman table: [appendix](APPENDIX.md#statistics).
 
@@ -311,7 +311,7 @@ Their definitions: [appendix](APPENDIX.md#not-yet-measured).
 
 ## What this report does not do
 
-It draws no conclusions; results are reviewed with Kevin. It does not measure reference diff similarity (no JavaScript target in `measure-code-distance`) or test pass rates (`execute-test-suite` finds no V2 suite). The [methodology review](https://github.com/thekevinscott/ports-research/blob/main/notes/REVIEW_2026-10-12-methodology.md) records the measurement limits.
+The readings above are the agent's; conclusions are drawn with Kevin. It does not measure reference diff similarity (no JavaScript target in `measure-code-distance`) or test pass rates (`execute-test-suite` finds no V2 suite). The [methodology review](https://github.com/thekevinscott/ports-research/blob/main/notes/REVIEW_2026-10-12-methodology.md) records the measurement limits.
 
 ## How this was made
 
