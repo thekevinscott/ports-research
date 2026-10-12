@@ -1,3 +1,9 @@
+# The gbnf pin: packages/gbnf_experiment/src/gbnf_experiment/config.py `gbnf_commit`.
+gbnf_commit := "13f1aca495d11e160fffd68c4ba299a2415909d8"
+patches := justfile_directory() / "../../packages/gbnf_experiment/docker/gbnf-prepare/patches"
+# The notebook's exclude lists: analysis/notebook/src/corpus.py EXCLUDE_BY_LANGUAGE.
+exclude := "--exclude node_modules --exclude __pycache__ --exclude .venv --exclude .pytest_cache --exclude dist --exclude dev-deps --exclude tests --exclude test --exclude integration-tests --exclude conftest.py --exclude '*_test.py' --exclude 'test_*.py' --exclude '*.test.ts' --exclude '*.spec.ts'"
+
 test-unit:
     uv run pytest src -x -q
 
@@ -8,4 +14,17 @@ test-e2e:
     uv run pytest tests/e2e -rA
 
 lint:
-    uv run ruff check src
+    uv run ruff check src tests
+
+# Clone the pin, apply the patches, and print the one-tree measures of both hand-written references.
+reference-measures:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    checkout=$(mktemp -d)
+    trap 'rm -rf "$checkout"' EXIT
+    git -C "$checkout" init -q
+    git -C "$checkout" fetch -q --depth 1 https://github.com/thekevinscott/gbnf {{gbnf_commit}}
+    git -C "$checkout" checkout -q FETCH_HEAD
+    git -C "$checkout" apply {{patches}}/*.patch
+    uv run measure-ast --language python --target "$checkout/packages/gbnf/python" {{exclude}}
+    uv run measure-ast --language typescript --target "$checkout/packages/gbnf/javascript" {{exclude}} --exclude builder --exclude dev

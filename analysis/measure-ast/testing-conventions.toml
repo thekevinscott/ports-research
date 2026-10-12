@@ -22,3 +22,33 @@ reason = "measure_tree walks real tree-sitter trees; the expected counts are onl
 path = "measure_ast/measure_ast_test.py"
 rules = ["unmocked-collaborator"]
 reason = "the aggregate over real parses of tmp files is the unit; mocking collect_files and measure_tree would leave only arithmetic"
+
+[[python.exempt]]
+path = "measure_ast/abstract_tree_test.py"
+rules = ["unmocked-collaborator"]
+reason = "abstract walks real tree-sitter trees; the grammar's parsers supply them"
+
+[[python.exempt]]
+path = "measure_ast/function_signature_test.py"
+rules = ["unmocked-collaborator"]
+reason = "names and arities are read off real tree-sitter nodes; a mocked node would only restate the field lookups"
+
+[[python.exempt]]
+path = "measure_ast/extract_functions_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the record is assembled from real tree-sitter nodes; mocking its helpers would leave only a constructor call"
+
+[[python.exempt]]
+path = "measure_ast/python_api_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the API surface is read off real python parses; the grammar's parser supplies them"
+
+[[python.exempt]]
+path = "measure_ast/typescript_api_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the API surface is read off real typescript parses; the grammar's parser supplies them"
+
+[[python.exempt]]
+path = "measure_ast/compare_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the comparison over real parses of tmp files is the unit; mocking every measure would leave only dict assembly"

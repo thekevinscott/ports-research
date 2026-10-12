@@ -11,6 +11,7 @@ class LanguageSpec:
     functions: frozenset[str]
     branches: frozenset[str]
     branch_operators: dict[str, frozenset[str]]
+    literals: frozenset[str]
 
     def is_branch(self, node: Node) -> bool:
         if node.type in self.branches:
@@ -39,6 +40,7 @@ PYTHON = LanguageSpec(
         }
     ),
     branch_operators={},
+    literals=frozenset({"string", "concatenated_string", "integer", "float", "true", "false", "none"}),
 )
 
 TYPESCRIPT = LanguageSpec(
@@ -68,6 +70,7 @@ TYPESCRIPT = LanguageSpec(
         }
     ),
     branch_operators={"binary_expression": frozenset({"&&", "||", "??"})},
+    literals=frozenset({"string", "template_string", "number", "regex", "true", "false", "null", "undefined"}),
 )
 
 LANGUAGES = {"python": PYTHON, "typescript": TYPESCRIPT}

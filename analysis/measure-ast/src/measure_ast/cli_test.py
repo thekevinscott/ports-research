@@ -4,7 +4,7 @@ from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
 
-from measure_ast.cli import cli
+from measure_ast.cli import cli, compare_cli, main
 
 REPORT = {
     "language": "python",
@@ -85,3 +85,72 @@ def describe_cli():
         result = invoke(target)
         assert result.exit_code != 0
         assert "no python source" in result.output
+
+
+COMPARISON = {"language": "python", "port": "/p", "reference": "/r", "delta": {}}
+
+
+@pytest.fixture
+def compare_function():
+    with patch("measure_ast.cli.compare", autospec=True) as m:
+        m.return_value = COMPARISON
+        yield m
+
+
+@pytest.fixture
+def reference(tmp_path):
+    directory = tmp_path / "reference"
+    directory.mkdir()
+    return directory
+
+
+def invoke_compare(target, reference, *args):
+    return CliRunner().invoke(
+        compare_cli, ["--language", "python", "--port", str(target), "--reference", str(reference), *args]
+    )
+
+
+def describe_compare_cli():
+    def it_requires_a_reference(compare_function, target):
+        result = CliRunner().invoke(compare_cli, ["--language", "python", "--port", str(target)])
+        assert result.exit_code != 0
+        assert "--reference" in result.output
+
+    def it_rejects_a_port_that_does_not_exist(compare_function, tmp_path, reference):
+        result = invoke_compare(tmp_path / "nowhere", reference)
+        assert result.exit_code != 0
+        compare_function.assert_not_called()
+
+    def it_forwards_language_port_reference_and_excludes(compare_function, target, reference):
+        invoke_compare(target, reference, "--exclude", "*_test.py", "--exclude", "build")
+        assert compare_function.call_args.kwargs == {
+            "language": "python",
+            "port": target,
+            "reference": reference,
+            "exclude": ["*_test.py", "build"],
+        }
+
+    def it_echoes_the_comparison_as_json(compare_function, target, reference):
+        result = invoke_compare(target, reference)
+        assert (result.exit_code, json.loads(result.output)) == (0, COMPARISON)
+
+    def it_renders_errors_as_click_errors(compare_function, target, reference):
+        compare_function.side_effect = FileNotFoundError("no python source")
+        result = invoke_compare(target, reference)
+        assert result.exit_code != 0
+        assert "no python source" in result.output
+
+
+def describe_main():
+    def it_runs_the_one_tree_measure_when_no_command_is_named(measure_ast_function, target):
+        result = CliRunner().invoke(main, ["--language", "python", "--target", str(target)])
+        assert (result.exit_code, json.loads(result.output)) == (0, REPORT)
+
+    def it_runs_compare_when_named(compare_function, target, reference):
+        result = CliRunner().invoke(
+            main, ["compare", "--language", "python", "--port", str(target), "--reference", str(reference)]
+        )
+        assert (result.exit_code, json.loads(result.output)) == (0, COMPARISON)
+
+    def it_lists_compare_in_its_help():
+        assert "compare" in CliRunner().invoke(main, ["--help"]).output
