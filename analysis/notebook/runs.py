@@ -1266,20 +1266,35 @@ def _(
         """The measures that take more than one value; a rank correlation needs a spread."""
         return [m for m in v2_measures(frame) if frame[m].drop_nulls().n_unique() > 1]
 
+    SPEARMAN_READING = (
+        "Pooled rows rank both source languages together, though each is measured against a"
+        " different reference; the rows for each source language rank within it."
+        " The `reference_<a>_port_<b>` counts are the pairs held-out behavior agreement is computed"
+        " from, so their correlation with it holds partly by definition."
+    )
+
     def spearman_table(frame):
-        measures = [measure for measure in varied_measures(frame) if measure != BEHAVIOR_LEAD]
-        lead = frame[BEHAVIOR_LEAD].to_list()
-        return pl.DataFrame(
-            {
-                "measure": measures,
-                "rho": [spearman(frame[measure].to_list(), lead) for measure in measures],
-                "n": [
-                    frame.filter(pl.col(measure).is_not_null() & pl.col(BEHAVIOR_LEAD).is_not_null()).height
-                    for measure in measures
-                ],
-            },
-            schema={"measure": pl.String, "rho": pl.Float64, "n": pl.Int64},
-        ).sort(pl.col("rho").abs(), descending=True, nulls_last=True)
+        """Each varied measure's rank correlation with held-out behavior, pooled and within each source language."""
+        tables = []
+        for scope in V2_SCOPES:
+            scoped = frame if scope == "pooled" else frame.filter(pl.col("source_language") == scope)
+            measures = [measure for measure in varied_measures(scoped) if measure != BEHAVIOR_LEAD]
+            lead = scoped[BEHAVIOR_LEAD].to_list()
+            tables.append(
+                pl.DataFrame(
+                    {
+                        "source_language": [scope] * len(measures),
+                        "measure": measures,
+                        "rho": [spearman(scoped[measure].to_list(), lead) for measure in measures],
+                        "n": [
+                            scoped.filter(pl.col(measure).is_not_null() & pl.col(BEHAVIOR_LEAD).is_not_null()).height
+                            for measure in measures
+                        ],
+                    },
+                    schema={"source_language": pl.String, "measure": pl.String, "rho": pl.Float64, "n": pl.Int64},
+                ).sort(pl.col("rho").abs(), descending=True, nulls_last=True)
+            )
+        return pl.concat(tables)
 
     def spearman_matrix(frame):
         measures = varied_measures(frame)
@@ -1385,7 +1400,11 @@ def _(
             [
                 mo.md(V2_NOT_MEASURED),
                 mo.md("### Rank correlation with held-out behavior"),
-                mo.ui.table(spearman_table(v2_runs).with_columns(pl.col("rho").round(3))),
+                mo.md(SPEARMAN_READING),
+                mo.ui.table(
+                    spearman_table(v2_runs).with_columns(pl.col("rho").round(3)),
+                    freeze_columns_left=["source_language", "measure"],
+                ),
                 spearman_chart(v2_runs),
             ]
         )
