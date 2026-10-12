@@ -26,17 +26,27 @@ from conftest import (
 # text here too, or the two sides drift together and prove nothing.
 UPSTREAM_PROMPT = (
     "Port the implementation under {source_language}/ to {target_language}.\n"
-    "Manage the port's dependencies and run its commands with {package_manager}.\n"
+    "There is no network access. uv, pytest, pnpm and vitest are installed.\n"
 )
 UPSTREAM_PROMPT_WITH_EVERY_SUITE = (
-    "Port the implementation under python/ to javascript.\n"
-    "Manage the port's dependencies and run its commands with pnpm.\n"
+    "Port the implementation under python/ to typescript.\n"
+    "There is no network access. uv, pytest, pnpm and vitest are installed.\n"
     "\n"
     "The following test suites are included:\n"
     "\n"
-    "- python unit tests: python/gbnf/**/*_test.py\n"
+    "- python unit tests: python/gbnf/ (colocated, *_test.py)\n"
     "- python integration tests: python/tests/generated/\n"
-    "- javascript integration tests: javascript/integration-tests/generated/\n"
+    "- typescript integration tests: javascript/integration-tests/generated/\n"
+)
+UPSTREAM_PROMPT_WITH_EVERY_SUITE_FROM_JAVASCRIPT = (
+    "Port the implementation under javascript/ to python.\n"
+    "There is no network access. uv, pytest, pnpm and vitest are installed.\n"
+    "\n"
+    "The following test suites are included:\n"
+    "\n"
+    "- typescript unit tests: javascript/src/ (colocated, *.test.ts)\n"
+    "- typescript integration tests: javascript/integration-tests/generated/\n"
+    "- python integration tests: python/tests/generated/\n"
 )
 # One line from each test rule file, as it reaches the image in RULES.
 UNIT_RULE = "+ /python/gbnf/**_test.py"
@@ -184,7 +194,7 @@ def describe_the_port():
             assert call["prompt"].endswith(
                 "\n\n"
                 + UPSTREAM_PROMPT.format(
-                    source_language="javascript", target_language="python", package_manager="uv"
+                    source_language="javascript", target_language="python"
                 )
                 + "\n"
             )
@@ -195,7 +205,7 @@ def describe_the_port():
             assert call["prompt"].endswith(
                 "\n\n"
                 + UPSTREAM_PROMPT.format(
-                    source_language="python", target_language="javascript", package_manager="pnpm"
+                    source_language="python", target_language="typescript"
                 )
                 + "\n"
             )
@@ -209,6 +219,18 @@ def describe_the_port():
             )
             [call] = porting_calls
             assert call["prompt"].endswith("\n\n" + UPSTREAM_PROMPT_WITH_EVERY_SUITE + "\n")
+
+        def it_names_where_each_included_suite_sits_from_javascript(experiment, porting_calls):
+            experiment(
+                source_language="javascript",
+                include_unit_tests=True,
+                include_source_integration_tests=True,
+                include_target_integration_tests=True,
+            )
+            [call] = porting_calls
+            assert call["prompt"].endswith(
+                "\n\n" + UPSTREAM_PROMPT_WITH_EVERY_SUITE_FROM_JAVASCRIPT + "\n"
+            )
 
         def it_collects_the_port_into_the_run_directory(experiment, data_directory):
             experiment()
@@ -421,16 +443,21 @@ def describe_the_rendered_prompt():
         assert "{" not in call["prompt"]
         assert "}" not in call["prompt"]
 
-    def it_names_the_package_manager_of_the_target_language(experiment, porting_calls):
-        experiment(source_language="javascript")
+    @pytest.mark.parametrize("source_language", ["python", "javascript"])
+    def it_states_the_environment_whichever_the_direction(
+        experiment, porting_calls, source_language
+    ):
+        experiment(source_language=source_language)
         [call] = porting_calls
-        assert "uv" in call["prompt"]
-        assert "pnpm" not in call["prompt"]
+        assert "There is no network access. uv, pytest, pnpm and vitest are installed.\n" in (
+            call["prompt"]
+        )
 
-    def it_names_the_package_manager_of_the_reverse_direction(experiment, porting_calls):
-        experiment(source_language="python")
+    def it_calls_javascript_typescript(experiment, porting_calls):
+        experiment(source_language="python", include_target_integration_tests=True)
         [call] = porting_calls
-        assert "pnpm" in call["prompt"]
+        assert " to typescript.\n" in call["prompt"]
+        assert "- typescript integration tests:" in call["prompt"]
 
 
 def describe_the_container_view():
