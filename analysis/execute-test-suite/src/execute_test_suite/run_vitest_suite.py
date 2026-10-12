@@ -5,11 +5,11 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from .adapt_typescript import adapt_typescript
-from .parse_coverage_summary import parse_coverage_summary
-from .parse_vitest_report import parse_vitest_report
-from .read_adapt_report import read_adapt_report
-from .suite_result import SuiteResult
+from execute_test_suite.adapt_typescript import adapt_typescript
+from execute_test_suite.parse_coverage_summary import parse_coverage_summary
+from execute_test_suite.parse_vitest_report import parse_vitest_report
+from execute_test_suite.read_adapt_report import read_adapt_report
+from execute_test_suite.suite_result import SuiteResult
 
 VITEST_VERSION = "2.1.3"
 PORT_ENTRY_FILE = "src/index.ts"

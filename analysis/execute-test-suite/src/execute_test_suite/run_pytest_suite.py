@@ -5,11 +5,11 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from .adapt_python import REPORT_VARIABLE, TARGET_VARIABLE
-from .parse_coverage_json import parse_coverage_json
-from .parse_junit_report import parse_junit_report
-from .read_adapt_report import read_adapt_report
-from .suite_result import SuiteResult
+from execute_test_suite.adapt_python import REPORT_VARIABLE, TARGET_VARIABLE
+from execute_test_suite.parse_coverage_json import parse_coverage_json
+from execute_test_suite.parse_junit_report import parse_junit_report
+from execute_test_suite.read_adapt_report import read_adapt_report
+from execute_test_suite.suite_result import SuiteResult
 
 PYTEST_VERSION = "9.1.1"
 PYTEST_DESCRIBE_VERSION = "3.2.0"

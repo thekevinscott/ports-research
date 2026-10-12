@@ -2,9 +2,9 @@ from pathlib import Path
 
 from rapidfuzz.distance import Levenshtein
 
-from .collect_files import collect_files
-from .languages import LANGUAGES, LanguageSpec
-from .token_stream import token_stream
+from round_trip_experiment.collect_files import collect_files
+from round_trip_experiment.languages import LANGUAGES, LanguageSpec
+from round_trip_experiment.token_stream import token_stream
 
 
 def read_codebase(language: str, target: Path, spec: LanguageSpec, exclude: list[str]) -> dict:

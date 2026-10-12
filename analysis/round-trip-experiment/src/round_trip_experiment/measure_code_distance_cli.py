@@ -3,8 +3,8 @@ from pathlib import Path
 
 import click
 
-from .measure_code_distance import measure_code_distance
-from .measure_git_diff import measure_git_diff
+from round_trip_experiment.measure_code_distance import measure_code_distance
+from round_trip_experiment.measure_git_diff import measure_git_diff
 
 DIRECTORY = click.Path(exists=True, file_okay=False, path_type=Path, resolve_path=True)
 LANGUAGE = click.option("--language", type=click.Choice(["python", "typescript"]), required=True)

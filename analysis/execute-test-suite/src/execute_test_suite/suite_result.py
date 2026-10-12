@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from .coverage_result import CoverageResult
+from execute_test_suite.coverage_result import CoverageResult
 
 
 @dataclass(frozen=True)

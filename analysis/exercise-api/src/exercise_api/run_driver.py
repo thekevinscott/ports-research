@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from .driver_command import driver_command
+from exercise_api.driver_command import driver_command
 
 DRIVER_FAILED = {"ok": False, "error_type": "driver_failed", "error_pos": None, "rules": None, "elapsed_ns": None}
 DRIVER_EXIT = {"ok": False, "error_type": "driver_exit", "error_pos": None, "rules": None, "elapsed_ns": None}

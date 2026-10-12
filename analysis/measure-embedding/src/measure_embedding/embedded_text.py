@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from .strip_comments import strip_comments
+from measure_embedding.strip_comments import strip_comments
 
 
 def embedded_text(source: Path, language: str, strip: bool) -> bytes:

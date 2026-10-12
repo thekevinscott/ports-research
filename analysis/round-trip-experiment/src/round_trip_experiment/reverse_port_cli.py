@@ -6,11 +6,11 @@ from pathlib import Path
 import click
 from gbnf_experiment.config import PACKAGE_ROOT as GBNF_EXPERIMENT_ROOT, prepare_cache_key, settings as gbnf_settings
 
-from .config import settings
-from .load_run import load_run
-from .record_forward import record_forward
-from .reverse_leg import reverse_leg
-from .reverse_run_directory import reverse_run_directory
+from round_trip_experiment.config import settings
+from round_trip_experiment.load_run import load_run
+from round_trip_experiment.record_forward import record_forward
+from round_trip_experiment.reverse_leg import reverse_leg
+from round_trip_experiment.reverse_run_directory import reverse_run_directory
 
 EXISTING_DIRECTORY = click.Path(exists=True, file_okay=False, path_type=Path, resolve_path=True)
 

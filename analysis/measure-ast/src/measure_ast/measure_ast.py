@@ -1,9 +1,9 @@
 from pathlib import Path
 from statistics import fmean
 
-from .collect_files import collect_files
-from .languages import LANGUAGES
-from .measure_tree import measure_tree
+from measure_ast.collect_files import collect_files
+from measure_ast.languages import LANGUAGES
+from measure_ast.measure_tree import measure_tree
 
 
 def measure_ast(*, language: str, target: Path, exclude: list[str]) -> dict:

@@ -3,9 +3,9 @@ from pathlib import Path
 from botbox import Agent
 from port_codebase import port_codebase
 from prompt import Prompt
-from .condition_name import condition_name
-from .prepare_filesystem import PreparedFilesystem
-from .suites_information import suites_information
+from gbnf_experiment.condition_name import condition_name
+from gbnf_experiment.prepare_filesystem import PreparedFilesystem
+from gbnf_experiment.suites_information import suites_information
 
 TARGET_LANGUAGES = {"javascript": "python", "python": "javascript"}
 # Named in the prompt because the agent has no registry access to discover it.

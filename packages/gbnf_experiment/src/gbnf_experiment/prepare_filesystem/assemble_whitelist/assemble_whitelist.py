@@ -8,7 +8,7 @@ language.
 
 from typing import Literal
 
-from .compose import compose
+from gbnf_experiment.prepare_filesystem.assemble_whitelist.compose import compose
 
 Language = Literal["python", "javascript"]
 

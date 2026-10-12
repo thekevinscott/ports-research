@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from .port_codebase import PROMPT_PATH, port_codebase
+from port_codebase.port_codebase import PROMPT_PATH, port_codebase
 
 
 @pytest.fixture

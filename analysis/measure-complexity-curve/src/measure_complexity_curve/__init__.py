@@ -1,3 +1,3 @@
-from .run_complexity_curve import run_complexity_curve
+from measure_complexity_curve.run_complexity_curve import run_complexity_curve
 
 __all__ = ["run_complexity_curve"]
