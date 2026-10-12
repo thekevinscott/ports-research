@@ -52,3 +52,13 @@ reason = "the API surface is read off real typescript parses; the grammar's pars
 path = "measure_ast/compare_test.py"
 rules = ["unmocked-collaborator"]
 reason = "the comparison over real parses of tmp files is the unit; mocking every measure would leave only dict assembly"
+
+[[python.exempt]]
+path = "measure_ast/call_graph_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the graph is read off real python and typescript parses; the grammar's parsers supply them"
+
+[[python.exempt]]
+path = "measure_ast/call_paths_test.py"
+rules = ["unmocked-collaborator"]
+reason = "call paths are traced over call graphs of real parses; a hand-built graph would only restate the resolver"

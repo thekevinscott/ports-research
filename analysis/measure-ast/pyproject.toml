@@ -1,7 +1,7 @@
 [project]
 name = "measure-ast"
 version = "0.1.0"
-description = "Tree-sitter AST size, depth and cyclomatic metrics over one python or typescript tree, alone or relative to a reference"
+description = "Tree-sitter AST size, depth, cyclomatic and call-path metrics over one python or typescript tree, alone or relative to a reference"
 readme = "README.md"
 authors = [
     { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }

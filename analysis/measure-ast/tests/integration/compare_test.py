@@ -77,6 +77,14 @@ def describe_compare_of_the_python_reference_against_itself():
         assert (api["port_only"], api["reference_only"]) == ([], [])
         assert "is_word_char/1" in api["shared"]
 
+    def it_traces_every_entry_point_identically(against_itself):
+        call_paths = against_itself["call_paths"]
+        assert call_paths["entry_point_count"] == len(call_paths["entry_points"]) > 0
+        assert call_paths["mean_edge_recall"] == 1
+        assert call_paths["median_trace_normalised"] == 0
+        assert {(e["trace_edit_distance"], len(e["missing_edges"]), len(e["extra_edges"])) for e in call_paths["entry_points"]} == {(0, 0, 0)}
+        assert call_paths["reachable_fraction_reference"] == call_paths["reachable_fraction_port"] > 0
+
 
 def describe_compare_of_the_python_reference_against_a_renamed_and_branched_copy():
     def it_unmatches_the_renamed_function_on_both_sides(against_edit, against_itself):
@@ -99,3 +107,11 @@ def describe_compare_of_the_python_reference_against_a_renamed_and_branched_copy
     def it_diffs_the_renamed_function_in_the_api_surface(against_edit):
         api = against_edit["api_surface"]
         assert (api["port_only"], api["reference_only"]) == (["is_letter/1"], ["is_word_char/1"])
+
+    def it_misses_the_call_edges_into_the_renamed_function(against_edit):
+        call_paths = against_edit["call_paths"]
+        missing = {edge for entry in call_paths["entry_points"] for edge in entry["missing_edges"]}
+        assert {edge.split("->")[1] for edge in missing} == {"is_word_char"}
+        assert "parse_name->is_word_char" in missing
+        assert all(entry["extra_edges"] == [] for entry in call_paths["entry_points"])
+        assert "is_letter/1" in call_paths["unreachable_port_only"]
