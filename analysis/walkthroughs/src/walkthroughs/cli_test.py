@@ -7,7 +7,7 @@ from click.testing import CliRunner
 
 from walkthroughs.cli import cli
 
-SIMILARITY = {"name": "fake", "threshold": 0.8, "score": None}
+SIMILARITY = {"name": "fake", "threshold": 0.8, "score": None, "embeddings": None}
 
 
 @pytest.fixture

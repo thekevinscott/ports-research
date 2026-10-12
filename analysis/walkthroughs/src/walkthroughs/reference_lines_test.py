@@ -6,7 +6,7 @@ import pytest
 
 from walkthroughs.reference_lines import reference_lines
 
-SIMILARITY = {"name": "fake", "threshold": 0.8, "score": None}
+SIMILARITY = {"name": "fake", "threshold": 0.8, "score": None, "embeddings": None}
 
 
 @pytest.fixture
