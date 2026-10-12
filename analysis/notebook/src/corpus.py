@@ -1,5 +1,6 @@
 """Shared corpus selection for the notebook and embedding pair export."""
 
+import os
 from pathlib import Path
 
 from dirsql._dirsql import DirSQL
@@ -8,7 +9,8 @@ from src.Codebase import Codebase
 from src.run_table import completed_runs
 
 ROOT = Path(__file__).resolve().parents[3]
-DATA = ROOT / "data" / "runs"
+# PORTS_RUNS_DIR points the scan at another runs directory, such as a scratch copy.
+DATA = Path(os.environ.get("PORTS_RUNS_DIR", ROOT / "data" / "runs"))
 REVERSE = ROOT / "analysis" / "round-trip-experiment" / "reverse"
 PREPARED = "771a734d60ecbae5"
 REFERENCE = Path.home() / ".cache" / "ports" / "gbnf-experiment" / "prepared" / PREPARED / "source"
@@ -28,7 +30,12 @@ EXCLUDE = [
     "*.test.ts",
     "*.spec.ts",
 ]
-EXCLUDE_BY_LANGUAGE = {"python": EXCLUDE, "typescript": [*EXCLUDE, "builder", "dev"]}
+EXCLUDE_BY_LANGUAGE = {
+    "python": EXCLUDE,
+    "typescript": [*EXCLUDE, "builder", "dev"],
+    # V2 names its typescript target "javascript".
+    "javascript": EXCLUDE,
+}
 
 def codebases_under(root, table):
     # A fresh DirSQL scan every run, so a run banked since the last refresh is picked up.

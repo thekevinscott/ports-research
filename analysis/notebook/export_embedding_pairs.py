@@ -11,7 +11,7 @@ import altair as alt
 
 from src.corpus import DATA, codebases_under
 from src.embedding_pairs import compare_corpus
-from src.run_table import runs_table
+from src.run_table import is_v2, runs_table
 
 OUT = Path(__file__).resolve().parent / "charts" / "embeddings"
 
@@ -46,7 +46,9 @@ def pair_chart(rows, source, target):
 
 
 def main():
-    report = compare_corpus(codebases_under(DATA, runs_table()))
+    report = compare_corpus(
+        [codebase for codebase in codebases_under(DATA, runs_table()) if not is_v2(codebase.run)]
+    )
     rows = report["comparisons"]
     summaries = []
     for source, target in sorted({(r["source_language"], r["target_language"]) for r in rows}):

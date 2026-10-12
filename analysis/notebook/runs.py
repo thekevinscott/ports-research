@@ -22,14 +22,17 @@ def _():
     )
     from src.port_pairs import within_cell, within_direction_similarity
     from src.rebuilt_layout import LAYOUT_LABELS, LAYOUT_RULE, layout_flag
-    from src.run_table import reverse_runs_table, runs_table
+    from src.run_table import is_v2, reverse_runs_table, runs_table
 
 
     from src.corpus import (
         DATA, REVERSE, REFERENCE, EXCLUDE_BY_LANGUAGE, codebases_under,
     )
 
-    codebases = codebases_under(DATA, runs_table())
+    # The sections below measure V1 runs: V2 runs carry other flags and another target name.
+    codebases = [
+        codebase for codebase in codebases_under(DATA, runs_table()) if not is_v2(codebase.run)
+    ]
     reverse_codebases = codebases_under(REVERSE, reverse_runs_table())
 
     FLAGS = ["include_python_tests", "include_typescript_tests", "is_error"]
