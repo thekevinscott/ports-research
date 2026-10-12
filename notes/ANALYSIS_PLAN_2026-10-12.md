@@ -51,7 +51,7 @@ One row per run, one column per measure, all in the runs notebook ([analysis/not
 
 - [x] A parser from transcript jsonl to per-run columns. What the agent read (source, shipped tests, both, neither); how often it ran which suite and the pass counts it saw; whether it wrote its own tests or a differential script against the reference; Bash calls, turns, tokens per phase. (PR #134)
 - [x] Notebook section, charted by test inclusion (PR #135).
-- [ ] Reading order, after the same article: whether the first file read is a public entry point, files read before the first write, re-reads of the same file, search calls per file read. Mechanical, from the transcript jsonl.
+- [x] Reading order, after the same article: whether the first file read is a public entry point, files read before the first write, re-reads of the same file, search calls per file read. Mechanical, from the transcript jsonl. Done: first read and whether it is the entry point, files read before the first write, re-reads, searches per file, read order, reads after the last write (PR #141); two lead charts and a first-read table in the notebook (PR #145).
 
 ### LLM judges
 
