@@ -21,3 +21,16 @@ def describe_command_word():
     )
     def it_skips_environment_and_wrapper_prefixes(words, expected):
         assert command_word(words) == expected
+
+    @pytest.mark.parametrize(
+        ("words", "expected"),
+        [
+            (["do", "cat", "x"], 1),
+            (["{", "cat", "x"], 1),
+            (["if", "!", "grep", "-q", "x"], 2),
+            (["then", "sed", "-n", "1p", "x"], 1),
+            (["while", "true"], 1),
+        ],
+    )
+    def it_skips_shell_keywords(words, expected):
+        assert command_word(words) == expected

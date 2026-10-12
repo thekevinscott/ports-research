@@ -38,3 +38,17 @@ def describe_split_command():
 
     def it_falls_back_to_whitespace_on_unbalanced_quotes():
         assert words("echo 'a b") == [["echo", "'a", "b"]]
+
+    def it_unrolls_a_for_loop_over_its_words():
+        assert words('cd /x; for f in a b/*.py; do echo "= $f"; cat ${f}; done | head') == [
+            ["cd", "/x"], ["echo", "= a"], ["cat", "a"], ["echo", "= b/*.py"], ["cat", "b/*.py"], ["head"],
+        ]
+
+    def it_unrolls_nested_loops():
+        assert words("for a in 1 2; do for b in x; do echo $a$b; done; done") == [["echo", "1x"], ["echo", "2x"]]
+
+    def it_expands_a_find_substitution_from_the_reference_listing():
+        files = {"/input/python/gbnf/b.py", "/input/python/gbnf/a.py", "/input/python/README.md"}
+        result = split_command("cd /input/python; for f in $(find gbnf -name '*.py' | sort); do cat $f; done", "/target", files)
+        assert [s["words"] for s in result["segments"]][-2:] == [["cat", "gbnf/a.py"], ["cat", "gbnf/b.py"]]
+        assert split_command("cat $(find /target -name '*.ts')", "/target", files)["segments"][-1]["words"] == ["cat", "$(...)"]

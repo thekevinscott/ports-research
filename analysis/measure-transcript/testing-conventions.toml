@@ -36,9 +36,14 @@ reason = "command_word decides where the runtime's name sits"
 [[python.exempt]]
 path = "measure_transcript/split_command_test.py"
 rules = ["unmocked-collaborator"]
-reason = "resolve_path is the path arithmetic the cwd and write targets are stated in"
+reason = "resolve_path is the path arithmetic the cwd and write targets are stated in; loop_end and find_output decide the words a loop and a find substitution leave"
 
 [[python.exempt]]
 path = "measure_transcript/copy_targets_test.py"
 rules = ["unmocked-collaborator"]
 reason = "resolve_path is the path arithmetic the copies are stated in"
+
+[[python.exempt]]
+path = "measure_transcript/find_output_test.py"
+rules = ["unmocked-collaborator"]
+reason = "resolve_path is the path arithmetic the start directories are stated in; grep_filter decides what a grep stage keeps"

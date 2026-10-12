@@ -17,8 +17,9 @@ def tool(name, **tool_input):
 
 @pytest.fixture
 def measure(tmp_path):
-    def measure(*calls, source_language="python"):
-        (tmp_path / "manifest.json").write_text(json.dumps({"condition": {"source_language": source_language}}))
+    def measure(*calls, source_language="python", included=()):
+        manifest = {"condition": {"source_language": source_language}, "reference_implementation": {"included": list(included)}}
+        (tmp_path / "manifest.json").write_text(json.dumps(manifest))
         session = tmp_path / "transcript" / ".claude" / "projects" / "-target" / "s.jsonl"
         session.parent.mkdir(parents=True, exist_ok=True)
         records = []
@@ -59,6 +60,20 @@ def describe_reads():
     def it_skips_the_pattern_or_script_argument(measure):
         result = measure(bash("grep -rn /input/python/gbnf/x.py /tmp; sed -n /input/python/gbnf/x.py /tmp/y"))
         assert result["read_source"] == 0
+
+    def it_counts_tail_and_awk_and_skips_option_values(measure):
+        result = measure(bash(
+            "cd /input/python/gbnf; tail -n 20 a.py; awk '/def/' b.py; head -n 5 c.py; grep -A 3 -e x -e y d.py",
+        ))
+        assert result["read_order"] == ["/input/python/gbnf/a.py", "/input/python/gbnf/b.py", "/input/python/gbnf/c.py", "/input/python/gbnf/d.py"]
+
+    def it_counts_a_class_once_per_call(measure):
+        result = measure(bash("cd /input/python/gbnf; for f in a.py b.py; do cat $f; done; head c.py"), bash("tail /input/python/gbnf/d.py"))
+        assert result["read_source"] == 2
+
+    def it_reads_after_a_shell_keyword(measure):
+        result = measure(bash("{ cat /input/python/gbnf/a.py; } > /tmp/x; if grep -q x /input/python/gbnf/b.py; then cat /input/python/gbnf/c.py; fi"))
+        assert result["read_order"] == ["/input/python/gbnf/a.py", "/input/python/gbnf/b.py", "/input/python/gbnf/c.py"]
 
     def it_marks_tests_touched_by_any_command(measure):
         result = measure(bash("ls /input/javascript/integration-tests/generated"))
@@ -232,3 +247,20 @@ def describe_reading_order():
         result = measure(bash("cp -r /input/javascript/src /tmp/ref"), bash("cat /tmp/ref/index.ts"), source_language="javascript")
         assert result["read_order"] == ["/input/javascript/src/index.ts"]
         assert result["first_read_is_entry_point"] is True
+
+    def it_reads_each_file_a_for_loop_names(measure):
+        result = measure(bash('cd /input/python/gbnf; for f in __init__.py graph.py; do echo "=== $f"; cat $f; done'))
+        assert result["read_order"] == ["/input/python/gbnf/__init__.py", "/input/python/gbnf/graph.py"]
+        assert result["first_read_is_entry_point"] is True
+
+    def it_reads_the_files_a_find_substitution_lists(measure):
+        included = ["python/gbnf/graph.py", "python/gbnf/__init__.py", "python/gbnf/graph_test.py", "python/README.md"]
+        result = measure(bash("cd /input/python; for f in $(find gbnf -name '*.py' ! -name '*_test.py' | sort); do cat $f; done"), included=included)
+        assert result["read_order"] == ["/input/python/gbnf/__init__.py", "/input/python/gbnf/graph.py"]
+
+    def it_expands_a_glob_against_the_reference_listing(measure):
+        included = ["javascript/src/index.ts", "javascript/src/gbnf.ts", "javascript/src/gbnf.test.ts"]
+        result = measure(bash("cp -r /input/javascript/src /tmp/ref; cat /tmp/ref/*.ts /target/*.ts"), included=included, source_language="javascript")
+        assert result["read_order"] == ["/input/javascript/src/gbnf.ts", "/input/javascript/src/index.ts"]
+        assert result["read_source_tests"] == 1
+        assert result["first_read_is_entry_point"] is False
