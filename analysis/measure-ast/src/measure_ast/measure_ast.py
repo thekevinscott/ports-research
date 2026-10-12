@@ -1,20 +1,14 @@
 from pathlib import Path
 from statistics import fmean
 
-from measure_ast.collect_files import collect_files
 from measure_ast.languages import LANGUAGES
 from measure_ast.measure_tree import measure_tree
+from measure_ast.parse_files import parse_files
 
 
 def measure_ast(*, language: str, target: Path, exclude: list[str]) -> dict:
     spec = LANGUAGES[language]
-    files = collect_files(target, suffixes=spec.parsers, exclude=exclude)
-    if not files:
-        raise FileNotFoundError(f"no {language} source files under {target}")
-    trees = [
-        measure_tree(spec.parsers[path.suffix].parse(path.read_bytes()).root_node, spec)
-        for path in files
-    ]
+    trees = [measure_tree(tree.root_node, spec) for tree in parse_files(language=language, target=target, exclude=exclude)]
     lines = [fn["lines"] for tree in trees for fn in tree["functions"]]
     cyclomatic = [fn["cyclomatic"] for tree in trees for fn in tree["functions"]]
     return {

@@ -1,7 +1,7 @@
 [project]
 name = "measure-ast"
 version = "0.1.0"
-description = "Tree-sitter AST size, depth and cyclomatic metrics over one python or typescript tree"
+description = "Tree-sitter AST size, depth and cyclomatic metrics over one python or typescript tree, alone or relative to a reference"
 readme = "README.md"
 authors = [
     { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }
@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.scripts]
-measure-ast = "measure_ast.cli:cli"
+measure-ast = "measure_ast.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.9,<1.0"]
