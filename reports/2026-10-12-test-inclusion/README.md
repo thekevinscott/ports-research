@@ -134,7 +134,7 @@ Medians per condition.
 | source + target | 1.1 | 3 | 0 | 1.3 | 3 | 1 |
 | all | 2.7 | 11 | 22 | 3.1 | 10 | 23 |
 
-Wall time is left out: 48 of the 192 runs, all given unit tests, record under one minute while using 2.2M tokens or more, so the recorded duration does not time the whole run.
+Wall time is left out: in 48 of the 192 runs, all given unit tests, the recorded duration covers only the run's last turn (4 to 22 seconds) because a background task's notification started another turn after the first result; the transcripts span 6 to 41 minutes. The [methodology review](https://github.com/thekevinscott/ports-research/blob/main/notes/REVIEW_2026-10-12-methodology.md) records this as X5; the notebook now times runs from the transcript.
 
 Tokens, all 192 runs, flag on against flag off:
 
