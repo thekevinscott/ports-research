@@ -34,6 +34,7 @@ One row per run, one column per measure, all in the runs notebook ([analysis/not
   - [x] All labelled structural drift, never fidelity alone: CodeBLEU's AST and dataflow subscores do not track functional correctness in the papers the embeddings review covers (PR #129, PR #133).
   - [x] Notebook section: `ast_matched_fraction`, `ast_tree_edit_median` and `ast_branching_wasserstein` leads, the other AST columns in the accordion, dots per run with median ticks, one panel per source language; the leads join the V2 statistics (PR #133).
   - [ ] The plain-language explainer asked for on 2026-09-10 is still owed.
+  - [ ] Call-path fidelity, after Sean Goedecke's [How to read code](https://www.seangoedecke.com/how-to-read-code/), which Kevin sent on 2026-10-12: "The canonical way to read code might be an additional clue for how to measure fidelity". Start at each shared public entry point, follow call expressions within the package with callees resolved by the normalised name and arity already used for pairing, everything outside the package a black box. Per entry point: edit distance between the reference's and the port's callee sequences, and the share of reference call edges present in the port. A function unreachable from the public API weighs nothing. A `measure-ast` extension with its own notebook columns; its per-entry-point output ("the port skips the error path after step four") is the explainer above.
 
 ### Held-out behavior
 
@@ -48,8 +49,9 @@ One row per run, one column per measure, all in the runs notebook ([analysis/not
 
 ### Transcripts, mechanical
 
-- [ ] A parser from transcript jsonl to per-run columns. What the agent read (source, shipped tests, both, neither); how often it ran which suite and the pass counts it saw; whether it wrote its own tests or a differential script against the reference; Bash calls, turns, tokens per phase.
-- [ ] Notebook section, charted by test inclusion.
+- [x] A parser from transcript jsonl to per-run columns. What the agent read (source, shipped tests, both, neither); how often it ran which suite and the pass counts it saw; whether it wrote its own tests or a differential script against the reference; Bash calls, turns, tokens per phase. (PR #134)
+- [ ] Notebook section, charted by test inclusion (PR #135, open).
+- [ ] Reading order, after the same article: whether the first file read is a public entry point, files read before the first write, re-reads of the same file, search calls per file read. Mechanical, from the transcript jsonl.
 
 ### LLM judges
 
@@ -58,8 +60,20 @@ Kevin, 2026-10-12: "we should run the judge suite against the base ports without
 - [x] Code judge rubric, written before any V2 port is read: API parity, structure kept or changed and why, semantic divergences with quoted lines, idiom versus transliteration. Output per item: a verdict per rubric line with quoted evidence, plus one ordinal fidelity score (PR #132).
 - [x] Transcript judge rubric, written before any V2 transcript is read: did the agent cheat; why did it keep or change the file structure (the two open questions from the [V2 plan](PLAN_2026-09-16-v2.md)). Input is the compressed transcript: commands and assistant text, tool output dropped (PR #132).
 - [x] Baseline: the human pair, both directions, judged blind. Its scores are the default reading of the code judge for a faithful port (PR #132).
-- [ ] One pass over every exit-0 run with a stronger model than the one under test, uncertain items escalated to Kevin. Each item judged once; the judge sees items in shuffled order.
+- [ ] One pass over every exit-0 run with the same model family at higher effort, uncertain items escalated to Kevin. Each item judged once; the judge sees items in shuffled order. Transcript rubric only for now. Kevin, 2026-10-12, after the dry run: "Let's focus on transcripts then? I don't want to burn the whole budget although it will reset in 36 hours".
+- [ ] Transcript rubric item on reading strategy: traced from an entry point versus read in directory order, the quoted sequence as evidence. Added before the transcript pass if it lands first; otherwise a second pass on that item alone.
+- [ ] Code rubric: the judge traces the happy path from each public entry point through both implementations and quotes the divergence point, rather than reading each in file order. Waits with the code pass.
 - [ ] Notebook section: fidelity score and verdict counts by test inclusion, with the human pair drawn as a reference line.
+
+### Derived walkthroughs
+
+Kevin, 2026-10-12: "In particular I wonder about asking an LLM to write explainers or walk through of the code- then compare those derivations". Each implementation is explained on its own, so the explainer never sees the other side, and both explanations are English, so the language difference drops out.
+
+- [ ] Fixed walkthrough format, following the article's method: for each public entry point, the happy path as ordered one-sentence steps naming what happens and what is called; then error paths; then invariants. Structured JSON.
+- [ ] One walkthrough per reference per language and one per port, each from one implementation alone, cached by content. Subscription billing, same model family as the judge.
+- [ ] Mechanical comparison: align port steps to reference steps by embedding similarity with the embedding server; per entry point, coverage (share of reference steps matched), order agreement, extra steps. A short LLM comparison of aligned pairs only if the embeddings prove too coarse.
+- [ ] Two reference lines, both free of ports: the noise floor (the same reference explained twice and compared) and the baseline (the python and javascript references explained independently and compared).
+- [ ] Notebook section: coverage lead with the noise floor and baseline drawn as lines, per-entry-point table of missing and extra steps.
 
 ### Not this cycle
 
