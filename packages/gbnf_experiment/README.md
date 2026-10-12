@@ -44,7 +44,7 @@ uv run --env-file ../../.env python scripts/study_test_configurations.py
 | Flag | Default |
 | --- | --- |
 | `--n` | `12` rounds. `0` runs until stopped. |
-| `--parallel` | `2` runs at a time. |
+| `-k`, `--parallel` | `4` concurrent jobs. Each job is one Docker container running the agent and its test runs. |
 | `--efforts` | `medium`. Comma-separated, e.g. `low,xhigh`. |
 | `--models` | `claude-opus-5-5`. Any of `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-fable-5-1`, `claude-haiku-4-5-20251001`. |
 | `--source-languages` | Both. |

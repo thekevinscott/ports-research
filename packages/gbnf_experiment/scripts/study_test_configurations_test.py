@@ -197,6 +197,15 @@ def describe_main():
         }
         assert matrix.call_args.kwargs["n"] == 12
 
+    def it_runs_four_jobs_at_once_by_default(matrix):
+        main([])
+        assert matrix.call_args.kwargs["parallel"] == 4
+
+    @pytest.mark.parametrize("flag", ["-k", "--parallel"])
+    def it_takes_k_as_the_number_of_concurrent_jobs(flag, matrix):
+        main([flag, "6"])
+        assert matrix.call_args.kwargs["parallel"] == 6
+
     def it_runs_until_stopped_at_n_zero(matrix):
         main(["--n", "0"])
         assert matrix.call_args.kwargs["n"] is None

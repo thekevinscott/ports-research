@@ -138,7 +138,13 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument(
         "--n", type=int, default=DEFAULT_ROUNDS, help="Rounds; 0 runs until stopped. Default: %(default)s."
     )
-    parser.add_argument("--parallel", type=int, default=2, help="Default: %(default)s.")
+    parser.add_argument(
+        "-k",
+        "--parallel",
+        type=int,
+        default=4,
+        help="Concurrent jobs; each is one Docker container running the agent and its test runs. Default: %(default)s.",
+    )
     parser.add_argument(
         "--efforts",
         type=lambda value: tuple(value.split(",")),
