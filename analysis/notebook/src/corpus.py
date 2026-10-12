@@ -6,7 +6,8 @@ from pathlib import Path
 from dirsql._dirsql import DirSQL
 
 from src.Codebase import Codebase
-from src.run_table import completed_runs
+from src.matrix_run_ids import matrix_run_ids
+from src.run_table import completed_runs, is_v2
 
 ROOT = Path(__file__).resolve().parents[3]
 # PORTS_RUNS_DIR points the scan at another runs directory, such as a scratch copy.
@@ -37,10 +38,17 @@ EXCLUDE_BY_LANGUAGE = {
     "javascript": EXCLUDE,
 }
 
-def runs_under(root, table, *, include_nonzero_exit=False):
+def runs_under(root, table, *, include_nonzero_exit=False, matrices=None):
+    """Completed runs under root. Given matrix logs (names under root, or PORTS_MATRICES, comma-separated), V2 runs are only those the logs list; V1 runs are kept."""
     # A fresh DirSQL scan every run, so a run banked since the last refresh is picked up.
     db = DirSQL(str(root), tables=[table])
-    return completed_runs(db, table.name, include_nonzero_exit=include_nonzero_exit)
+    runs = completed_runs(db, table.name, include_nonzero_exit=include_nonzero_exit)
+    if matrices is None:
+        matrices = [name.strip() for name in os.environ.get("PORTS_MATRICES", "").split(",") if name.strip()]
+    if not matrices:
+        return runs
+    listed = matrix_run_ids(Path(root), matrices)
+    return [run for run in runs if not is_v2(run) or run["run_id"] in listed]
 
 
 def codebases_under(root, table):
