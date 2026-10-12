@@ -40,6 +40,7 @@ REVERSE_SECTIONS = ("diff", "embeddings")
 GROUPS = {"embeddings": "embeddings", "performance": "performance"}
 FORWARD_GROUP = "statistical-analysis"
 REVERSE_GROUP = "reverse-ports"
+BEHAVIOR_GROUP = "held-out-behavior"
 # A section whose lead column is charted alone needs a name for the chart of what is left.
 OTHER_COLUMNS = {
     "diff": "reference-diff-other-columns",
@@ -194,6 +195,12 @@ def charts(notebook):
                 notebook["FORWARD_FLAGS"],
             ):
                 yield f"{REVERSE_GROUP}/{name}-{direction}", built
+
+    v2_runs = notebook["v2_runs"]
+    if v2_runs.height:
+        for column in v2_runs.columns:
+            if column == notebook["BEHAVIOR_LEAD"] or column.startswith("reference_"):
+                yield f"{BEHAVIOR_GROUP}/{slug(column)}", notebook["behavior_chart"](v2_runs, column)
 
 
 def write(chart, stem):

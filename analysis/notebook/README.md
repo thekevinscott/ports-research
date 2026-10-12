@@ -5,6 +5,8 @@ last refresh appears without a code change.
 
 The run table reads V1 manifests (`include_python_tests`, `include_typescript_tests`) and V2 manifests (`include_unit_tests`, `include_source_integration_tests`, `include_target_integration_tests`, `exit_code`); a row carries one set and nulls for the other. V2 runs that exited non-zero are dropped unless `completed_runs` is called with `include_nonzero_exit=True`. The existing sections measure V1 runs only. `PORTS_RUNS_DIR` points the scan at another runs directory.
 
+The held-out behavior section measures V2 runs only: measure-behavior runs each port over its corpus (100 generated grammars, 799 inputs) and compares the outcomes with the reference's, cached under `~/.cache/ports/analysis/codebases/behavior/` by the port's contents. Uncached, a python port takes about 22 s and a javascript port about 105 s.
+
 Edit: `uv run --directory analysis/notebook marimo edit runs.py`. Unit tests: `just --working-directory analysis/notebook test-unit`.
 Charts to disk: `GENERATE_EMBEDDING_BASE_URL=http://127.0.0.1:8089/v1 uv run --directory analysis/notebook python export_charts.py`
 writes every chart the notebook renders to `charts/` as SVG, PNG and Vega-Lite JSON, built from the notebook's own chart functions.
