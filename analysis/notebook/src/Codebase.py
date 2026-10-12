@@ -26,8 +26,16 @@ MEASURE_API_DIR = ANALYSIS / "measure-api"
 # The held-out corpora: generated grammars and inputs no agent container ever mounts.
 BEHAVIOR_CORPUS = MEASURE_BEHAVIOR_DIR / "corpus"
 API_CORPUS = MEASURE_API_DIR / "corpus"
-# measure-behavior and measure-api load a javascript port through their typescript driver.
+# measure-behavior and measure-api load a javascript port through their typescript driver;
+# measure-ast parses it with its typescript grammar.
 DRIVERS = {"python": "python", "javascript": "typescript"}
+# The gbnf pin: packages/gbnf_experiment/src/gbnf_experiment/config.py `gbnf_commit`.
+GBNF_COMMIT = "13f1aca495d11e160fffd68c4ba299a2415909d8"
+PATCHES = ANALYSIS.parent / "packages" / "gbnf_experiment" / "docker" / "gbnf-prepare" / "patches"
+REFERENCE_CHECKOUT = Path.home() / ".cache" / "ports" / "analysis" / "codebases" / "reference" / GBNF_COMMIT
+# The javascript reference's build tooling, left out as measure-ast's reference-measures recipe
+# does. compare applies every pattern to both sides.
+REFERENCE_EXCLUDE = {"python": [], "javascript": ["builder", "dev"]}
 # Installed dependencies and caches are not the port's own code.
 CONTENT_SKIP = {"node_modules", "__pycache__"}
 EMBEDDINGS = Path.home() / ".cache" / "ports" / "analysis" / "embeddings-stripped"
@@ -50,6 +58,7 @@ reference_diff_cache = disk_cache / (
 
 behavior_cache = disk_cache / (lambda contents, **kwargs: f"codebases/behavior/{contents}.pkl")
 api_cache = disk_cache / (lambda contents, **kwargs: f"codebases/api/{contents}.pkl")
+ast_cache = disk_cache / (lambda contents, **kwargs: f"codebases/ast/{contents}.pkl")
 
 
 def exclude_args(exclude: list[str]) -> list[str]:
@@ -212,6 +221,60 @@ def run_measure_api(contents: str, *, implementation: Path, language: str) -> di
             else None
         )
         return {**json.loads(report.read_text()), "note": note}
+
+
+def pinned_reference() -> Path:
+    """The gbnf pin with the gbnf-prepare patches applied, checked out once and kept."""
+    if REFERENCE_CHECKOUT.is_dir():
+        return REFERENCE_CHECKOUT
+    REFERENCE_CHECKOUT.parent.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(dir=REFERENCE_CHECKOUT.parent) as scratch:
+        checkout = Path(scratch) / "checkout"
+        checkout.mkdir()
+        for command in (
+            ["init", "-q"],
+            ["fetch", "-q", "--depth", "1", "https://github.com/thekevinscott/gbnf", GBNF_COMMIT],
+            ["checkout", "-q", "FETCH_HEAD"],
+            ["apply", *sorted(str(patch) for patch in PATCHES.glob("*.patch"))],
+        ):
+            process = subprocess.run(
+                ["git", "-C", str(checkout), *command], capture_output=True, text=True
+            )
+            if process.returncode != 0:
+                raise RuntimeError(
+                    f"git {command[0]} failed (exit {process.returncode}): {process.stderr}"
+                )
+        checkout.rename(REFERENCE_CHECKOUT)
+    return REFERENCE_CHECKOUT
+
+
+@ast_cache
+def run_measure_ast_compare(
+    contents: str, *, implementation: Path, language: str, exclude: list[str]
+) -> dict:
+    reference = pinned_reference() / "packages" / "gbnf" / language
+    process = subprocess.run(
+        [
+            "uv",
+            "run",
+            "--directory",
+            str(MEASURE_AST_DIR),
+            "measure-ast",
+            "compare",
+            "--language",
+            DRIVERS[language],
+            "--port",
+            str(implementation),
+            "--reference",
+            str(reference),
+            *exclude_args([*exclude, *REFERENCE_EXCLUDE[language]]),
+        ],
+        capture_output=True,
+        text=True,
+    )
+    if process.returncode != 0:
+        return {"report": None, "note": process.stderr.strip()}
+    return {"report": json.loads(process.stdout), "note": None}
 
 
 @test_runs_cache
@@ -598,3 +661,18 @@ class Codebase:
     @property
     def api_note(self) -> str | None:
         return self._api["note"]
+
+    @cached_property
+    def _ast_compare(self) -> dict:
+        return run_measure_ast_compare(
+            self._contents, implementation=self.path, language=self.language, exclude=self.exclude
+        )
+
+    @property
+    def ast_report(self) -> dict | None:
+        """measure-ast compare against the pinned reference; None when it exited non-zero."""
+        return self._ast_compare["report"]
+
+    @property
+    def ast_note(self) -> str | None:
+        return self._ast_compare["note"]
