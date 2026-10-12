@@ -18,7 +18,9 @@ def transcript_item(files: list[Path]) -> str:
 
     steps = []
     for path in files:
-        for line in path.read_text().splitlines():
+        for line in path.read_text().split("\n"):
+            if not line.strip():
+                continue
             record = json.loads(line)
             if record.get("type") != "assistant":
                 continue
