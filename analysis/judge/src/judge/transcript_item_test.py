@@ -57,3 +57,8 @@ def describe_transcript_item():
         first = write(tmp_path / "a.jsonl", [assistant({"type": "text", "text": "one"})])
         second = write(tmp_path / "b.jsonl", [assistant({"type": "text", "text": "two"})])
         assert transcript_item([first, second]) == "[1] text: one\n[2] text: two\n"
+
+    def it_keeps_a_record_whole_when_a_string_holds_a_line_or_paragraph_separator(tmp_path):
+        path = tmp_path / "s.jsonl"
+        path.write_text(json.dumps(assistant({"type": "text", "text": "a\u2028b\u2029c"}), ensure_ascii=False) + "\n\n")
+        assert transcript_item([path]) == "[1] text: a\u2028b\u2029c\n"
