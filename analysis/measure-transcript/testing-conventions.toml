@@ -1,0 +1,44 @@
+[[python.exempt]]
+path = "measure_transcript/__init__.py"
+rules = ["colocated-test"]
+reason = "empty package marker; the CLI is tested in cli_test.py"
+
+[[python.exempt]]
+path = "measure_transcript/cli_test.py"
+rules = ["unmocked-collaborator", "no-first-party-patch"]
+reason = "click's CliRunner is the harness driving the unit; measure_transcript is patched at its cli import binding to test argument wiring"
+
+[[python.exempt]]
+path = "measure_transcript/measure_transcript_test.py"
+rules = ["unmocked-collaborator"]
+reason = "the counts are only meaningful over the real command parsing and path classes; mocking them would leave only a tally"
+
+[[python.exempt]]
+path = "measure_transcript/suite_class_test.py"
+rules = ["unmocked-collaborator"]
+reason = "classify_path, reference_path and may_hold_tests define which suite a directory holds"
+
+[[python.exempt]]
+path = "measure_transcript/classify_path_test.py"
+rules = ["unmocked-collaborator"]
+reason = "reference_path maps a copy back to the layout the classes are defined on"
+
+[[python.exempt]]
+path = "measure_transcript/suite_runner_test.py"
+rules = ["unmocked-collaborator"]
+reason = "command_word decides where the runner's name sits"
+
+[[python.exempt]]
+path = "measure_transcript/segment_runtime_test.py"
+rules = ["unmocked-collaborator"]
+reason = "command_word decides where the runtime's name sits"
+
+[[python.exempt]]
+path = "measure_transcript/split_command_test.py"
+rules = ["unmocked-collaborator"]
+reason = "resolve_path is the path arithmetic the cwd and write targets are stated in"
+
+[[python.exempt]]
+path = "measure_transcript/copy_targets_test.py"
+rules = ["unmocked-collaborator"]
+reason = "resolve_path is the path arithmetic the copies are stated in"
