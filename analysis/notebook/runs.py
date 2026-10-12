@@ -119,6 +119,8 @@ def _():
         "ast_matched_fraction": "Share of the reference's functions the port has a counterpart for",
         "ast_tree_edit_median": "Median tree edit distance between paired functions, normalised",
         "ast_branching_wasserstein": "Distance between the port's and the reference's branching distributions",
+        "ast_mean_edge_recall": "Share of the reference's call edges the port also makes, mean over entry points",
+        "ast_median_trace_normalised": "Edit distance between the reference's and the port's call traces, median over entry points",
         "ast_matched_count": "Functions paired with a reference function",
         "ast_port_only_count": "Port functions with no reference counterpart",
         "ast_reference_only_count": "Reference functions with no port counterpart",
@@ -127,6 +129,10 @@ def _():
         "ast_api_shared": "Public API entries the port shares with the reference",
         "ast_api_port_only": "Public API entries only the port exports",
         "ast_api_reference_only": "Public API entries only the reference exports",
+        "ast_entry_point_count": "Public entry points traced",
+        "ast_reachable_fraction_reference": "Share of the reference's functions reachable from an entry point",
+        "ast_reachable_fraction_port": "Share of the port's functions reachable from an entry point",
+        "ast_unreachable_port_only": "Port functions reachable from no entry point",
         "ast_delta_node_count": "AST nodes, port minus reference",
         "ast_delta_max_depth": "Deepest AST node, port minus reference",
         "ast_delta_function_count": "Functions, port minus reference",
@@ -142,17 +148,24 @@ def _():
             return {**dict.fromkeys(AST_TITLES), "ast_note": codebase.ast_note}
         functions = report["functions"]
         tree_edit = report["tree_edit_distance"]
+        call_paths = report["call_paths"]
         api = report["api_surface"]
         return {
             "ast_matched_fraction": functions["matched_fraction"],
             "ast_tree_edit_median": tree_edit["median_normalised"],
             "ast_branching_wasserstein": report["branching"]["wasserstein"],
+            "ast_mean_edge_recall": call_paths["mean_edge_recall"],
+            "ast_median_trace_normalised": call_paths["median_trace_normalised"],
             "ast_matched_count": functions["matched_count"],
             "ast_port_only_count": functions["port_only_count"],
             "ast_reference_only_count": functions["reference_only_count"],
             "ast_median_line_drift": functions["median_line_drift"],
             "ast_tree_edit_mean": tree_edit["mean_normalised"],
             **{f"ast_api_{side}": len(api[side]) for side in ("shared", "port_only", "reference_only")},
+            "ast_entry_point_count": call_paths["entry_point_count"],
+            "ast_reachable_fraction_reference": call_paths["reachable_fraction_reference"],
+            "ast_reachable_fraction_port": call_paths["reachable_fraction_port"],
+            "ast_unreachable_port_only": len(call_paths["unreachable_port_only"]),
             **{
                 column: report["delta"][column.removeprefix("ast_delta_")]["delta"]
                 for column in AST_TITLES
@@ -182,6 +195,15 @@ def _():
             "ast_note": pl.String,
             "ast_median_line_drift": pl.Float64,
         },
+    )
+    v2_ast_explainers = pl.DataFrame(
+        [
+            {"run_id": codebase.run["run_id"], "explainer": sentence}
+            for codebase in v2_codebases
+            if codebase.ast_report is not None
+            for sentence in codebase.ast_report['call_paths']['explainer']
+        ],
+        schema={"run_id": pl.String, "explainer": pl.String},
     )
     # Every finished V2 attempt, the non-zero exits the tables above exclude among them.
     v2_attempts = pl.DataFrame(
@@ -278,6 +300,7 @@ def _():
         similarity_matrix,
         spearman,
         v2_api_runs,
+        v2_ast_explainers,
         v2_attempts,
         v2_runs,
         v2_transcript_runs,
@@ -360,6 +383,7 @@ def _(
     similarity_matrix,
     spearman,
     v2_api_runs,
+    v2_ast_explainers,
     v2_attempts,
     v2_runs,
     v2_transcript_runs,
@@ -902,7 +926,13 @@ def _(
             ]
         )
 
-    AST_LEADS = ["ast_matched_fraction", "ast_tree_edit_median", "ast_branching_wasserstein"]
+    AST_LEADS = [
+        "ast_matched_fraction",
+        "ast_tree_edit_median",
+        "ast_branching_wasserstein",
+        "ast_mean_edge_recall",
+        "ast_median_trace_normalised",
+    ]
 
     def ast_title(metric):
         return AST_TITLES[metric]
@@ -920,6 +950,17 @@ def _(
             pl.col("^ast_.+$").exclude(*AST_LEADS, "ast_note"),
             "ast_note",
         )
+
+    def ast_explainers(frame, explainers):
+        """Each run's call-path explainer sentences, labelled by run, source language and condition."""
+        runs = with_v2_conditions(frame).select("run_id", "source_language", "condition")
+        return {
+            f"{run['run_id']} · {run['source_language']} · {run['condition']}": explainers.filter(
+                pl.col("run_id") == run["run_id"]
+            ).select("explainer")
+            for run in runs.iter_rows(named=True)
+            if run["run_id"] in explainers["run_id"]
+        }
 
     def ast_report():
         if v2_runs.height == 0:
@@ -958,6 +999,16 @@ def _(
                     {
                         f"Runs (n={labelled.height})": mo.ui.table(
                             labelled.with_columns(pl.col(pl.Float64).round(3))
+                        )
+                    }
+                ),
+                mo.accordion(
+                    {
+                        "Call-path explainer, per run": mo.accordion(
+                            {
+                                label: mo.ui.table(table, selection=None)
+                                for label, table in ast_explainers(v2_runs, v2_ast_explainers).items()
+                            }
                         )
                     }
                 ),
@@ -2568,6 +2619,13 @@ def _(mo):
                     - `ast_median_line_drift`: median over pairs of port lines minus reference lines.
                     - `ast_api_shared`, `ast_api_port_only`, `ast_api_reference_only`: public API entries (`name/arity`) on both sides or one.
                     - `ast_delta_<field>`: port minus reference for each one-tree measure (node count, depth, function count, function lines, cyclomatic).
+                    - Call paths, after Sean Goedecke's [How to read code](https://www.seangoedecke.com/how-to-read-code/): each side's calls are followed from every public entry point the two share (a shared function, or a shared class's constructor and public methods), anything outside the package a black box. A call resolves by normalised name when its argument count fits; a method call through any object resolves by name alone; calls through `super`, functions passed as values and implicit calls (operators, iteration) do not resolve.
+                    - `ast_mean_edge_recall`: per entry point, the share of the reference's caller-to-callee edges the port also has, by normalised names; mean over entry points whose reference trace has an edge.
+                    - `ast_median_trace_normalised`: per entry point, the edit distance between the reference's and the port's depth-first call traces (each function once, callees in call-site order), over the longer trace; median over entry points. 0 is the same path.
+                    - `ast_entry_point_count`: entry points traced, on either side.
+                    - `ast_reachable_fraction_reference`, `ast_reachable_fraction_port`: named functions reachable from any entry point, over all named functions on that side.
+                    - `ast_unreachable_port_only`: port functions reachable from no entry point.
+                    - Call-path explainer: one sentence per entry point, `entry: reference trace of n (functions in order); port m, missing caller->callee, extra caller->callee`.
                     - `ast_note`: measure-ast's error when compare exited non-zero, such as a port with no parsable file; the other columns are empty.
                     """),
                     "How to read": mo.md("""

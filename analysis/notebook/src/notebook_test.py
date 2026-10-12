@@ -169,6 +169,8 @@ def v2_row(
         "ast_matched_fraction": None,
         "ast_tree_edit_median": None,
         "ast_branching_wasserstein": None,
+        "ast_mean_edge_recall": None,
+        "ast_median_trace_normalised": None,
         "read_source_tests": 0,
         "read_target_tests": 0,
         "suite_run_count": suites,
@@ -608,8 +610,14 @@ def test_the_chart_export_takes_the_api_chart_from_the_notebook():
     assert 'notebook["api_chart"]' in (NOTEBOOK.parent / "export_charts.py").read_text()
 
 
-AST_LEAD_NAMES = ["ast_matched_fraction", "ast_tree_edit_median", "ast_branching_wasserstein"]
-AST_NAMES = (*CHART_NAMES, "ast_chart", "ast_runs")
+AST_LEAD_NAMES = [
+    "ast_matched_fraction",
+    "ast_tree_edit_median",
+    "ast_branching_wasserstein",
+    "ast_mean_edge_recall",
+    "ast_median_trace_normalised",
+]
+AST_NAMES = (*CHART_NAMES, "ast_chart", "ast_runs", "ast_explainers")
 ONE_TREE_FIELDS = (
     "node_count",
     "max_depth",
@@ -648,6 +656,19 @@ AST_REPORT = {
         "port_only": ["parse/1"],
         "reference_only": ["RuleRef", "RuleEnd", "default"],
     },
+    "call_paths": {
+        "entry_point_count": 2,
+        "mean_edge_recall": 0.5,
+        "median_trace_normalised": 0.25,
+        "reachable_fraction_reference": 0.9,
+        "reachable_fraction_port": 0.8,
+        "unreachable_port_only": ["leftover/0", "spare/1", "unused/2"],
+        "entry_points": [],
+        "explainer": [
+            "GBNF: reference trace of 2 (GBNF, parse); port 2, missing none, extra none",
+            "RuleChar: reference trace of 1 (RuleChar); port 0, missing none, extra none",
+        ],
+    },
 }
 AST_COLUMNS = [
     *AST_LEAD_NAMES,
@@ -659,6 +680,10 @@ AST_COLUMNS = [
     "ast_api_shared",
     "ast_api_port_only",
     "ast_api_reference_only",
+    "ast_entry_point_count",
+    "ast_reachable_fraction_reference",
+    "ast_reachable_fraction_port",
+    "ast_unreachable_port_only",
     *(f"ast_delta_{field}" for field in ONE_TREE_FIELDS),
 ]
 
@@ -670,6 +695,8 @@ def with_ast(runs, matched, tree_edit, wasserstein, note=None):
             "ast_matched_fraction": m,
             "ast_tree_edit_median": t,
             "ast_branching_wasserstein": w,
+            "ast_mean_edge_recall": m,
+            "ast_median_trace_normalised": t,
             "ast_matched_count": None if m is None else round(40 * m),
             "ast_note": note if m is None else None,
         }
@@ -692,7 +719,7 @@ def test_a_v2_run_carries_every_ast_column_from_the_compare_report():
     ast_columns = definitions("AST_TITLES", "ast_columns")["ast_columns"]
     columns = ast_columns(SimpleNamespace(ast_report=AST_REPORT, ast_note=None))
     assert list(columns) == [*AST_COLUMNS, "ast_note"]
-    assert [columns[lead] for lead in AST_LEAD_NAMES] == [0.75, 0.38, 0.6]
+    assert [columns[lead] for lead in AST_LEAD_NAMES] == [0.75, 0.38, 0.6, 0.5, 0.25]
     assert (
         columns["ast_matched_count"],
         columns["ast_port_only_count"],
@@ -705,6 +732,12 @@ def test_a_v2_run_carries_every_ast_column_from_the_compare_report():
         columns["ast_api_reference_only"],
     ) == (2, 1, 3)
     assert [columns[f"ast_delta_{field}"] for field in ONE_TREE_FIELDS] == [-3, -2, -1, 0, 1, 2, 3]
+    assert (
+        columns["ast_entry_point_count"],
+        columns["ast_reachable_fraction_reference"],
+        columns["ast_reachable_fraction_port"],
+        columns["ast_unreachable_port_only"],
+    ) == (2, 0.9, 0.8, 3)
     assert columns["ast_note"] is None
 
 
@@ -727,11 +760,11 @@ def test_v2_runs_read_median_line_drift_as_a_float_whether_compare_wrote_an_int_
     assert "'ast_median_line_drift': pl.Float64" in assigned("v2_runs")
 
 
-def test_the_v2_statistics_compare_flags_on_the_three_ast_leads():
+def test_the_v2_statistics_compare_flags_on_the_five_ast_leads():
     import polars as pl
 
     namespace = definitions(*CHART_NAMES)
-    assert namespace["V2_LEADS"][2:5] == AST_LEAD_NAMES
+    assert namespace["V2_LEADS"][2:7] == AST_LEAD_NAMES
     assert set(AST_LEAD_NAMES) <= set(namespace["v2_measures"](pl.DataFrame(AST_RUNS)))
     table = namespace["flag_comparison"](pl.DataFrame(AST_RUNS), "ast_matched_fraction")
     pooled = table.filter(
@@ -756,6 +789,8 @@ def test_the_ast_leads_are_titled_in_prose():
         "Share of the reference's functions the port has a counterpart for",
         "Median tree edit distance between paired functions, normalised",
         "Distance between the port's and the reference's branching distributions",
+        "Share of the reference's call edges the port also makes, mean over entry points",
+        "Edit distance between the reference's and the port's call traces, median over entry points",
     ]
 
 
@@ -800,12 +835,33 @@ def test_the_ast_run_table_shows_the_note_of_a_port_compare_could_not_measure():
     import polars as pl
 
     runs = definitions(*AST_NAMES)["ast_runs"](pl.DataFrame(AST_RUNS))
-    assert runs.columns[:6] == ["run_id", "source_language", "condition", *AST_LEAD_NAMES]
+    assert runs.columns[:8] == ["run_id", "source_language", "condition", *AST_LEAD_NAMES]
     assert runs.columns[-1] == "ast_note"
     row = runs.filter(pl.col("run_id") == "d").row(0, named=True)
     assert row["condition"] == "none"
     assert row["ast_matched_fraction"] is None
     assert row["ast_note"] == "no typescript file parsed under /run/ported_implementation"
+
+
+def test_v2_ast_explainers_hold_one_row_per_compare_explainer_sentence():
+    assert "codebase.ast_report['call_paths']['explainer']" in assigned("v2_ast_explainers")
+
+
+def test_the_ast_explainer_table_groups_each_runs_sentences_under_its_condition():
+    import polars as pl
+
+    explainers = pl.DataFrame(
+        {
+            "run_id": ["b", "a", "a"],
+            "explainer": ["b: one", "a: one", "a: two"],
+        }
+    )
+    tables = definitions(*AST_NAMES)["ast_explainers"](pl.DataFrame(AST_RUNS), explainers)
+    assert {label: table["explainer"].to_list() for label, table in tables.items()} == {
+        "a · python · source + target": ["a: one", "a: two"],
+        "b · python · source + target": ["b: one"],
+    }
+    assert list(tables) == ["a · python · source + target", "b · python · source + target"]
 
 
 def test_the_notebook_renders_the_ast_section_right_after_the_api_section():

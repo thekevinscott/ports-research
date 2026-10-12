@@ -9,7 +9,7 @@ The held-out behavior section measures V2 runs only: measure-behavior runs each 
 
 The held-out API section measures V2 runs only: measure-api runs each port over its corpus (100 generated grammars, 999 cases) and compares the outcomes with the reference's, cached under `~/.cache/ports/analysis/codebases/api/` by the port's contents. Uncached, a python port takes about 38 s and a javascript port about 168 s.
 
-The AST section measures V2 runs only: measure-ast `compare` runs each port against the reference in its language at the gbnf pin, cached under `~/.cache/ports/analysis/codebases/ast/` by the port's contents. The pinned reference is checked out once, with the gbnf-prepare patches, under `~/.cache/ports/analysis/codebases/reference/<commit>/`. Uncached, a python port takes about 6 s and a javascript port about 5 s.
+The AST section measures V2 runs only: measure-ast `compare` runs each port against the reference in its language at the gbnf pin, cached under `~/.cache/ports/analysis/codebases/ast/<measure-ast source hash>/` by the port's contents, so a change to measure-ast misses the cache. The pinned reference is checked out once, with the gbnf-prepare patches, under `~/.cache/ports/analysis/codebases/reference/<commit>/`. Uncached, with call paths, a python port takes about 6 s and a javascript port about 4 s.
 
 The transcripts section measures V2 runs only: measure-transcript counts reads, suite runs, own tests, differential scripts and fetch attempts from each run's transcript, cached under `~/.cache/ports/analysis/codebases/transcript/` by the transcript's contents and the run's source language. The cache-tier token columns are left out; `tokens_before_first_write` and `tokens_after_first_write` stay.
 
