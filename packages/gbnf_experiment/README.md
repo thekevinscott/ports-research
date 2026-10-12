@@ -9,7 +9,7 @@ CLI `run_gbnf_experiment`. Each invocation is one experimental condition: a sour
 - hands that tree unchanged as the source, with a prompt and a `ClaudeAgent`, to `port_codebase`;
 - banks the `RunResult` as one run directory under `data/`: `manifest.json` (with the agent's `exit_code`), `result.json` (the agent CLI's stdout), `stderr.txt` (its stderr), `transcript/` (the transcript files, at their paths relative to the agent's home), `proxy.log`.
 
-The prompt names the source as `javascript/` or `python/`, the target language, the package manager, and where each included suite sits. Paths in it are relative to the source directory.
+The prompt names the source as `javascript/` or `python/`, the target language (`javascript` reads as `typescript`), the installed tools, and where each included suite sits. Paths in it are relative to the source directory.
 
 ```
 uv run run_gbnf_experiment --source-language python --include-unit-tests --include-source-integration-tests --include-target-integration-tests

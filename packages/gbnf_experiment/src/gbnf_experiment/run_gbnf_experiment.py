@@ -5,11 +5,9 @@ from port_codebase import port_codebase
 from prompt import Prompt
 from .condition_name import condition_name
 from .prepare_filesystem import PreparedFilesystem
-from .suites_information import suites_information
+from gbnf_experiment.suites_information import LANGUAGE_NAMES, suites_information
 
 TARGET_LANGUAGES = {"javascript": "python", "python": "javascript"}
-# Named in the prompt because the agent has no registry access to discover it.
-PACKAGE_MANAGERS = {"python": "uv", "javascript": "pnpm"}
 # The library half of the prompt. port_codebase frames the task; only this
 # package knows how it laid the source directory out.
 PROMPT_PATH = Path(__file__).parent / "prompts" / "prompt.txt"
@@ -54,8 +52,7 @@ def run_gbnf_experiment(
                 Prompt(
                     PROMPT_PATH,
                     source_language=source_language,
-                    target_language=target,
-                    package_manager=PACKAGE_MANAGERS[target],
+                    target_language=LANGUAGE_NAMES[target],
                     suites_information=suites_information(
                         source_language=source_language, **tests
                     ),

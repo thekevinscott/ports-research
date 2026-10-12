@@ -187,8 +187,7 @@ def describe_run():
                 Prompt(
                     PROMPT_PATH,
                     source_language="python",
-                    target_language="javascript",
-                    package_manager="pnpm",
+                    target_language="typescript",
                     suites_information="",
                 )
             )
@@ -206,7 +205,6 @@ def describe_run():
                     PROMPT_PATH,
                     source_language="javascript",
                     target_language="python",
-                    package_manager="uv",
                     suites_information="",
                 )
             )
@@ -228,30 +226,18 @@ def describe_run():
         experiment()
         assert "tests" not in port_codebase.call_args.kwargs["prompt"]
 
-    def describe_the_package_manager_it_names():
-        def it_names_uv_when_the_target_is_python(
-            experiment,
-            prepare_reference_implementation,
-            port_codebase,
-        ):
-            experiment(source_language="javascript")
-            assert "uv" in port_codebase.call_args.kwargs["prompt"]
-
-        def it_names_pnpm_when_the_target_is_javascript(
-            experiment,
-            prepare_reference_implementation,
-            port_codebase,
-        ):
-            experiment(source_language="python")
-            assert "pnpm" in port_codebase.call_args.kwargs["prompt"]
-
-        def it_names_only_the_target_language_manager(
-            experiment,
-            prepare_reference_implementation,
-            port_codebase,
-        ):
-            experiment(source_language="javascript")
-            assert "pnpm" not in port_codebase.call_args.kwargs["prompt"]
+    @pytest.mark.parametrize("source_language", ["python", "javascript"])
+    def it_states_the_same_environment_whichever_the_direction(
+        experiment,
+        prepare_reference_implementation,
+        port_codebase,
+        source_language,
+    ):
+        experiment(source_language=source_language)
+        assert (
+            "There is no network access. uv, pytest, pnpm and vitest are installed.\n"
+            in port_codebase.call_args.kwargs["prompt"]
+        )
 
     def it_leaves_no_placeholder_in_the_prompt(
         experiment,
