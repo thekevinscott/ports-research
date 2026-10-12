@@ -31,6 +31,36 @@ def write_v2_run(run_dir, exit_code=0):
         (run_dir / "result.json").write_text(json.dumps({"is_error": False, "duration_ms": 1}))
 
 
+V1_CONDITION = {
+    "source_language": "python",
+    "target_language": "typescript",
+    "include_python_tests": True,
+    "include_typescript_tests": False,
+    "effort": "medium",
+    "model": "claude-opus-5-5",
+}
+
+
+def write_v1_run(run_dir):
+    run_dir.mkdir(parents=True)
+    manifest = {
+        "timestamp": "2026-09-08T23:42:47Z",
+        "completed_at": "2026-09-08T23:50:00Z",
+        "condition": V1_CONDITION,
+        "harness": {"commit": "353d5b3", "dirty": False},
+    }
+    (run_dir / "manifest.json").write_text(json.dumps(manifest))
+    (run_dir / "result.json").write_text(json.dumps({"is_error": False, "duration_ms": 1}))
+
+
+def write_matrix(path, *run_ids):
+    # The driver records each run's directory where it ran, often another worktree.
+    path.write_text(
+        "".join(json.dumps({"run_directory": f"/elsewhere/data/runs/{run_id}", "exit_code": 0}) + "\n" for run_id in run_ids)
+        + json.dumps({"run_directory": None, "exit_code": 1}) + "\n"
+    )
+
+
 def describe_codebases_under():
     def it_builds_a_codebase_for_a_javascript_port(tmp_path):
         write_v2_run(tmp_path / "20261012T094953Z_370ab98a")
@@ -50,3 +80,33 @@ def describe_runs_under():
         write_v2_run(tmp_path / "killed", exit_code=137)
         runs = runs_under(tmp_path, runs_table(), include_nonzero_exit=True)
         assert [(run["run_id"], run["exit_code"]) for run in runs] == [("killed", 137), ("ok", 0)]
+
+    def it_keeps_only_the_v2_runs_the_named_matrices_list(tmp_path):
+        write_v2_run(tmp_path / "study")
+        write_v2_run(tmp_path / "pilot")
+        write_matrix(tmp_path / "matrix-study.jsonl", "study")
+        runs = runs_under(tmp_path, runs_table(), matrices=["matrix-study.jsonl"])
+        assert [run["run_id"] for run in runs] == ["study"]
+
+    def it_keeps_v1_runs_whatever_the_matrices(tmp_path):
+        write_v1_run(tmp_path / "v1")
+        write_v2_run(tmp_path / "pilot")
+        write_matrix(tmp_path / "matrix-study.jsonl")
+        runs = runs_under(tmp_path, runs_table(), matrices=["matrix-study.jsonl"])
+        assert [run["run_id"] for run in runs] == ["v1"]
+
+    def it_reads_the_matrices_from_PORTS_MATRICES(tmp_path, monkeypatch):
+        write_v2_run(tmp_path / "study")
+        write_v2_run(tmp_path / "pilot")
+        write_v2_run(tmp_path / "refill")
+        write_matrix(tmp_path / "matrix-a.jsonl", "study")
+        write_matrix(tmp_path / "matrix-b.jsonl", "refill")
+        monkeypatch.setenv("PORTS_MATRICES", "matrix-a.jsonl, matrix-b.jsonl")
+        assert [run["run_id"] for run in runs_under(tmp_path, runs_table())] == ["refill", "study"]
+        assert [codebase.run_id for codebase in codebases_under(tmp_path, runs_table())] == ["refill", "study"]
+
+    def it_keeps_every_run_without_PORTS_MATRICES(tmp_path, monkeypatch):
+        monkeypatch.delenv("PORTS_MATRICES", raising=False)
+        write_v2_run(tmp_path / "study")
+        write_v2_run(tmp_path / "pilot")
+        assert [run["run_id"] for run in runs_under(tmp_path, runs_table())] == ["pilot", "study"]

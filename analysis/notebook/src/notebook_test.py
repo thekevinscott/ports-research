@@ -130,6 +130,7 @@ CHART_NAMES = (
     "v2_failures",
     "flag_comparison",
     "varied_measures",
+    "SPEARMAN_READING",
     "spearman_table",
     "spearman_matrix",
     "spearman_chart",
@@ -384,7 +385,9 @@ def test_the_flag_comparison_has_a_row_per_flag_pooled_and_per_source():
 def test_the_spearman_table_ranks_every_varied_measure_against_behavior_agreement():
     import polars as pl
 
-    table = definitions(*CHART_NAMES)["spearman_table"](pl.DataFrame(V2_RUNS))
+    table = definitions(*CHART_NAMES)["spearman_table"](pl.DataFrame(V2_RUNS)).filter(
+        pl.col("source_language") == "pooled"
+    )
     measures = table["measure"].to_list()
     assert "behavior_agreement_pct" not in measures
     # Constant over these runs, so its rank correlation is undefined.
@@ -393,6 +396,25 @@ def test_the_spearman_table_ranks_every_varied_measure_against_behavior_agreemen
     # agreement 99, 97, 96, 0 against loc 400, 600, 700, 900: a reversed order.
     assert round(table.filter(pl.col("measure") == "loc")["rho"][0], 9) == -1.0
     assert table["rho"].abs().to_list() == sorted(table["rho"].abs().to_list(), reverse=True)
+
+
+def test_the_spearman_table_also_ranks_within_each_source_language():
+    import polars as pl
+
+    table = definitions(*CHART_NAMES)["spearman_table"](pl.DataFrame(V2_RUNS))
+    # One javascript run: nothing varies within it, so it has no rows.
+    assert table["source_language"].unique(maintain_order=True).to_list() == ["pooled", "python"]
+    python = table.filter(pl.col("source_language") == "python")
+    # Within python, agreement 99, 97, 96 against loc 400, 600, 700.
+    assert round(python.filter(pl.col("measure") == "loc")["rho"][0], 9) == -1.0
+    assert set(python["n"].to_list()) == {3}
+    assert python["rho"].abs().to_list() == sorted(python["rho"].abs().to_list(), reverse=True)
+
+
+def test_the_spearman_reading_names_the_pooling_and_the_lead_components():
+    reading = definitions("SPEARMAN_READING")["SPEARMAN_READING"]
+    assert "each source language" in reading
+    assert "by definition" in reading
 
 
 def test_the_spearman_heatmap_is_titled_in_prose_and_draws_every_pair():
@@ -801,7 +823,9 @@ def test_the_v2_statistics_compare_flags_on_the_five_ast_leads():
 def test_the_spearman_table_ranks_the_ast_leads_against_behavior_agreement():
     import polars as pl
 
-    table = definitions(*CHART_NAMES)["spearman_table"](pl.DataFrame(AST_RUNS))
+    table = definitions(*CHART_NAMES)["spearman_table"](pl.DataFrame(AST_RUNS)).filter(
+        pl.col("source_language") == "pooled"
+    )
     assert set(AST_LEAD_NAMES) <= set(table["measure"].to_list())
     # Three runs carry both: the failed port has no AST measure.
     assert table.filter(pl.col("measure") == "ast_matched_fraction")["n"][0] == 3
