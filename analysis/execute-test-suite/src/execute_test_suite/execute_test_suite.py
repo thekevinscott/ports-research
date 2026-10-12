@@ -1,9 +1,9 @@
 import dataclasses
 from pathlib import Path
 
-from .locate_test_suite import locate_test_suite
-from .run_pytest_suite import run_pytest_suite
-from .run_vitest_suite import run_vitest_suite
+from execute_test_suite.locate_test_suite import locate_test_suite
+from execute_test_suite.run_pytest_suite import run_pytest_suite
+from execute_test_suite.run_vitest_suite import run_vitest_suite
 
 
 def execute_test_suite(

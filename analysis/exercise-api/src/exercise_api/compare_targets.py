@@ -1,6 +1,6 @@
-from .ladder_summary import ladder_summary
-from .outcome_key import outcome_key
-from .timing_summary import timing_summary
+from exercise_api.ladder_summary import ladder_summary
+from exercise_api.outcome_key import outcome_key
+from exercise_api.timing_summary import timing_summary
 
 DISAGREEMENT_LIMIT = 20
 TIMING_KEYS = {"elapsed_ns", "construct_ns", "add_ns"}

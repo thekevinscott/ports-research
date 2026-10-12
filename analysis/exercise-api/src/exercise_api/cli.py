@@ -3,13 +3,13 @@ from pathlib import Path
 
 import click
 
-from .exercise_api import exercise_api
-from .fixture_cases import fixture_cases
-from .generate_cases import generate_cases
-from .ladder_cases import ladder_cases
-from .read_cases import read_cases
-from .write_cases import write_cases
-from .write_report import write_report
+from exercise_api.exercise_api import exercise_api
+from exercise_api.fixture_cases import fixture_cases
+from exercise_api.generate_cases import generate_cases
+from exercise_api.ladder_cases import ladder_cases
+from exercise_api.read_cases import read_cases
+from exercise_api.write_cases import write_cases
+from exercise_api.write_report import write_report
 
 DIRECTORY = click.Path(exists=True, file_okay=False, path_type=Path, resolve_path=True)
 OUT = click.Path(dir_okay=False, path_type=Path)

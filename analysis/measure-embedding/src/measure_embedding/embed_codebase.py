@@ -4,9 +4,9 @@ from pathlib import Path
 
 import numpy as np
 
-from .collect_files import collect_files
-from .embedded_text import embedded_text
-from .run_generate_embedding import run_generate_embedding
+from measure_embedding.collect_files import collect_files
+from measure_embedding.embedded_text import embedded_text
+from measure_embedding.run_generate_embedding import run_generate_embedding
 
 SUFFIXES = {"python": {".py"}, "typescript": {".ts", ".tsx"}}
 

@@ -1,4 +1,4 @@
-from .generate_grammar import generate_grammar
+from measure_complexity_curve.generate_grammar import generate_grammar
 
 
 def build_corpus(*, sizes: list[int], nesting_depth: int, alternation_width: int, seed: int) -> list[dict]:

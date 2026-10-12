@@ -5,7 +5,7 @@ from pathlib import Path
 import click
 from gbnf_experiment.config import prepare_cache_key, settings
 
-from .execute_test_suite import execute_test_suite
+from execute_test_suite.execute_test_suite import execute_test_suite
 
 
 @click.command()

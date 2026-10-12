@@ -2,7 +2,7 @@ from collections.abc import Iterator
 
 from tree_sitter import Node, Parser
 
-from .languages import LanguageSpec
+from round_trip_experiment.languages import LanguageSpec
 
 PLACEHOLDER = "ID"
 COMMENT = "comment"

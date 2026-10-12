@@ -1,6 +1,6 @@
 from hypothesis import HealthCheck, Phase, given, seed, settings
 
-from .case_strategy import case_strategy
+from exercise_api.case_strategy import case_strategy
 
 ROUNDS = 20
 # Every round opens with hypothesis's simplest example, which is a duplicate after round one.

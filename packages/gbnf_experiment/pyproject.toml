@@ -32,4 +32,11 @@ dev = [
     "coverage>=7.16.0",
     "pytest>=9.1.1",
     "pytest-describe>=3.2.0",
+    "ruff>=0.17.0",
 ]
+
+[tool.ruff.lint]
+select = ["TID252"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"

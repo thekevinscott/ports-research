@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from .compose import compose
+from gbnf_experiment.prepare_filesystem.assemble_whitelist.compose import compose
 
 
 @pytest.fixture

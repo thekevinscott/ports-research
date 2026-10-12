@@ -2,10 +2,10 @@ from datetime import UTC, datetime
 
 from botbox import Agent, RunResult
 
-from ..config import settings
-from .prepare_reference_implementation import prepare_reference_implementation
-from .run_directory_name import run_directory_name
-from .write_manifest import write_manifest as _write_manifest
+from gbnf_experiment.config import settings
+from gbnf_experiment.prepare_filesystem.prepare_reference_implementation import prepare_reference_implementation
+from gbnf_experiment.prepare_filesystem.run_directory_name import run_directory_name
+from gbnf_experiment.prepare_filesystem.write_manifest import write_manifest as _write_manifest
 
 
 class PreparedFilesystem:

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 
-from .run_complexity_curve import run_complexity_curve
+from measure_complexity_curve.run_complexity_curve import run_complexity_curve
 
 
 @click.command()

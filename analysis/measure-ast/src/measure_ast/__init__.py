@@ -1,3 +1,3 @@
-from .measure_ast import measure_ast
+from measure_ast.measure_ast import measure_ast
 
 __all__ = ["measure_ast"]

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 
-from .measure_ast import measure_ast
+from measure_ast.measure_ast import measure_ast
 
 
 @click.command()

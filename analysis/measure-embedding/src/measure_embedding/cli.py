@@ -3,8 +3,8 @@ from pathlib import Path
 
 import click
 
-from .compare_embeddings import compare_embeddings
-from .embed_codebase import embed_codebase
+from measure_embedding.compare_embeddings import compare_embeddings
+from measure_embedding.embed_codebase import embed_codebase
 
 EXISTING_DIRECTORY = click.Path(exists=True, file_okay=False, path_type=Path, resolve_path=True)
 

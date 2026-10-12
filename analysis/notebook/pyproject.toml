@@ -20,6 +20,7 @@ dependencies = [
 dev = [
     "pytest>=9.1.1",
     "pytest-describe>=3.2.0",
+    "ruff>=0.17.0",
 ]
 
 [tool.marimo.runtime]
@@ -28,3 +29,9 @@ watcher_on_save = "autorun"
 [tool.uv.sources]
 gbnf_experiment = { path = "../../packages/gbnf_experiment", editable = true }
 measure-embedding = { path = "../measure-embedding", editable = true }
+
+[tool.ruff.lint]
+select = ["TID252"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"

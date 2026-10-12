@@ -1,7 +1,7 @@
 from pathlib import Path
 from xml.etree import ElementTree
 
-from .suite_result import SuiteResult
+from execute_test_suite.suite_result import SuiteResult
 
 
 def parse_junit_report(report_path: Path) -> SuiteResult:
