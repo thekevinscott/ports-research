@@ -1,0 +1,12 @@
+test-unit:
+    uv run pytest src -x -q
+
+test-integration:
+    uv run pytest tests/integration -x -q
+
+# reference-lines for real: four claude calls. Without an embeddings url, the alignment falls back to word overlap.
+test-e2e out embeddings_url="":
+    WALKTHROUGHS_OUT={{out}} WALKTHROUGHS_EMBEDDINGS_URL={{embeddings_url}} uv run pytest tests/e2e -rA
+
+lint:
+    uv run ruff check src tests
