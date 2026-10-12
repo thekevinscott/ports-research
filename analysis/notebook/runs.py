@@ -1334,10 +1334,19 @@ def _(
         " source languages and then within each. `gap` is the on median minus the off median."
         " `p` is the share of 10,000 shuffles of the on/off labels (seed 0) whose gap is at least"
         " as far from zero. `low` to `high` is a 95% bootstrap interval on the gap (10,000"
-        " resamples, seed 0). A gap has to be larger than `minimum_detectable_gap` for the same"
-        " shuffles to give p < 0.05 at this n. A row with p ≥ 0.05 reads as a gap too small to see"
-        " with this n, never as no effect."
+        " resamples, seed 0). `minimum_detectable_gap` is the critical value: an observed gap larger"
+        " than it gives p < 0.05 against the same shuffles at this n. A true gap of exactly that size"
+        " lands above it only about half the time, so only gaps well beyond it are reliably seen."
+        " A row with p ≥ 0.05 reads as a gap too small to see with this n, never as no effect."
     )
+
+    def multiplicity_note(tests):
+        """How many flag comparisons this section runs and how many fall below 0.05 by chance alone."""
+        return (
+            f"This section runs {tests} comparisons with a p, none corrected for the others. If no flag"
+            f" changed any measure, about {round(tests * 0.05)} of them would still give p < 0.05."
+            " Every p here is exploratory: a lead for a later test, not a confirmed effect."
+        )
     V2_NOT_MEASURED = (
         "Reference diff similarity and test pass rates are not measured on V2 runs:"
         " `measure-code-distance` takes no javascript target and `execute-test-suite` finds no V2"
@@ -1358,17 +1367,16 @@ def _(
             mo.ui.table(rounded(v2_summary(v2_runs, v2_attempts)), freeze_columns_left=cell_columns),
             mo.md("### Failures and tokens per successful run"),
             mo.ui.table(rounded(v2_failures(v2_attempts)), freeze_columns_left=cell_columns),
-            mo.md("### Per-flag comparison"),
-            mo.md(FLAG_READING),
         ]
-        for measure in V2_LEADS:
+        comparisons = {measure: flag_comparison(v2_runs, measure) for measure in V2_LEADS}
+        tests = sum(table["p"].is_not_null().sum() for table in comparisons.values())
+        parts.extend([mo.md("### Per-flag comparison"), mo.md(FLAG_READING), mo.md(multiplicity_note(tests))])
+        for measure, table in comparisons.items():
             parts.extend(
                 [
                     mo.md(f"#### {lead_title(measure)}"),
                     mo.ui.table(
-                        flag_comparison(v2_runs, measure).with_columns(
-                            pl.col(pl.Float64).exclude("p").round(2), pl.col("p").round(4)
-                        ),
+                        table.with_columns(pl.col(pl.Float64).exclude("p").round(2), pl.col("p").round(4)),
                         freeze_columns_left=["flag", "source_language"],
                     ),
                 ]

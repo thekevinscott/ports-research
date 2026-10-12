@@ -446,6 +446,28 @@ def test_the_v2_attempts_keep_runs_that_exited_nonzero():
     assert "include_nonzero_exit=True" in assigned("v2_attempts")
 
 
+def test_the_multiplicity_note_counts_the_tests_and_the_ones_expected_below_005_by_chance():
+    note = definitions("multiplicity_note")["multiplicity_note"](135)
+    assert "135" in note
+    assert "about 7" in note
+    assert "exploratory" in note
+
+
+def test_the_v2_statistics_count_every_flag_comparison_with_a_p():
+    (report,) = [
+        node
+        for node in ast.walk(ast.parse(SOURCE))
+        if isinstance(node, ast.FunctionDef) and node.name == "v2_statistics_report"
+    ]
+    assert "multiplicity_note(" in ast.unparse(report)
+
+
+def test_the_flag_reading_calls_the_detectable_gap_a_critical_value_detected_about_half_the_time():
+    reading = definitions("FLAG_READING")["FLAG_READING"]
+    assert "critical value" in reading
+    assert "about half" in reading
+
+
 def test_how_to_read_describes_the_v2_study_and_marks_the_v1_sections():
     (cell,) = [
         cell
