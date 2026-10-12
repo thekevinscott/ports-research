@@ -270,15 +270,15 @@ Why it matters: the walkthrough of a port and of a reference may share phrasing 
 What would answer it: conceded. W1's floor bounds it.
 Severity: weakens.
 
-#### W5. **The embedding configuration is unrecorded, and Q8_0 against f16 and pooling are untested.**
+#### W5. **The embedding configuration is unrecorded in compare outputs.**
 Evidence:
-- The local `walkthroughs-embed` container serves `Qwen3-Embedding-0.6B-Q8_0.gguf` with `--pooling last` on CPU.
-- Tower's router has `Qwen3-Embedding-0.6B-f16` without `--embeddings`, and returns 501.
+- The compares already written used the local CPU container `walkthroughs-embed`: `Qwen3-Embedding-0.6B-Q8_0.gguf`, `--pooling last`.
+- Kevin: "Embedding server should run on tower. There is a GPU". Tower now serves the same gguf (639,150,592 bytes) with pooling last. One sentence embedded locally and on tower has cosine 0.99971, so a Q8_0 versus f16 difference does not arise.
 - The request's model string `qwen3-embedding-0.6b-q8_0` (`embed_text.py:9`) is a label that a single-model llama-server ignores.
 - The compare output records only `similarity` and `threshold`.
 - llama-server's `/props` reports the model path and quantisation, but not pooling.
-Why it matters: a rerun on tower would change the vectors silently. Whether 0.8 means the same under f16 or under another pooling is untested.
-What would answer it: record the endpoint, model file and quantisation from `/props`, and the pooling as declared by the caller, in every compare output. Kevin: "Embedding server should run on tower. There is a GPU": tower's preset needs `--embeddings --pooling last`.
+Why it matters: a later server change would change the vectors silently. Whether 0.8 means the same under another pooling is untested.
+What would answer it: record the endpoint, model file and quantisation from `/props`, plus the pooling as declared by the caller, in every compare output.
 Severity: weakens.
 
 #### W6. **Every port is compared against reference walkthrough `a` only.**
@@ -293,7 +293,7 @@ Measure: per flag, the median of the runs with the flag on minus the median with
 
 #### S1. **There are 135 uncorrected tests.**
 Evidence:
-- `V2_LEADS` has 15 measures (`runs.py:1144`). Each gets 3 flags × 3 scopes (pooled, python, javascript) = 9 rows (`flag_comparison`, `runs.py:1226`), so 135 p-values at α = 0.05.
+- `V2_LEADS` has 15 measures (`runs.py:1144`). Each gets 3 flags × 3 scopes (pooled, python, javascript) = 9 rows (`flag_comparison`, `runs.py:1225`), so 135 p-values at α = 0.05.
 - About 7 rows are expected below 0.05 if no flag affects anything.
 - The Spearman table and matrix add one rank correlation per pair of varied measures, also uncorrected.
 Why it matters: a single p < 0.05 row is weak evidence.
@@ -307,7 +307,7 @@ What would answer it: say so in the table's reading.
 Severity: weakens.
 
 #### S3. **The pooled shuffles ignore source language.**
-Evidence: `flag_comparison` pools both languages and shuffles labels across them (`runs.py:1229-1232`).
+Evidence: `flag_comparison` pools both languages and shuffles labels across them (`runs.py:1225-1232`).
 Why it matters: the design is balanced (48 on and 48 off per language), so the test stays valid, but it loses power when language shifts the measure.
 What would answer it: shuffles stratified by source language. Conceded: it is conservative, not wrong.
 Severity: cosmetic.
