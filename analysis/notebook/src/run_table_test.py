@@ -59,6 +59,7 @@ def write_run(
     exit_code: int | None = None,
     terminal_reason: str | None = None,
     killed: bool = False,
+    result_index: int | None = None,
 ) -> Path:
     run_dir.mkdir(parents=True)
     manifest = {
@@ -76,6 +77,8 @@ def write_run(
     result = {"is_error": is_error, "duration_ms": 560157}
     if terminal_reason is not None:
         result["terminal_reason"] = terminal_reason
+    if result_index is not None:
+        result["result_index"] = result_index
     # A run killed with exit 137 never gets to write its result.
     if not killed:
         (run_dir / "result.json").write_text(json.dumps(result))
@@ -83,8 +86,12 @@ def write_run(
     transcript.mkdir()
     (transcript / "session.jsonl").write_text(
         "\n".join(
-            json.dumps({"type": "assistant", "message": {"id": message_id, "usage": USAGE}})
-            for message_id in ("msg_1", "msg_1", "msg_2")
+            json.dumps({"type": "assistant", "timestamp": timestamp, "message": {"id": message_id, "usage": USAGE}})
+            for message_id, timestamp in (
+                ("msg_1", "2026-09-10T04:41:05.000Z"),
+                ("msg_1", "2026-09-10T04:41:06.000Z"),
+                ("msg_2", "2026-09-10T04:50:20.157Z"),
+            )
         )
     )
     return run_dir
@@ -109,6 +116,14 @@ def describe_run_rows():
         assert row["duration_ms"] == 560157
         assert row["total_tokens"] == 260
         assert row["api_calls"] == 2
+
+    def it_reads_the_wall_time_from_the_transcript_beside_the_recorded_duration(tmp_path):
+        # A run whose last turn answered a background subagent's notification records only
+        # that turn's duration; the transcript still spans the whole run.
+        run_dir = write_run(tmp_path / "run", V2_CONDITION, exit_code=0, result_index=2)
+        (row,) = run_rows(str(run_dir / "manifest.json"))
+        assert row["transcript_wall_ms"] == 555_157
+        assert row["result_index"] == 2
 
     def it_reads_the_three_v2_flags_and_the_exit_code(tmp_path):
         run_dir = write_run(tmp_path / "run", V2_CONDITION, exit_code=0)

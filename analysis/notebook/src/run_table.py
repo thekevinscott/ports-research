@@ -4,6 +4,8 @@ from pathlib import Path
 from dirsql import Table
 from gbnf_experiment.transcript_usage import transcript_usage
 
+from src.transcript_wall_ms import transcript_wall_ms
+
 RUNS_COLUMNS = {
     "run_id": "TEXT PRIMARY KEY",
     "run_dir": "TEXT",
@@ -25,7 +27,10 @@ RUNS_COLUMNS = {
     "terminal_reason": "TEXT",
     "total_tokens": "INTEGER",
     "api_calls": "INTEGER",
+    # result.json's duration_ms covers the last turn only when that result is not the first.
     "duration_ms": "INTEGER",
+    "result_index": "INTEGER",
+    "transcript_wall_ms": "INTEGER",
     "harness_commit": "TEXT",
 }
 REVERSE_RUNS_COLUMNS = {
@@ -76,6 +81,8 @@ def _row(manifest_path: Path, manifest: dict) -> dict:
         "total_tokens": tokens.get("total_tokens"),
         "api_calls": tokens.get("api_calls"),
         "duration_ms": result.get("duration_ms"),
+        "result_index": result.get("result_index"),
+        "transcript_wall_ms": transcript_wall_ms(manifest_path.parent),
         "harness_commit": manifest["harness"]["commit"],
     }
 

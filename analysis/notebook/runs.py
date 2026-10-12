@@ -1249,7 +1249,7 @@ def _(
     V2_LEADS = [BEHAVIOR_LEAD, API_LEAD, *AST_LEADS, "total_tokens", "loc", *TRANSCRIPT_LEADS]
     V2_SCOPES = ["pooled", *BEHAVIOR_SOURCES]
     # Per-run measures besides held-out behavior; the confusion counts join them from the frame.
-    V2_MEASURES = ["total_tokens", "api_calls", "duration_ms", "file_count", "loc", *TRANSCRIPT_LEADS]
+    V2_MEASURES = ["total_tokens", "api_calls", "transcript_wall_ms", "file_count", "loc", *TRANSCRIPT_LEADS]
     SPEARMAN_CELL_PX = 26
     # red, neutral grey, blue: a diverging ramp whose midpoint reads as no correlation.
     DIVERGING = ["#e34948", "#f0efec", "#2a78d6"]
@@ -1452,6 +1452,26 @@ def _(
     def rounded(frame):
         return frame.with_columns(pl.col(pl.Float64).round(2))
 
+    DURATION_TOLERANCE = 0.01
+    DURATION_READING = (
+        "Wall time per run comes from the transcript: first to last timestamp across the main session"
+        " and every subagent session (`transcript_wall_ms`). result.json's `duration_ms` is the duration"
+        " of the result the run ended on; when a background subagent's notification starts another turn"
+        " (`result_index` above 0), that is the last turn alone. Runs listed here record a `duration_ms`"
+        f" more than {DURATION_TOLERANCE:.0%} away from the transcript's span."
+    )
+
+    def duration_discrepancies(frame):
+        """Runs whose recorded duration is not the transcript's span."""
+        columns = ["run_id", "source_language", "condition", "result_index", "duration_ms", "transcript_wall_ms", "total_tokens"]
+        gap = (pl.col("duration_ms") - pl.col("transcript_wall_ms")).abs()
+        return (
+            with_v2_conditions(frame)
+            .filter(gap > pl.col("transcript_wall_ms") * DURATION_TOLERANCE)
+            .select(columns)
+            .sort("run_id")
+        )
+
     def v2_statistics_report():
         if v2_runs.height == 0:
             return mo.md("No completed V2 runs.")
@@ -1463,7 +1483,16 @@ def _(
             mo.ui.table(rounded(v2_summary(v2_runs, v2_attempts)), freeze_columns_left=cell_columns),
             mo.md("### Failures and tokens per successful run"),
             mo.ui.table(rounded(v2_failures(v2_attempts)), freeze_columns_left=cell_columns),
+            mo.md("### Recorded duration against transcript wall time"),
+            mo.md(DURATION_READING),
         ]
+        discrepancies = duration_discrepancies(v2_runs)
+        parts.extend(
+            [
+                mo.md(f"{discrepancies.height} of {v2_runs.height} runs."),
+                mo.ui.table(discrepancies, freeze_columns_left=["run_id"]),
+            ]
+        )
         comparisons = {measure: flag_comparison(v2_runs, measure) for measure in V2_LEADS}
         tests = sum(table["p"].is_not_null().sum() for table in comparisons.values())
         parts.extend([mo.md("### Per-flag comparison"), mo.md(FLAG_READING), mo.md(multiplicity_note(tests))])
@@ -2884,6 +2913,7 @@ def _(mo):
                     - `attempts`: every finished run in the cell. `exit_0`, `exit_137`: runs that exited with that code. `api_error`: runs whose result has `terminal_reason` `api_error`.
                     - `tokens_per_success`: every token the cell spent, failed attempts included, divided by its exit-0 runs.
                     - `n_on`, `n_off`, `median_on`, `median_off`, `gap`, `p`, `low`, `high`, `minimum_detectable_gap`: see the per-flag comparison.
+                    - `transcript_wall_ms`: the run's wall time, first to last transcript timestamp across the main session and its subagents. `duration_ms`: the duration result.json records, which covers only the last turn when `result_index` is above 0; see the duration table.
                     - `rho`: Spearman rank correlation, the Pearson correlation of the two measures' ranks (ties share their average rank), from −1 to 1. `n`: runs with both measures present.
                     """),
                     "How to read": mo.md("""
