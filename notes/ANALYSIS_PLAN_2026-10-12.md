@@ -18,7 +18,7 @@ One row per run, one column per measure, all in the runs notebook ([analysis/not
 
 ### Already in the notebook
 
-- [ ] Run table reads the V2 manifest schema (three flags, javascript target, exit code) and labels V2 rows by flags and source language (PR in flight).
+- [x] Run table reads the V2 manifest schema (three flags, javascript target, exit code) and labels V2 rows by flags and source language (PR #124).
 - [ ] Cost: total tokens, API calls, wall time.
 - [ ] Size: file count, LOC.
 - [ ] Test pass rates: target integration pass rate is a fair measure only in the 8 cells where the target suite was not shipped; the table says so.
@@ -37,12 +37,12 @@ One row per run, one column per measure, all in the runs notebook ([analysis/not
 ### Held-out behavior
 
 - [x] Package: [analysis/measure-behavior](../measure-behavior/README.md), 100 generated grammars, 799 inputs, seed 0, never mounted into any agent container; accept, reject, error, crash per pair; agreement rate and confusion table (PR #118).
-- [ ] Notebook section: `behavior_agreement_pct` lead, confusion counts in the accordion, dots per run with median ticks, one panel per source language (PR in flight).
+- [x] Notebook section: `behavior_agreement_pct` lead, confusion counts in the accordion, dots per run with median ticks, one panel per source language (PR #127).
 
 ### Held-out API
 
-- [ ] Delete `analysis/exercise-api` (PR in flight). Kevin: "drop exercise api and start fresh with that".
-- [ ] Package `analysis/measure-api`: seeded corpus, per-step rule-set comparison against the reference, outcomes match, mismatch, error_match, error_mismatch, crash; agreement rate and confusion table (PR in flight).
+- [x] Delete `analysis/exercise-api` (PR #123). Kevin: "drop exercise api and start fresh with that".
+- [x] Package `analysis/measure-api`: seeded corpus, per-step rule-set comparison against the reference, outcomes match, mismatch, error_match, error_mismatch, crash; agreement rate and confusion table (PR #126).
 - [ ] Notebook section, same shape as the behavior section.
 
 ### Transcripts, mechanical
