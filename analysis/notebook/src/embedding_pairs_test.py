@@ -51,3 +51,10 @@ def test_cache_rejects_nonfinite_vectors(cached_tree):
     np.save(cache / "main.py.npy", np.array([float("nan"), 0.0]))
     with pytest.raises(ValueError, match="invalid vector"):
         validate_cache(cache, source, "python", [])
+
+
+def test_cache_names_a_missing_source_rather_than_a_selection_mismatch(cached_tree):
+    source, cache = cached_tree
+    missing = source.parent / "gone"
+    with pytest.raises(FileNotFoundError, match=f"{missing}: source to check the cache against is missing"):
+        validate_cache(cache, missing, "python", [])

@@ -20,6 +20,8 @@ def validate_cache(directory: Path, target: Path, language: str, exclude: list[s
     Check content rather than mtimes, which can change when a cache is restored.
     Stripped sidecars attest to saved inputs; model identity comes from the cache index.
     """
+    if not target.is_dir():
+        raise FileNotFoundError(f"{target}: source to check the cache against is missing")
     index_bytes = (directory / "index.json").read_bytes()
     index = json.loads(index_bytes)
     files = collect_files(target, suffixes=SUFFIXES[language], exclude=exclude)
