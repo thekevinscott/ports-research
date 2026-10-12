@@ -1,6 +1,8 @@
 from pathlib import Path
 from statistics import fmean, median
 
+from measure_ast.call_graph import CallGraph, call_graph
+from measure_ast.call_paths import call_paths
 from measure_ast.extract_functions import FunctionRecord, extract_functions
 from measure_ast.label import label
 from measure_ast.languages import LANGUAGES
@@ -15,10 +17,12 @@ from measure_ast.wasserstein import wasserstein
 API_SURFACE = {"python": python_api, "typescript": typescript_api}
 
 
-def side(language: str, target: Path, exclude: list[str]) -> tuple[dict, list[FunctionRecord], set[str]]:
+def side(language: str, target: Path, exclude: list[str]) -> tuple[dict, list[FunctionRecord], set[str], CallGraph]:
+    spec = LANGUAGES[language]
     roots = [tree.root_node for tree in parse_files(language=language, target=target, exclude=exclude)]
-    functions = [record for root in roots for record in extract_functions(root, LANGUAGES[language])]
-    return measure_ast(language=language, target=target, exclude=exclude), functions, API_SURFACE[language](roots)
+    functions = [record for root in roots for record in extract_functions(root, spec)]
+    measures = measure_ast(language=language, target=target, exclude=exclude)
+    return measures, functions, API_SURFACE[language](roots), call_graph(roots, spec)
 
 
 def matched_pair(port: FunctionRecord, reference: FunctionRecord) -> dict:
@@ -34,8 +38,8 @@ def matched_pair(port: FunctionRecord, reference: FunctionRecord) -> dict:
 
 
 def compare(*, language: str, port: Path, reference: Path, exclude: list[str]) -> dict:
-    port_measures, port_functions, port_api = side(language, port, exclude)
-    reference_measures, reference_functions, reference_api = side(language, reference, exclude)
+    port_measures, port_functions, port_api, port_graph = side(language, port, exclude)
+    reference_measures, reference_functions, reference_api, reference_graph = side(language, reference, exclude)
     named_reference = [fn for fn in reference_functions if fn.name is not None]
     pairs, port_only, reference_only = pair_functions(
         [fn for fn in port_functions if fn.name is not None], named_reference
@@ -79,4 +83,5 @@ def compare(*, language: str, port: Path, reference: Path, exclude: list[str]) -
             "port_only": sorted(port_api - reference_api),
             "reference_only": sorted(reference_api - port_api),
         },
+        "call_paths": call_paths(reference=reference_graph, port=port_graph, shared=sorted(port_api & reference_api)),
     }

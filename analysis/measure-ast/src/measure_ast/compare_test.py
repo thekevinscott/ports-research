@@ -91,6 +91,13 @@ def describe_compare():
     def it_diffs_the_api_surface(port, reference):
         assert run(port, reference)["api_surface"] == {"shared": ["f/1"], "port_only": ["h/0"], "reference_only": ["g/0"]}
 
+    def it_traces_call_paths_from_the_shared_api_surface(port, reference):
+        call_paths = run(port, reference)["call_paths"]
+        assert call_paths["entry_point_count"] == 1
+        assert call_paths["entry_points"][0]["entry_point"] == "f"
+        assert call_paths["explainer"] == ["f: reference trace of 1 (f); port 1, missing none, extra none"]
+        assert call_paths["unreachable_port_only"] == ["h/0"]
+
     def it_is_all_zero_against_itself(reference):
         report = run(reference, reference)
         assert all(d["delta"] == 0 for d in report["delta"].values())
