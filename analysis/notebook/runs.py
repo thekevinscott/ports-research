@@ -850,6 +850,50 @@ def _(
             "behavior_note",
         )
 
+    DRIVER_STATUSES = ["not_loaded", "loaded_failing", "driven"]
+    DRIVER_STATUS_READING = (
+        "The driver imports the port by the reference's names and layout and reads the end of input"
+        " the reference's way, so a score mixes \"exposes the reference's interface\" with \"behaves the same\"."
+        " `not_loaded`: every pair or case crashed, so the driver could not load the port."
+        " `loaded_failing`: it loaded, but no input the reference accepts was accepted (behavior), or no case"
+        " matched without raising (API). `driven`: the rest. `unmeasured`: no report."
+        " The chart below repeats agreement over driven ports only."
+    )
+
+    def behavior_driver_status(frame):
+        """not_loaded when every pair crashed, loaded_failing when the port accepts none of the inputs the reference accepts, driven otherwise."""
+        pairs = pl.sum_horizontal(pl.col("^reference_.+_port_.+$"))
+        crashes = pl.sum_horizontal(pl.col("^reference_.+_port_crash$"))
+        return frame.with_columns(
+            behavior_driver_status=pl.when(pl.col(BEHAVIOR_LEAD).is_null())
+            .then(None)
+            .when(crashes == pairs)
+            .then(pl.lit("not_loaded"))
+            .when(pl.col("reference_accept_port_accept") == 0)
+            .then(pl.lit("loaded_failing"))
+            .otherwise(pl.lit("driven"))
+        )
+
+    def driver_status_counts(frame, column):
+        """Runs per cell in each driver status; unmeasured runs have no report."""
+        labels = [label for label, *_ in V2_CONDITIONS]
+        return (
+            with_v2_conditions(frame)
+            .group_by("source_language", "condition")
+            .agg(
+                pl.len().alias("n"),
+                *((pl.col(column) == status).sum().alias(status) for status in DRIVER_STATUSES),
+                pl.col(column).is_null().sum().alias("unmeasured"),
+            )
+            .sort(
+                pl.col("source_language").cast(pl.Enum(BEHAVIOR_SOURCES)),
+                pl.col("condition").cast(pl.Enum(labels)),
+            )
+        )
+
+    def driven_title(title):
+        return lambda metric: f"{title(metric)}, driven ports only"
+
     def behavior_report():
         if v2_runs.height == 0:
             return mo.md("No completed V2 runs.")
@@ -870,10 +914,21 @@ def _(
             .with_columns(pl.col(pl.Float64).round(2))
         )
         confusion = [column for column in labelled.columns if column.startswith("reference_")]
+        statuses = behavior_driver_status(v2_runs)
         return mo.vstack(
             [
                 mo.ui.table(summary_table, freeze_columns_left=["source_language", "condition"]),
                 behavior_chart(v2_runs),
+                mo.md("### Driver status by cell"),
+                mo.md(DRIVER_STATUS_READING),
+                mo.ui.table(
+                    driver_status_counts(statuses, "behavior_driver_status"),
+                    freeze_columns_left=["source_language", "condition"],
+                ),
+                behavior_chart(
+                    statuses.filter(pl.col("behavior_driver_status") == "driven"),
+                    title=driven_title(behavior_title),
+                ),
                 mo.accordion(
                     {
                         "Other behavior columns": mo.vstack(
@@ -923,6 +978,19 @@ def _(
             "api_note",
         )
 
+    def api_driver_status(frame):
+        """not_loaded when every case crashed, loaded_failing when no case matches without raising, driven otherwise."""
+        cases = pl.sum_horizontal(pl.col(f"api_{outcome}") for outcome in API_OUTCOME_TITLES)
+        return frame.with_columns(
+            api_driver_status=pl.when(pl.col(API_LEAD).is_null())
+            .then(None)
+            .when(pl.col("api_crash") == cases)
+            .then(pl.lit("not_loaded"))
+            .when(pl.col("api_match") == 0)
+            .then(pl.lit("loaded_failing"))
+            .otherwise(pl.lit("driven"))
+        )
+
     def api_report():
         if v2_api_runs.height == 0:
             return mo.md("No completed V2 runs.")
@@ -947,10 +1015,23 @@ def _(
             for column in labelled.columns
             if column.startswith("api_") and column not in (API_LEAD, "api_note")
         ]
+        statuses = api_driver_status(v2_api_runs)
         return mo.vstack(
             [
                 mo.ui.table(summary_table, freeze_columns_left=["source_language", "condition"]),
                 api_chart(v2_api_runs),
+                mo.md("### Driver status by cell"),
+                mo.md(DRIVER_STATUS_READING),
+                mo.ui.table(
+                    driver_status_counts(statuses, "api_driver_status"),
+                    freeze_columns_left=["source_language", "condition"],
+                ),
+                behavior_chart(
+                    statuses.filter(pl.col("api_driver_status") == "driven"),
+                    API_LEAD,
+                    lead=API_LEAD,
+                    title=driven_title(api_title),
+                ),
                 mo.accordion(
                     {
                         "Other API columns": mo.vstack(
