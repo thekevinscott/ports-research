@@ -132,6 +132,11 @@ CHART_NAMES = (
     "varied_measures",
     "SPEARMAN_READING",
     "spearman_table",
+    "DRIVER_STATUSES",
+    "behavior_driver_status",
+    "api_driver_status",
+    "driver_status_counts",
+    "driven_title",
     "spearman_matrix",
     "spearman_chart",
 )
@@ -1148,3 +1153,88 @@ def test_the_notebook_renders_the_transcript_section_between_the_ast_section_and
 
 def test_the_chart_export_takes_the_transcript_chart_from_the_notebook():
     assert 'notebook["transcript_chart"]' in (NOTEBOOK.parent / "export_charts.py").read_text()
+
+
+def confusion_row(run_id, source, flags, agreement, **counts):
+    outcomes = ("accept", "reject", "error", "crash")
+    return {
+        "run_id": run_id,
+        "source_language": source,
+        "target_language": "javascript" if source == "python" else "python",
+        **dict(zip(V2_FLAG_NAMES, flags)),
+        "behavior_agreement_pct": agreement,
+        **{f"reference_{a}_port_{b}": counts.get(f"{a}_{b}", 0) for a in outcomes for b in outcomes},
+    }
+
+
+DRIVER_RUNS = [
+    # Every pair crashed: the driver could not load the port.
+    confusion_row("gone", "javascript", (1, 0, 0), 0.0, accept_crash=346, reject_crash=376, error_crash=77),
+    # Loaded, matches the errors, rejects every input: no accept is reached.
+    confusion_row("stuck", "python", (1, 0, 0), 9.6, accept_reject=346, reject_reject=376, error_error=77),
+    confusion_row("driven", "python", (1, 0, 0), 97.5, accept_accept=340, accept_reject=6, reject_reject=376, error_error=77),
+    confusion_row("unmeasured", "python", (0, 0, 0), None),
+]
+
+
+def test_behavior_driver_status_separates_unloaded_failing_and_driven_ports():
+    import polars as pl
+
+    frame = definitions(*CHART_NAMES)["behavior_driver_status"](pl.DataFrame(DRIVER_RUNS))
+    assert frame["behavior_driver_status"].to_list() == ["not_loaded", "loaded_failing", "driven", None]
+
+
+def test_api_driver_status_separates_unloaded_failing_and_driven_ports():
+    import polars as pl
+
+    def row(run_id, match, crash, mismatch=0, agreement=1.0):
+        return {
+            "run_id": run_id,
+            "api_agreement_pct": agreement,
+            "api_match": match,
+            "api_mismatch": mismatch,
+            "api_error_match": 5,
+            "api_error_mismatch": 0,
+            "api_crash": crash,
+        }
+
+    frame = pl.DataFrame(
+        [
+            # Every case crashed: crash counts the cases where either side crashed.
+            {**row("gone", 0, 999), "api_error_match": 0},
+            row("stuck", 0, 0, 994),
+            row("driven", 900, 0, 94),
+            {**row("unmeasured", 0, 0), "api_agreement_pct": None},
+        ]
+    )
+    statuses = definitions(*CHART_NAMES)["api_driver_status"](frame)["api_driver_status"].to_list()
+    assert statuses == ["not_loaded", "loaded_failing", "driven", None]
+
+
+def test_driver_status_counts_count_each_status_per_cell():
+    import polars as pl
+
+    namespace = definitions(*CHART_NAMES)
+    frame = namespace["behavior_driver_status"](pl.DataFrame(DRIVER_RUNS))
+    counts = namespace["driver_status_counts"](frame, "behavior_driver_status")
+    assert counts.columns == ["source_language", "condition", "n", "not_loaded", "loaded_failing", "driven", "unmeasured"]
+    python = counts.filter(pl.col("source_language") == "python").to_dicts()
+    assert [(row["n"], row["not_loaded"], row["loaded_failing"], row["driven"], row["unmeasured"]) for row in python] == [(1, 0, 0, 0, 1), (2, 0, 1, 1, 0)]
+    javascript = counts.filter(pl.col("source_language") == "javascript").row(0, named=True)
+    assert (javascript["n"], javascript["not_loaded"]) == (1, 1)
+
+
+def test_the_driven_charts_say_so_in_their_titles():
+    namespace = definitions(*CHART_NAMES)
+    title = namespace["driven_title"](namespace["behavior_title"])
+    assert title("behavior_agreement_pct") == "Held-out behavior agreement with the reference (%), driven ports only"
+
+
+def test_the_behavior_and_api_reports_show_driver_status_and_driven_charts():
+    for name in ("behavior_report", "api_report"):
+        (report,) = [
+            node for node in ast.walk(ast.parse(SOURCE)) if isinstance(node, ast.FunctionDef) and node.name == name
+        ]
+        text = ast.unparse(report)
+        assert "driver_status_counts(" in text
+        assert "driven_title(" in text
