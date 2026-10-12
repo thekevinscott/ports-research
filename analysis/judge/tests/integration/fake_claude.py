@@ -21,6 +21,7 @@ if "cheating" in schema["properties"]:
         "tests_run": {"verdict": ["none"], "evidence": [], "confidence": "sure"},
         "own_tests": {"verdict": ["none"], "evidence": [], "confidence": "likely"},
         "structure": {"verdict": "kept", "evidence": [], "confidence": "sure", "rationale": "not stated"},
+        "reading_strategy": {"verdict": "entry-point-traced", "evidence": [{"position": 2, "quote": "ls /input"}], "confidence": "likely"},
     }
 else:
     item = {"evidence": [{"side": "A", "file": "gbnf/GBNF.py", "lines": "1", "quote": "x"}], "note": "n"}

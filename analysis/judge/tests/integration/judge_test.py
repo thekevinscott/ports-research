@@ -60,6 +60,16 @@ def describe_judge_run():
             judgments, manifest = read_out(tmp_path / "out")
             assert [e["run"] for e in manifest.values()] == ["20261012T000000Z_aaaaaaaa"]
 
+        def it_asks_for_a_reading_strategy_from_its_fixed_set_with_quoted_steps(run_cli, make_run, calls, tmp_path):
+            make_run("20261012T000000Z_aaaaaaaa", "python", steps=STEPS)
+            run_cli("run", "--rubric", "transcript", "--runs", tmp_path / "runs", "--out", tmp_path / "out")
+            [call] = calls()
+            schema = json.loads(call["argv"][call["argv"].index("--json-schema") + 1])
+            assert "reading_strategy" in schema["required"]
+            item = schema["properties"]["reading_strategy"]
+            assert item["properties"]["verdict"]["enum"] == ["entry-point-traced", "directory-order", "tests-first", "mixed", "unclear"]
+            assert set(item["required"]) == {"verdict", "evidence", "confidence"}
+
     def it_calls_claude_on_the_subscription_with_tools_off_from_an_empty_directory(run_cli, make_run, calls, tmp_path):
         make_run("20261012T000000Z_aaaaaaaa", "python", steps=STEPS)
         run_cli("run", "--rubric", "transcript", "--runs", tmp_path / "runs", "--out", tmp_path / "out", "--model", "claude-test", "--effort", "low")
@@ -119,6 +129,7 @@ def describe_judge_report():
         lines = [line.split() for line in result.stdout.splitlines()]
         assert ["code", "fidelity"] in lines
         assert ["python", "unit=0", "source-int=1", "target-int=1", "1", "0", "0", "0", "1", "0"] in lines
+        assert lines[lines.index(["transcript", "reading_strategy"]) + 2] == ["python", "unit=0", "source-int=1", "target-int=1", "1", "1", "0", "0", "0", "0"]
         baselines = [line for line in result.stdout.splitlines() if line.startswith("baseline ")]
         assert sorted(line.split()[1] for line in baselines) == ["javascript->python", "python->javascript"]
         assert all(line.endswith("fidelity=4") for line in baselines)
