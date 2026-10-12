@@ -13,14 +13,14 @@ wheels = [
 
 [[package]]
 name = "botbox"
-version = "0.0.4"
+version = "0.0.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "python-on-whales" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ef/27/315e3bc9b29f52cd4ad946e9fd6f4055ab0d0a1ffefc9b9ca576ed237a1d/botbox-0.0.4.tar.gz", hash = "sha256:aea7d97fcadb51473d092ef999e2dec8d8fc83d380c948077f6f555f00f17ce9", size = 39529, upload-time = "2026-10-11T19:32:37.054Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/eb/43/6a1ecc467c3919cfcc7134bd45164eed2c9ae0ea50e5651ec67b67a509c5/botbox-0.0.6.tar.gz", hash = "sha256:e4a4e35d3b0f64132badc2305e612de84f41d741c2104747c3d467975907fe03", size = 39778, upload-time = "2026-10-12T00:11:16.751Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/82/4e/21dd3b26b149feabe7fb64e9e45e9d697799a5e3e142ca129705e9ecc46c/botbox-0.0.4-py3-none-any.whl", hash = "sha256:4f001b24e0de45820a0c2280151cf13b6e268b4974b0cd32ab4b6c367e9c03e6", size = 10712, upload-time = "2026-10-11T19:32:35.826Z" },
+    { url = "https://files.pythonhosted.org/packages/ac/90/55eb9ce5e2ff7088d93bcfad196b0c4157b3b434073b7e9cd821b2c5ea53/botbox-0.0.6-py3-none-any.whl", hash = "sha256:6583efbbc4831b17ead5403dd6682cf2989ab0aed883ead3464951d9a623cde0", size = 11370, upload-time = "2026-10-12T00:11:15.367Z" },
 ]
 
 [[package]]
@@ -132,7 +132,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "botbox", specifier = ">=0.0.4" },
+    { name = "botbox", specifier = ">=0.0.6" },
     { name = "click", specifier = ">=8.5.0" },
     { name = "port-codebase", editable = "../port_codebase" },
     { name = "prompt", editable = "../prompt" },

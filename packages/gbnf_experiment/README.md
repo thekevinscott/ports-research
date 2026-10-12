@@ -30,3 +30,21 @@ Everything gbnf-specific lives here: the pin, the patches, the test generation, 
 A run that raises still writes `manifest.json` with the error, then re-raises.
 
 Depends on port_codebase and botbox.
+
+## Running the matrix
+
+`scripts/run_matrix.py` runs `run_gbnf_experiment` through the SDK over 64 cells: source language × the three test flags × four models (Opus 5.5, Sonnet 5.5, Fable 5.1, Haiku 4.5).
+
+```
+uv run --env-file ../../.env python scripts/run_matrix.py --parallel 2
+```
+
+It exits before doing anything if `ANTHROPIC_API_KEY` is unset or empty. The key goes to `ClaudeAgent(api_key=)`; subscription credentials are never used.
+
+It first prepares all 16 conditions one at a time, since concurrent prepares of one condition collide. Then each round runs every cell once in a fresh shuffled order, `--parallel` at a time, until `--n` rounds are done or it is stopped.
+
+Each finished run appends one line to `data/runs/matrix-<UTC timestamp>.jsonl`: the cell, the round, the run directory or the error, `exit_code`, wall seconds and `result.json`'s `usage`. A run that raises is recorded and the loop continues.
+
+Ctrl-C starts no new runs and waits for the in-flight ones to finish and be recorded. Runs ignore SIGINT, as do their docker subprocesses.
+
+`--effort` applies to every model; unset, the claude CLI's default. `--models`, `--source-languages` and `--cells` (names as printed per run, e.g. `source-python_unit-tests_model-claude-haiku-4-5-20251001`) restrict the cells.
