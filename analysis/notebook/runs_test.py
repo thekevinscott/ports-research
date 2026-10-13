@@ -185,6 +185,7 @@ def reference_row(codebase_class, language="typescript"):
         "EXCLUDE_BY_LANGUAGE": {language: []},
         "REFERENCE": Path("/reference"),
         "PINNED": Path("/reference"),
+        "GBNF_COMMIT": "commit",
     }
     module = ast.Module(body=[function_def("reference_row")], type_ignores=[])
     exec(compile(ast.fix_missing_locations(module), str(NOTEBOOK), "exec"), namespace)

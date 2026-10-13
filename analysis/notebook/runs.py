@@ -34,9 +34,8 @@ def _():
         codebase for codebase in codebases_under(DATA, runs_table()) if is_v2(codebase.run)
     ]
     reverse_codebases = codebases_under(REVERSE, reverse_runs_table())
-    # The V1 prepared reference is gone and the diff and embedding tools take no javascript
-    # target yet, so reference-relative columns are empty until those land.
-    for codebase in [*codebases, *reverse_codebases]:
+    # The reverse runs are V1; their V1 prepared reference is gone and the pin has no typescript package.
+    for codebase in reverse_codebases:
         codebase.reference = None
 
     FLAGS = [*V2_FLAGS, "is_error"]
@@ -174,7 +173,7 @@ def _(mo):
 
 @app.cell(hide_code=True)
 def _(Codebase, EXCLUDE_BY_LANGUAGE, mo, pl):
-    from src.Codebase import pinned_reference
+    from src.Codebase import GBNF_COMMIT, pinned_reference
 
     PINNED = pinned_reference() / "packages" / "gbnf"
 
@@ -183,7 +182,7 @@ def _(Codebase, EXCLUDE_BY_LANGUAGE, mo, pl):
             PINNED / language,
             exclude=EXCLUDE_BY_LANGUAGE[language],
             language=language,
-            run_id=f"reference-{language}",
+            run_id=f"reference-{GBNF_COMMIT}-{language}",
         )
         # Empty for V2: execute-test-suite fails at import.
         coverage = None
@@ -1848,8 +1847,8 @@ def _(report):
 
 @app.cell(hide_code=True)
 def _(mo):
-    # Every codebase's reference is None, so compare_corpus has no reference to validate against.
-    mo.md("### Every port to every port\nEmpty: no V2 reference for the embedding pairs yet.")
+    # The embedding pair export splits pairs on the V1 test flags, which V2 runs do not carry.
+    mo.md("### Every port to every port\nEmpty: the embedding pair export splits on the V1 test flags.")
     return
 
 @app.cell(hide_code=True)
