@@ -548,7 +548,7 @@ def describe_embedding_distance():
         calls = [call.args[0] for call in measure_embedding_process.run.call_args_list]
         target = str(Path(run["run_dir"]) / "ported_implementation")
         out = str(codebase_module.EMBEDDINGS / "runs" / run["run_id"])
-        reference_out = str(codebase_module.EMBEDDINGS / "reference" / "typescript")
+        reference_out = str(codebase_module.EMBEDDINGS / "reference" / codebase_module.GBNF_COMMIT / "typescript")
         excludes = ["--exclude", "__pycache__", "--exclude", "*_test.py"]
         model = ["--model", codebase_module.EMBEDDING_MODEL, "--strip-comments"]
         assert [argv[argv.index("measure-embedding") :] for argv in calls] == [

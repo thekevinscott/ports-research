@@ -1,5 +1,9 @@
 import json
+from unittest.mock import patch
 
+import pytest
+
+from src.Codebase import REFERENCE_CHECKOUT
 from src.corpus import codebases_under, runs_under
 from src.run_table import runs_table
 
@@ -61,12 +65,30 @@ def write_matrix(path, *run_ids):
     )
 
 
+@pytest.fixture
+def pinned_reference():
+    with patch("src.corpus.pinned_reference", autospec=True) as m:
+        m.return_value = REFERENCE_CHECKOUT
+        yield m
+
+
 def describe_codebases_under():
-    def it_builds_a_codebase_for_a_javascript_port(tmp_path):
+    def it_builds_a_codebase_for_a_javascript_port(tmp_path, pinned_reference):
         write_v2_run(tmp_path / "20261012T094953Z_370ab98a")
         (codebase,) = codebases_under(tmp_path, runs_table())
         assert codebase.language == "javascript"
         assert codebase.file_count == 1
+
+    def it_measures_a_javascript_port_against_the_pinned_javascript_reference(tmp_path, pinned_reference):
+        write_v2_run(tmp_path / "20261012T094953Z_370ab98a")
+        (codebase,) = codebases_under(tmp_path, runs_table())
+        pinned_reference.assert_called_once_with()
+        assert codebase.reference == REFERENCE_CHECKOUT / "packages" / "gbnf" / "javascript"
+
+    def it_leaves_the_javascript_build_tooling_out_as_for_typescript(tmp_path, pinned_reference):
+        write_v2_run(tmp_path / "20261012T094953Z_370ab98a")
+        (codebase,) = codebases_under(tmp_path, runs_table())
+        assert {"builder", "dev"} <= set(codebase.exclude)
 
 
 def describe_runs_under():
