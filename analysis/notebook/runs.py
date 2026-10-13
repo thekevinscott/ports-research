@@ -28,6 +28,7 @@ def _():
     from src.corpus import (
         DATA, REVERSE, REFERENCE, EXCLUDE_BY_LANGUAGE, codebases_under, runs_under,
     )
+    from src.full_table import full_table
     from src.stats import compare, spearman
 
     # V2 runs only.
@@ -337,6 +338,7 @@ def _():
         cell_pairs,
         compare,
         focused_layout,
+        full_table,
         layout_flag,
         mds_layout,
         medoid_similarity,
@@ -368,7 +370,7 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(Codebase, EXCLUDE_BY_LANGUAGE, mo, pl):
+def _(Codebase, EXCLUDE_BY_LANGUAGE, full_table, mo, pl):
     from src.Codebase import GBNF_COMMIT, pinned_reference
 
     PINNED = pinned_reference() / "packages" / "gbnf"
@@ -404,7 +406,7 @@ def _(Codebase, EXCLUDE_BY_LANGUAGE, mo, pl):
             "adapted_integration_coverage_pct": pl.Float64,
         },
     )
-    mo.ui.table(reference.with_columns(pl.col(pl.Float64).round(2)))
+    full_table(reference.with_columns(pl.col(pl.Float64).round(2)))
     return (reference,)
 
 
@@ -426,6 +428,7 @@ def _(
     cell_pairs,
     compare,
     focused_layout,
+    full_table,
     layout_flag,
     mds_layout,
     medoid_similarity,
@@ -938,11 +941,11 @@ def _(
         statuses = behavior_driver_status(v2_runs)
         return mo.vstack(
             [
-                mo.ui.table(summary_table, freeze_columns_left=["source_language", "condition"]),
+                full_table(summary_table, freeze_columns_left=["source_language", "condition"]),
                 behavior_chart(v2_runs),
                 mo.md("### Driver status by cell"),
                 mo.md(DRIVER_STATUS_READING),
-                mo.ui.table(
+                full_table(
                     driver_status_counts(statuses, "behavior_driver_status"),
                     freeze_columns_left=["source_language", "condition"],
                 ),
@@ -959,7 +962,7 @@ def _(
                 ),
                 mo.accordion(
                     {
-                        f"Runs (n={labelled.height})": mo.ui.table(
+                        f"Runs (n={labelled.height})": full_table(
                             labelled.with_columns(pl.col(pl.Float64).round(2))
                         )
                     }
@@ -1039,11 +1042,11 @@ def _(
         statuses = api_driver_status(v2_api_runs)
         return mo.vstack(
             [
-                mo.ui.table(summary_table, freeze_columns_left=["source_language", "condition"]),
+                full_table(summary_table, freeze_columns_left=["source_language", "condition"]),
                 api_chart(v2_api_runs),
                 mo.md("### Driver status by cell"),
                 mo.md(DRIVER_STATUS_READING),
-                mo.ui.table(
+                full_table(
                     driver_status_counts(statuses, "api_driver_status"),
                     freeze_columns_left=["source_language", "condition"],
                 ),
@@ -1062,7 +1065,7 @@ def _(
                 ),
                 mo.accordion(
                     {
-                        f"Runs (n={labelled.height})": mo.ui.table(
+                        f"Runs (n={labelled.height})": full_table(
                             labelled.with_columns(pl.col(pl.Float64).round(2))
                         )
                     }
@@ -1130,7 +1133,7 @@ def _(
         others = [column for column in AST_TITLES if column not in AST_LEADS]
         return mo.vstack(
             [
-                mo.ui.table(summary_table, freeze_columns_left=["source_language", "condition"]),
+                full_table(summary_table, freeze_columns_left=["source_language", "condition"]),
                 *(ast_chart(v2_runs, lead) for lead in AST_LEADS),
                 mo.accordion(
                     {
@@ -1141,7 +1144,7 @@ def _(
                 ),
                 mo.accordion(
                     {
-                        f"Runs (n={labelled.height})": mo.ui.table(
+                        f"Runs (n={labelled.height})": full_table(
                             labelled.with_columns(pl.col(pl.Float64).round(3))
                         )
                     }
@@ -1150,7 +1153,7 @@ def _(
                     {
                         "Call-path explainer, per run": mo.accordion(
                             {
-                                label: mo.ui.table(table, selection=None)
+                                label: full_table(table, selection=None)
                                 for label, table in ast_explainers(v2_runs, v2_ast_explainers).items()
                             }
                         )
@@ -1248,11 +1251,11 @@ def _(
         return mo.vstack(
             [
                 *(transcript_chart(v2_transcript_runs, lead) for lead in TRANSCRIPT_LEADS),
-                mo.ui.table(
+                full_table(
                     transcript_counts(v2_transcript_runs),
                     freeze_columns_left=["source_language", "condition"],
                 ),
-                mo.ui.table(
+                full_table(
                     first_read_counts(v2_transcript_runs),
                     freeze_columns_left=["source_language", "condition"],
                 ),
@@ -1263,7 +1266,7 @@ def _(
                         )
                     }
                 ),
-                mo.accordion({f"Runs (n={labelled.height})": mo.ui.table(labelled)}),
+                mo.accordion({f"Runs (n={labelled.height})": full_table(labelled)}),
             ]
         )
 
@@ -1496,9 +1499,9 @@ def _(
         constant = [m for m in v2_measures(v2_runs) if m not in varied]
         parts = [
             mo.md("### n, median and interquartile range by cell"),
-            mo.ui.table(rounded(v2_summary(v2_runs, v2_attempts)), freeze_columns_left=cell_columns),
+            full_table(rounded(v2_summary(v2_runs, v2_attempts)), freeze_columns_left=cell_columns),
             mo.md("### Failures and tokens per successful run"),
-            mo.ui.table(rounded(v2_failures(v2_attempts)), freeze_columns_left=cell_columns),
+            full_table(rounded(v2_failures(v2_attempts)), freeze_columns_left=cell_columns),
             mo.md("### Recorded duration against transcript wall time"),
             mo.md(DURATION_READING),
         ]
@@ -1506,7 +1509,7 @@ def _(
         parts.extend(
             [
                 mo.md(f"{discrepancies.height} of {v2_runs.height} runs."),
-                mo.ui.table(discrepancies, freeze_columns_left=["run_id"]),
+                full_table(discrepancies, freeze_columns_left=["run_id"]),
             ]
         )
         comparisons = {measure: flag_comparison(v2_runs, measure) for measure in V2_LEADS}
@@ -1516,7 +1519,7 @@ def _(
             parts.extend(
                 [
                     mo.md(f"#### {lead_title(measure)}"),
-                    mo.ui.table(
+                    full_table(
                         table.with_columns(pl.col(pl.Float64).exclude("p").round(2), pl.col("p").round(4)),
                         freeze_columns_left=["flag", "source_language"],
                     ),
@@ -1526,7 +1529,7 @@ def _(
             [
                 mo.md("### Rank correlation with held-out behavior"),
                 mo.md(SPEARMAN_READING),
-                mo.ui.table(
+                full_table(
                     spearman_table(v2_runs).with_columns(pl.col("rho").round(3)),
                     freeze_columns_left=["source_language", "measure"],
                 ),
@@ -2102,7 +2105,7 @@ def _(
     def pair_report():
         return mo.vstack(
             [
-                mo.ui.table(
+                full_table(
                     pl.concat(
                         pair_summary(source_language)
                         for source_language in ("python", "javascript")
@@ -2387,7 +2390,7 @@ def _(
             [
                 section_chart(TEST_COLUMNS, by_source, target_language, source_language),
                 shim_chart(source_language),
-                mo.ui.table(
+                full_table(
                     shim_rules(by_source, source_language), freeze_columns_left=["condition"]
                 ),
             ]
@@ -2415,7 +2418,7 @@ def _(
             parts.extend(
                 [
                     mo.md(f"#### {source_language} → {target_language}"),
-                    mo.ui.table(
+                    full_table(
                         summary(by_source, metrics, source_language),
                         freeze_columns_left=["condition"],
                     ),
@@ -2432,7 +2435,7 @@ def _(
                 parts.append(
                     mo.accordion(
                         {
-                            f"{label} (n={condition.height})": mo.ui.table(
+                            f"{label} (n={condition.height})": full_table(
                                 condition.select(display).with_columns(
                                     pl.col(pl.Float64).exclude(EMBEDDING_COLUMNS).round(2),
                                     pl.col(EMBEDDING_COLUMNS).round(3),
@@ -2548,7 +2551,7 @@ def _(
             parts.extend(
                 [
                     mo.md(f"#### {forward_source} → {forward_target} → {target_language}"),
-                    mo.ui.table(
+                    full_table(
                         summary(by_target, metrics, forward_source, FORWARD_FLAGS),
                         freeze_columns_left=["condition"],
                     ),
@@ -2567,7 +2570,7 @@ def _(
                 parts.append(
                     mo.accordion(
                         {
-                            f"forward {label} (n={condition.height})": mo.ui.table(
+                            f"forward {label} (n={condition.height})": full_table(
                                 condition.select("forward_run_id", *display).with_columns(
                                     pl.col(pl.Float64).exclude(EMBEDDING_COLUMNS).round(2),
                                     pl.col(EMBEDDING_COLUMNS).round(3),
