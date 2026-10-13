@@ -38,6 +38,19 @@ def describe_run_corpus():
             {"grammar": "g0001", "input": 0, "outcome": "accept", "error": None},
         ]
 
+    def it_writes_a_record_whose_error_holds_a_lone_surrogate(corpus, run_pair_function, tmp_path):
+        # A javascript port that slices an emoji reports half of it: JSON.stringify escapes it as \ud83d.
+        run_pair_function.side_effect = None
+        run_pair_function.return_value = {"outcome": "reject", "error": "InputParseError: ]\ud83dx"}
+        out = tmp_path / "out.jsonl"
+        run_corpus(corpus=corpus, implementation=tmp_path, language="typescript", out=out)
+        assert json.loads(out.read_text(encoding="utf-8").splitlines()[0]) == {
+            "grammar": "g0000",
+            "input": 0,
+            "outcome": "reject",
+            "error": "InputParseError: ]\ud83dx",
+        }
+
     def it_runs_each_pair_through_the_implementation_in_the_language(corpus, run_pair_function, tmp_path):
         run_corpus(corpus=corpus, implementation=tmp_path, language="typescript", out=tmp_path / "out.jsonl")
         assert run_pair_function.call_args_list[0].args == ("typescript", tmp_path, 'root ::= "a"\n', "a")
