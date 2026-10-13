@@ -14,12 +14,14 @@ from src.Codebase import EMBEDDING_MODEL, EMBEDDINGS
 from src.port_pairs import within_direction_pairs
 
 
-def validate_cache(directory: Path, target: Path, language: str, exclude: list[str]) -> dict:
+def validate_cache(directory: Path, target: Path | None, language: str, exclude: list[str]) -> dict:
     """Check selection, stripped inputs, weights and vectors; fingerprint consumed bytes.
 
     Check content rather than mtimes, which can change when a cache is restored.
     Stripped sidecars attest to saved inputs; model identity comes from the cache index.
     """
+    if target is None:
+        raise FileNotFoundError(f"{directory}: no source to check the cache against")
     if not target.is_dir():
         raise FileNotFoundError(f"{target}: source to check the cache against is missing")
     index_bytes = (directory / "index.json").read_bytes()
