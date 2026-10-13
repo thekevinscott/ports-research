@@ -28,16 +28,12 @@ def assigned(name: str, source: str = SOURCE) -> str:
     raise AssertionError(f"{name} is not assigned")
 
 
-def test_the_v1_sections_measure_v1_runs_only():
-    assert "if not is_v2(codebase.run)" in assigned("codebases")
-
-
 def test_the_embedding_pair_export_reads_v1_runs_only():
     assert "if not is_v2(codebase.run)" in EMBEDDING_EXPORT.read_text()
 
 
 def test_the_behavior_section_measures_v2_runs_only():
-    assert "if is_v2(codebase.run)" in assigned("v2_codebases")
+    assert "if is_v2(codebase.run)" in assigned("codebases")
 
 
 V2_FLAG_NAMES = [
@@ -454,7 +450,6 @@ def test_the_v2_statistics_lead_with_held_out_behavior_and_api_agreement():
 
 def test_v2_runs_carry_api_agreement_for_the_statistics():
     assert "'api_agreement_pct': codebase.api_agreement_pct" in assigned("v2_runs")
-    assert "api_agreement_pct" not in assigned("V2_NOT_MEASURED")
 
 
 def test_the_flag_comparison_reads_api_agreement():
@@ -527,7 +522,7 @@ def test_the_chart_export_takes_the_spearman_heatmap_from_the_notebook():
 
 
 def test_the_api_section_measures_v2_runs_only():
-    assert "for codebase in v2_codebases" in assigned("v2_api_runs")
+    assert "for codebase in codebases" in assigned("v2_api_runs")
 
 
 API_STATUSES = ("ok", "error", "crash")
@@ -1034,7 +1029,7 @@ def test_v2_runs_carry_the_transcript_leads_for_the_statistics():
 
 
 def test_the_transcript_section_measures_v2_runs_only():
-    assert "for codebase in v2_codebases" in assigned("v2_transcript_runs")
+    assert "for codebase in codebases" in assigned("v2_transcript_runs")
 
 
 def test_a_v2_run_carries_every_transcript_count_but_the_cache_split_of_its_tokens():
