@@ -30,6 +30,9 @@ def pair_chart(rows, source, target):
             condition = labels[(row["include_python_tests_a"], row["include_typescript_tests_a"])]
             chart_rows.append({"condition": condition, "series": "port vs port",
                                "value": row["chamfer_distance"]})
+    if not chart_rows:
+        # A chart over zero rows renders in marimo as a canvas 3.4e38 px tall.
+        return None
     data = alt.Data(values=chart_rows)
     x = alt.X("condition:N", sort=list(labels.values()), title=None)
     y_title = "Weighted Chamfer distance (lower = closer)"

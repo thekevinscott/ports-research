@@ -2669,8 +2669,9 @@ def _(codebases, mo):
     mo.vstack([
         *skipped,
         mo.md("### Every port to every port\nAll pairs within each direction, across test conditions. Lower distance means closer. Pairs share ports and are not independent observations."),
-        *[embedding_pair_chart(embedding_pair_report["comparisons"], source, target)
-          for source, target in (("python", "typescript"), ("typescript", "python"))],
+        *[chart for chart in (embedding_pair_chart(embedding_pair_report["comparisons"], source, target)
+                              for source, target in (("python", "typescript"), ("typescript", "python")))
+          if chart is not None],
     ])
     return embedding_pair_chart, embedding_pair_report
 
