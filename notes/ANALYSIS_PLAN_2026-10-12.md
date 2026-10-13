@@ -79,6 +79,8 @@ Kevin, 2026-10-12: "In particular I wonder about asking an LLM to write explaine
 
 - Fidelity scale, internal-state parity script (Mistral), grader validation by mutation.
 - Literature only: property-based and metamorphic relations, differential symbolic execution, doc-as-spec judging, security gate. See [literature/SYNTHESIS.md](../literature/SYNTHESIS.md).
+- Next-change experiment, 2026-10-13. The motivating case is a port that tracks a living upstream, not a one-shot translation. The cost of the next change is then measured against the reference's own commit history: apply each upstream commit to the port and count tokens, turns and test outcomes. Nobody invents the features, and nobody can be accused of picking features the reference's design anticipates, because every feature in upstream's history is one the reference's design anticipated. Kevin: "an unbelievably phenomenal idea". Not run; needs its own budget.
+- Open question, 2026-10-13, to surface in the write-up rather than answer: when a maintainer wants a port's internals organised a certain way, is the want that the code be organised like the original, so an upstream change has a matching place to land, or that it be good code in the target language regardless of the original's layout? The two pull apart when the languages do. Kevin: "The truth is I don't know, and also; from the perspective of this research, I don't particularly _want_ to know. Because I don't want to overly base this in me. I want it relevant to the other hundreds of open source maintainers in my position, too." Also open: whether the port's future maintainer is a human or the agent that wrote it.
 
 ## Statistics
 
