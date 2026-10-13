@@ -37,11 +37,37 @@ def _ddl(name: str, columns: dict[str, str]) -> str:
     return f"CREATE TABLE {name} ({', '.join(f'{c} {t}' for c, t in columns.items())})"
 
 
+# V2 names the typescript side "javascript". Every V1 code path (EXCLUDE_BY_LANGUAGE,
+# REFERENCE / language, drivers, labels) is keyed on "typescript", and the V1 typescript
+# reference is the same gbnf javascript package, so a V2 "javascript" loads as "typescript".
+V2_LANGUAGE = {"javascript": "typescript"}
+
+
+def _v1_condition(condition: dict) -> dict:
+    """A V2 condition in V1 columns: a language's flag is set when any included suite is in it."""
+    if "include_python_tests" in condition:
+        return condition
+    source = condition["source_language"]
+    target = condition["target_language"]
+    included = [
+        source for flag in ("include_unit_tests", "include_source_integration_tests") if condition[flag]
+    ]
+    if condition["include_target_integration_tests"]:
+        included.append(target)
+    return {
+        **condition,
+        "source_language": V2_LANGUAGE.get(source, source),
+        "target_language": V2_LANGUAGE.get(target, target),
+        "include_python_tests": "python" in included,
+        "include_typescript_tests": "javascript" in included,
+    }
+
+
 def _row(manifest_path: Path, manifest: dict) -> dict:
     result_path = manifest_path.parent / "result.json"
     result = json.loads(result_path.read_text()) if result_path.is_file() else {}
     tokens = transcript_usage(manifest_path.parent)
-    condition = manifest["condition"]
+    condition = _v1_condition(manifest["condition"])
     return {
         "run_id": manifest_path.parent.name,
         "run_dir": str(manifest_path.parent),

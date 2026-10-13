@@ -1,5 +1,6 @@
 """Shared corpus selection for the notebook and embedding pair export."""
 
+import os
 from pathlib import Path
 
 from dirsql._dirsql import DirSQL
@@ -8,8 +9,9 @@ from src.Codebase import Codebase
 from src.run_table import completed_runs
 
 ROOT = Path(__file__).resolve().parents[3]
-DATA = ROOT / "data" / "runs"
-REVERSE = ROOT / "analysis" / "round-trip-experiment" / "reverse"
+# PORTS_RUNS_DIR / PORTS_REVERSE_DIR point the scan at another runs directory.
+DATA = Path(os.environ.get("PORTS_RUNS_DIR", ROOT / "data" / "runs"))
+REVERSE = Path(os.environ.get("PORTS_REVERSE_DIR", ROOT / "analysis" / "round-trip-experiment" / "reverse"))
 PREPARED = "771a734d60ecbae5"
 REFERENCE = Path.home() / ".cache" / "ports" / "gbnf-experiment" / "prepared" / PREPARED / "source"
 EXCLUDE = [

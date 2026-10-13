@@ -95,6 +95,70 @@ def describe_run_rows():
         assert "forward_run_id" not in row
 
 
+V2_CONDITION = {
+    "source_language": "python",
+    "target_language": "javascript",
+    "include_unit_tests": False,
+    "include_source_integration_tests": False,
+    "include_target_integration_tests": False,
+    "effort": "medium",
+    "model": "claude-opus-5-5",
+}
+
+
+def v2_row(tmp_path, **condition):
+    run_dir = write_run(tmp_path / "run", {**V2_CONDITION, **condition})
+    (row,) = run_rows(str(run_dir / "manifest.json"))
+    return row
+
+
+def describe_v2_run_rows():
+    def it_loads_a_javascript_target_as_typescript(tmp_path):
+        row = v2_row(tmp_path)
+        assert row["source_language"] == "python"
+        assert row["target_language"] == "typescript"
+
+    def it_loads_a_javascript_source_as_typescript(tmp_path):
+        row = v2_row(tmp_path, source_language="javascript", target_language="python")
+        assert row["source_language"] == "typescript"
+        assert row["target_language"] == "python"
+
+    def it_sets_no_suite_flag_when_no_suite_is_included(tmp_path):
+        row = v2_row(tmp_path)
+        assert row["include_python_tests"] is False
+        assert row["include_typescript_tests"] is False
+
+    def it_counts_the_unit_suite_in_the_source_language(tmp_path):
+        row = v2_row(tmp_path, include_unit_tests=True)
+        assert row["include_python_tests"] is True
+        assert row["include_typescript_tests"] is False
+
+    def it_counts_the_source_integration_suite_in_the_source_language(tmp_path):
+        row = v2_row(
+            tmp_path,
+            source_language="javascript",
+            target_language="python",
+            include_source_integration_tests=True,
+        )
+        assert row["include_python_tests"] is False
+        assert row["include_typescript_tests"] is True
+
+    def it_counts_the_target_integration_suite_in_the_target_language(tmp_path):
+        row = v2_row(tmp_path, include_target_integration_tests=True)
+        assert row["include_python_tests"] is False
+        assert row["include_typescript_tests"] is True
+
+    def it_sets_both_flags_when_suites_cover_both_languages(tmp_path):
+        row = v2_row(tmp_path, include_unit_tests=True, include_target_integration_tests=True)
+        assert row["include_python_tests"] is True
+        assert row["include_typescript_tests"] is True
+
+    def it_reads_model_and_effort(tmp_path):
+        row = v2_row(tmp_path)
+        assert row["model"] == "claude-opus-5-5"
+        assert row["effort"] == "medium"
+
+
 def describe_reverse_run_rows():
     def it_reads_the_reverse_condition(tmp_path):
         run_dir = write_run(tmp_path / "fwd" / "rev", REVERSE_CONDITION, forward=FORWARD)
