@@ -2581,11 +2581,120 @@ def _(
                 )
         return mo.vstack(parts)
 
+    JUDGE_CODE_READING = {
+        "api_parity": "Asked whether B exposes every public name and signature of A. `complete`: all of them; `minor-gaps`, `major-gaps`: some missing or changed. It matters because a caller of A should be able to call B the same way.",
+        "structure": "Asked whether B keeps A's modules, classes and functions. `kept`: same layout; `changed-idiomatic`: reorganised in the target language's way; `changed-arbitrary`: reorganised for no stated reason. It matters because a port that keeps the layout can follow the reference's next change file by file.",
+        "semantic_divergences": "Asked, after tracing each entry point through A then B, whether B behaves differently. `none-found`; `edge-inputs-only`: only on unusual inputs; `ordinary-inputs`: on inputs a caller would send. It matters because behavior is what a port has to keep.",
+        "idiom": "Asked whether B reads as target-language code. `idiomatic`, `mixed`, `transliterated` (source-language code in target syntax). It matters for whoever maintains B.",
+        "dropped_or_added": "Asked whether B drops anything A has or adds anything A lacks. `neither`, `dropped`, `added`, `both`. It matters because both are departures from the reference.",
+        "fidelity": "Asked for one score of how faithfully B ports A, 1 (not a port) to 5 (faithful). Counts per score.",
+    }
+    JUDGE_TRANSCRIPT_READING = {
+        "shipped_material_read": "Asked which shipped material the agent read; a run can read several. `none`, `source`, `source-tests`, `target-tests`. Each value is counted once per run that read it, so a row's values can sum past n. It matters because the conditions differ in what was shipped.",
+        "tests_run": "Asked which tests the agent ran; several per run. `none`, `source-tests`, `target-tests`, `own-tests`. Each value counted once per run. It matters because running a suite is how an agent can check its port.",
+        "own_tests": "Asked whether the agent wrote its own tests or a script running reference and port side by side. `none`, `tests`, `differential-script`; a run can do both. It matters because it is checking the agent did not have to do.",
+        "structure": "Asked whether the agent kept the source's file structure, in its own words. `kept`, `changed`, `unclear`. It matters for the same reason as the code rubric's structure question.",
+    }
+    JUDGE_CHEATING_READING = "Asked whether the agent cheated: `none`, `read-target-implementation` (read a target-language implementation or its tests), `fetched` (fetched anything from outside), `edited-tests` (edited tests to make them pass), `hard-coded-expectations`. A run can carry several; each value is counted once per run. It matters because a cheating run's port is not the agent's own port."
+    JUDGE_FIRST_READ_READING = "Asked how the agent first read the source: `entry-point-traced` (followed calls from a public entry point), `directory-order` (files in listing order), `tests-first`, `mixed`, `unclear`. It matters because reading order is one way agents can differ before they write anything."
+
+    def judge_fidelity_chart(fidelity):
+        labels = [label for label, *_ in conditions(None)]
+        centre = BEHAVIOR_PANEL_WIDTH / len(labels) * (1 - BAND_PADDING) / 2
+        scale = alt.Scale(domain=[1, 5])
+
+        def panel(source_language):
+            by_source = fidelity.filter(pl.col("source_language") == source_language)
+            rows = fan_out(by_source.select("condition", pl.col("fidelity").cast(pl.Float64).alias("value")))
+            x = alt.X(
+                "condition:N",
+                sort=labels,
+                scale=alt.Scale(domain=labels, paddingInner=BAND_PADDING, paddingOuter=BAND_PADDING / 2),
+                title=TEST_AXIS_TITLE,
+                axis=alt.Axis(labelExpr=n_label_expr(rows, labels), labelAngle=0),
+            )
+            base = alt.Chart(rows)
+            median = median_tick(base, x=x, y=alt.Y("median(value):Q", title=None, scale=scale))
+            points = base.mark_point(
+                filled=True, size=60, fillOpacity=0.5, stroke=DOT_STROKE, strokeWidth=1.5, strokeOpacity=1
+            ).encode(x=x, xOffset=dot_offset(rows, centre), y=alt.Y("value:Q", title=None, scale=scale, axis=alt.Axis(tickMinStep=1)))
+            target_language = by_source["target_language"][0]
+            return alt.layer(median, points).properties(
+                width=BEHAVIOR_PANEL_WIDTH, height=160, title=panel_title(f"{source_language} → {target_language}")
+            )
+
+        present = set(fidelity["source_language"])
+        return alt.concat(*(panel(s) for s in BEHAVIOR_SOURCES if s in present), columns=2).properties(
+            title=alt.TitleParams("Judge's fidelity score, port against its reference (1 to 5)", anchor="start")
+        )
+
+    def judge_report():
+        from src.corpus import ROOT as judge_root
+        from src.judge_table import baseline_rows, fidelity_runs, load, per_run, questions, split, unsure, verdict_counts
+
+        judge_dir = judge_root / "data" / "judge"
+        rubrics = judge_root / "analysis" / "judge" / "rubrics"
+        run_ids = set(v2_transcript_runs["run_id"])
+        cell = ["source_language", "condition"]
+
+        def counts(items, name, values):
+            return full_table(verdict_counts(items, name, values, conditions(None), CONDITION_FLAGS, BEHAVIOR_SOURCES), freeze_columns_left=cell)
+
+        code_questions = questions(rubrics / "code.schema.json")
+        code_runs, code_baselines, code_unmatched = split(load(judge_dir / "code"), run_ids)
+        transcript_questions = questions(rubrics / "transcript.schema.json")
+        transcript_runs, transcript_baselines, transcript_unmatched = split(load(judge_dir / "transcript"), run_ids)
+
+        parts = [
+            mo.md(
+                f"Items matched to a notebook run: code {len(code_runs)}, transcript {len(transcript_runs)}. "
+                f"Baseline items: code {len(code_baselines)}, transcript {len(transcript_baselines)}. "
+                f"Items on a run not in the notebook (pilot or failed runs), left out of every table below: "
+                f"code {len(code_unmatched)}, transcript {len(transcript_unmatched)}."
+            ),
+            mo.md("### Code rubric"),
+            mo.md("The two human ports of gbnf judged against each other, one item each way, as the judge was given every run's port."),
+            full_table(baseline_rows(code_baselines, list(code_questions))),
+            judge_fidelity_chart(fidelity_runs(code_runs, conditions(None), CONDITION_FLAGS)),
+        ]
+        for name, values in code_questions.items():
+            parts += [mo.md(f"#### {name}"), mo.md(JUDGE_CODE_READING[name]), counts(code_runs, name, values)]
+        parts += [mo.md("### Transcript rubric"), mo.md("#### cheating"), mo.md(JUDGE_CHEATING_READING), counts(transcript_runs, "cheating", transcript_questions["cheating"])]
+        parts += [mo.md("#### first read"), mo.md(JUDGE_FIRST_READ_READING), counts(transcript_runs, "reading_strategy", transcript_questions["reading_strategy"])]
+        for name, values in transcript_questions.items():
+            if name in ("cheating", "reading_strategy"):
+                continue
+            parts += [mo.md(f"#### {name}"), mo.md(JUDGE_TRANSCRIPT_READING[name]), counts(transcript_runs, name, values)]
+        unsure_items = unsure(transcript_runs, list(transcript_questions))
+        parts += [
+            mo.md("#### Unsure"),
+            mo.md("Each transcript answer carries the judge's confidence; these are the answers it marked `unsure`, one row per run and question."),
+            full_table(unsure_items) if unsure_items.height else mo.md("None."),
+        ]
+        code_table = per_run(code_runs, list(code_questions), conditions(None), CONDITION_FLAGS)
+        transcript_table = per_run(transcript_runs, list(transcript_questions), conditions(None), CONDITION_FLAGS)
+        parts.append(
+            mo.accordion(
+                {
+                    f"Code rubric runs (n={code_table.height})": full_table(code_table),
+                    f"Transcript rubric runs (n={transcript_table.height})": full_table(transcript_table),
+                    f"Unmatched items (code {len(code_unmatched)}, transcript {len(transcript_unmatched)})": full_table(
+                        pl.DataFrame(
+                            [{"rubric": i["rubric"], "item": i["id"], "run_id": i["run"]} for i in code_unmatched + transcript_unmatched],
+                            schema={"rubric": pl.String, "item": pl.String, "run_id": pl.String},
+                        )
+                    ),
+                }
+            )
+        )
+        return mo.vstack(parts)
+
     return (
         api_report,
         ast_chart,
         ast_report,
         behavior_report,
+        judge_report,
         pair_report,
         report,
         reverse_report,
@@ -3211,6 +3320,33 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(v2_statistics_report):
     v2_statistics_report()
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.vstack(
+        [
+            mo.md("## Judge"),
+            mo.accordion(
+                {
+                    "How to read": mo.md("""
+                    A judge item is one blind prompt to `claude-opus-5-5` at effort `max` (the runs were made at `medium`), with the rubric and nothing about who or what wrote the code. A code item is A, the gbnf reference in the run's source language, then B, the run's port, as numbered source files; tests and build files are left out. A transcript item is the run's agent transcript alone: its text and tool calls, no tool results. Each item was judged once; k=4 is the number of items judged at a time, four concurrent calls, not four samples per item.
+
+                    Every question has a fixed set of verdicts, listed above its table. Each table counts, per source language and test inclusion condition, the runs (`n`) and how many runs got each verdict. Questions that allow several verdicts at once count each verdict once per run, so a row can sum past `n`. Source integration tests are pooled within each condition. The fidelity chart shows each run as a dot and the condition's median as a tick.
+
+                    The baseline rows are the two human gbnf packages judged against each other, python as A against javascript as B and the reverse, built the same way as every run's item. They are their own rows, never pooled with the runs. The transcript rubric has no baseline: the human packages have no transcript.
+                    """),
+                }
+            ),
+        ]
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(judge_report):
+    judge_report()
     return
 
 
