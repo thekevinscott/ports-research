@@ -26,18 +26,19 @@ def _():
 
 
     from src.corpus import (
-        DATA, REVERSE, REFERENCE, EXCLUDE_BY_LANGUAGE, codebases_under, runs_under,
+        DATA, REVERSE, REFERENCE, EXCLUDE_BY_LANGUAGE, codebases_under,
     )
-    from src.stats import compare, spearman
 
-    all_codebases = codebases_under(DATA, runs_table())
-    # The sections below measure V1 runs: V2 runs carry other flags and another target name.
-    codebases = [codebase for codebase in all_codebases if not is_v2(codebase.run)]
-    # The held-out behavior and API sections measure V2 runs only.
-    v2_codebases = [codebase for codebase in all_codebases if is_v2(codebase.run)]
+    # V2 runs only.
+    codebases = [
+        codebase for codebase in codebases_under(DATA, runs_table()) if is_v2(codebase.run)
+    ]
     reverse_codebases = codebases_under(REVERSE, reverse_runs_table())
+    # The reverse runs are V1; their V1 prepared reference is gone and the pin has no typescript package.
+    for codebase in reverse_codebases:
+        codebase.reference = None
 
-    FLAGS = ["include_python_tests", "include_typescript_tests", "is_error"]
+    FLAGS = [*V2_FLAGS, "is_error"]
     FORWARD_FLAGS = ["forward_include_python_tests", "forward_include_typescript_tests"]
     STATIC_METRICS = [
         "file_count",
@@ -62,6 +63,11 @@ def _():
     # report, so asking for one there re-runs the suite.
     PRESHIM_METRICS = ["integration_pass_pct"]
     EMBEDDING_METRICS = ["chamfer_distance", "chamfer_a_to_b", "chamfer_b_to_a"]
+    PERFORMANCE_METRICS = ["ladder_ref_ratio", "ladder_rungs_completed", "ladder_total_ms"]
+    # The reference is timed once per port run, so its total is a run column, not a table column.
+    LADDER_REFERENCE_TOTAL = "ladder_reference_total_ms"
+    # Read by the performance notes below as prose, so they stay out of the summary tables.
+    LADDER_NOTE_METRICS = ["ladder_slope", "ladder_reference_slope", "ladder_reference_rungs"]
     DIFF_METRICS = [
         "reference_diff_similarity_pct",
         "reference_diff_kept_pct",
@@ -81,250 +87,65 @@ def _():
         *SHARED_METRICS,
         *PRESHIM_METRICS,
         *DIFF_METRICS,
+        *PERFORMANCE_METRICS,
+        LADDER_REFERENCE_TOTAL,
+        *LADDER_NOTE_METRICS,
     ]
 
+    # Empty for V2: execute-test-suite fails at import and Codebase no longer produces ladder timings.
+    EMPTY_METRICS = {
+        *TEST_METRICS,
+        *PRESHIM_METRICS,
+        *PERFORMANCE_METRICS,
+        LADDER_REFERENCE_TOTAL,
+        *LADDER_NOTE_METRICS,
+    }
+
     def metrics_frame(codebases, metrics, flags):
-        return pl.DataFrame(
+        frame = pl.DataFrame(
             [
-                {**codebase.run, **{metric: getattr(codebase, metric) for metric in metrics}}
+                {
+                    **codebase.run,
+                    **{
+                        metric: None if metric in EMPTY_METRICS else getattr(codebase, metric)
+                        for metric in metrics
+                    },
+                }
                 for codebase in codebases
             ],
-            # Float even when every value is null, as with no V1 reference below.
-            schema_overrides={
-                "completed_at": pl.String,
-                "error": pl.String,
-                **dict.fromkeys(EMBEDDING_METRICS, pl.Float64),
-            },
+            schema_overrides={"completed_at": pl.String, "error": pl.String, "adapt_rules": pl.String},
         ).with_columns(
             pl.col(flags).cast(pl.Boolean),
             duration=pl.duration(milliseconds=pl.col("duration_ms")),
         )
-
-    def v1_frames():
-        return (
-            metrics_frame(codebases, METRICS, FLAGS),
-            metrics_frame(reverse_codebases, REVERSE_METRICS, [*FLAGS, *FORWARD_FLAGS]),
+        # An all-empty metric column comes out untyped; the tables round it as a number.
+        return frame.with_columns(
+            pl.col(metric).cast(pl.Float64) for metric in metrics if frame.schema[metric] == pl.Null
         )
 
-    v1_reference_missing = False
-    try:
-        runs, reverse_runs = v1_frames()
-    except RuntimeError as error:
-        v1_reference_missing = True
-        # The V1 reference source is a cache that can be missing. Without it the V1
-        # reference-relative columns are left empty, so the V2 sections still render.
-        mo.output.append(mo.callout(mo.md(
-            f"V1 reference-relative columns (embeddings, reference diff) are empty: "
-            f"`{str(error).splitlines()[0][:300]}`"
-        ), kind="warn"))
-        for codebase in [*codebases, *reverse_codebases]:
-            codebase.reference = None
-        runs, reverse_runs = v1_frames()
-
-    def behavior_columns(codebase):
-        return {
-            "behavior_agreement_pct": codebase.behavior_agreement_pct,
-            **{
-                f"reference_{reference}_port_{port}": count
-                for reference, ports in codebase.behavior_confusion.items()
-                for port, count in ports.items()
-            },
-            "behavior_note": codebase.behavior_note,
-        }
-
-    def size_columns(codebase):
-        return {"file_count": codebase.file_count, "loc": codebase.loc}
-
-    # Every AST column, in table order, with the title its chart carries.
-    AST_TITLES = {
-        "ast_matched_fraction": "Share of the reference's functions the port has a counterpart for",
-        "ast_tree_edit_median": "Median tree edit distance between paired functions, normalised",
-        "ast_branching_wasserstein": "Distance between the port's and the reference's branching distributions",
-        "ast_mean_edge_recall": "Share of the reference's call edges the port also makes, mean over entry points",
-        "ast_median_trace_normalised": "Edit distance between the reference's and the port's call traces, median over entry points",
-        "ast_matched_count": "Functions paired with a reference function",
-        "ast_port_only_count": "Port functions with no reference counterpart",
-        "ast_reference_only_count": "Reference functions with no port counterpart",
-        "ast_median_line_drift": "Median length difference of paired functions in lines, port minus reference",
-        "ast_tree_edit_mean": "Mean tree edit distance between paired functions, normalised",
-        "ast_api_shared": "Public API entries the port shares with the reference",
-        "ast_api_port_only": "Public API entries only the port exports",
-        "ast_api_reference_only": "Public API entries only the reference exports",
-        "ast_entry_point_count": "Public entry points traced",
-        "ast_reachable_fraction_reference": "Share of the reference's functions reachable from an entry point",
-        "ast_reachable_fraction_port": "Share of the port's functions reachable from an entry point",
-        "ast_unreachable_port_only": "Port functions reachable from no entry point",
-        "ast_delta_node_count": "AST nodes, port minus reference",
-        "ast_delta_max_depth": "Deepest AST node, port minus reference",
-        "ast_delta_function_count": "Functions, port minus reference",
-        "ast_delta_mean_function_lines": "Mean function length in lines, port minus reference",
-        "ast_delta_max_function_lines": "Longest function in lines, port minus reference",
-        "ast_delta_mean_cyclomatic": "Mean cyclomatic complexity, port minus reference",
-        "ast_delta_max_cyclomatic": "Highest cyclomatic complexity, port minus reference",
-    }
-
-    def ast_columns(codebase):
-        report = codebase.ast_report
-        if report is None:
-            return {**dict.fromkeys(AST_TITLES), "ast_note": codebase.ast_note}
-        functions = report["functions"]
-        tree_edit = report["tree_edit_distance"]
-        call_paths = report["call_paths"]
-        api = report["api_surface"]
-        return {
-            "ast_matched_fraction": functions["matched_fraction"],
-            "ast_tree_edit_median": tree_edit["median_normalised"],
-            "ast_branching_wasserstein": report["branching"]["wasserstein"],
-            "ast_mean_edge_recall": call_paths["mean_edge_recall"],
-            "ast_median_trace_normalised": call_paths["median_trace_normalised"],
-            "ast_matched_count": functions["matched_count"],
-            "ast_port_only_count": functions["port_only_count"],
-            "ast_reference_only_count": functions["reference_only_count"],
-            "ast_median_line_drift": functions["median_line_drift"],
-            "ast_tree_edit_mean": tree_edit["mean_normalised"],
-            **{f"ast_api_{side}": len(api[side]) for side in ("shared", "port_only", "reference_only")},
-            "ast_entry_point_count": call_paths["entry_point_count"],
-            "ast_reachable_fraction_reference": call_paths["reachable_fraction_reference"],
-            "ast_reachable_fraction_port": call_paths["reachable_fraction_port"],
-            "ast_unreachable_port_only": len(call_paths["unreachable_port_only"]),
-            **{
-                column: report["delta"][column.removeprefix("ast_delta_")]["delta"]
-                for column in AST_TITLES
-                if column.startswith("ast_delta_")
-            },
-            "ast_note": None,
-        }
-
-    TRANSCRIPT_LEADS = [
-        "read_source_tests",
-        "read_target_tests",
-        "suite_run_count",
-        "own_tests_written",
-        "files_read_before_first_write",
-        "reread_count",
-    ]
-    V2_STRINGS = {"completed_at": pl.String, "error": pl.String, "terminal_reason": pl.String}
-    v2_runs = pl.DataFrame(
-        [
-            {
-                **codebase.run,
-                **size_columns(codebase),
-                **behavior_columns(codebase),
-                "api_agreement_pct": codebase.api_agreement_pct,
-                **ast_columns(codebase),
-                **{lead: codebase.transcript[lead] for lead in TRANSCRIPT_LEADS},
-            }
-            for codebase in v2_codebases
-        ],
-        # measure-ast's median line drift is an int or a float run to run.
-        schema_overrides={
-            **V2_STRINGS,
-            "behavior_note": pl.String,
-            "ast_note": pl.String,
-            "ast_median_line_drift": pl.Float64,
-            "files_read_before_first_write": pl.Int64,
-        },
+    runs = metrics_frame(codebases, METRICS, FLAGS)
+    reverse_runs = metrics_frame(
+        reverse_codebases, REVERSE_METRICS, [*FLAGS, *FORWARD_FLAGS]
     )
-    v2_ast_explainers = pl.DataFrame(
-        [
-            {"run_id": codebase.run["run_id"], "explainer": sentence}
-            for codebase in v2_codebases
-            if codebase.ast_report is not None
-            for sentence in codebase.ast_report['call_paths']['explainer']
-        ],
-        schema={"run_id": pl.String, "explainer": pl.String},
-    )
-    # Every finished V2 attempt, the non-zero exits the tables above exclude among them.
-    v2_attempts = pl.DataFrame(
-        [run for run in runs_under(DATA, runs_table(), include_nonzero_exit=True) if is_v2(run)],
-        schema_overrides=V2_STRINGS,
-    )
-
-    def api_columns(codebase):
-        return {
-            "api_agreement_pct": codebase.api_agreement_pct,
-            **{f"api_{outcome}": count for outcome, count in codebase.api_outcomes.items()},
-            **{
-                f"api_reference_{reference}_port_{port}": count
-                for reference, ports in codebase.api_confusion.items()
-                for port, count in ports.items()
-            },
-            "api_note": codebase.api_note,
-        }
-
-    v2_api_runs = pl.DataFrame(
-        [{**codebase.run, **api_columns(codebase)} for codebase in v2_codebases],
-        schema_overrides={"completed_at": pl.String, "error": pl.String, "api_note": pl.String},
-    )
-    # The token split by cache tier is left out; the totals around the first write stay.
-    # Lists and the per-class last counts are flattened or quoted below.
-    TRANSCRIPT_DROPPED = {
-        "input_tokens",
-        "output_tokens",
-        "cache_read_tokens",
-        "cache_creation_tokens",
-        "suite_runs",
-        "last_suite_counts",
-        "own_test_files",
-        "fetch_commands",
-        "differential_evidence",
-    }
-    SUITE_CLASSES = ["source_tests", "target_tests", "own_tests", "unknown"]
-
-    def transcript_columns(codebase):
-        report = codebase.transcript
-        evidence = report["differential_evidence"]
-        return {
-            **{field: value for field, value in report.items() if field not in TRANSCRIPT_DROPPED},
-            **{
-                f"last_{suite}_{count}": report["last_suite_counts"].get(suite, {}).get(count)
-                for suite in SUITE_CLASSES
-                for count in ("passed", "failed")
-            },
-            "differential_evidence": None if evidence is None else evidence.get("command", evidence.get("path")),
-            "read_order": " → ".join(report["read_order"]),
-        }
-
-    v2_transcript_runs = pl.DataFrame(
-        [{**codebase.run, **transcript_columns(codebase)} for codebase in v2_codebases],
-        schema_overrides={
-            **V2_STRINGS,
-            "differential_evidence": pl.String,
-            **{f"last_{suite}_{count}": pl.Int64 for suite in SUITE_CLASSES for count in ("passed", "failed")},
-            "first_write_turn": pl.Int64,
-            "last_suite_run_turn": pl.Int64,
-            "tokens_before_first_write": pl.Int64,
-            "tokens_after_first_write": pl.Int64,
-            "first_read_path": pl.String,
-            "first_read_class": pl.String,
-            "first_read_is_entry_point": pl.Boolean,
-            "files_read_before_first_write": pl.Int64,
-            "source_files_read_before_first_write": pl.Int64,
-            "max_rereads_path": pl.String,
-            "search_calls_per_file_read": pl.Float64,
-            "read_order": pl.String,
-            "reads_after_last_write": pl.Int64,
-        },
-    )
-    port_pairs = within_direction_similarity(codebases)
-    cell_pairs = within_cell(port_pairs)
+    # Pairs share a cell on the two V2 flags the conditions split on.
+    PAIR_FLAGS = ["include_unit_tests", "include_target_integration_tests"]
+    port_pairs = within_direction_similarity(codebases, PAIR_FLAGS)
+    cell_pairs = within_cell(port_pairs, PAIR_FLAGS)
     return (
-        AST_TITLES,
         Codebase,
         DIFF_METRICS,
         EMBEDDING_METRICS,
         EXCLUDE_BY_LANGUAGE,
         FORWARD_FLAGS,
+        LADDER_REFERENCE_TOTAL,
         LAYOUT_LABELS,
         LAYOUT_RULE,
+        PERFORMANCE_METRICS,
         REFERENCE,
         REFERENCE_ID,
         TEST_METRICS,
-        TRANSCRIPT_LEADS,
-        V2_FLAGS,
         alt,
         cell_pairs,
-        compare,
         focused_layout,
         layout_flag,
         mds_layout,
@@ -337,13 +158,6 @@ def _():
         ring_points,
         runs,
         similarity_matrix,
-        spearman,
-        v1_reference_missing,
-        v2_api_runs,
-        v2_ast_explainers,
-        v2_attempts,
-        v2_runs,
-        v2_transcript_runs,
     )
 
 
@@ -358,15 +172,20 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(Codebase, EXCLUDE_BY_LANGUAGE, REFERENCE, mo, pl):
+def _(Codebase, EXCLUDE_BY_LANGUAGE, mo, pl):
+    from src.Codebase import GBNF_COMMIT, pinned_reference
+
+    PINNED = pinned_reference() / "packages" / "gbnf"
+
     def reference_row(language):
         codebase = Codebase(
-            REFERENCE / language,
+            PINNED / language,
             exclude=EXCLUDE_BY_LANGUAGE[language],
             language=language,
-            run_id=f"reference-{language}",
+            run_id=f"reference-{GBNF_COMMIT}-{language}",
         )
-        coverage = codebase.adapted_integration_coverage_pct
+        # Empty for V2: execute-test-suite fails at import.
+        coverage = None
         return {
             "language": language,
             "file_count": codebase.file_count,
@@ -378,8 +197,8 @@ def _(Codebase, EXCLUDE_BY_LANGUAGE, REFERENCE, mo, pl):
     reference = pl.DataFrame(
         [
             reference_row(language)
-            for language in ("python", "typescript")
-            if (REFERENCE / language).exists()
+            for language in ("python", "javascript")
+            if (PINNED / language).exists()
         ],
         schema={
             "language": pl.String,
@@ -395,19 +214,17 @@ def _(Codebase, EXCLUDE_BY_LANGUAGE, REFERENCE, mo, pl):
 
 @app.cell(hide_code=True)
 def _(
-    AST_TITLES,
     DIFF_METRICS,
     EMBEDDING_METRICS,
     FORWARD_FLAGS,
+    LADDER_REFERENCE_TOTAL,
     LAYOUT_LABELS,
     LAYOUT_RULE,
+    PERFORMANCE_METRICS,
     REFERENCE_ID,
     TEST_METRICS,
-    TRANSCRIPT_LEADS,
-    V2_FLAGS,
     alt,
     cell_pairs,
-    compare,
     focused_layout,
     layout_flag,
     mds_layout,
@@ -421,24 +238,17 @@ def _(
     ring_points,
     runs,
     similarity_matrix,
-    spearman,
-    v1_reference_missing,
-    v2_api_runs,
-    v2_ast_explainers,
-    v2_attempts,
-    v2_runs,
-    v2_transcript_runs,
 ):
-    CONDITION_FLAGS = ["include_python_tests", "include_typescript_tests"]
+    CONDITION_FLAGS = ["include_unit_tests", "include_target_integration_tests"]
 
     def conditions(source_language):
-        # Labels name the port's own direction, so the flag order flips with it.
-        source_python = source_language == "python"
+        # V2 cells by unit tests and target integration tests; source integration tests
+        # are pooled within each cell.
         return [
-            ("no tests", False, False),
-            ("source tests", source_python, not source_python),
-            ("target tests", not source_python, source_python),
-            ("both tests", True, True),
+            ("neither", False, False),
+            ("unit tests", True, False),
+            ("target integration tests", False, True),
+            ("both", True, True),
         ]
 
     COST_COLUMNS = [
@@ -477,6 +287,9 @@ def _(
         "chamfer_distance": "Embedding distance (chamfer)",
         "chamfer_a_to_b": "Embedding, port to reference",
         "chamfer_b_to_a": "Embedding, reference to port",
+        "ladder_ref_ratio": "Ladder time ÷ reference",
+        "ladder_rungs_completed": "Ladder rungs completed",
+        "ladder_total_ms": "Ladder total (ms)",
     }
     CALIBRATION = {
         "chamfer_distance": [
@@ -668,6 +481,8 @@ def _(
             rungs = [
                 {"label": label, "level": levels[target_language]}
                 for label, levels in (anchors or {}).get(metric, [])
+                # Calibrated on the V1 python and typescript references only.
+                if target_language in levels
             ]
             # An anchored panel is taller: six rungs need the room.
             height = 260 if rungs else 140
@@ -754,774 +569,6 @@ def _(
         others = [metric for metric in metrics if metric not in (lead, *SHIM_COLUMNS)]
         return mo.vstack([build([lead]), mo.accordion({LEAD_COLUMNS[lead]: build(others)})])
 
-    # V2 conditions name which reference suites sat in the sandbox: unit is the source
-    # language's unit suite, source and target the integration suites in each language.
-    V2_CONDITIONS = [
-        ("none", False, False, False),
-        ("unit", True, False, False),
-        ("source", False, True, False),
-        ("target", False, False, True),
-        ("unit + source", True, True, False),
-        ("unit + target", True, False, True),
-        ("source + target", False, True, True),
-        ("all", True, True, True),
-    ]
-    BEHAVIOR_LEAD = "behavior_agreement_pct"
-    BEHAVIOR_PANEL_WIDTH = 320
-    BEHAVIOR_SOURCES = ["python", "javascript"]
-
-    def with_v2_conditions(frame):
-        return pl.concat(
-            frame.filter(
-                *(pl.col(flag).cast(pl.Boolean) == value for flag, value in zip(V2_FLAGS, values))
-            ).with_columns(pl.lit(label).alias("condition"))
-            for label, *values in V2_CONDITIONS
-        )
-
-    def behavior_title(metric):
-        if metric == BEHAVIOR_LEAD:
-            return "Held-out behavior agreement with the reference (%)"
-        _, reference_outcome, _, port_outcome = metric.split("_")
-        verbs = {"accept": "accepts", "reject": "rejects", "error": "errors on", "crash": "crashes on"}
-        return f"Pairs the reference {verbs[reference_outcome]} and the port {verbs[port_outcome]}"
-
-    DOT_STROKE = "#4c78a8"
-    IQR_OPACITY = 0.25
-    IQR_WIDTH = 8
-
-    def n_label_expr(rows, labels):
-        """Each band's label over its run count, so every panel says how many runs it holds."""
-        counts = dict(rows.group_by("condition").len().iter_rows())
-        lookup = ", ".join(f"'{label}': 'n={counts.get(label, 0)}'" for label in labels)
-        return f"[datum.label, {{{lookup}}}[datum.label]]"
-
-    def iqr_bar(base, x, scale):
-        """The middle half of the cell's runs, drawn behind its dots."""
-        return base.mark_rule(strokeWidth=IQR_WIDTH, color=DOT_STROKE, opacity=IQR_OPACITY).encode(
-            x=x, y=alt.Y("q1(value):Q", title=None, scale=scale), y2=alt.Y2("q3(value)")
-        )
-
-    def behavior_chart(frame, metric=BEHAVIOR_LEAD, *, lead=BEHAVIOR_LEAD, title=behavior_title):
-        labels = [label for label, *_ in V2_CONDITIONS]
-        labelled = with_v2_conditions(frame)
-        centre = BEHAVIOR_PANEL_WIDTH / len(labels) * (1 - BAND_PADDING) / 2
-
-        def panel(source_language):
-            by_source = labelled.filter(pl.col("source_language") == source_language)
-            values = by_source.select("condition", pl.col(metric).cast(pl.Float64).alias("value"))
-            # A run without a value has no dot, so it joins no n either.
-            rows = fan_out(values.drop_nulls("value"))
-            x = alt.X(
-                "condition:N",
-                sort=labels,
-                scale=alt.Scale(
-                    domain=labels, paddingInner=BAND_PADDING, paddingOuter=BAND_PADDING / 2
-                ),
-                title=TEST_AXIS_TITLE,
-                axis=alt.Axis(labelExpr=n_label_expr(rows, labels)),
-            )
-            base = alt.Chart(rows)
-            # Agreement is a percentage, so every panel shares 0 to 100; counts start at zero.
-            scale = alt.Scale(domain=[0, 100]) if metric == lead else alt.Scale(zero=True)
-            iqr = iqr_bar(base, x, scale)
-            median = median_tick(base, x=x, y=alt.Y("median(value):Q", title=None, scale=scale))
-            points = base.mark_point(
-                filled=True, size=96, fillOpacity=0.5, stroke=DOT_STROKE, strokeWidth=2, strokeOpacity=1
-            ).encode(x=x, xOffset=dot_offset(rows, centre), y=alt.Y("value:Q", title=None, scale=scale))
-            target_language = by_source["target_language"][0]
-            return alt.layer(iqr, median, points).properties(
-                width=BEHAVIOR_PANEL_WIDTH,
-                height=140,
-                title=panel_title(f"{source_language} → {target_language}"),
-            )
-
-        present = set(labelled["source_language"])
-        return alt.concat(
-            *(panel(source) for source in BEHAVIOR_SOURCES if source in present), columns=2
-        ).properties(title=alt.TitleParams(title(metric), anchor="start"))
-
-    def behavior_runs(frame):
-        return with_v2_conditions(frame).select(
-            "run_id",
-            "source_language",
-            "condition",
-            BEHAVIOR_LEAD,
-            pl.col("^reference_.+_port_.+$"),
-            "behavior_note",
-        )
-
-    DRIVER_STATUSES = ["not_loaded", "loaded_failing", "driven"]
-    DRIVER_STATUS_READING = (
-        "The driver imports the port by the reference's names and layout and reads the end of input"
-        " the reference's way, so a score mixes \"exposes the reference's interface\" with \"behaves the same\"."
-        " `not_loaded`: every pair or case crashed, so the driver could not load the port."
-        " `loaded_failing`: it loaded, but no input the reference accepts was accepted (behavior), or no case"
-        " matched without raising (API). `driven`: the rest. `unmeasured`: no report."
-        " The chart below repeats agreement over driven ports only."
-    )
-
-    def behavior_driver_status(frame):
-        """not_loaded when every pair crashed, loaded_failing when the port accepts none of the inputs the reference accepts, driven otherwise."""
-        pairs = pl.sum_horizontal(pl.col("^reference_.+_port_.+$"))
-        crashes = pl.sum_horizontal(pl.col("^reference_.+_port_crash$"))
-        return frame.with_columns(
-            behavior_driver_status=pl.when(pl.col(BEHAVIOR_LEAD).is_null())
-            .then(None)
-            .when(crashes == pairs)
-            .then(pl.lit("not_loaded"))
-            .when(pl.col("reference_accept_port_accept") == 0)
-            .then(pl.lit("loaded_failing"))
-            .otherwise(pl.lit("driven"))
-        )
-
-    def driver_status_counts(frame, column):
-        """Runs per cell in each driver status; unmeasured runs have no report."""
-        labels = [label for label, *_ in V2_CONDITIONS]
-        return (
-            with_v2_conditions(frame)
-            .group_by("source_language", "condition")
-            .agg(
-                pl.len().alias("n"),
-                *((pl.col(column) == status).sum().alias(status) for status in DRIVER_STATUSES),
-                pl.col(column).is_null().sum().alias("unmeasured"),
-            )
-            .sort(
-                pl.col("source_language").cast(pl.Enum(BEHAVIOR_SOURCES)),
-                pl.col("condition").cast(pl.Enum(labels)),
-            )
-        )
-
-    def driven_title(title):
-        return lambda metric: f"{title(metric)}, driven ports only"
-
-    def behavior_report():
-        if v2_runs.height == 0:
-            return mo.md("No completed V2 runs.")
-        labelled = behavior_runs(v2_runs)
-        labels = [label for label, *_ in V2_CONDITIONS]
-        summary_table = (
-            labelled.group_by("source_language", "condition")
-            .agg(
-                pl.len().alias("n"),
-                pl.col(BEHAVIOR_LEAD).min().alias(f"min_{BEHAVIOR_LEAD}"),
-                pl.col(BEHAVIOR_LEAD).median().alias(f"median_{BEHAVIOR_LEAD}"),
-                pl.col(BEHAVIOR_LEAD).max().alias(f"max_{BEHAVIOR_LEAD}"),
-            )
-            .sort(
-                pl.col("source_language").cast(pl.Enum(BEHAVIOR_SOURCES)),
-                pl.col("condition").cast(pl.Enum(labels)),
-            )
-            .with_columns(pl.col(pl.Float64).round(2))
-        )
-        confusion = [column for column in labelled.columns if column.startswith("reference_")]
-        statuses = behavior_driver_status(v2_runs)
-        return mo.vstack(
-            [
-                mo.ui.table(summary_table, freeze_columns_left=["source_language", "condition"]),
-                behavior_chart(v2_runs),
-                mo.md("### Driver status by cell"),
-                mo.md(DRIVER_STATUS_READING),
-                mo.ui.table(
-                    driver_status_counts(statuses, "behavior_driver_status"),
-                    freeze_columns_left=["source_language", "condition"],
-                ),
-                behavior_chart(
-                    statuses.filter(pl.col("behavior_driver_status") == "driven"),
-                    title=driven_title(behavior_title),
-                ),
-                mo.accordion(
-                    {
-                        "Other behavior columns": mo.vstack(
-                            [behavior_chart(v2_runs, column) for column in confusion]
-                        )
-                    }
-                ),
-                mo.accordion(
-                    {
-                        f"Runs (n={labelled.height})": mo.ui.table(
-                            labelled.with_columns(pl.col(pl.Float64).round(2))
-                        )
-                    }
-                ),
-            ]
-        )
-
-    API_LEAD = "api_agreement_pct"
-    API_OUTCOME_TITLES = {
-        "match": "Cases where every step matches and none raised",
-        "mismatch": "Cases where the first differing step returned rules on both sides",
-        "error_match": "Cases where every step matches and one raised",
-        "error_mismatch": "Cases where the first differing step raised on one side",
-        "crash": "Cases where either side crashed",
-    }
-
-    def api_title(metric):
-        if metric == API_LEAD:
-            return "Held-out API agreement with the reference (%)"
-        if not metric.startswith("api_reference_"):
-            return API_OUTCOME_TITLES[metric.removeprefix("api_")]
-        _, _, reference_status, _, port_status = metric.split("_")
-        verbs = {"ok": "runs without raising", "error": "raises on", "crash": "crashes on"}
-        return f"Cases the reference {verbs[reference_status]} and the port {verbs[port_status]}"
-
-    def api_chart(frame, metric=API_LEAD):
-        return behavior_chart(frame, metric, lead=API_LEAD, title=api_title)
-
-    def api_runs(frame):
-        return with_v2_conditions(frame).select(
-            "run_id",
-            "source_language",
-            "condition",
-            API_LEAD,
-            # api_calls is the run's own count of model calls, not a measure-api column.
-            pl.col("^api_.+$").exclude(API_LEAD, "api_note", "api_calls"),
-            "api_note",
-        )
-
-    def api_driver_status(frame):
-        """not_loaded when every case crashed, loaded_failing when no case matches without raising, driven otherwise."""
-        cases = pl.sum_horizontal(pl.col(f"api_{outcome}") for outcome in API_OUTCOME_TITLES)
-        return frame.with_columns(
-            api_driver_status=pl.when(pl.col(API_LEAD).is_null())
-            .then(None)
-            .when(pl.col("api_crash") == cases)
-            .then(pl.lit("not_loaded"))
-            .when(pl.col("api_match") == 0)
-            .then(pl.lit("loaded_failing"))
-            .otherwise(pl.lit("driven"))
-        )
-
-    def api_report():
-        if v2_api_runs.height == 0:
-            return mo.md("No completed V2 runs.")
-        labelled = api_runs(v2_api_runs)
-        labels = [label for label, *_ in V2_CONDITIONS]
-        summary_table = (
-            labelled.group_by("source_language", "condition")
-            .agg(
-                pl.len().alias("n"),
-                pl.col(API_LEAD).min().alias(f"min_{API_LEAD}"),
-                pl.col(API_LEAD).median().alias(f"median_{API_LEAD}"),
-                pl.col(API_LEAD).max().alias(f"max_{API_LEAD}"),
-            )
-            .sort(
-                pl.col("source_language").cast(pl.Enum(BEHAVIOR_SOURCES)),
-                pl.col("condition").cast(pl.Enum(labels)),
-            )
-            .with_columns(pl.col(pl.Float64).round(2))
-        )
-        others = [
-            column
-            for column in labelled.columns
-            if column.startswith("api_") and column not in (API_LEAD, "api_note")
-        ]
-        statuses = api_driver_status(v2_api_runs)
-        return mo.vstack(
-            [
-                mo.ui.table(summary_table, freeze_columns_left=["source_language", "condition"]),
-                api_chart(v2_api_runs),
-                mo.md("### Driver status by cell"),
-                mo.md(DRIVER_STATUS_READING),
-                mo.ui.table(
-                    driver_status_counts(statuses, "api_driver_status"),
-                    freeze_columns_left=["source_language", "condition"],
-                ),
-                behavior_chart(
-                    statuses.filter(pl.col("api_driver_status") == "driven"),
-                    API_LEAD,
-                    lead=API_LEAD,
-                    title=driven_title(api_title),
-                ),
-                mo.accordion(
-                    {
-                        "Other API columns": mo.vstack(
-                            [api_chart(v2_api_runs, column) for column in others]
-                        )
-                    }
-                ),
-                mo.accordion(
-                    {
-                        f"Runs (n={labelled.height})": mo.ui.table(
-                            labelled.with_columns(pl.col(pl.Float64).round(2))
-                        )
-                    }
-                ),
-            ]
-        )
-
-    AST_LEADS = [
-        "ast_matched_fraction",
-        "ast_tree_edit_median",
-        "ast_branching_wasserstein",
-        "ast_mean_edge_recall",
-        "ast_median_trace_normalised",
-    ]
-
-    def ast_title(metric):
-        return AST_TITLES[metric]
-
-    def ast_chart(frame, metric=AST_LEADS[0]):
-        # No AST column is a percentage, so every axis starts at zero.
-        return behavior_chart(frame, metric, lead=None, title=ast_title)
-
-    def ast_runs(frame):
-        return with_v2_conditions(frame).select(
-            "run_id",
-            "source_language",
-            "condition",
-            *AST_LEADS,
-            pl.col("^ast_.+$").exclude(*AST_LEADS, "ast_note"),
-            "ast_note",
-        )
-
-    def ast_explainers(frame, explainers):
-        """Each run's call-path explainer sentences, labelled by run, source language and condition."""
-        runs = with_v2_conditions(frame).select("run_id", "source_language", "condition")
-        return {
-            f"{run['run_id']} · {run['source_language']} · {run['condition']}": explainers.filter(
-                pl.col("run_id") == run["run_id"]
-            ).select("explainer")
-            for run in runs.iter_rows(named=True)
-            if run["run_id"] in explainers["run_id"]
-        }
-
-    def ast_report():
-        if v2_runs.height == 0:
-            return mo.md("No completed V2 runs.")
-        labelled = ast_runs(v2_runs)
-        labels = [label for label, *_ in V2_CONDITIONS]
-        summary_table = (
-            labelled.group_by("source_language", "condition")
-            .agg(
-                pl.len().alias("n"),
-                *(
-                    getattr(pl.col(lead), statistic)().alias(f"{statistic}_{lead}")
-                    for lead in AST_LEADS
-                    for statistic in ("min", "median", "max")
-                ),
-            )
-            .sort(
-                pl.col("source_language").cast(pl.Enum(BEHAVIOR_SOURCES)),
-                pl.col("condition").cast(pl.Enum(labels)),
-            )
-            .with_columns(pl.col(pl.Float64).round(3))
-        )
-        others = [column for column in AST_TITLES if column not in AST_LEADS]
-        return mo.vstack(
-            [
-                mo.ui.table(summary_table, freeze_columns_left=["source_language", "condition"]),
-                *(ast_chart(v2_runs, lead) for lead in AST_LEADS),
-                mo.accordion(
-                    {
-                        "Other AST columns": mo.vstack(
-                            [ast_chart(v2_runs, column) for column in others]
-                        )
-                    }
-                ),
-                mo.accordion(
-                    {
-                        f"Runs (n={labelled.height})": mo.ui.table(
-                            labelled.with_columns(pl.col(pl.Float64).round(3))
-                        )
-                    }
-                ),
-                mo.accordion(
-                    {
-                        "Call-path explainer, per run": mo.accordion(
-                            {
-                                label: mo.ui.table(table, selection=None)
-                                for label, table in ast_explainers(v2_runs, v2_ast_explainers).items()
-                            }
-                        )
-                    }
-                ),
-            ]
-        )
-
-    TRANSCRIPT_TITLES = {
-        "turns": "Assistant turns",
-        "bash_calls": "Bash calls",
-        "read_calls": "Read calls",
-        "write_calls": "Write calls",
-        "edit_calls": "Edit calls",
-        "search_calls": "Glob and Grep calls",
-        "read_source": "Reads of the source implementation",
-        "read_source_tests": "Reads of the source language's shipped tests",
-        "read_target_tests": "Reads of the target language's shipped tests",
-        "suite_run_count": "Test suite runs",
-        "own_tests_written": "Test files the agent wrote itself",
-        "fetch_attempts": "Network fetch and install attempts",
-        "tokens_before_first_write": "Tokens before the first write into the port",
-        "tokens_after_first_write": "Tokens from the first write into the port on",
-        "first_write_turn": "Turn of the first write into the port",
-        "last_suite_run_turn": "Turn of the last test suite run",
-        "files_read_before_first_write": "Files read before the first write into the port",
-        "source_files_read_before_first_write": "Source files read before the first write into the port",
-        "reread_count": "Reads of a file already read",
-        "max_rereads_of_one_file": "Most rereads of one file",
-        "search_calls_per_file_read": "Glob and Grep calls per file read",
-        "reads_after_last_write": "Reads after the last write into the port",
-        **{
-            f"last_{suite}_{count}": f"{count.capitalize()} tests in the last run of {name}"
-            for suite, name in (
-                ("source_tests", "the source language's shipped tests"),
-                ("target_tests", "the target language's shipped tests"),
-                ("own_tests", "the agent's own tests"),
-                ("unknown", "a suite of more than one class"),
-            )
-            for count in ("passed", "failed")
-        },
-    }
-    # Booleans: the section counts the runs where each holds instead of charting them.
-    TRANSCRIPT_COUNTED = ["touched_source_tests", "touched_target_tests", "differential_script"]
-    # Counted by value in the first-read table.
-    TRANSCRIPT_FIRST_READ = ["first_read_is_entry_point", "first_read_class"]
-    FIRST_READ_CLASSES = ["source", "source_tests", "target_tests", "port", "other"]
-    # Quoted in the runs table only.
-    TRANSCRIPT_QUOTED = ["differential_evidence", "first_read_path", "max_rereads_path", "read_order"]
-
-    def transcript_title(metric):
-        return TRANSCRIPT_TITLES[metric]
-
-    def transcript_chart(frame, metric):
-        # Counts, never a percentage: no lead takes the 0 to 100 scale.
-        return behavior_chart(frame, metric, lead=None, title=transcript_title)
-
-    def transcript_counts(frame):
-        return by_cell(
-            frame,
-            pl.len().alias("n"),
-            *(pl.col(column).sum().alias(column) for column in TRANSCRIPT_COUNTED),
-        ).with_columns(pl.col("n", *TRANSCRIPT_COUNTED).fill_null(0))
-
-    def first_read_counts(frame):
-        # A null entry point: no code file of the source was named by a read.
-        entry = pl.col("first_read_is_entry_point")
-        return by_cell(
-            frame,
-            pl.len().alias("n"),
-            entry.sum().alias("entry_point"),
-            (~entry).sum().alias("not_entry_point"),
-            entry.is_null().sum().alias("no_code_file_read"),
-            *((pl.col("first_read_class") == cls).sum().alias(f"first_read_{cls}") for cls in FIRST_READ_CLASSES),
-        ).with_columns(pl.exclude("source_language", "condition").fill_null(0))
-
-    def transcript_runs(frame):
-        others = [column for column in TRANSCRIPT_TITLES if column not in TRANSCRIPT_LEADS]
-        return with_v2_conditions(frame).select(
-            "run_id",
-            "source_language",
-            "condition",
-            *TRANSCRIPT_LEADS,
-            *TRANSCRIPT_COUNTED,
-            *TRANSCRIPT_FIRST_READ,
-            *others,
-            *TRANSCRIPT_QUOTED,
-        )
-
-    def transcript_report():
-        if v2_transcript_runs.height == 0:
-            return mo.md("No completed V2 runs.")
-        labelled = transcript_runs(v2_transcript_runs)
-        others = [column for column in TRANSCRIPT_TITLES if column not in TRANSCRIPT_LEADS]
-        return mo.vstack(
-            [
-                *(transcript_chart(v2_transcript_runs, lead) for lead in TRANSCRIPT_LEADS),
-                mo.ui.table(
-                    transcript_counts(v2_transcript_runs),
-                    freeze_columns_left=["source_language", "condition"],
-                ),
-                mo.ui.table(
-                    first_read_counts(v2_transcript_runs),
-                    freeze_columns_left=["source_language", "condition"],
-                ),
-                mo.accordion(
-                    {
-                        "Other transcript columns": mo.vstack(
-                            [transcript_chart(v2_transcript_runs, column) for column in others]
-                        )
-                    }
-                ),
-                mo.accordion({f"Runs (n={labelled.height})": mo.ui.table(labelled)}),
-            ]
-        )
-
-    V2_LEADS = [BEHAVIOR_LEAD, API_LEAD, *AST_LEADS, "total_tokens", "loc", *TRANSCRIPT_LEADS]
-    V2_SCOPES = ["pooled", *BEHAVIOR_SOURCES]
-    # Per-run measures besides held-out behavior; the confusion counts join them from the frame.
-    V2_MEASURES = ["total_tokens", "api_calls", "transcript_wall_ms", "file_count", "loc", *TRANSCRIPT_LEADS]
-    SPEARMAN_CELL_PX = 26
-    # red, neutral grey, blue: a diverging ramp whose midpoint reads as no correlation.
-    DIVERGING = ["#e34948", "#f0efec", "#2a78d6"]
-
-    def v2_cells():
-        """The 16 V2 cells, source language first."""
-        labels = [label for label, *_ in V2_CONDITIONS]
-        return pl.DataFrame(
-            {
-                "source_language": [source for source in BEHAVIOR_SOURCES for _ in labels],
-                "condition": labels * len(BEHAVIOR_SOURCES),
-            }
-        )
-
-    def by_cell(frame, *aggregations):
-        """One row per V2 cell, every cell present whether or not it has runs."""
-        cells = v2_cells()
-        if frame.height == 0:
-            return cells
-        counted = with_v2_conditions(frame).group_by("source_language", "condition").agg(*aggregations)
-        return cells.join(counted, on=["source_language", "condition"], how="left", maintain_order="left")
-
-    def lead_title(measure):
-        if measure == BEHAVIOR_LEAD:
-            return behavior_title(measure)
-        if measure in AST_LEADS:
-            return ast_title(measure)
-        if measure in TRANSCRIPT_LEADS:
-            return transcript_title(measure)
-        return api_title(measure) if measure == API_LEAD else metric_title(measure)
-
-    def v2_summary(frame, attempts):
-        codes = sorted(attempts.filter(pl.col("exit_code") != 0)["exit_code"].unique().to_list())
-        excluded = [f"excluded_exit_{code}" for code in codes]
-        quartiles = by_cell(
-            frame,
-            pl.len().alias("n"),
-            *(
-                expr
-                for lead in V2_LEADS
-                for expr in (
-                    pl.col(lead).quantile(0.25, "linear").alias(f"q1_{lead}"),
-                    pl.col(lead).median().alias(f"median_{lead}"),
-                    pl.col(lead).quantile(0.75, "linear").alias(f"q3_{lead}"),
-                )
-            ),
-        )
-        exits = by_cell(
-            attempts,
-            *((pl.col("exit_code") == code).sum().alias(name) for code, name in zip(codes, excluded)),
-        )
-        return (
-            quartiles.join(exits, on=["source_language", "condition"], maintain_order="left")
-            .with_columns(pl.col("n", *excluded).fill_null(0))
-            .select("source_language", "condition", "n", *excluded, pl.exclude("source_language", "condition", "n", *excluded))
-        )
-
-    def v2_failures(attempts):
-        exits = ["attempts", "exit_0", "exit_137", "api_error"]
-        return (
-            by_cell(
-                attempts,
-                pl.len().alias("attempts"),
-                (pl.col("exit_code") == 0).sum().alias("exit_0"),
-                (pl.col("exit_code") == 137).sum().alias("exit_137"),
-                (pl.col("terminal_reason") == "api_error").sum().alias("api_error"),
-                pl.col("total_tokens").sum().alias("tokens"),
-            )
-            .with_columns(pl.col(exits).fill_null(0))
-            .with_columns(
-                tokens_per_success=pl.when(pl.col("exit_0") > 0).then(
-                    pl.col("tokens") / pl.col("exit_0")
-                )
-            )
-            .drop("tokens")
-        )
-
-    def flag_comparison(frame, measure):
-        """Each flag's on runs against its off runs, pooled and within each source language."""
-        rows = []
-        for flag in V2_FLAGS:
-            on = pl.col(flag).cast(pl.Boolean)
-            for scope in V2_SCOPES:
-                scoped = frame if scope == "pooled" else frame.filter(pl.col("source_language") == scope)
-                result = compare(scoped.filter(on)[measure].to_list(), scoped.filter(~on)[measure].to_list())
-                rows.append({"flag": flag, "source_language": scope, **result})
-        return pl.DataFrame(rows, schema_overrides={column: pl.Float64 for column in ("median_on", "median_off", "gap", "low", "high", "p", "minimum_detectable_gap")})
-
-    def v2_measures(frame):
-        """Every per-run measure the frame carries: both agreements, the AST leads, behavior's confusion counts, cost and size."""
-        confusion = [column for column in frame.columns if column.startswith("reference_") and "_port_" in column]
-        return [m for m in [BEHAVIOR_LEAD, API_LEAD, *AST_LEADS, *confusion, *V2_MEASURES] if m in frame.columns]
-
-    def varied_measures(frame):
-        """The measures that take more than one value; a rank correlation needs a spread."""
-        return [m for m in v2_measures(frame) if frame[m].drop_nulls().n_unique() > 1]
-
-    SPEARMAN_READING = (
-        "Pooled rows rank both source languages together, though each is measured against a"
-        " different reference; the rows for each source language rank within it."
-        " The `reference_<a>_port_<b>` counts are the pairs held-out behavior agreement is computed"
-        " from, so their correlation with it holds partly by definition."
-    )
-
-    def spearman_table(frame):
-        """Each varied measure's rank correlation with held-out behavior, pooled and within each source language."""
-        tables = []
-        for scope in V2_SCOPES:
-            scoped = frame if scope == "pooled" else frame.filter(pl.col("source_language") == scope)
-            measures = [measure for measure in varied_measures(scoped) if measure != BEHAVIOR_LEAD]
-            lead = scoped[BEHAVIOR_LEAD].to_list()
-            tables.append(
-                pl.DataFrame(
-                    {
-                        "source_language": [scope] * len(measures),
-                        "measure": measures,
-                        "rho": [spearman(scoped[measure].to_list(), lead) for measure in measures],
-                        "n": [
-                            scoped.filter(pl.col(measure).is_not_null() & pl.col(BEHAVIOR_LEAD).is_not_null()).height
-                            for measure in measures
-                        ],
-                    },
-                    schema={"source_language": pl.String, "measure": pl.String, "rho": pl.Float64, "n": pl.Int64},
-                ).sort(pl.col("rho").abs(), descending=True, nulls_last=True)
-            )
-        return pl.concat(tables)
-
-    def spearman_matrix(frame):
-        measures = varied_measures(frame)
-        return pl.DataFrame(
-            [
-                {"measure_a": a, "measure_b": b, "rho": spearman(frame[a].to_list(), frame[b].to_list())}
-                for b in measures
-                for a in measures
-            ],
-            schema={"measure_a": pl.String, "measure_b": pl.String, "rho": pl.Float64},
-        )
-
-    def spearman_chart(frame):
-        measures = varied_measures(frame)
-        side = SPEARMAN_CELL_PX * len(measures)
-        x = alt.X("measure_a:N", sort=measures, title=None, axis=alt.Axis(labelAngle=-90, ticks=False, domain=False))
-        y = alt.Y("measure_b:N", sort=measures, title=None, axis=alt.Axis(ticks=False, domain=False))
-        base = alt.Chart(spearman_matrix(frame))
-        cells = base.mark_rect(stroke=SURFACE, strokeWidth=1).encode(
-            x=x,
-            y=y,
-            color=alt.Color(
-                "rho:Q",
-                title="Spearman ρ",
-                # Lab keeps each side on its own hue; the default hcl swings blue through pink.
-                scale=alt.Scale(domain=[-1, 0, 1], range=DIVERGING, interpolate="lab"),
-                legend=alt.Legend(values=[-1, -0.5, 0, 0.5, 1], format=".1f"),
-            ),
-            tooltip=[
-                alt.Tooltip("measure_a:N", title="measure"),
-                alt.Tooltip("measure_b:N", title="against"),
-                alt.Tooltip("rho:Q", title="ρ", format=".2f"),
-            ],
-        )
-        # Printed values flip to the page colour where the cell is dark.
-        numbers = [
-            base.transform_filter(test)
-            .mark_text(fontSize=9, color=colour)
-            .encode(x=x, y=y, text=alt.Text("rho:Q", format=".2f"))
-            for test, colour in (("abs(datum.rho) < 0.6", INK), ("abs(datum.rho) >= 0.6", SURFACE))
-        ]
-        return alt.layer(cells, *numbers).properties(
-            width=side,
-            height=side,
-            title=alt.TitleParams(
-                "How per-run measures rank against each other on V2 runs (Spearman)", anchor="start"
-            ),
-        )
-
-    FLAG_READING = (
-        "Each row sets the runs with the flag on against the runs with it off, pooled over both"
-        " source languages and then within each. `gap` is the on median minus the off median."
-        " `p` is the share of 10,000 shuffles of the on/off labels (seed 0) whose gap is at least"
-        " as far from zero. `low` to `high` is a 95% bootstrap interval on the gap (10,000"
-        " resamples, seed 0). `minimum_detectable_gap` is the critical value: an observed gap larger"
-        " than it gives p < 0.05 against the same shuffles at this n. A true gap of exactly that size"
-        " lands above it only about half the time, so only gaps well beyond it are reliably seen."
-        " A row with p ≥ 0.05 reads as a gap too small to see with this n, never as no effect."
-    )
-
-    def multiplicity_note(tests):
-        """How many flag comparisons this section runs and how many fall below 0.05 by chance alone."""
-        return (
-            f"This section runs {tests} comparisons with a p, none corrected for the others. If no flag"
-            f" changed any measure, about {round(tests * 0.05)} of them would still give p < 0.05."
-            " Every p here is exploratory: a lead for a later test, not a confirmed effect."
-        )
-    V2_NOT_MEASURED = (
-        "Reference diff similarity and test pass rates are not measured on V2 runs:"
-        " `measure-code-distance` takes no javascript target and `execute-test-suite` finds no V2"
-        " suite in the derivation cache."
-    )
-
-    def rounded(frame):
-        return frame.with_columns(pl.col(pl.Float64).round(2))
-
-    DURATION_TOLERANCE = 0.01
-    DURATION_READING = (
-        "Wall time per run comes from the transcript: first to last timestamp across the main session"
-        " and every subagent session (`transcript_wall_ms`). result.json's `duration_ms` is the duration"
-        " of the result the run ended on; when a background subagent's notification starts another turn"
-        " (`result_index` above 0), that is the last turn alone. Runs listed here record a `duration_ms`"
-        f" more than {DURATION_TOLERANCE:.0%} away from the transcript's span."
-    )
-
-    def duration_discrepancies(frame):
-        """Runs whose recorded duration is not the transcript's span."""
-        columns = ["run_id", "source_language", "condition", "result_index", "duration_ms", "transcript_wall_ms", "total_tokens"]
-        gap = (pl.col("duration_ms") - pl.col("transcript_wall_ms")).abs()
-        return (
-            with_v2_conditions(frame)
-            .filter(gap > pl.col("transcript_wall_ms") * DURATION_TOLERANCE)
-            .select(columns)
-            .sort("run_id")
-        )
-
-    def v2_statistics_report():
-        if v2_runs.height == 0:
-            return mo.md("No completed V2 runs.")
-        cell_columns = ["source_language", "condition"]
-        varied = varied_measures(v2_runs)
-        constant = [m for m in v2_measures(v2_runs) if m not in varied]
-        parts = [
-            mo.md("### n, median and interquartile range by cell"),
-            mo.ui.table(rounded(v2_summary(v2_runs, v2_attempts)), freeze_columns_left=cell_columns),
-            mo.md("### Failures and tokens per successful run"),
-            mo.ui.table(rounded(v2_failures(v2_attempts)), freeze_columns_left=cell_columns),
-            mo.md("### Recorded duration against transcript wall time"),
-            mo.md(DURATION_READING),
-        ]
-        discrepancies = duration_discrepancies(v2_runs)
-        parts.extend(
-            [
-                mo.md(f"{discrepancies.height} of {v2_runs.height} runs."),
-                mo.ui.table(discrepancies, freeze_columns_left=["run_id"]),
-            ]
-        )
-        comparisons = {measure: flag_comparison(v2_runs, measure) for measure in V2_LEADS}
-        tests = sum(table["p"].is_not_null().sum() for table in comparisons.values())
-        parts.extend([mo.md("### Per-flag comparison"), mo.md(FLAG_READING), mo.md(multiplicity_note(tests))])
-        for measure, table in comparisons.items():
-            parts.extend(
-                [
-                    mo.md(f"#### {lead_title(measure)}"),
-                    mo.ui.table(
-                        table.with_columns(pl.col(pl.Float64).exclude("p").round(2), pl.col("p").round(4)),
-                        freeze_columns_left=["flag", "source_language"],
-                    ),
-                ]
-            )
-        parts.extend(
-            [
-                mo.md(V2_NOT_MEASURED),
-                mo.md("### Rank correlation with held-out behavior"),
-                mo.md(SPEARMAN_READING),
-                mo.ui.table(
-                    spearman_table(v2_runs).with_columns(pl.col("rho").round(3)),
-                    freeze_columns_left=["source_language", "measure"],
-                ),
-                spearman_chart(v2_runs),
-            ]
-        )
-        if constant:
-            parts.append(mo.md(f"One value across every V2 run, so no rank correlation: {', '.join(constant)}."))
-        return mo.vstack(parts)
-
     PAIR_SERIES = "port vs port"
     REFERENCE_SERIES = "port vs reference"
 
@@ -1602,7 +649,7 @@ def _(
                 width=300, height=240, title=panel_title(direction(source_language))
             )
 
-        return alt.concat(*(panel(language) for language in ("python", "typescript")), columns=2)
+        return alt.concat(*(panel(language) for language in ("python", "javascript")), columns=2)
 
     INK = "#0b0b0b"
     DIAGONAL = "#c3c2b7"
@@ -2090,22 +1137,172 @@ def _(
                 mo.ui.table(
                     pl.concat(
                         pair_summary(source_language)
-                        for source_language in ("python", "typescript")
+                        for source_language in ("python", "javascript")
                     ).with_columns(pl.col(pl.Float64).round(2)),
                     freeze_columns_left=["direction"],
                 ),
                 pair_chart(),
-                # The port maps place each port by its similarity to the V1 reference.
+                # The four maps place each port by its similarity to the reference, which is empty.
                 *(
-                    build(source_language)
-                    for build in (
-                        () if v1_reference_missing
-                        else (focused_chart, anchor_chart, mds_chart, pair_matrix_chart)
-                    )
-                    for source_language in ("python", "typescript")
+                    [
+                        build(source_language)
+                        for build in (focused_chart, anchor_chart, mds_chart, pair_matrix_chart)
+                        for source_language in ("python", "javascript")
+                    ]
+                    if runs[DIFF_LEAD].is_not_null().any()
+                    else [mo.md("Port maps empty: no reference similarity for V2 runs.")]
                 ),
             ]
         )
+
+    def ratio_rows(source_language):
+        return (
+            with_conditions(
+                runs.filter(pl.col("source_language") == source_language), source_language
+            )
+            .select(
+                "run_id",
+                "condition",
+                "ladder_rungs_completed",
+                "ladder_total_ms",
+                pl.col("ladder_ref_ratio").alias("value"),
+                pl.lit(1.0).alias("reference"),
+            )
+            .with_columns(port=pl.col("run_id").str.slice(-8))
+        )
+
+    RATIO_TOLERANCE = 0.01
+    # Plot width that fills half the blog's 757px body (minus the 1rem gap) once the
+    # y-axis and margins join in: the exported ladder renders exactly 370.5px wide.
+    RATIO_WIDTH = 326.25
+    # Speed charts sit 10 degrees closer to horizontal than the rest of the blog's charts.
+    LADDER_LABEL_ANGLE = -27.5
+
+
+    def nudges(values, tolerance=RATIO_TOLERANCE):
+        """Dots within `tolerance` of each other spread sideways; a dot on its own stays centred."""
+        slots = [0.0] * len(values)
+        cluster = []
+
+        def spread(cluster):
+            for position, index in enumerate(cluster):
+                slots[index] = position - (len(cluster) - 1) / 2
+
+        for index in sorted(range(len(values)), key=lambda index: values[index]):
+            if cluster and values[index] - values[cluster[-1]] > tolerance:
+                spread(cluster)
+                cluster = []
+            cluster.append(index)
+        spread(cluster)
+        return slots
+
+    def with_nudges(rows):
+        placed = {
+            run_id: nudge
+            for group in rows.partition_by("condition")
+            for run_id, nudge in zip(group["run_id"], nudges(group["value"].to_list()))
+        }
+        return rows.with_columns(
+            nudge=pl.col("run_id").replace_strict(placed, return_dtype=pl.Float64)
+        )
+
+    def ratio_domain():
+        # One domain for both directions, so the panels can be read against each other.
+        return metric_domain(
+            runs.select(pl.col("ladder_ref_ratio").alias("value"), pl.lit(1.0).alias("reference"))
+        )
+
+    def ratio_chart(source_language, rows):
+        rows = with_nudges(rows)
+        domain = ratio_domain()
+        scale = (
+            alt.Scale(zero=False) if domain is None else alt.Scale(domain=list(domain), nice=False)
+        )
+        y = alt.Y(
+            "value:Q",
+            title=None,
+            scale=scale,
+            axis=alt.Axis(labelFontSize=AXIS_LABEL_PX),
+        )
+        parity = pl.DataFrame({"value": [1.0], "label": ["reference"]})
+        x = alt.X(
+            "condition:N",
+            sort=[label for label, *_ in conditions(source_language)],
+            title=TEST_AXIS_TITLE,
+            axis=alt.Axis(
+                labelFontSize=AXIS_LABEL_PX,
+                labelExpr=CONDITION_LABEL_EXPR,
+                labelAngle=LADDER_LABEL_ANGLE,
+                titleFontSize=AXIS_TITLE_PX,
+            ),
+        )
+        # A continuous offset scale is measured from the band's left edge, so half a band
+        # re-centres the dots under their label. The band scale keeps Vega-Lite's padding
+        # defaults (0.2 inner, 0.2 outer), so a band spans width / (n + 0.2) * 0.8 pixels.
+        centre = RATIO_WIDTH * 0.8 / (2 * (len(conditions(source_language)) + 0.2))
+        offset = alt.XOffset(
+            "nudge:Q",
+            scale=alt.Scale(domain=[-2, 2], range=[centre - 24, centre + 24]),
+            title=None,
+        )
+        dots = (
+            alt.Chart(rows)
+            # Dots: a full-strength ring around a half-strength fill stays readable
+            # where the fan's points overlap.
+            .mark_point(filled=True, size=136, fillOpacity=0.5, stroke="#4c78a8", strokeWidth=2, strokeOpacity=1)
+            .encode(
+                x=x,
+                xOffset=offset,
+                y=y,
+                tooltip=[
+                    alt.Tooltip("port:N", title="run"),
+                    alt.Tooltip("value:Q", title="ladder time ÷ reference", format=".2f"),
+                    alt.Tooltip("ladder_rungs_completed:Q", title="rungs completed"),
+                    alt.Tooltip("ladder_total_ms:Q", title="total ms", format=",.1f"),
+                ],
+            )
+        )
+        # The median rides the same offset scale as the dots, which is anchored to the band's edge.
+        medians = median_tick(
+            alt.Chart(
+                rows.group_by("condition", maintain_order=True).agg(
+                    pl.col("value").median(), nudge=pl.lit(0.0)
+                )
+            ),
+            size=56,
+            x=x,
+            xOffset=offset,
+            y=y,
+        )
+        rule = alt.Chart(parity).mark_rule(color=REFERENCE_GREY, strokeWidth=2).encode(y=y)
+        rule_label = (
+            alt.Chart(parity)
+            .mark_text(align="left", baseline="bottom", dy=-2, fontSize=9, color=REFERENCE_GREY)
+            .encode(y=y, x=alt.value(2), text="label:N")
+        )
+        return alt.layer(medians, dots, rule, rule_label).properties(
+            width=RATIO_WIDTH,
+            height=300,
+            title=panel_title(direction(), MAIN_TITLE_PX),
+        )
+
+    def performance_panel(source_language):
+        by_source = runs.filter(pl.col("source_language") == source_language)
+        rows = ratio_rows(source_language)
+        failed = rows.filter(pl.col("value").is_null())["port"].sort().to_list()
+        reference_total = by_source[LADDER_REFERENCE_TOTAL].median()
+        if reference_total is None:
+            return mo.md("No ladder timings: `Codebase` does not produce them for V2 runs.")
+        parts = [
+            mo.md(
+                f"Reference ladder total: {reference_total:,.1f} ms "
+                f"(median over {by_source.height} runs)."
+            ),
+            ratio_chart(source_language, rows.filter(pl.col("value").is_not_null())),
+        ]
+        if failed:
+            parts.append(mo.md(f"Failed every rung: {len(failed)} ({', '.join(failed)})."))
+        return mo.vstack(parts)
 
     def shim_rules(frame, source_language):
         fired = pl.col("adapt_rules").str.len_chars() > 0
@@ -2234,12 +1431,17 @@ def _(
         "tests": (TEST_COLUMNS, ["timestamp", *TEST_METRICS], tests_panel),
         "diff": (DIFF_METRICS, ["timestamp", *DIFF_METRICS], None),
         "embeddings": (EMBEDDING_METRICS, ["timestamp", *EMBEDDING_METRICS], None),
+        "performance": (
+            PERFORMANCE_METRICS,
+            ["timestamp", *PERFORMANCE_METRICS],
+            performance_panel,
+        ),
     }
 
     def report(section):
         metrics, display, extra = SECTIONS[section]
         parts = []
-        for source_language in ("python", "typescript"):
+        for source_language in ("python", "javascript"):
             by_source = runs.filter(pl.col("source_language") == source_language)
             target_language = by_source["target_language"][0]
             parts.extend(
@@ -2408,18 +1610,7 @@ def _(
                 )
         return mo.vstack(parts)
 
-    return (
-        api_report,
-        ast_chart,
-        ast_report,
-        behavior_report,
-        pair_report,
-        report,
-        reverse_report,
-        spearman_chart,
-        transcript_report,
-        v2_statistics_report,
-    )
+    return pair_report, report, reverse_report
 
 
 @app.cell(hide_code=True)
@@ -2442,9 +1633,9 @@ def _(mo):
             mo.accordion(
                 {
                     "How to read": mo.md("""
-                    V2 is the current study: 16 cells, 2 source languages (python → javascript, javascript → python) × 3 test flags (`include_unit_tests`, `include_source_integration_tests`, `include_target_integration_tests`), 12 runs per cell, claude-opus-5-5 at medium effort. A run that exited non-zero (killed with 137, or an api_error) is left out of every V2 table and chart and counted in the failure table. The V2 sections are the last five: Held-out behavior, Held-out API, AST relative to the reference, Transcripts and V2 statistics. Every V2 chart draws each run as a dot, the cell's median as a tick, its interquartile range as a faint bar, and n under each label.
+                    A forward run ports one hand-written reference library into the other language. The 40 runs cover eight cells: source language, python reference tests placed in the sandbox or not, typescript reference tests placed in the sandbox or not. Every port is measured against the hand-written reference in its own target language, under the same excludes.
 
-                    The sections in between are V1: 40 runs in eight cells (source language, python reference tests in the sandbox or not, typescript reference tests in the sandbox or not). Each V1 port is measured against the hand-written reference in its own target language, under the same excludes: the reference diff, the port-to-port diff, cost, size, test pass rates. They are read off the runs and the files, with no model involved.
+                    The sections below are the mechanical measurements — the reference diff, the port-to-port diff, what the run cost, the size of what it produced, test pass rates. They are read off the runs and the files themselves, with no model involved.
                     """)
                 }
             ),
@@ -2655,25 +1846,131 @@ def _(report):
 
 
 @app.cell(hide_code=True)
-def _(codebases, mo):
-    from export_embedding_pairs import pair_chart as embedding_pair_chart
-    from src.embedding_pairs import compare_corpus
+def _(mo):
+    # The embedding pair export splits pairs on the V1 test flags, which V2 runs do not carry.
+    mo.md("### Every port to every port\nEmpty: the embedding pair export splits on the V1 test flags.")
+    return
 
-    skipped = []
-    try:
-        embedding_pair_report = compare_corpus(codebases)
-    except (TypeError, ValueError, OSError) as error:
-        # The V1 reference source is missing (see the warning at the top); no pairs.
-        skipped = [mo.callout(mo.md(f"Embedding pairs skipped: `{str(error)[:300]}`"), kind="warn")]
-        embedding_pair_report = {"comparisons": []}
-    mo.vstack([
-        *skipped,
-        mo.md("### Every port to every port\nAll pairs within each direction, across test conditions. Lower distance means closer. Pairs share ports and are not independent observations."),
-        *[chart for chart in (embedding_pair_chart(embedding_pair_report["comparisons"], source, target)
-                              for source, target in (("python", "typescript"), ("typescript", "python")))
-          if chart is not None],
-    ])
-    return embedding_pair_chart, embedding_pair_report
+@app.cell(hide_code=True)
+def _(mo):
+    mo.vstack(
+        [
+            mo.md("""
+            ## Performance
+
+            The timing ladder from exercise-api, run over the forward ports only.
+
+            ### performance ladder
+            """),
+            mo.accordion(
+                {
+                    "Glossary": mo.md("""
+                    A rung is one of the 22 cases in `cases/ladder.jsonl`: eight grammars, each with inputs of growing size, from a one-character literal up to a 64 KB JSON object and JSON nested at six depths.
+
+                    What is timed is `.add(input)` on a freshly constructed `GBNF(grammar)`, with `perf_counter_ns` / `process.hrtime.bigint()`, in one driver process per port.
+
+                    The statistic per rung is the median of that rung's timed passes, in milliseconds. Each case carries its own budget: 3 warm-up and 100 timed passes for the sixteen cases the typescript reference parses in under 100 ms, 1 and 5 for the five that cost it seconds, and a single cold pass for nested depth 8192.
+
+                    The reference is the hand-written library in the port's target language, timed on the same rungs in the same process run as the port it is compared against; it is the black rule at 1.0.
+
+                    Each dot is one port. A rung the port failed (`driver_failed`, timeout, or a raise) carries no timing and drops out of its statistics; a port that failed every rung has no ratio and no dot.
+
+                    - `ladder_ref_ratio`: the median across rungs of the port's per-rung medians, divided by the same median for the reference.
+                    - `ladder_rungs_completed`: how many of the 22 rungs produced a timing.
+                    - `ladder_total_ms`: the sum of the per-rung medians over the rungs the port completed, in milliseconds.
+                    """)
+                }
+            ),
+        ]
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(report):
+    report("performance")
+    return
+
+
+@app.cell(hide_code=True)
+def _(pl, reverse_runs, runs):
+    DIRECTIONS = [("python", "javascript"), ("javascript", "python")]
+    SIMILARITY_FLOOR = 25
+
+    def forward(source_language):
+        return runs.filter(pl.col("source_language") == source_language)
+
+    def reference_rungs(frame):
+        return [rungs for rungs in frame["ladder_reference_rungs"].to_list() if rungs]
+
+    def median(values):
+        return pl.Series(values, dtype=pl.Float64).median()
+
+    def named(frame, column="run_id"):
+        # A run is named by the tail of its id here, as it is in the plot above.
+        return ", ".join(sorted(value[-8:] for value in frame[column].to_list()))
+
+    def scaling(source_language, target_language):
+        frame = forward(source_language)
+        slopes = frame["ladder_slope"].drop_nulls()
+        reference = frame["ladder_reference_slope"].drop_nulls().median()
+        return (
+            f"- {source_language} → {target_language}: ports {slopes.min():.2f} to "
+            f"{slopes.max():.2f}, reference {reference:.2f}"
+        )
+
+    def envelope(source_language, target_language):
+        frame = forward(source_language)
+        count = median([len(rungs) for rungs in reference_rungs(frame)])
+        timed = frame.filter(pl.col("ladder_rungs_completed").is_not_null())
+        gaps = sorted(
+            completed - count
+            for completed in timed["ladder_rungs_completed"].to_list()
+            if completed != count
+        )
+        line = (
+            f"- {source_language} → {target_language}: {timed.height - len(gaps)} of "
+            f"{timed.height} timed ports completed the reference's {count:.0f} rungs"
+        )
+        if gaps:
+            line += f", {len(gaps)} differed by " + ", ".join(f"{gap:+.0f}" for gap in gaps)
+        missing = frame.filter(pl.col("ladder_rungs_completed").is_null())
+        if missing.height:
+            line += f". No timings at all: {named(missing)}"
+        return f"{line}."
+
+    def open_question():
+        failed = runs.filter(pl.col("ladder_rungs_completed").is_null())
+        weak = reverse_runs.filter(pl.col("reference_diff_similarity_pct") < SIMILARITY_FLOOR)
+        both = set(failed["run_id"].to_list()) & set(weak["forward_run_id"].to_list())
+        return (
+            f"Does speed track fidelity? Failed every rung: {named(failed)}. "
+            f"Reverse leg below {SIMILARITY_FLOOR}% `reference_diff_similarity_pct`, "
+            f"named by their forward run: {named(weak, 'forward_run_id')}. "
+            f"In both: {', '.join(sorted(run_id[-8:] for run_id in both)) or 'none'}."
+        )
+
+    # Every ladder column is empty for V2 runs, so the notes have nothing to read.
+    performance_notes = "No ladder timings for V2 runs." if runs["ladder_slope"].is_null().all() else "\n\n".join(
+        [
+            "**Scaling.** The rung-8 log-log slope, the port against the reference timed in "
+            "the same run (`ladder_slope`, on `Codebase` and not in the tables above). The "
+            "reference figure is the median over the runs in that direction.",
+            "\n".join(scaling(*direction) for direction in DIRECTIONS),
+            "**Failure envelope.** Rungs completed, the port against the reference's own "
+            "count on the same run.",
+            "\n".join(envelope(*direction) for direction in DIRECTIONS),
+            f"**Open question.** {open_question()}",
+        ]
+    )
+    return (performance_notes,)
+
+
+@app.cell(hide_code=True)
+def _(mo, performance_notes):
+    mo.vstack([mo.md("### notes"), mo.accordion({"Notes": mo.md(performance_notes)})])
+    return
+
 
 @app.cell(hide_code=True)
 def _(mo):
@@ -2688,6 +1985,8 @@ def _(mo):
                     The reverse condition is constant. Both reference test suites are always placed in the sandbox, whatever the forward run's condition was, and `--model` and `--effort` are the forward run's own. The tables therefore vary only by the forward run's condition, which is what each group below is keyed on, and every row names the forward run it came from.
 
                     Each reverse port is measured against the hand-written reference library in its own target language — the same reference the forward runs into that language are measured against, and the same excludes. The columns mean exactly what they mean in the forward sections above.
+
+                    There is no performance ladder here: exercise-api has not been run over the reverse ports.
                     """)
                 }
             ),
@@ -2748,188 +2047,6 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(reverse_report):
     reverse_report("embeddings")
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.vstack(
-        [
-            mo.md("## Held-out behavior"),
-            mo.accordion(
-                {
-                    "Glossary": mo.md("""
-                    Held out: the measure-behavior corpus, 100 generated grammars and 799 inputs, never mounted into any agent container. Not either test suite.
-
-                    measure-behavior loads the port, runs every grammar and input pair through it, one process per pair, and records `accept`, `reject`, `error` or `crash`. The hand-written reference in the same language ran the same pairs. A javascript port loads through the typescript driver from `src/index.ts`; a port without one crashes on every pair.
-
-                    - `behavior_agreement_pct`: percent of pairs where the port's outcome matches the reference's.
-                    - `reference_<a>_port_<b>`: pairs where the reference's outcome is `a` and the port's is `b`.
-                    - `behavior_note`: the first error, when every pair crashed.
-                    """),
-                    "How to read": mo.md("""
-                    V2 runs only. The x axis is test inclusion: `unit` is the source language's unit suite, `source` and `target` the integration suites in the source and target language. Each dot is a run; the tick is the condition's median, the faint bar its interquartile range, and the number under each label its n.
-                    """),
-                }
-            ),
-        ]
-    )
-    return
-
-
-@app.cell(hide_code=True)
-def _(behavior_report):
-    behavior_report()
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.vstack(
-        [
-            mo.md("## Held-out API"),
-            mo.accordion(
-                {
-                    "Glossary": mo.md("""
-                    Held out: the measure-api corpus, 100 generated grammars and 999 cases, never mounted into any agent container. Not either test suite.
-
-                    measure-api steps each case through the port's public API, one process per case: `construct` is `GBNF(grammar)`, `whole` is `add(input)`, then the input added one code point at a time for its first 16. Each step records the rules returned or the class and `pos` of what it raised. The hand-written reference in the same language ran the same cases. A javascript port loads through the typescript driver from `src/index.ts`; a port without one crashes on every case.
-
-                    - `api_agreement_pct`: percent of cases where every step equals the reference's (`match` plus `error_match`).
-                    - `api_match`: every step equal, none raised.
-                    - `api_mismatch`: the first unequal step returned rules on both sides.
-                    - `api_error_match`: every step equal, at least one raised.
-                    - `api_error_mismatch`: the first unequal step raised on at least one side, or is missing on one side.
-                    - `api_crash`: either side crashed.
-                    - `api_reference_<a>_port_<b>`: cases where the reference's status is `a` and the port's is `b`; a status is `crash`, `error` when any step raised, else `ok`.
-                    - `api_note`: the first crash, when every case crashed.
-                    """),
-                    "How to read": mo.md("""
-                    V2 runs only. The x axis is test inclusion: `unit` is the source language's unit suite, `source` and `target` the integration suites in the source and target language. Each dot is a run; the tick is the condition's median.
-                    """),
-                }
-            ),
-        ]
-    )
-    return
-
-
-@app.cell(hide_code=True)
-def _(api_report):
-    api_report()
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.vstack(
-        [
-            mo.md("## AST relative to the reference"),
-            mo.md("V2 runs only: a python port is compared with the pinned python reference, a javascript port with the pinned javascript reference; reverse ports have no reference here beyond that pin and are not measured."),
-            mo.accordion(
-                {
-                    "Glossary": mo.md("""
-                    measure-ast `compare` parses the port and the reference at the gbnf pin (with the gbnf-prepare patches) with tree-sitter, under the same excludes, a javascript port with the typescript grammar. Every number measures structural drift from the reference, not fidelity.
-
-                    - `ast_matched_fraction`: reference functions paired with a port function, over the reference's named functions. Functions pair by name, normalised (`_`, `#` and case dropped), and arity.
-                    - `ast_tree_edit_median`, `ast_tree_edit_mean`: median and mean over pairs of the Zhang-Shasha tree edit distance between the two functions' syntax trees, labelled by node type alone, over the larger tree's node count. 0 is the same shape; renaming is free.
-                    - `ast_branching_wasserstein`: Wasserstein-1 distance between the port's and the reference's per-function cyclomatic numbers.
-                    - `ast_matched_count`, `ast_port_only_count`, `ast_reference_only_count`: functions paired, and named functions on one side only.
-                    - `ast_median_line_drift`: median over pairs of port lines minus reference lines.
-                    - `ast_api_shared`, `ast_api_port_only`, `ast_api_reference_only`: public API entries (`name/arity`) on both sides or one.
-                    - `ast_delta_<field>`: port minus reference for each one-tree measure (node count, depth, function count, function lines, cyclomatic).
-                    - Call paths, after Sean Goedecke's [How to read code](https://www.seangoedecke.com/how-to-read-code/): each side's calls are followed from every public entry point the two share (a shared function, or a shared class's constructor and public methods), anything outside the package a black box. A call resolves by normalised name when its argument count fits; a method call through any object resolves by name alone; calls through `super`, functions passed as values and implicit calls (operators, iteration) do not resolve.
-                    - `ast_mean_edge_recall`: per entry point, the share of the reference's caller-to-callee edges the port also has, by normalised names; mean over entry points whose reference trace has an edge.
-                    - `ast_median_trace_normalised`: per entry point, the edit distance between the reference's and the port's depth-first call traces (each function once, callees in call-site order), over the longer trace; median over entry points. 0 is the same path.
-                    - `ast_entry_point_count`: entry points traced, on either side.
-                    - `ast_reachable_fraction_reference`, `ast_reachable_fraction_port`: named functions reachable from any entry point, over all named functions on that side.
-                    - `ast_unreachable_port_only`: port functions reachable from no entry point.
-                    - Call-path explainer: one sentence per entry point, `entry: reference trace of n (functions in order); port m, missing caller->callee, extra caller->callee`.
-                    - `ast_note`: measure-ast's error when compare exited non-zero, such as a port with no parsable file; the other columns are empty.
-                    """),
-                    "How to read": mo.md("""
-                    The x axis is test inclusion, as in the held-out sections. Each dot is a run, the tick the condition's median, the faint bar its interquartile range, and n sits under each label. One chart per lead; the rest are under "Other AST columns".
-                    """),
-                }
-            ),
-        ]
-    )
-    return
-
-
-@app.cell(hide_code=True)
-def _(ast_report):
-    ast_report()
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.vstack(
-        [
-            mo.md("## Transcripts"),
-            mo.accordion(
-                {
-                    "Glossary": mo.md("""
-                    measure-transcript reads each run's Claude Code transcript, subagents included, and counts what the agent did. Every column is a count, a turn number or a quoted command. In the sandbox the reference sits at `/input/python` and `/input/javascript` and the port at `/target`. The shipped tests are `/input/python/tests/` and colocated `*_test.py` for python, `/input/javascript/integration-tests/` and colocated `*.test.ts` for javascript. A copy keeps its origin's class until the agent writes the file whole.
-
-                    - `read_source_tests`, `read_target_tests`, `read_source`: Read calls and `cat`, `head`, `less`, `grep`, `sed -n` commands that reach the source language's shipped tests, the target language's shipped tests, or the rest of the source implementation.
-                    - `suite_run_count`: commands that run a test suite (pytest, vitest, jest, `node --test`, `npm test`, `pnpm test`, `just test*`).
-                    - `own_tests_written`: test files the agent wrote under `/target` and did not copy from `/input`.
-                    - `touched_source_tests`, `touched_target_tests`: any read, write, search, command argument or suite run reached that suite. In the table, the runs in the cell where it holds.
-                    - `differential_script`: a command or written file runs both python and node, or names both a reference path and a port path. In the table, the runs in the cell where it holds; `differential_evidence` quotes the first.
-                    - `turns`: assistant messages. `bash_calls`, `read_calls`, `write_calls`, `edit_calls`, `search_calls` (Glob and Grep): tool calls.
-                    - `fetch_attempts`: WebFetch and WebSearch calls and `curl`, `wget`, `pip install`, `npm install` commands. The sandbox has no network; these count the attempts.
-                    - `tokens_before_first_write`, `tokens_after_first_write`: input, cache and output tokens summed over the turns before the first write into `/target` and from it on.
-                    - `first_write_turn`, `last_suite_run_turn`: the turn of the first write into `/target` and of the last suite run.
-                    - `last_<class>_passed`, `last_<class>_failed`: the pass and fail counts of the last suite run of that class whose summary line was read; `unknown` is a run that reached more than one class.
-                    - Reading order. A read is one path named by a Read call or a reading command, as written: a glob or a `for f in ...; do cat $f` loop is one read of its pattern. `first_read_path`, `first_read_class`: the first read. `read_order`: source paths in order of first read. `first_read_is_entry_point`: the first source code file read is `gbnf/__init__.py` (python) or `src/index.ts` (javascript); in the second table, `no_code_file_read` when reads name none. `files_read_before_first_write`, `source_files_read_before_first_write`: distinct paths read before the first write into `/target`. `reread_count`: reads of a path already read; `max_rereads_of_one_file`, `max_rereads_path`: the most reread one. `search_calls_per_file_read`: Glob and Grep calls per distinct path read. `reads_after_last_write`: reads after the last write into `/target`.
-                    """),
-                    "How to read": mo.md("""
-                    V2 runs only. The x axis is test inclusion: `unit` is the source language's unit suite, `source` and `target` the integration suites in the source and target language. Each dot is a run; the tick is the condition's median, the faint bar its interquartile range, and the number under each label its n. A run without a value (no write, no suite run of that class) has no dot and is not in the n.
-                    """),
-                }
-            ),
-        ]
-    )
-    return
-
-
-@app.cell(hide_code=True)
-def _(transcript_report):
-    transcript_report()
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.vstack(
-        [
-            mo.md("## V2 statistics"),
-            mo.accordion(
-                {
-                    "Glossary": mo.md("""
-                    - `n`: exit-0 runs in the cell. `excluded_exit_<code>`: runs in the cell that exited with that code, left out of every V2 table and chart.
-                    - `q1_`, `median_`, `q3_`: the 25th, 50th and 75th percentiles over the cell's runs; `q1` to `q3` is the interquartile range, the middle half of the runs.
-                    - `attempts`: every finished run in the cell. `exit_0`, `exit_137`: runs that exited with that code. `api_error`: runs whose result has `terminal_reason` `api_error`.
-                    - `tokens_per_success`: every token the cell spent, failed attempts included, divided by its exit-0 runs.
-                    - `n_on`, `n_off`, `median_on`, `median_off`, `gap`, `p`, `low`, `high`, `minimum_detectable_gap`: see the per-flag comparison.
-                    - `transcript_wall_ms`: the run's wall time, first to last transcript timestamp across the main session and its subagents. `duration_ms`: the duration result.json records, which covers only the last turn when `result_index` is above 0; see the duration table.
-                    - `rho`: Spearman rank correlation, the Pearson correlation of the two measures' ranks (ties share their average rank), from −1 to 1. `n`: runs with both measures present.
-                    """),
-                    "How to read": mo.md("""
-                    V2 exit-0 runs only. The lead measures are held-out behavior agreement, held-out API agreement, the three AST leads, total tokens, LOC, and six transcript counts: reads of the source language's shipped tests, reads of the target language's shipped tests, test suite runs, test files the agent wrote itself, files read before the first write into the port, and reads of a file already read. The rank correlation table sets every per-run measure against held-out behavior agreement, so a cheap measure can be checked against it on this data; the heatmap shows every pair.
-                    """),
-                }
-            ),
-        ]
-    )
-    return
-
-
-@app.cell(hide_code=True)
-def _(v2_statistics_report):
-    v2_statistics_report()
     return
 
 

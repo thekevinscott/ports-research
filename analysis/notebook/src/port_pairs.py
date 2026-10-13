@@ -8,17 +8,18 @@ from src.Codebase import Codebase, exclude_args, run_git_diff
 REFERENCE_RUN_ID = "reference"
 CONDITION_FLAGS = ("include_python_tests", "include_typescript_tests")
 
-PAIR_SCHEMA = {
-    "run_id_a": pl.String,
-    "run_id_b": pl.String,
-    "source_language": pl.String,
-    "target_language": pl.String,
-    "include_python_tests_a": pl.Boolean,
-    "include_typescript_tests_a": pl.Boolean,
-    "include_python_tests_b": pl.Boolean,
-    "include_typescript_tests_b": pl.Boolean,
-    "similarity_pct": pl.Float64,
-}
+def pair_schema(flags: Sequence[str] = CONDITION_FLAGS) -> dict:
+    return {
+        "run_id_a": pl.String,
+        "run_id_b": pl.String,
+        "source_language": pl.String,
+        "target_language": pl.String,
+        **{f"{flag}_{side}": pl.Boolean for side in ("a", "b") for flag in flags},
+        "similarity_pct": pl.Float64,
+    }
+
+
+PAIR_SCHEMA = pair_schema()
 
 def direction_of(codebase: Codebase) -> tuple:
     """Source and target language, the widest group two ports can be compared inside."""
@@ -38,7 +39,9 @@ def within_direction_pairs(codebases: list[Codebase]) -> list[tuple[Codebase, Co
     ]
 
 
-def within_direction_similarity(codebases: list[Codebase]) -> pl.DataFrame:
+def within_direction_similarity(
+    codebases: list[Codebase], flags: Sequence[str] = CONDITION_FLAGS
+) -> pl.DataFrame:
     return pl.DataFrame(
         [
             {
@@ -46,30 +49,31 @@ def within_direction_similarity(codebases: list[Codebase]) -> pl.DataFrame:
                 "run_id_b": b.run["run_id"],
                 "source_language": a.run["source_language"],
                 "target_language": a.run["target_language"],
-                "include_python_tests_a": bool(a.run["include_python_tests"]),
-                "include_typescript_tests_a": bool(a.run["include_typescript_tests"]),
-                "include_python_tests_b": bool(b.run["include_python_tests"]),
-                "include_typescript_tests_b": bool(b.run["include_typescript_tests"]),
+                **{
+                    f"{flag}_{side}": bool(port.run[flag])
+                    for side, port in (("a", a), ("b", b))
+                    for flag in flags
+                },
                 "similarity_pct": run_git_diff(
                     a.path, b.path, language=a.language, exclude=exclude_args(a.exclude)
                 )["similarity_pct"],
             }
             for a, b in within_direction_pairs(codebases)
         ],
-        schema=PAIR_SCHEMA,
+        schema=pair_schema(flags),
     )
 
 
-def within_cell(pairs: pl.DataFrame) -> pl.DataFrame:
+def within_cell(pairs: pl.DataFrame, flags: Sequence[str] = CONDITION_FLAGS) -> pl.DataFrame:
     """The pairs whose two ports share a condition, under the one condition they share."""
     return pairs.filter(
-        pl.all_horizontal(pl.col(f"{flag}_a") == pl.col(f"{flag}_b") for flag in CONDITION_FLAGS)
+        pl.all_horizontal(pl.col(f"{flag}_a") == pl.col(f"{flag}_b") for flag in flags)
     ).select(
         "run_id_a",
         "run_id_b",
         "source_language",
         "target_language",
-        *(pl.col(f"{flag}_a").alias(flag) for flag in CONDITION_FLAGS),
+        *(pl.col(f"{flag}_a").alias(flag) for flag in flags),
         "similarity_pct",
     )
 

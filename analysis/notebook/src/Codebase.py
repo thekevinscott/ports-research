@@ -31,7 +31,7 @@ BEHAVIOR_CORPUS = MEASURE_BEHAVIOR_DIR / "corpus"
 API_CORPUS = MEASURE_API_DIR / "corpus"
 # measure-behavior and measure-api load a javascript port through their typescript driver;
 # measure-ast parses it with its typescript grammar.
-DRIVERS = {"python": "python", "javascript": "typescript"}
+DRIVERS = {"python": "python", "typescript": "typescript", "javascript": "typescript"}
 # The gbnf pin: packages/gbnf_experiment/src/gbnf_experiment/config.py `gbnf_commit`.
 GBNF_COMMIT = "13f1aca495d11e160fffd68c4ba299a2415909d8"
 PATCHES = ANALYSIS.parent / "packages" / "gbnf_experiment" / "docker" / "gbnf-prepare" / "patches"
@@ -105,7 +105,7 @@ def run_git_diff(reference: Path, target: Path, *, language: str, exclude: list[
         "measure-code-distance",
         "git-diff",
         "--language",
-        language,
+        DRIVERS[language],
         "--a",
         str(reference),
         "--b",
@@ -481,7 +481,7 @@ class Codebase:
                 str(MEASURE_AST_DIR),
                 "measure-ast",
                 "--language",
-                self.language,
+                DRIVERS[self.language],
                 "--target",
                 str(self.path),
                 *chain.from_iterable(("--exclude", pattern) for pattern in self.exclude),
@@ -537,7 +537,7 @@ class Codebase:
             "measure-embedding",
             "embed",
             "--language",
-            self.language,
+            DRIVERS[self.language],
             "--target",
             str(target),
             "--out",
@@ -595,7 +595,7 @@ class Codebase:
             "measure-code-distance",
             "levenshtein",
             "--language",
-            self.language,
+            DRIVERS[self.language],
             "--a",
             str(self.reference),
             "--b",

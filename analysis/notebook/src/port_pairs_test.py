@@ -149,6 +149,16 @@ def describe_within_cell():
     def it_pairs_every_run_in_a_cell_once(cell, git_diff):
         assert within_cell(within_direction_similarity(cell)).height == 10
 
+    def it_matches_on_the_flags_it_is_given(git_diff):
+        ports = [StubPort("a"), StubPort("b"), StubPort("c")]
+        for port, unit in zip(ports, (False, False, True)):
+            port.run["include_unit_tests"] = unit
+        flags = ["include_unit_tests"]
+        frame = within_cell(within_direction_similarity(ports, flags), flags)
+        assert frame.select("run_id_a", "run_id_b", "include_unit_tests").rows() == [
+            ("a", "b", False)
+        ]
+
 
 CONDITIONS = [
     ("no tests", False, False),
