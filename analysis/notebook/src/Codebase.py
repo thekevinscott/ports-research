@@ -45,6 +45,8 @@ EMBEDDING_MODEL = "qwen3-embedding-0.6b-q8_0"
 # The cache is keyed on the server's model file and pooling; new vectors come only from a server that matches.
 EMBEDDING_SERVER = "qwen3-embedding-0.6b-q8_0-pooling-last"
 EMBEDDINGS = Path.home() / ".cache" / "ports" / "analysis" / "embeddings-stripped" / EMBEDDING_SERVER
+# Reference vectors are keyed by the gbnf commit they were embedded from.
+REFERENCE_EMBEDDINGS = EMBEDDINGS / "reference" / GBNF_COMMIT
 
 
 @cache
@@ -550,7 +552,7 @@ class Codebase:
     def _embedding(self) -> dict:
         check_embedding_server()
         out = EMBEDDINGS / "runs" / self.run["run_id"]
-        reference_out = EMBEDDINGS / "reference" / self.language
+        reference_out = REFERENCE_EMBEDDINGS / self.language
         self._embed(self.path, out)
         self._embed(self.reference, reference_out)
         return run_tool(

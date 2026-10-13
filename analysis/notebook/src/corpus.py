@@ -5,7 +5,7 @@ from pathlib import Path
 
 from dirsql._dirsql import DirSQL
 
-from src.Codebase import Codebase
+from src.Codebase import REFERENCE_CHECKOUT, Codebase, pinned_reference
 from src.matrix_run_ids import matrix_run_ids
 from src.run_table import completed_runs, is_v2
 
@@ -13,8 +13,8 @@ ROOT = Path(__file__).resolve().parents[3]
 # PORTS_RUNS_DIR points the scan at another runs directory, such as a scratch copy.
 DATA = Path(os.environ.get("PORTS_RUNS_DIR", ROOT / "data" / "runs"))
 REVERSE = ROOT / "analysis" / "round-trip-experiment" / "reverse"
-PREPARED = "771a734d60ecbae5"
-REFERENCE = Path.home() / ".cache" / "ports" / "gbnf-experiment" / "prepared" / PREPARED / "source"
+# The pinned gbnf reference, one package per language.
+REFERENCE = REFERENCE_CHECKOUT / "packages" / "gbnf"
 EXCLUDE = [
     "node_modules",
     "__pycache__",
@@ -35,7 +35,7 @@ EXCLUDE_BY_LANGUAGE = {
     "python": EXCLUDE,
     "typescript": [*EXCLUDE, "builder", "dev"],
     # V2 names its typescript target "javascript".
-    "javascript": EXCLUDE,
+    "javascript": [*EXCLUDE, "builder", "dev"],
 }
 
 def runs_under(root, table, *, include_nonzero_exit=False, matrices=None):
@@ -52,6 +52,7 @@ def runs_under(root, table, *, include_nonzero_exit=False, matrices=None):
 
 
 def codebases_under(root, table):
+    pinned_reference()
     return [
         Codebase.from_run(
             row,

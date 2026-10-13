@@ -10,7 +10,7 @@ from measure_embedding.compare_embeddings import compare_embeddings
 from measure_embedding.embed_codebase import SUFFIXES
 from measure_embedding.embedded_text import embedded_text
 
-from src.Codebase import EMBEDDING_MODEL, EMBEDDINGS
+from src.Codebase import DRIVERS, EMBEDDING_MODEL, EMBEDDINGS, REFERENCE_EMBEDDINGS
 from src.port_pairs import within_direction_pairs
 
 
@@ -20,6 +20,8 @@ def validate_cache(directory: Path, target: Path | None, language: str, exclude:
     Check content rather than mtimes, which can change when a cache is restored.
     Stripped sidecars attest to saved inputs; model identity comes from the cache index.
     """
+    # measure-embedding records a javascript port as the typescript it is written in.
+    language = DRIVERS.get(language, language)
     if target is None:
         raise FileNotFoundError(f"{directory}: no source to check the cache against")
     if not target.is_dir():
@@ -61,7 +63,7 @@ def compare_corpus(codebases: list) -> dict:
         for key, target, directory in (
             (codebase.run_id, codebase.path, EMBEDDINGS / "runs" / codebase.run_id),
             (f"reference-{codebase.language}", codebase.reference,
-             EMBEDDINGS / "reference" / codebase.language),
+             REFERENCE_EMBEDDINGS / codebase.language),
         ):
             if key not in caches:
                 provenance[key] = validate_cache(
