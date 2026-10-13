@@ -7,7 +7,9 @@ from round_trip_experiment.measure_code_distance import measure_code_distance
 from round_trip_experiment.measure_git_diff import measure_git_diff
 
 DIRECTORY = click.Path(exists=True, file_okay=False, path_type=Path, resolve_path=True)
-LANGUAGE = click.option("--language", type=click.Choice(["python", "typescript"]), required=True)
+# The gbnf javascript package is written in TypeScript.
+ALIASES = {"javascript": "typescript"}
+LANGUAGE = click.option("--language", type=click.Choice(["python", "typescript", "javascript"]), required=True)
 A = click.option("--a", type=DIRECTORY, required=True)
 B = click.option("--b", type=DIRECTORY, required=True)
 EXCLUDE = click.option("--exclude", multiple=True, help="fnmatch pattern against each relative path and its parts")
@@ -15,7 +17,7 @@ EXCLUDE = click.option("--exclude", multiple=True, help="fnmatch pattern against
 
 def report(measure, language: str, a: Path, b: Path, exclude: tuple[str, ...]) -> None:
     try:
-        result = measure(language=language, a=a, b=b, exclude=list(exclude))
+        result = measure(language=ALIASES.get(language, language), a=a, b=b, exclude=list(exclude))
     except Exception as e:
         raise click.ClickException(str(e))
     click.echo(json.dumps(result))
