@@ -95,6 +95,12 @@ def describe_runs_under():
         runs = runs_under(tmp_path, runs_table(), matrices=["matrix-study.jsonl"])
         assert [run["run_id"] for run in runs] == ["v1"]
 
+    def it_reads_no_matrix_under_a_root_without_v2_runs(tmp_path):
+        # The reverse-port scan holds V1 runs only and none of the runs directory's matrix logs.
+        write_v1_run(tmp_path / "v1")
+        runs = runs_under(tmp_path, runs_table(), matrices=["matrix-study.jsonl"])
+        assert [run["run_id"] for run in runs] == ["v1"]
+
     def it_reads_the_matrices_from_PORTS_MATRICES(tmp_path, monkeypatch):
         write_v2_run(tmp_path / "study")
         write_v2_run(tmp_path / "pilot")

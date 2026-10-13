@@ -58,3 +58,10 @@ def test_cache_names_a_missing_source_rather_than_a_selection_mismatch(cached_tr
     missing = source.parent / "gone"
     with pytest.raises(FileNotFoundError, match=f"{missing}: source to check the cache against is missing"):
         validate_cache(cache, missing, "python", [])
+
+
+def test_cache_names_a_cleared_reference_as_missing(cached_tree):
+    # runs.py clears every V1 codebase's reference when the V1 reference cache is missing.
+    _, cache = cached_tree
+    with pytest.raises(FileNotFoundError, match=f"{cache}: no source to check the cache against"):
+        validate_cache(cache, None, "python", [])

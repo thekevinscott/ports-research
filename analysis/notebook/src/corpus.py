@@ -45,7 +45,7 @@ def runs_under(root, table, *, include_nonzero_exit=False, matrices=None):
     runs = completed_runs(db, table.name, include_nonzero_exit=include_nonzero_exit)
     if matrices is None:
         matrices = [name.strip() for name in os.environ.get("PORTS_MATRICES", "").split(",") if name.strip()]
-    if not matrices:
+    if not matrices or not any(is_v2(run) for run in runs):
         return runs
     listed = matrix_run_ids(Path(root), matrices)
     return [run for run in runs if not is_v2(run) or run["run_id"] in listed]
