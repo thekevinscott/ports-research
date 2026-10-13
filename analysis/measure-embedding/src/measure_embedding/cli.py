@@ -7,6 +7,8 @@ from measure_embedding.compare_embeddings import compare_embeddings
 from measure_embedding.embed_codebase import embed_codebase
 
 EXISTING_DIRECTORY = click.Path(exists=True, file_okay=False, path_type=Path, resolve_path=True)
+# The gbnf javascript package is written in TypeScript.
+ALIASES = {"javascript": "typescript"}
 
 
 @click.group()
@@ -15,7 +17,7 @@ def cli() -> None:
 
 
 @cli.command()
-@click.option("--language", type=click.Choice(["python", "typescript"]), required=True)
+@click.option("--language", type=click.Choice(["python", "typescript", "javascript"]), required=True)
 @click.option("--target", type=EXISTING_DIRECTORY, required=True)
 @click.option("--exclude", multiple=True, help="fnmatch pattern against each relative path and its parts")
 @click.option("--out", type=click.Path(file_okay=False, path_type=Path, resolve_path=True), required=True)
@@ -26,7 +28,7 @@ def embed(
 ) -> None:
     try:
         report = embed_codebase(
-            language=language,
+            language=ALIASES.get(language, language),
             target=target,
             exclude=list(exclude),
             out=out,
