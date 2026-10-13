@@ -2,32 +2,6 @@ version = 1
 revision = 5
 requires-python = ">=3.14"
 
-[options]
-exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
-exclude-newer-span = "P3D"
-
-[[package]]
-name = "agent-harness-sandbox"
-version = "0.1.0"
-source = { editable = "../../packages/agent-harness-sandbox" }
-dependencies = [
-    { name = "click" },
-    { name = "python-on-whales" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "click", specifier = ">=8.5.0" },
-    { name = "python-on-whales", specifier = ">=0.81.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "coverage", specifier = ">=7.16.0" },
-    { name = "pytest", specifier = ">=9.1.1" },
-    { name = "pytest-describe", specifier = ">=3.2.0" },
-]
-
 [[package]]
 name = "aiohappyeyeballs"
 version = "2.7.1"
@@ -135,6 +109,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/9a/8e/82a0fe20a541c03148528be8cac2408564a6c9a0cc7e9171802bc1d26985/attrs-26.1.0.tar.gz", hash = "sha256:d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c985eff32", size = 952055, upload-time = "2026-03-19T14:22:25.026Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/64/b4/17d4b0b2a2dc85a6df63d1157e028ed19f90d4cd97c36717afef2bc2f395/attrs-26.1.0-py3-none-any.whl", hash = "sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309", size = 67548, upload-time = "2026-03-19T14:22:23.645Z" },
+]
+
+[[package]]
+name = "botbox"
+version = "0.0.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "python-on-whales" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e1/c1/176bf5038fd15fb060a3716f72b941802257c48e7b3bbacb442a18020345/botbox-0.0.8.tar.gz", hash = "sha256:31988aad330dbafb281c49cdacc60d2c3f276e4c4952609079a7788c05c3ea70", size = 40257, upload-time = "2026-10-12T02:09:55.543Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e1/86/5de9901e9e674956174be701048e3715668c7678a77b4af9a21955d84c07/botbox-0.0.8-py3-none-any.whl", hash = "sha256:61fa3be7ffaafb11d7d1675307a363481d813253f1a93295368e16b292e349fc", size = 12128, upload-time = "2026-10-12T02:09:53.99Z" },
 ]
 
 [[package]]
@@ -312,16 +298,20 @@ name = "gbnf-experiment"
 version = "0.1.0"
 source = { editable = "../../packages/gbnf_experiment" }
 dependencies = [
+    { name = "botbox" },
     { name = "click" },
     { name = "port-codebase" },
+    { name = "prompt" },
     { name = "pydantic-settings" },
     { name = "python-on-whales" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "botbox", specifier = ">=0.0.4" },
     { name = "click", specifier = ">=8.5.0" },
     { name = "port-codebase", editable = "../../packages/port_codebase" },
+    { name = "prompt", editable = "../../packages/prompt" },
     { name = "pydantic-settings", specifier = ">=2.15.0" },
     { name = "python-on-whales", specifier = ">=0.81.0" },
 ]
@@ -331,6 +321,7 @@ dev = [
     { name = "coverage", specifier = ">=7.16.0" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-describe", specifier = ">=3.2.0" },
+    { name = "ruff", specifier = ">=0.17.0" },
 ]
 
 [[package]]
@@ -461,6 +452,7 @@ dev = [
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-describe", specifier = ">=3.2.0" },
     { name = "pytest-httpserver", specifier = ">=1.1.0" },
+    { name = "ruff", specifier = ">=0.17.0" },
     { name = "testing-conventions", specifier = ">=0.0.104" },
 ]
 
@@ -601,14 +593,16 @@ name = "port-codebase"
 version = "0.1.0"
 source = { editable = "../../packages/port_codebase" }
 dependencies = [
-    { name = "agent-harness-sandbox" },
+    { name = "botbox" },
     { name = "pathspec" },
+    { name = "prompt" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "agent-harness-sandbox", editable = "../../packages/agent-harness-sandbox" },
+    { name = "botbox", specifier = ">=0.0.4" },
     { name = "pathspec", specifier = ">=1.1.1" },
+    { name = "prompt", editable = "../../packages/prompt" },
 ]
 
 [package.metadata.requires-dev]
@@ -616,6 +610,22 @@ dev = [
     { name = "coverage", specifier = ">=7.16.0" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-describe", specifier = ">=3.2.0" },
+    { name = "ruff", specifier = ">=0.17.0" },
+]
+
+[[package]]
+name = "prompt"
+version = "0.1.0"
+source = { editable = "../../packages/prompt" }
+
+[package.metadata]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "coverage", specifier = ">=7.16.0" },
+    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-describe", specifier = ">=3.2.0" },
+    { name = "ruff", specifier = ">=0.17.0" },
 ]
 
 [[package]]

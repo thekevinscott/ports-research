@@ -1244,7 +1244,7 @@ def _(
         return alt.layer(medians, dots, rule, rule_label).properties(
             width=RATIO_WIDTH,
             height=300,
-            title=panel_title(direction(), MAIN_TITLE_PX),
+            title=panel_title(direction(source_language), MAIN_TITLE_PX),
         )
 
     def performance_panel(source_language):
