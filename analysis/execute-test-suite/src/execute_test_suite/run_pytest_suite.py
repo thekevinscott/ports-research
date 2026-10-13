@@ -14,7 +14,6 @@ from execute_test_suite.suite_result import SuiteResult
 PYTEST_VERSION = "9.1.1"
 PYTEST_DESCRIBE_VERSION = "3.2.0"
 PYTEST_COV_VERSION = "7.0.0"
-INTEGRATION_TEST_FILE = "iteration/grammars_test.py"
 ADAPT_PLUGIN = "adapt_python"
 COVERAGE_CONFIG_FILE = ".coveragerc"
 COVERAGE_OMIT = (
@@ -37,20 +36,16 @@ omit =
 
 def run_pytest_suite(
     *,
-    test_suite_directory: Path,
     target: Path,
-    suite: str | None = None,
+    test_files: list[Path],
     adapt: bool = False,
     coverage: bool = False,
 ) -> SuiteResult:
-    """Run test_suite_directory as pytest, with target importable as the port root.
+    """Run test_files under pinned pytest and pytest-describe, with target as the port root.
 
-    Pinned to the same interpreter the derivation's own README documents
-    (`uv run --with pytest==... --with pytest-describe==...`), so a port that
-    passed in-sandbox passes the same way here. `PYTHONPATH=target` stands in for
-    that README's `cd <port>; python -m pytest tests` cwd trick without running
-    pytest inside the port or the read-only test suite — neither is written to;
-    the process runs from a scratch directory instead.
+    `PYTHONPATH=target` makes `import gbnf` find the port; pytest's own rootdir
+    insertion resolves the colocated tests' relative imports. The process runs from
+    a scratch directory that holds its reports.
 
     With `adapt`, the `adapt_python` plugin is copied into the scratch directory
     and loaded with `-p`, so it patches the port's `gbnf` surface before
@@ -58,19 +53,13 @@ def run_pytest_suite(
 
     With `coverage`, pytest-cov measures `target` itself — every file under it,
     imported or not — through a config written into the scratch directory that
-    turns on branch mode and omits the port's own tests. Neither the flag nor the
+    turns on branch mode and omits every test file. Neither the flag nor the
     dependency is passed otherwise, so a run without it is what it always was.
     """
-    integration_test = test_suite_directory / INTEGRATION_TEST_FILE
-    selection = {
-        None: [str(test_suite_directory)],
-        "unit": [str(test_suite_directory), f"--ignore={integration_test}"],
-        "integration": [str(integration_test)],
-    }[suite]
     with tempfile.TemporaryDirectory() as scratch:
         report_path = Path(scratch) / "report.xml"
         adapt_report_path = Path(scratch) / "adapt.json"
-        env = {**os.environ, "PYTHONPATH": str(target), "PYTHONDONTWRITEBYTECODE": "1"}
+        env = {**os.environ, "PYTHONPATH": str(target)}
         plugin = []
         if adapt:
             shutil.copy(Path(__file__).with_name(f"{ADAPT_PLUGIN}.py"), scratch)
@@ -109,10 +98,9 @@ def run_pytest_suite(
                 "python",
                 "-m",
                 "pytest",
-                "-p",
-                "no:cacheprovider",
+                "--continue-on-collection-errors",
                 *plugin,
-                *selection,
+                *(str(path) for path in test_files),
                 f"--junit-xml={report_path}",
                 *coverage_flags,
                 "-q",
