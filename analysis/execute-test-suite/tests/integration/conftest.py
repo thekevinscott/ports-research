@@ -194,6 +194,16 @@ def python_flat_target(tmp_path):
 
 
 @pytest.fixture
+def python_nested_target(tmp_path):
+    """A passing `gbnf/` package one directory below the target root, where the suite
+    never finds it."""
+    return write_tree(
+        tmp_path / "python_nested_target",
+        {"python/gbnf/__init__.py": PYTHON_PACKAGE_PORT.format(value=42)},
+    )
+
+
+@pytest.fixture
 def python_partial_target(python_target):
     """A passing port carrying a module the suite never imports."""
     return write_tree(python_target(42), {"unused.py": PYTHON_UNIMPORTED_MODULE})
@@ -216,6 +226,15 @@ def typescript_relocated_target(tmp_path):
     return write_tree(
         tmp_path / "typescript_relocated_target",
         {"lib/index.ts": "export default function GBNF(): number { return 42; }\n"},
+    )
+
+
+@pytest.fixture
+def typescript_nested_target(tmp_path):
+    """A passing port one directory below the target root, where the suite never finds it."""
+    return write_tree(
+        tmp_path / "typescript_nested_target",
+        {"javascript/src/index.ts": "export default function GBNF(): number { return 42; }\n"},
     )
 
 

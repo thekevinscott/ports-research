@@ -263,6 +263,27 @@ def describe_run_pytest_suite():
             assert result.coverage is parse_coverage_json_function.return_value
             assert result.rules_fired == ("flat_module",)
 
+        def it_reports_zero_when_the_suite_ran_none_of_the_port(
+            parse_junit_report_function, parse_coverage_json_function
+        ):
+            def run(argv, **kwargs):
+                Path(report_flag(argv).removeprefix("--junit-xml=")).write_text(
+                    '<testsuites><testsuite tests="1" failures="1" errors="0" '
+                    'skipped="0"></testsuite></testsuites>'
+                )
+                return Mock(
+                    returncode=1,
+                    stderr="CovReportWarning: Failed to generate report: No data to report.",
+                )
+
+            with patch("execute_test_suite.run_pytest_suite.subprocess", autospec=True) as m:
+                m.run.side_effect = run
+                result = run_pytest_suite(test_files=TEST_FILES, target=TARGET, coverage=True)
+            assert result.coverage == CoverageResult(
+                covered_lines=0, total_lines=0, covered_branches=0, total_branches=0
+            )
+            parse_coverage_json_function.assert_not_called()
+
         def it_raises_when_pytest_never_produced_a_coverage_report(
             parse_junit_report_function, parse_coverage_json_function
         ):

@@ -29,6 +29,12 @@ def describe_coverage():
             assert report["errors"] == 2
             assert report["coverage"]["total_lines"] > 0
 
+        def it_reports_zero_for_a_port_the_suite_never_ran(grade, python_nested_target):
+            report = grade("python", python_nested_target, "integration", "--adapt", "--coverage")
+            assert report["passed"] == 0
+            assert report["coverage"]["covered_lines"] == 0
+            assert report["coverage"]["line_pct"] == 0.0
+
         def it_reports_coverage_and_the_fired_rules_together(grade, python_flat_target):
             report = grade("python", python_flat_target, "integration", "--adapt", "--coverage")
             assert report["passed"] == 2
@@ -54,6 +60,14 @@ def describe_coverage():
             report = grade("typescript", typescript_target(0), "integration", "--coverage")
             assert report["failed"] == 2
             assert report["coverage"]["total_lines"] > 0
+
+        def it_reports_zero_for_a_port_the_suite_never_ran(grade, typescript_nested_target):
+            report = grade(
+                "typescript", typescript_nested_target, "integration", "--adapt", "--coverage"
+            )
+            assert report["passed"] == 0
+            assert report["coverage"]["covered_lines"] == 0
+            assert report["coverage"]["line_pct"] == 0.0
 
         def it_measures_only_the_ports_source_under_the_unit_suite(grade, typescript_target):
             target = typescript_target(42)

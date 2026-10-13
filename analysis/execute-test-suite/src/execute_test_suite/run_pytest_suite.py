@@ -6,6 +6,7 @@ import tempfile
 from pathlib import Path
 
 from execute_test_suite.adapt_python import REPORT_VARIABLE, TARGET_VARIABLE
+from execute_test_suite.coverage_result import CoverageResult
 from execute_test_suite.parse_coverage_json import parse_coverage_json
 from execute_test_suite.parse_junit_report import parse_junit_report
 from execute_test_suite.read_adapt_report import read_adapt_report
@@ -16,6 +17,7 @@ PYTEST_DESCRIBE_VERSION = "3.2.0"
 PYTEST_COV_VERSION = "7.0.0"
 ADAPT_PLUGIN = "adapt_python"
 COVERAGE_CONFIG_FILE = ".coveragerc"
+NO_COVERAGE_DATA = "No data to report"
 COVERAGE_OMIT = (
     "*/tests/*",
     "*/test/*",
@@ -54,7 +56,9 @@ def run_pytest_suite(
     With `coverage`, pytest-cov measures `target` itself — every file under it,
     imported or not — through a config written into the scratch directory that
     turns on branch mode and omits every test file. Neither the flag nor the
-    dependency is passed otherwise, so a run without it is what it always was.
+    dependency is passed otherwise, so a run without it is what it always was. A
+    suite that ran none of the port leaves coverage.py no data and no report; that
+    is zero lines covered.
     """
     with tempfile.TemporaryDirectory() as scratch:
         report_path = Path(scratch) / "report.xml"
@@ -116,12 +120,18 @@ def run_pytest_suite(
             )
         result = parse_junit_report(report_path)
         if coverage:
-            if not coverage_path.is_file():
+            if coverage_path.is_file():
+                measured = parse_coverage_json(coverage_path)
+            elif NO_COVERAGE_DATA in process.stderr:
+                measured = CoverageResult(
+                    covered_lines=0, total_lines=0, covered_branches=0, total_branches=0
+                )
+            else:
                 raise RuntimeError(
                     f"pytest produced no coverage report (exit {process.returncode}): "
                     f"{process.stderr}"
                 )
-            result = dataclasses.replace(result, coverage=parse_coverage_json(coverage_path))
+            result = dataclasses.replace(result, coverage=measured)
         if adapt:
             result = dataclasses.replace(
                 result, rules_fired=read_adapt_report(adapt_report_path)
