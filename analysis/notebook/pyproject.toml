@@ -7,7 +7,7 @@ dependencies = [
     "cachetta>=0.7.0",
     "dirsql>=0.4.39",
     "gbnf_experiment",
-    "marimo>=0.24.0",
+    "marimo>=0.25.1",
     "numpy>=2.5.3",
     "measure-embedding",
     "polars>=1.44.1",
