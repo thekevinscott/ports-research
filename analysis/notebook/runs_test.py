@@ -184,6 +184,7 @@ def reference_row(codebase_class, language="typescript"):
         "Codebase": codebase_class,
         "EXCLUDE_BY_LANGUAGE": {language: []},
         "REFERENCE": Path("/reference"),
+        "PINNED": Path("/reference"),
     }
     module = ast.Module(body=[function_def("reference_row")], type_ignores=[])
     exec(compile(ast.fix_missing_locations(module), str(NOTEBOOK), "exec"), namespace)
@@ -191,8 +192,8 @@ def reference_row(codebase_class, language="typescript"):
 
 
 def describe_reference_row():
-    def it_measures_the_reference_under_its_own_run_id():
-        assert reference_row(StubCodebase)["adapted_integration_coverage_pct"] == 61.5
+    def it_leaves_the_coverage_empty_while_execute_test_suite_cannot_run():
+        assert reference_row(StubCodebase)["adapted_integration_coverage_pct"] is None
 
 
 CHART_BUILDERS = ["chart", "pair_chart", "round_trip_chart"]
@@ -334,10 +335,10 @@ def describe_port_to_port_section():
         assert assignment("DIFF_LEAD").value == DIFF_METRICS[0]
 
     def it_pairs_forward_ports_only():
-        assert "port_pairs = within_direction_similarity(codebases)" in SOURCE
+        assert "port_pairs = within_direction_similarity(codebases, PAIR_FLAGS)" in SOURCE
 
     def it_summarizes_the_cells_out_of_the_same_pairs_the_dots_draw():
-        assert "cell_pairs = within_cell(port_pairs)" in SOURCE
+        assert "cell_pairs = within_cell(port_pairs, PAIR_FLAGS)" in SOURCE
         assert "cell_pairs.filter" in ast.unparse(function_def("pair_summary"))
 
     def it_scales_the_anchor_axes_over_the_whole_range():
