@@ -22,7 +22,7 @@ def _():
     )
     from src.port_pairs import within_cell, within_direction_similarity
     from src.rebuilt_layout import LAYOUT_LABELS, LAYOUT_RULE, layout_flag
-    from src.run_table import reverse_runs_table, runs_table
+    from src.run_table import REVERSE_RUNS_COLUMNS, RUNS_COLUMNS, reverse_runs_table, runs_table
 
 
     from src.corpus import (
@@ -86,21 +86,29 @@ def _():
         *LADDER_NOTE_METRICS,
     ]
 
-    def metrics_frame(codebases, metrics, flags):
+    def metrics_frame(codebases, metrics, flags, columns):
+        rows = [
+            {**codebase.run, **{metric: getattr(codebase, metric) for metric in metrics}}
+            for codebase in codebases
+        ]
+        # No rows means no columns, so an empty corpus (V2 has no reverse runs) needs
+        # the schema spelled out for the casts and the filters downstream.
+        empty = {
+            **{column: pl.Int64 if kind == "INTEGER" else pl.String for column, kind in columns.items()},
+            **{metric: pl.Float64 for metric in metrics},
+        }
         return pl.DataFrame(
-            [
-                {**codebase.run, **{metric: getattr(codebase, metric) for metric in metrics}}
-                for codebase in codebases
-            ],
+            rows,
+            schema=None if rows else empty,
             schema_overrides={"completed_at": pl.String, "error": pl.String},
         ).with_columns(
             pl.col(flags).cast(pl.Boolean),
             duration=pl.duration(milliseconds=pl.col("duration_ms")),
         )
 
-    runs = metrics_frame(codebases, METRICS, FLAGS)
+    runs = metrics_frame(codebases, METRICS, FLAGS, RUNS_COLUMNS)
     reverse_runs = metrics_frame(
-        reverse_codebases, REVERSE_METRICS, [*FLAGS, *FORWARD_FLAGS]
+        reverse_codebases, REVERSE_METRICS, [*FLAGS, *FORWARD_FLAGS], REVERSE_RUNS_COLUMNS
     )
     port_pairs = within_direction_similarity(codebases)
     cell_pairs = within_cell(port_pairs)
