@@ -28,6 +28,7 @@ def _():
     from src.corpus import (
         DATA, REVERSE, REFERENCE, EXCLUDE_BY_LANGUAGE, codebases_under,
     )
+    from src.full_table import full_table
 
     codebases = codebases_under(DATA, runs_table())
     reverse_codebases = codebases_under(REVERSE, reverse_runs_table())
@@ -128,6 +129,7 @@ def _():
         alt,
         cell_pairs,
         focused_layout,
+        full_table,
         layout_flag,
         mds_layout,
         medoid_similarity,
@@ -153,7 +155,7 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(Codebase, EXCLUDE_BY_LANGUAGE, REFERENCE, mo, pl):
+def _(Codebase, EXCLUDE_BY_LANGUAGE, REFERENCE, full_table, mo, pl):
     def reference_row(language):
         codebase = Codebase(
             REFERENCE / language,
@@ -184,7 +186,7 @@ def _(Codebase, EXCLUDE_BY_LANGUAGE, REFERENCE, mo, pl):
             "adapted_integration_coverage_pct": pl.Float64,
         },
     )
-    mo.ui.table(reference.with_columns(pl.col(pl.Float64).round(2)))
+    full_table(reference.with_columns(pl.col(pl.Float64).round(2)))
     return (reference,)
 
 
@@ -202,6 +204,7 @@ def _(
     alt,
     cell_pairs,
     focused_layout,
+    full_table,
     layout_flag,
     mds_layout,
     medoid_similarity,
@@ -1108,7 +1111,7 @@ def _(
     def pair_report():
         return mo.vstack(
             [
-                mo.ui.table(
+                full_table(
                     pl.concat(
                         pair_summary(source_language)
                         for source_language in ("python", "typescript")
@@ -1386,7 +1389,7 @@ def _(
             [
                 section_chart(TEST_COLUMNS, by_source, target_language, source_language),
                 shim_chart(source_language),
-                mo.ui.table(
+                full_table(
                     shim_rules(by_source, source_language), freeze_columns_left=["condition"]
                 ),
             ]
@@ -1414,7 +1417,7 @@ def _(
             parts.extend(
                 [
                     mo.md(f"#### {source_language} → {target_language}"),
-                    mo.ui.table(
+                    full_table(
                         summary(by_source, metrics, source_language),
                         freeze_columns_left=["condition"],
                     ),
@@ -1431,7 +1434,7 @@ def _(
                 parts.append(
                     mo.accordion(
                         {
-                            f"{label} (n={condition.height})": mo.ui.table(
+                            f"{label} (n={condition.height})": full_table(
                                 condition.select(display).with_columns(
                                     pl.col(pl.Float64).exclude(EMBEDDING_COLUMNS).round(2),
                                     pl.col(EMBEDDING_COLUMNS).round(3),
@@ -1547,7 +1550,7 @@ def _(
             parts.extend(
                 [
                     mo.md(f"#### {forward_source} → {forward_target} → {target_language}"),
-                    mo.ui.table(
+                    full_table(
                         summary(by_target, metrics, forward_source, FORWARD_FLAGS),
                         freeze_columns_left=["condition"],
                     ),
@@ -1566,7 +1569,7 @@ def _(
                 parts.append(
                     mo.accordion(
                         {
-                            f"forward {label} (n={condition.height})": mo.ui.table(
+                            f"forward {label} (n={condition.height})": full_table(
                                 condition.select("forward_run_id", *display).with_columns(
                                     pl.col(pl.Float64).exclude(EMBEDDING_COLUMNS).round(2),
                                     pl.col(EMBEDDING_COLUMNS).round(3),
