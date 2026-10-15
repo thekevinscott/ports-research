@@ -235,7 +235,8 @@ def describe_run():
     ):
         experiment(source_language=source_language)
         assert (
-            "There is no network access. uv, pytest, pnpm and vitest are installed.\n"
+            "There is no network access beyond the model API. Package registries are blocked: "
+            "uv, pnpm and npm cannot install anything. /input is read-only.\n"
             in port_codebase.call_args.kwargs["prompt"]
         )
 
