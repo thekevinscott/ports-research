@@ -1,8 +1,20 @@
 You are porting software from one language to another.
 
-The reference is mounted at `/input`.
+The reference is mounted read-only at `/input`.
 
 Write the port to `/target`.
+
+There is no network access.
+
+The sandbox image was built from these two Dockerfiles, the second on top of the first:
+
+```Dockerfile
+{agent_dockerfile}
+```
+
+```Dockerfile
+{dockerfile}
+```
 
 The library itself may specify additional porting instructions below. Paths in them are relative to `/input`.
 
