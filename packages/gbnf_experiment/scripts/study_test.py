@@ -53,9 +53,17 @@ def failed_run(tmp_path: Path, name: str, result: dict | None = None, stderr: st
     return directory
 
 
-def write_jsonl(path: Path, records: list[tuple[dict, int]]) -> Path:
-    path.write_text("".join(json.dumps({"cell": cell, "exit_code": code}) + "\n" for cell, code in records))
-    return path
+def banked_run(tmp_path: Path, name: str, cell: dict, study: str = STUDY, exit_code: int = 0, result: dict | None = None):
+    directory = tmp_path / "runs" / name
+    directory.mkdir(parents=True)
+    manifest = {"study": study, "condition": cell, "exit_code": exit_code, "error": None, "completed_at": "2026-10-15"}
+    (directory / "manifest.json").write_text(json.dumps(manifest))
+    (directory / "result.json").write_text(json.dumps({"is_error": False} if result is None else result))
+
+
+def bank(tmp_path: Path, runs: list[tuple[dict, int]], study: str = STUDY) -> None:
+    for i, (cell, code) in enumerate(runs):
+        banked_run(tmp_path, f"20261012T00000{i}Z_0000000{i}", cell, study, code)
 
 
 @pytest.fixture
@@ -248,7 +256,7 @@ def describe_main():
         assert "32 cells; auth api-key; writing " in capsys.readouterr().err
 
 
-def describe_resume():
+def describe_banked_runs():
     def it_runs_each_cell_up_to_n_counting_prior_successes():
         three = CELLS[:3]
         prior = Counter({cell_key(three[0]): 3, cell_key(three[1]): 5})
@@ -261,17 +269,28 @@ def describe_resume():
         runs = list(schedule(three, n=5, prior=prior))
         assert [r for r, _ in runs] == [1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5]
 
-    def it_counts_exit_code_zero_per_full_cell_across_every_file(tmp_path, study):
+    def it_counts_the_completed_runs_banked_under_output_per_full_cell(tmp_path, study):
         opus, sonnet = (next(cell for cell in CELLS if cell["model"] == model) for model in MODELS)
-        first = write_jsonl(tmp_path / "a.jsonl", [(opus, 0), (opus, 1), (opus, 137), (sonnet, 0)])
-        second = write_jsonl(tmp_path / "b.jsonl", [(opus, 0), (opus, None)])
-        main(STUDY, CELLS, parse(tmp_path, ["--resume", str(first), str(second)]))
+        bank(tmp_path, [(opus, 0), (opus, 1), (opus, 137), (sonnet, 0), (opus, 0)])
+        main(STUDY, CELLS, parse(tmp_path, []))
         assert study.call_args.kwargs["prior"] == {cell_key(opus): 2, cell_key(sonnet): 1}
+
+    def it_ignores_other_studies_and_runs_whose_result_is_an_error(tmp_path, study):
+        opus = CELLS[0]
+        bank(tmp_path, [(opus, 0)], study="v2-model-effort")
+        banked_run(tmp_path, "20261012T000009Z_00000009", opus, result=CREDIT)
+        banked_run(tmp_path, "20261012T000008Z_00000008", opus)
+        main(STUDY, CELLS, parse(tmp_path, []))
+        assert study.call_args.kwargs["prior"] == {cell_key(opus): 1}
+
+    def it_starts_from_zero_when_output_does_not_exist_yet(tmp_path, study):
+        main(STUDY, CELLS, parse(tmp_path, []))
+        assert study.call_args.kwargs["prior"] == Counter()
 
     def it_prints_each_cell_s_shortfall_and_the_total(tmp_path, study, capsys):
         opus = CELLS[0]
-        path = write_jsonl(tmp_path / "a.jsonl", [(opus, 0)] * 5)
-        main(STUDY, CELLS, parse(tmp_path, ["--resume", str(path)]))
+        bank(tmp_path, [(opus, 0)] * 5)
+        main(STUDY, CELLS, parse(tmp_path, []))
         err = capsys.readouterr().err
         assert f"{cell_name(opus)}=7" in err
         assert "total 379" in err

@@ -10,6 +10,7 @@ requires-python = ">=3.14"
 dependencies = [
     "botbox>=0.0.8",
     "click>=8.5.0",
+    "dirsql>=0.4.110",
     "port_codebase",
     "prompt",
     "pydantic-settings>=2.15.0",
