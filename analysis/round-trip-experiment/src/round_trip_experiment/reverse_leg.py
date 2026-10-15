@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from pathlib import Path
 
 from round_trip_experiment.check_staged_derivation import check_staged_derivation
@@ -10,7 +11,7 @@ from round_trip_experiment.stage_port import stage_port
 def reverse_leg(
     run_directory: Path,
     *,
-    derivation_cache_key: str,
+    derivation_cache_key: Callable[[str], str],
     derivations_directory: Path,
     gbnf_experiment_directory: Path,
     staging_directory: Path,
@@ -25,7 +26,7 @@ def reverse_leg(
     staged = stage_port(
         run_directory,
         source_language=condition["source_language"],
-        derivation_cache_key=derivation_cache_key,
+        derivation_cache_key=derivation_cache_key(condition["source_language"]),
         derivations_directory=derivations_directory,
         staging_directory=staging_directory,
     )

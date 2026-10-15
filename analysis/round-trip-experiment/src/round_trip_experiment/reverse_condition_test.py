@@ -19,11 +19,11 @@ CELLS = [
 
 
 def describe_reverse_condition():
-    def it_reads_a_python_source_runs_port_back_from_typescript():
-        assert reverse_condition(FORWARD)["source_language"] == "typescript"
+    def it_reads_a_python_source_runs_port_back_from_javascript():
+        assert reverse_condition(FORWARD)["source_language"] == "javascript"
 
-    def it_reads_a_typescript_source_runs_port_back_from_python():
-        forward = {**FORWARD, "source_language": "typescript"}
+    def it_reads_a_javascript_source_runs_port_back_from_python():
+        forward = {**FORWARD, "source_language": "javascript"}
         assert reverse_condition(forward)["source_language"] == "python"
 
     def it_rejects_an_unknown_source_language():

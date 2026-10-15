@@ -9,7 +9,7 @@ import pytest
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[2]
 GBNF_EXPERIMENT_ROOT = PACKAGE_ROOT.parents[1] / "packages" / "gbnf_experiment"
-DERIVATION_KEY = "af673dbe41be73ce"
+DERIVATION_KEY = "d9464914dc2adf25"
 UV = shutil.which("uv")
 FORWARD_CONDITION = {
     "name": "source-python_python-tests_effort-high_model-claude-opus-5",
@@ -110,11 +110,11 @@ def describe_stage():
     def it_copies_the_port_in_as_the_reverse_source_languages_derived_source(staged_report, places, forward_run):
         staged = places["staging"] / forward_run.name / DERIVATION_KEY
         assert staged_report["staged"] == str(staged)
-        assert (staged / "source" / "typescript" / "src" / "index.ts").read_text() == "export const f = () => 1;\n"
+        assert (staged / "source" / "javascript" / "src" / "index.ts").read_text() == "export const f = () => 1;\n"
 
     def it_leaves_build_artefacts_out(staged_report, places, forward_run):
         staged = places["staging"] / forward_run.name / DERIVATION_KEY
-        assert not (staged / "source" / "typescript" / "node_modules").exists()
+        assert not (staged / "source" / "javascript" / "node_modules").exists()
 
     def it_links_the_real_test_suites_beside_the_source(staged_report, places, forward_run):
         staged = places["staging"] / forward_run.name / DERIVATION_KEY
@@ -123,7 +123,7 @@ def describe_stage():
 
     def it_reverses_the_condition_with_both_suites(staged_report):
         assert staged_report["condition"] == {
-            "source_language": "typescript",
+            "source_language": "javascript",
             "include_typescript_tests": True,
             "include_python_tests": True,
             "effort": "high",
@@ -133,7 +133,7 @@ def describe_stage():
     def it_prints_the_run_gbnf_experiment_command(staged_report):
         assert staged_report["argv"] == [
             "uv", "run", "--directory", str(GBNF_EXPERIMENT_ROOT), "run_gbnf_experiment",
-            "--source-language", "typescript",
+            "--source-language", "javascript",
             "--include-typescript-tests",
             "--include-python-tests",
             "--effort", "high",

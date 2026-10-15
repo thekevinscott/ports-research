@@ -4,9 +4,10 @@ import subprocess
 from pathlib import Path
 
 import click
-from gbnf_experiment.config import PACKAGE_ROOT as GBNF_EXPERIMENT_ROOT, prepare_cache_key, settings as gbnf_settings
+from gbnf_experiment.config import PACKAGE_ROOT as GBNF_EXPERIMENT_ROOT, settings as gbnf_settings
 
 from round_trip_experiment.config import settings
+from round_trip_experiment.derivation_cache_key import derivation_cache_key
 from round_trip_experiment.load_run import load_run
 from round_trip_experiment.record_forward import record_forward
 from round_trip_experiment.reverse_leg import reverse_leg
@@ -67,7 +68,7 @@ def run(forward_run: Path) -> None:
 def leg(forward_run: Path) -> dict:
     return reverse_leg(
         forward_run,
-        derivation_cache_key=prepare_cache_key,
+        derivation_cache_key=derivation_cache_key,
         derivations_directory=gbnf_settings.prepared_directory,
         gbnf_experiment_directory=GBNF_EXPERIMENT_ROOT,
         staging_directory=settings.staging_directory,

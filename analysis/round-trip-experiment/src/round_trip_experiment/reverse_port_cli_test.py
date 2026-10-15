@@ -91,7 +91,7 @@ def launch():
 @pytest.fixture
 def places():
     with (
-        patch("round_trip_experiment.reverse_port_cli.prepare_cache_key", "390bf534c55d496b"),
+        patch("round_trip_experiment.reverse_port_cli.derivation_cache_key", autospec=True) as key,
         patch("round_trip_experiment.reverse_port_cli.gbnf_settings") as gbnf,
         patch("round_trip_experiment.reverse_port_cli.settings") as own,
         patch(
@@ -102,7 +102,7 @@ def places():
         gbnf.prepared_directory = Path("/cache/gbnf-experiment/derivations")
         own.staging_directory = Path("/cache/staging")
         own.reverse_directory = Path("/pkg/reverse")
-        yield
+        yield key
 
 
 @pytest.fixture
@@ -124,11 +124,11 @@ def describe_stage():
         result = invoke("stage", "--run", str(tmp_path / "nowhere"))
         assert result.exit_code != 0
 
-    def it_stages_the_leg_with_the_configured_places(wired, reverse_leg, forward_run):
+    def it_stages_the_leg_with_the_configured_places(wired, reverse_leg, places, forward_run):
         invoke("stage", "--run", str(forward_run))
         assert reverse_leg.call_args.args == (forward_run,)
         assert reverse_leg.call_args.kwargs == {
-            "derivation_cache_key": "390bf534c55d496b",
+            "derivation_cache_key": places,
             "derivations_directory": Path("/cache/gbnf-experiment/derivations"),
             "gbnf_experiment_directory": Path("/repo/packages/gbnf_experiment"),
             "staging_directory": Path("/cache/staging"),
