@@ -50,7 +50,7 @@ def pair_chart(rows, source, target):
 
 def main():
     report = compare_corpus(
-        [codebase for codebase in codebases_under(DATA, runs_table()) if not is_v2(codebase.run)]
+        [codebase for codebase in codebases_under(DATA, runs_table(), "v2-test-configurations") if not is_v2(codebase.run)]
     )
     rows = report["comparisons"]
     summaries = []
