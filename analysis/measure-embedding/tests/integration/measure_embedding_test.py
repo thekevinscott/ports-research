@@ -78,6 +78,12 @@ def describe_embed():
         assert result.returncode == 0, result.stderr
         assert json.loads((out / "index.json").read_text())["files"] == ["top.ts"]
 
+    def it_embeds_javascript_as_typescript(run_cli, python_tree, tmp_path):
+        out = tmp_path / "out"
+        result = run_cli(*embed_args(python_tree, out, language="javascript", strip_comments=True))
+        assert result.returncode == 0, result.stderr
+        assert json.loads((out / "index.json").read_text())["files"] == ["top.ts"]
+
     def it_does_not_call_the_embedder_for_an_up_to_date_npy(run_cli, embeddings_server, python_tree, tmp_path):
         out = tmp_path / "out"
         run_cli(*embed_args(python_tree, out))
