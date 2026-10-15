@@ -42,10 +42,11 @@ class PreparedFilesystem:
     def proxy_log(self):
         return self.run_directory / "proxy.log"
 
-    def write_manifest(self, agent: Agent, **kwargs):
+    def write_manifest(self, agent: Agent, *, study: str, **kwargs):
         _write_manifest(
             self.run_directory,
             timestamp=self.timestamp,
+            study=study,
             condition={
                 **kwargs,
             },
@@ -56,7 +57,7 @@ class PreparedFilesystem:
         )
 
     def write_result(
-        self, result: RunResult | None, agent: Agent, error: str | None = None, **kwargs
+        self, result: RunResult | None, agent: Agent, *, study: str, error: str | None = None, **kwargs
     ):
         if result is not None:
             if result.stdout:
@@ -65,6 +66,7 @@ class PreparedFilesystem:
         _write_manifest(
             self.run_directory,
             timestamp=self.timestamp,
+            study=study,
             condition={
                 **kwargs,
             },

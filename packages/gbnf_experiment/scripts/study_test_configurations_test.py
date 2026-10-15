@@ -23,9 +23,9 @@ def describe_cells():
 
 
 def describe_main():
-    def it_runs_the_sixteen_cells_for_twelve_rounds_by_default(study):
+    def it_runs_the_sixteen_cells_as_v2_test_configurations_for_twelve_rounds_by_default(study):
         main([])
-        assert study.call_args.args[0] == cells()
+        assert study.call_args.args == ("v2-test-configurations", cells())
         assert study.call_args.kwargs["n"] == 12
 
     def it_takes_the_shared_flags(study):

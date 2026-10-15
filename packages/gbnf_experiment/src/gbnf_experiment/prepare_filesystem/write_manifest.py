@@ -15,6 +15,7 @@ def write_manifest(
     run_directory: Path,
     *,
     timestamp: datetime,
+    study: str,
     condition: dict,
     included: list[str],
     image_tag: str,
@@ -31,6 +32,7 @@ def write_manifest(
         else None,
         **({"exit_code": exit_code} if exit_code is not None else {}),
         **({"error": error} if error is not None else {}),
+        "study": study,
         "condition": condition,
         "derivation": {
             "gbnf_commit": gbnf_commit,

@@ -52,6 +52,7 @@ TARGET_INTEGRATION_RULE = "+ /javascript/integration-tests/***"
 
 
 CONFIG = {
+    "study": "probe",
     "source_language": "python",
     "include_unit_tests": False,
     "include_source_integration_tests": False,
@@ -305,6 +306,7 @@ def describe_the_manifest():
             "timestamp",
             "completed_at",
             "exit_code",
+            "study",
             "condition",
             "derivation",
             "reference_implementation",
@@ -475,14 +477,14 @@ def describe_cli():
     def it_prints_where_the_run_landed(
         home, data_directory, docker_daemon
     ):
-        result = CliRunner().invoke(cli, ["--source-language", "javascript"])
+        result = CliRunner().invoke(cli, ["--source-language", "javascript", "--study", "probe"])
         [run_directory] = data_directory.iterdir()
         assert f"Run directory: {run_directory}" in result.output
 
     def it_prepares_the_condition_its_flags_name(home, data_directory, docker_daemon, builds):
         CliRunner().invoke(
             cli,
-            ["--source-language", "python", "--include-target-integration-tests"],
+            ["--source-language", "python", "--include-target-integration-tests", "--study", "probe"],
         )
         [build] = prepare_builds(builds)
         assert TARGET_INTEGRATION_RULE in build["build_args"]["RULES"].splitlines()

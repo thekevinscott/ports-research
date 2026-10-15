@@ -66,7 +66,7 @@ def now() -> str:
     return datetime.now(UTC).isoformat()
 
 
-def run_cell(round_number: int, cell: dict, *, api_key: str | None) -> dict:
+def run_cell(round_number: int, cell: dict, *, study: str, api_key: str | None) -> dict:
     start = monotonic()
     record = {
         "round": round_number,
@@ -83,6 +83,7 @@ def run_cell(round_number: int, cell: dict, *, api_key: str | None) -> dict:
     try:
         run_directory = run_gbnf_experiment(
             agent=ClaudeAgent(model=cell["model"], effort=cell["effort"], api_key=api_key),
+            study=study,
             source_language=cell["source_language"],
             **{flag: cell[flag] for flag in FLAGS},
             debug=False,
@@ -119,6 +120,7 @@ def ignore_interrupts() -> None:
 
 
 def run_study(
+    study: str,
     cells: list[dict],
     *,
     n: int | None,
@@ -145,7 +147,7 @@ def run_study(
                 if run is None:
                     stopping = True
                 else:
-                    in_flight.add(pool.submit(run_cell, *run, api_key=api_key))
+                    in_flight.add(pool.submit(run_cell, *run, study=study, api_key=api_key))
             if not in_flight:
                 break
             try:
@@ -208,7 +210,7 @@ def argument_parser(description: str) -> argparse.ArgumentParser:
     return parser
 
 
-def main(cells: list[dict], args: argparse.Namespace) -> None:
+def main(study: str, cells: list[dict], args: argparse.Namespace) -> None:
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if args.auth == "subscription":
         if api_key:
@@ -227,7 +229,7 @@ def main(cells: list[dict], args: argparse.Namespace) -> None:
         )
     settings.data_directory.mkdir(parents=True, exist_ok=True)
     out = settings.data_directory / f"matrix-{datetime.now(UTC):%Y%m%dT%H%M%SZ}.jsonl"
-    print(f"{len(cells)} cells; auth {args.auth}; writing {out}", file=sys.stderr)
-    stopped = run_study(cells, n=n, parallel=args.parallel, api_key=api_key, out=out, prior=prior, runs=args.runs)
+    print(f"{study}: {len(cells)} cells; auth {args.auth}; writing {out}", file=sys.stderr)
+    stopped = run_study(study, cells, n=n, parallel=args.parallel, api_key=api_key, out=out, prior=prior, runs=args.runs)
     if stopped:
         sys.exit(1)

@@ -90,6 +90,7 @@ AGENT = Mock(name="agent", model="claude-opus-5", effort="high")
 
 CONFIG = {
     "agent": AGENT,
+    "study": "v2-test-configurations",
     "source_language": "javascript",
     "include_unit_tests": False,
     "include_source_integration_tests": False,
@@ -116,6 +117,7 @@ def describe_the_signature():
         "omitted",
         [
             "agent",
+            "study",
             "source_language",
             "include_unit_tests",
             "include_source_integration_tests",
@@ -320,6 +322,15 @@ def describe_the_manifest():
     ):
         run_directory = experiment()
         assert {call.args for call in write_manifest.call_args_list} == {(run_directory,)}
+
+    def it_records_the_study_in_every_write(
+        experiment,
+        prepare_reference_implementation,
+        port_codebase,
+        write_manifest,
+    ):
+        experiment(study="v2-model-effort")
+        assert [call.kwargs["study"] for call in write_manifest.call_args_list] == ["v2-model-effort"] * 2
 
     def it_records_the_condition_that_ran(
         experiment,
