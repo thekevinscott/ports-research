@@ -8,6 +8,7 @@ from itertools import product
 import study
 from study import SOURCE_LANGUAGES
 
+STUDY = "v2-model-effort"
 MODELS = ("claude-fable-5-1", "claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5")
 EFFORTS = ("low", "medium", "high", "xhigh", "max")
 TESTS = {
@@ -25,7 +26,7 @@ def cells() -> list[dict]:
 
 
 def main(argv: list[str] | None = None) -> None:
-    study.main(cells(), study.argument_parser(__doc__).parse_args(argv))
+    study.main(STUDY, cells(), study.argument_parser(__doc__).parse_args(argv))
 
 
 if __name__ == "__main__":

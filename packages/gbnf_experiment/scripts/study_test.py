@@ -10,6 +10,7 @@ import pytest
 from study import FLAGS, SOURCE_LANGUAGES, argument_parser, cell_key, cell_name, main, run_study, schedule
 
 API_KEY = "sk-ant-test"
+STUDY = "v2-test-configurations"
 MODELS = ("claude-opus-5-5", "claude-sonnet-5-5")
 
 
@@ -116,7 +117,7 @@ def describe_schedule():
 def describe_run_study():
     def it_writes_one_line_per_run(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
-        run_study(CELLS, n=2, parallel=2, api_key=API_KEY, out=out)
+        run_study(STUDY, CELLS, n=2, parallel=2, api_key=API_KEY, out=out)
         assert len(read(out)) == 64
 
     def it_writes_the_cell_round_run_directory_exit_code_wall_time_and_usage(
@@ -124,7 +125,7 @@ def describe_run_study():
     ):
         out = tmp_path / "matrix.jsonl"
         [cell] = cells(efforts=("high",))[:1]
-        run_study([cell], n=1, parallel=1, api_key=API_KEY, out=out)
+        run_study(STUDY, [cell], n=1, parallel=1, api_key=API_KEY, out=out)
         [line] = read(out)
         assert line["cell"] == cell
         assert line["cell"]["effort"] == "high"
@@ -138,7 +139,7 @@ def describe_run_study():
     def it_keeps_going_when_a_run_raises(tmp_path, gbnf_experiment, run_directory):
         gbnf_experiment.side_effect = [RuntimeError("boom"), *[run_directory] * 31]
         out = tmp_path / "matrix.jsonl"
-        run_study(CELLS, n=1, parallel=1, api_key=API_KEY, out=out)
+        run_study(STUDY, CELLS, n=1, parallel=1, api_key=API_KEY, out=out)
         lines = read(out)
         assert len(lines) == 32
         assert lines[0]["error"] == "boom"
@@ -147,7 +148,7 @@ def describe_run_study():
 
     def it_logs_runs_so_that_any_prefix_is_balanced_across_cells(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
-        run_study(CELLS, n=3, parallel=1, api_key=API_KEY, out=out)
+        run_study(STUDY, CELLS, n=3, parallel=1, api_key=API_KEY, out=out)
         counts = Counter({cell_name(cell): 0 for cell in CELLS})
         for line in read(out):
             counts[cell_name(line["cell"])] += 1
@@ -155,22 +156,26 @@ def describe_run_study():
 
     def it_writes_runs_in_round_order(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
-        run_study(CELLS, n=2, parallel=1, api_key=API_KEY, out=out)
+        run_study(STUDY, CELLS, n=2, parallel=1, api_key=API_KEY, out=out)
         rounds = [line["round"] for line in read(out)]
         assert rounds == [1] * 32 + [2] * 32
 
     def it_gives_each_agent_the_key_and_its_cell_s_model_and_effort(tmp_path, gbnf_experiment, claude_agent):
         two = [cell for cell in cells(efforts=("low", "xhigh")) if cell_name(cell) in NAMES]
-        run_study(two, n=1, parallel=1, api_key=API_KEY, out=tmp_path / "m")
+        run_study(STUDY, two, n=1, parallel=1, api_key=API_KEY, out=tmp_path / "m")
         assert sorted(c.kwargs["effort"] for c in claude_agent.call_args_list) == ["low", "xhigh"]
         for c in claude_agent.call_args_list:
             assert c.kwargs == {"model": MODELS[0], "effort": c.kwargs["effort"], "api_key": API_KEY}
+
+    def it_names_the_study_on_every_run(tmp_path, gbnf_experiment):
+        run_study("v2-model-effort", CELLS[:3], n=1, parallel=1, api_key=API_KEY, out=tmp_path / "m")
+        assert [c.kwargs["study"] for c in gbnf_experiment.call_args_list] == ["v2-model-effort"] * 3
 
     def it_warms_every_condition_before_the_first_run(tmp_path, gbnf_experiment, prepare):
         order = Mock()
         order.attach_mock(prepare, "prepare")
         order.attach_mock(gbnf_experiment, "run")
-        run_study(CELLS, n=1, parallel=2, api_key=API_KEY, out=tmp_path / "m")
+        run_study(STUDY, CELLS, n=1, parallel=2, api_key=API_KEY, out=tmp_path / "m")
         names = [name for name, _, _ in order.mock_calls]
         assert names[:16] == ["prepare"] * 16
         assert "prepare" not in names[16:]
@@ -193,33 +198,33 @@ def describe_main():
         for key, value in environment.items():
             monkeypatch.setenv(key, value)
         with pytest.raises(SystemExit) as exit:
-            main(CELLS, parse(["--n", "1"]))
+            main(STUDY, CELLS, parse(["--n", "1"]))
         assert exit.value.code != 0
         assert "ANTHROPIC_API_KEY" in str(exit.value.code)
         prepare.assert_not_called()
         gbnf_experiment.assert_not_called()
         claude_agent.assert_not_called()
 
-    def it_runs_the_cells_it_is_given_for_twelve_rounds_by_default(study):
-        main(CELLS, parse([]))
-        assert study.call_args.args[0] == CELLS
+    def it_runs_the_study_and_cells_it_is_given_for_twelve_rounds_by_default(study):
+        main(STUDY, CELLS, parse([]))
+        assert study.call_args.args == (STUDY, CELLS)
         assert study.call_args.kwargs["n"] == 12
 
     def it_runs_four_jobs_at_once_by_default(study):
-        main(CELLS, parse([]))
+        main(STUDY, CELLS, parse([]))
         assert study.call_args.kwargs["parallel"] == 4
 
     @pytest.mark.parametrize("flag", ["-k", "--parallel"])
     def it_takes_k_as_the_number_of_concurrent_jobs(flag, study):
-        main(CELLS, parse([flag, "6"]))
+        main(STUDY, CELLS, parse([flag, "6"]))
         assert study.call_args.kwargs["parallel"] == 6
 
     def it_runs_until_stopped_at_n_zero(study):
-        main(CELLS, parse(["--n", "0"]))
+        main(STUDY, CELLS, parse(["--n", "0"]))
         assert study.call_args.kwargs["n"] is None
 
     def it_names_the_cell_count_and_the_jsonl_at_startup(study, capsys):
-        main(CELLS, parse([]))
+        main(STUDY, CELLS, parse([]))
         assert "32 cells; auth api-key; writing " in capsys.readouterr().err
 
 
@@ -240,13 +245,13 @@ def describe_resume():
         opus, sonnet = (next(cell for cell in CELLS if cell["model"] == model) for model in MODELS)
         first = write_jsonl(tmp_path / "a.jsonl", [(opus, 0), (opus, 1), (opus, 137), (sonnet, 0)])
         second = write_jsonl(tmp_path / "b.jsonl", [(opus, 0), (opus, None)])
-        main(CELLS, parse(["--resume", str(first), str(second)]))
+        main(STUDY, CELLS, parse(["--resume", str(first), str(second)]))
         assert study.call_args.kwargs["prior"] == {cell_key(opus): 2, cell_key(sonnet): 1}
 
     def it_prints_each_cell_s_shortfall_and_the_total(tmp_path, study, capsys):
         opus = CELLS[0]
         path = write_jsonl(tmp_path / "a.jsonl", [(opus, 0)] * 5)
-        main(CELLS, parse(["--resume", str(path)]))
+        main(STUDY, CELLS, parse(["--resume", str(path)]))
         err = capsys.readouterr().err
         assert f"{cell_name(opus)}=7" in err
         assert "total 379" in err
@@ -255,24 +260,24 @@ def describe_resume():
 def describe_runs():
     def it_stops_submitting_after_n_runs_in_round_robin_order(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
-        run_study(CELLS, n=2, parallel=2, api_key=API_KEY, out=out, runs=5)
+        run_study(STUDY, CELLS, n=2, parallel=2, api_key=API_KEY, out=out, runs=5)
         lines = read(out)
         assert len(lines) == 5
         assert {line["round"] for line in lines} == {1}
 
     def it_passes_runs_from_the_command_line(study):
-        main(CELLS, parse(["--runs", "4"]))
+        main(STUDY, CELLS, parse(["--runs", "4"]))
         assert study.call_args.kwargs["runs"] == 4
 
     def it_is_unlimited_by_default(study):
-        main(CELLS, parse([]))
+        main(STUDY, CELLS, parse([]))
         assert study.call_args.kwargs["runs"] is None
 
 
 def describe_record():
     def it_writes_utc_start_and_finish_times(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
-        run_study(CELLS[:1], n=1, parallel=1, api_key=API_KEY, out=out)
+        run_study(STUDY, CELLS[:1], n=1, parallel=1, api_key=API_KEY, out=out)
         [line] = read(out)
         started, finished = (datetime.fromisoformat(line[key]) for key in ("started_at", "finished_at"))
         assert started.utcoffset().total_seconds() == 0
@@ -283,7 +288,7 @@ def describe_record():
             tmp_path, "long", {"is_error": False, "terminal_reason": "completed", "result": "x" * 1000}
         )
         out = tmp_path / "matrix.jsonl"
-        run_study(CELLS[:1], n=1, parallel=1, api_key=API_KEY, out=out)
+        run_study(STUDY, CELLS[:1], n=1, parallel=1, api_key=API_KEY, out=out)
         [line] = read(out)
         assert line["terminal_reason"] == "completed"
         assert line["result"] == "x" * 300
@@ -291,7 +296,7 @@ def describe_record():
     def it_writes_none_without_a_result_json(tmp_path, gbnf_experiment):
         gbnf_experiment.return_value = failed_run(tmp_path, "none")
         out = tmp_path / "matrix.jsonl"
-        run_study(CELLS[:1], n=1, parallel=1, api_key=API_KEY, out=out)
+        run_study(STUDY, CELLS[:1], n=1, parallel=1, api_key=API_KEY, out=out)
         [line] = read(out)
         assert (line["terminal_reason"], line["result"], line["usage"]) == (None, None, None)
 
@@ -311,7 +316,7 @@ def describe_fail_fast():
         exhausted = failed_run(tmp_path, "exhausted", result, stderr)
         gbnf_experiment.return_value = exhausted
         out = tmp_path / "matrix.jsonl"
-        stopped = run_study(CELLS, n=2, parallel=1, api_key=API_KEY, out=out)
+        stopped = run_study(STUDY, CELLS, n=2, parallel=1, api_key=API_KEY, out=out)
         [line] = read(out)
         assert stopped == line
         assert f"STOPPED: round 1 {cell_name(line['cell'])} {exhausted}: " in capsys.readouterr().err
@@ -319,7 +324,7 @@ def describe_fail_fast():
     def it_lets_the_in_flight_runs_finish_and_names_the_first(tmp_path, gbnf_experiment, capsys):
         gbnf_experiment.return_value = failed_run(tmp_path, "exhausted", CREDIT)
         out = tmp_path / "matrix.jsonl"
-        stopped = run_study(CELLS, n=2, parallel=4, api_key=API_KEY, out=out)
+        stopped = run_study(STUDY, CELLS, n=2, parallel=4, api_key=API_KEY, out=out)
         lines = read(out)
         assert len(lines) == 4
         assert stopped == lines[0]
@@ -333,29 +338,29 @@ def describe_fail_fast():
             tmp_path, "other", {"is_error": True, "terminal_reason": "max_turns", "result": "too many turns"}
         )
         out = tmp_path / "matrix.jsonl"
-        assert run_study(CELLS, n=1, parallel=2, api_key=API_KEY, out=out) is None
+        assert run_study(STUDY, CELLS, n=1, parallel=2, api_key=API_KEY, out=out) is None
         assert len(read(out)) == 32
 
     def it_exits_non_zero_when_stopped(study):
         study.return_value = {"round": 1}
         with pytest.raises(SystemExit) as exit:
-            main(CELLS, parse([]))
+            main(STUDY, CELLS, parse([]))
         assert exit.value.code != 0
 
 
 def describe_auth():
     def it_gives_each_agent_no_key_on_subscription(tmp_path, gbnf_experiment, claude_agent):
-        run_study(CELLS[:1], n=1, parallel=1, api_key=None, out=tmp_path / "m")
+        run_study(STUDY, CELLS[:1], n=1, parallel=1, api_key=None, out=tmp_path / "m")
         assert claude_agent.call_args.kwargs["api_key"] is None
 
     def it_passes_no_key_on_subscription(monkeypatch, study):
         monkeypatch.delenv("ANTHROPIC_API_KEY")
-        main(CELLS, parse(["--auth", "subscription"]))
+        main(STUDY, CELLS, parse(["--auth", "subscription"]))
         assert study.call_args.kwargs["api_key"] is None
 
     def it_refuses_subscription_while_an_api_key_is_set(study):
         with pytest.raises(SystemExit) as exit:
-            main(CELLS, parse(["--auth", "subscription"]))
+            main(STUDY, CELLS, parse(["--auth", "subscription"]))
         assert "ANTHROPIC_API_KEY" in str(exit.value.code)
         study.assert_not_called()
 
@@ -363,5 +368,5 @@ def describe_auth():
     def it_names_the_auth_mode_at_startup(auth, monkeypatch, study, capsys):
         if auth == "subscription":
             monkeypatch.delenv("ANTHROPIC_API_KEY")
-        main(CELLS, parse(["--auth", auth]))
+        main(STUDY, CELLS, parse(["--auth", auth]))
         assert f"auth {auth}" in capsys.readouterr().err

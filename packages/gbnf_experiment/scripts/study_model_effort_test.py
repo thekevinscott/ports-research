@@ -34,9 +34,9 @@ def describe_cells():
 
 
 def describe_main():
-    def it_runs_the_forty_cells_for_twelve_rounds_by_default(study):
+    def it_runs_the_forty_cells_as_v2_model_effort_for_twelve_rounds_by_default(study):
         main([])
-        assert study.call_args.args[0] == cells()
+        assert study.call_args.args == ("v2-model-effort", cells())
         assert study.call_args.kwargs["n"] == 12
 
     def it_takes_the_shared_flags(study):
