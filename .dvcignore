@@ -1,0 +1,9 @@
+# Symlinks agents left in ported_implementation/: targets inside the container
+# (/usr/local/lib, /target), a loop (node_modules/gbnf -> ..), or a venv alias.
+# DVC cannot store a dangling link and would follow the loop. The zip keeps them.
+**/node_modules/vitest
+**/node_modules/gbnf
+**/.venv/bin/python
+**/.venv/bin/python3
+**/.venv/bin/python3.14
+**/.venv/lib64

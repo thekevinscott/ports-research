@@ -22,6 +22,12 @@ gitignored.
 - Branch names use **dashes only**: lowercase letters, digits, and `-`.
   No slashes, no spaces (e.g., `whitelist-assembly`, not `feat/whitelist-assembly`).
 - Do all editing, building, and testing inside `.worktrees/<branch>/`.
+- **Run data lives only in the root checkout's `data/`.** Never read or write
+  `.worktrees/*/data/`. Studies and the CLI always pass
+  `--output /home/duncan/work/code/research/ports/data/runs`. `data/runs`,
+  `data/judge` and `data/walkthroughs` are DVC-tracked: after `git pull`, run
+  `dvc pull`; after banking runs, `dvc add data/runs`, commit the `.dvc` file,
+  `dvc push`.
 - **When the PR merges, clean up in this order.** Leaving stale worktrees and
   branches behind makes it impossible to see what is actually in flight.
   1. `cd` to the root checkout first. Never skip this — removing a worktree

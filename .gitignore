@@ -36,3 +36,12 @@ node_modules/
 /internal/
 .env
 /tmp
+
+# Snapshots of data/ taken before it moved to DVC; too big for the repo.
+*.zip
+
+# Run data, tracked by DVC (data/*.dvc); dvc pull restores it.
+/data/runs
+/data/judge
+/data/walkthroughs
+/.dvc/
