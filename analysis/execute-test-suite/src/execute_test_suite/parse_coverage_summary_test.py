@@ -39,13 +39,15 @@ def describe_parse_coverage_summary():
         write_report(report_path)
         assert parse_coverage_summary(report_path).line_pct == 100 * 758 / 1085
 
-    def it_raises_when_the_provider_measured_nothing(report_path):
-        """A summary of zero lines means the include glob matched no file — a
-        misconfigured run, not a port without source."""
+    def it_reads_a_run_that_loaded_none_of_the_port_as_zero(report_path):
+        """The provider counts only files the tests loaded, so a suite that ran none
+        of the port's source reports zero lines."""
         write_report(
             report_path,
             lines={"total": 0, "covered": 0, "skipped": 0, "pct": "Unknown"},
             branches={"total": 0, "covered": 0, "skipped": 0, "pct": "Unknown"},
         )
-        with pytest.raises(RuntimeError):
-            parse_coverage_summary(report_path)
+        result = parse_coverage_summary(report_path)
+        assert result.covered_lines == 0
+        assert result.total_lines == 0
+        assert result.line_pct == 0.0

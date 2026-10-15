@@ -1,7 +1,7 @@
 [project]
 name = "execute-test-suite"
 version = "0.1.0"
-description = "Run gbnf's derived test suite against one ported implementation and report pass/fail counts"
+description = "Grade one ported implementation against the pinned gbnf reference's unit or generated integration tests and report pass/fail counts"
 readme = "README.md"
 authors = [
     { name = "Kevin Scott", email = "151596+thekevinscott@users.noreply.github.com" }

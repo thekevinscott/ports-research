@@ -1,8 +1,0 @@
-export const validateNonEmpty = <T>(value: T[]): T[] => {
-  if (!value || value.length === 0) {
-    throw new Error('Value cannot be empty.');
-  }
-  return value;
-};
-
-export const validate_non_empty = validateNonEmpty;

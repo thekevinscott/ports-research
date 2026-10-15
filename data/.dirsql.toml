@@ -1,0 +1,37 @@
+# SQL over the run data. From the repo root: uvx dirsql --no-ignore -c data/.dirsql.toml "<sql>". See README.md.
+
+[[table]]
+name = "runs"
+glob = "runs/*/*.json"
+on-file = """jq -c -n '
+  [inputs | {dir: (input_filename | split("/")[-2]), file: (input_filename | split("/")[-1]), d: .}]
+  | group_by(.dir)[]
+  | (map(select(.file == "manifest.json").d)[0] // {}) as $m
+  | (map(select(.file == "result.json").d)[0] // {}) as $r
+  | {run_id: .[0].dir}
+    + $m + ($m.condition // {})
+    + {harness_commit: $m.harness.commit, harness_dirty: $m.harness.dirty,
+       sandbox_image_id: $m.sandbox.image_id, gbnf_commit: $m.derivation.gbnf_commit,
+       reference_files: $m.reference_implementation.included}
+    + $r + ($r.usage // {})
+    + {thinking_tokens: $r.usage.output_tokens_details.thinking_tokens, model_usage: $r.modelUsage}
+'"""
+ddl = """
+CREATE TABLE runs (
+  run_id TEXT PRIMARY KEY, study TEXT, timestamp TEXT, completed_at TEXT, exit_code INTEGER, error TEXT,
+  name TEXT, source_language TEXT, target_language TEXT, model TEXT, effort TEXT,
+  include_unit_tests INTEGER, include_source_integration_tests INTEGER, include_target_integration_tests INTEGER,
+  include_python_tests INTEGER, include_typescript_tests INTEGER,
+  harness_commit TEXT, harness_dirty INTEGER, sandbox_image_id TEXT, gbnf_commit TEXT, reference_files TEXT,
+  is_error INTEGER, terminal_reason TEXT, stop_reason TEXT, subtype TEXT, api_error TEXT, api_error_status INTEGER,
+  num_turns INTEGER, queued_turn_count INTEGER, result_index INTEGER, safety_stops INTEGER,
+  duration_ms INTEGER, duration_api_ms INTEGER, ttft_ms INTEGER, ttft_stream_ms INTEGER,
+  time_to_request_ms INTEGER, first_content_frame_ms INTEGER,
+  input_tokens INTEGER, output_tokens INTEGER, cache_creation_input_tokens INTEGER, cache_read_input_tokens INTEGER,
+  thinking_tokens INTEGER, speed TEXT, service_tier TEXT, inference_geo TEXT,
+  fast_mode_state TEXT, fast_mode_disabled_reason TEXT,
+  session_id TEXT, uuid TEXT, result TEXT,
+  usage TEXT, model_usage TEXT, subagent_stats TEXT, permission_denials TEXT, origin TEXT
+);
+CREATE VIEW studies AS SELECT DISTINCT study FROM runs ORDER BY study;
+"""

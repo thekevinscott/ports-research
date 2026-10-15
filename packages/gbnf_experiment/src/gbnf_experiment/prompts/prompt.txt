@@ -1,3 +1,2 @@
 Port the implementation under {source_language}/ to {target_language}.
-There is no network access. uv, pytest, pnpm and vitest are installed.
 {suites_information}

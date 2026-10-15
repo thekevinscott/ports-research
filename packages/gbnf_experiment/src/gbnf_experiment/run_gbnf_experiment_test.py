@@ -226,19 +226,6 @@ def describe_run():
         experiment()
         assert "tests" not in port_codebase.call_args.kwargs["prompt"]
 
-    @pytest.mark.parametrize("source_language", ["python", "javascript"])
-    def it_states_the_same_environment_whichever_the_direction(
-        experiment,
-        prepare_reference_implementation,
-        port_codebase,
-        source_language,
-    ):
-        experiment(source_language=source_language)
-        assert (
-            "There is no network access. uv, pytest, pnpm and vitest are installed.\n"
-            in port_codebase.call_args.kwargs["prompt"]
-        )
-
     def it_leaves_no_placeholder_in_the_prompt(
         experiment,
         prepare_reference_implementation,

@@ -83,6 +83,13 @@ def describe_embed():
         kwargs = embed_codebase_function.call_args.kwargs
         assert (kwargs["language"], kwargs["target"], kwargs["out"], kwargs["model"]) == ("python", target, out, "m")
 
+    def it_embeds_javascript_as_typescript(embed_codebase_function, target, out):
+        result = CliRunner().invoke(
+            cli, ["embed", "--language", "javascript", "--target", str(target), "--out", str(out), "--model", "m"]
+        )
+        assert result.exit_code == 0, result.output
+        assert embed_codebase_function.call_args.kwargs["language"] == "typescript"
+
     def it_forwards_no_excludes_by_default(embed_codebase_function, target, out):
         invoke_embed(target, out)
         assert embed_codebase_function.call_args.kwargs["exclude"] == []

@@ -99,6 +99,11 @@ def describe_levenshtein():
         kwargs = measure_function.call_args.kwargs
         assert (kwargs["language"], kwargs["a"], kwargs["b"]) == ("python", a, b)
 
+    def it_measures_javascript_as_typescript(measure_function, a, b):
+        result = CliRunner().invoke(cli, ["levenshtein", "--language", "javascript", "--a", str(a), "--b", str(b)])
+        assert result.exit_code == 0, result.output
+        assert measure_function.call_args.kwargs["language"] == "typescript"
+
     def it_forwards_no_excludes_by_default(measure_function, a, b):
         invoke("levenshtein", a, b)
         assert measure_function.call_args.kwargs["exclude"] == []
@@ -140,6 +145,11 @@ def describe_git_diff():
         invoke("git-diff", a, b)
         kwargs = git_diff_function.call_args.kwargs
         assert (kwargs["language"], kwargs["a"], kwargs["b"]) == ("python", a, b)
+
+    def it_measures_javascript_as_typescript(git_diff_function, a, b):
+        result = CliRunner().invoke(cli, ["git-diff", "--language", "javascript", "--a", str(a), "--b", str(b)])
+        assert result.exit_code == 0, result.output
+        assert git_diff_function.call_args.kwargs["language"] == "typescript"
 
     def it_forwards_every_exclude_in_order(git_diff_function, a, b):
         invoke("git-diff", a, b, "--exclude", "*_test.py", "--exclude", "build")

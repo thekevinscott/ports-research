@@ -49,3 +49,13 @@ def describe_parse_coverage_json():
         write_report(report_path, covered_lines=0, num_statements=0)
         with pytest.raises(RuntimeError):
             parse_coverage_json(report_path)
+
+    def it_reads_a_run_that_executed_none_of_the_port_as_line_only(report_path):
+        """With no code executed, coverage.py records no arcs and reports line totals
+        only, as when every test file fails to import."""
+        totals = {key: value for key, value in TOTALS.items() if "branch" not in key}
+        report_path.write_text(json.dumps({"totals": {**totals, "covered_lines": 0}}))
+        result = parse_coverage_json(report_path)
+        assert result.covered_lines == 0
+        assert result.total_lines == 917
+        assert result.branch_pct is None

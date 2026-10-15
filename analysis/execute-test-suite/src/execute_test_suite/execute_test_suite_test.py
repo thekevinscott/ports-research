@@ -8,15 +8,21 @@ from execute_test_suite.coverage_result import CoverageResult
 from execute_test_suite.execute_test_suite import execute_test_suite
 from execute_test_suite.suite_result import SuiteResult
 
-DERIVATIONS_DIRECTORY = Path("/cache/ports/gbnf-experiment/derivations")
-DERIVATION_CACHE_KEY = "390bf534c55d496b"
 TARGET = Path("/data/run/ported_implementation")
+TEST_FILES = [Path("/scratch/port/gbnf/parse_test.py")]
 
 
 @pytest.fixture
 def locate_test_suite_function():
     with patch("execute_test_suite.execute_test_suite.locate_test_suite", autospec=True) as m:
-        m.return_value = Path("/cache/.../tests/python")
+        m.return_value = Path("/cache/.../prepared/key/python")
+        yield m
+
+
+@pytest.fixture(autouse=True)
+def stage_test_suite_function():
+    with patch("execute_test_suite.execute_test_suite.stage_test_suite", autospec=True) as m:
+        m.return_value = TEST_FILES
         yield m
 
 
@@ -44,67 +50,73 @@ def call(**overrides):
         **{
             "language": "python",
             "target": TARGET,
-            "derivations_directory": DERIVATIONS_DIRECTORY,
-            "derivation_cache_key": DERIVATION_CACHE_KEY,
+            "suite": "unit",
             **overrides,
         }
     )
 
 
 def describe_execute_test_suite():
-    def it_locates_the_suite_for_the_language_at_the_pinned_key(
+    def it_locates_the_suite_for_the_language(
         locate_test_suite_function, run_pytest_suite_function
     ):
         call()
-        locate_test_suite_function.assert_called_once_with(
-            "python",
-            derivations_directory=DERIVATIONS_DIRECTORY,
-            derivation_cache_key=DERIVATION_CACHE_KEY,
-        )
+        locate_test_suite_function.assert_called_once_with("python")
+
+    def it_stages_the_suite_over_a_scratch_copy_of_the_target(
+        locate_test_suite_function, run_pytest_suite_function, stage_test_suite_function
+    ):
+        call(suite="integration")
+        kwargs = stage_test_suite_function.call_args.kwargs
+        assert kwargs["language"] == "python"
+        assert kwargs["suite"] == "integration"
+        assert kwargs["test_suite_directory"] == locate_test_suite_function.return_value
+        assert kwargs["target"] == TARGET
+        assert not kwargs["destination"].is_relative_to(TARGET)
 
     def it_runs_python_ports_through_pytest(
-        locate_test_suite_function, run_pytest_suite_function, run_vitest_suite_function
+        locate_test_suite_function,
+        run_pytest_suite_function,
+        run_vitest_suite_function,
+        stage_test_suite_function,
     ):
         call(language="python")
         run_pytest_suite_function.assert_called_once_with(
-            test_suite_directory=locate_test_suite_function.return_value,
-            target=TARGET,
-            suite=None,
+            target=stage_test_suite_function.call_args.kwargs["destination"],
+            test_files=TEST_FILES,
             adapt=False,
             coverage=False,
         )
         run_vitest_suite_function.assert_not_called()
 
     def it_runs_typescript_ports_through_vitest(
-        locate_test_suite_function, run_pytest_suite_function, run_vitest_suite_function
+        locate_test_suite_function,
+        run_pytest_suite_function,
+        run_vitest_suite_function,
+        stage_test_suite_function,
     ):
         call(language="typescript")
         run_vitest_suite_function.assert_called_once_with(
-            test_suite_directory=locate_test_suite_function.return_value,
-            target=TARGET,
-            suite=None,
+            target=stage_test_suite_function.call_args.kwargs["destination"],
+            test_files=TEST_FILES,
             adapt=False,
             coverage=False,
         )
         run_pytest_suite_function.assert_not_called()
 
     def it_runs_javascript_ports_through_vitest(
-        locate_test_suite_function, run_pytest_suite_function, run_vitest_suite_function
+        locate_test_suite_function,
+        run_pytest_suite_function,
+        run_vitest_suite_function,
+        stage_test_suite_function,
     ):
         call(language="javascript")
         run_vitest_suite_function.assert_called_once_with(
-            test_suite_directory=locate_test_suite_function.return_value,
-            target=TARGET,
-            suite=None,
+            target=stage_test_suite_function.call_args.kwargs["destination"],
+            test_files=TEST_FILES,
             adapt=False,
             coverage=False,
         )
-
-    def it_forwards_the_suite_to_the_runner(
-        locate_test_suite_function, run_pytest_suite_function
-    ):
-        call(suite="unit")
-        assert run_pytest_suite_function.call_args.kwargs["suite"] == "unit"
 
     def it_forwards_adapt_to_the_runner(locate_test_suite_function, run_pytest_suite_function):
         call(adapt=True)
@@ -178,7 +190,7 @@ def describe_execute_test_suite():
         assert report["target"] == str(TARGET)
 
     def it_reports_the_suite(locate_test_suite_function, run_pytest_suite_function):
-        assert call()["suite"] is None
+        assert call()["suite"] == "unit"
         assert call(suite="integration")["suite"] == "integration"
 
     def it_reports_which_test_suite_directory_it_ran(

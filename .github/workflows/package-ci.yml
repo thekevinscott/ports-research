@@ -14,7 +14,7 @@ on:
         default: true
         type: boolean
       node:
-        description: Whether integration shells out to node and pnpm
+        description: Whether the tests shell out to node and pnpm
         default: false
         type: boolean
       integration-timeout-minutes:
@@ -38,6 +38,18 @@ jobs:
 
       - name: Install just
         uses: extractions/setup-just@v2
+
+      - name: Install pnpm
+        if: inputs.node
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
+      - name: Install node
+        if: inputs.node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
 
       - name: Lint
         run: just lint

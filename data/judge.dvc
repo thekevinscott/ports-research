@@ -1,0 +1,6 @@
+outs:
+- md5: 00a81c1a73ed6db0b6c6b68dad8936da.dir
+  size: 7539634
+  nfiles: 4
+  hash: md5
+  path: judge

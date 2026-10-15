@@ -9,7 +9,7 @@ CLI `run_gbnf_experiment`. Each invocation is one experimental condition: a sour
 - hands that tree unchanged as the source, with a prompt and a `ClaudeAgent`, to `port_codebase`;
 - banks the `RunResult` as one run directory under `data/`: `manifest.json` (with the agent's `exit_code`), `result.json` (the agent CLI's stdout), `stderr.txt` (its stderr), `transcript/` (the transcript files, at their paths relative to the agent's home), `proxy.log`.
 
-The prompt names the source as `javascript/` or `python/`, the target language (`javascript` reads as `typescript`), the installed tools, and where each included suite sits. Paths in it are relative to the source directory.
+The prompt names the source as `javascript/` or `python/`, the target language (`javascript` reads as `typescript`), and where each included suite sits. Paths in it are relative to the source directory.
 
 ```
 uv run run_gbnf_experiment --source-language python --include-unit-tests --include-source-integration-tests --include-target-integration-tests
@@ -46,7 +46,7 @@ uv run --env-file ../../.env python scripts/study_test_configurations.py
 | `--n` | `12` rounds. `0` runs until stopped. |
 | `-k`, `--parallel` | `4` concurrent jobs. Each job is one Docker container running the agent and its test runs. |
 | `--efforts` | `medium`. Comma-separated, e.g. `low,xhigh`. |
-| `--models` | `claude-opus-5-5`. Any of `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-fable-5-1`, `claude-haiku-4-5-20251001`. |
+| `--models` | `claude-opus-5-5`. Any of `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-fable-5-1`, `claude-haiku-5-5`. |
 | `--source-languages` | Both. |
 | `--cells` | All. Names are the manifest's condition name, as printed per run, e.g. `source-python_unit-tests_effort-medium_model-claude-opus-5-5`. |
 

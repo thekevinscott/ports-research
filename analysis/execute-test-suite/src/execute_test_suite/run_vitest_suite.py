@@ -1,6 +1,5 @@
 import dataclasses
 import json
-import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -14,8 +13,6 @@ from execute_test_suite.suite_result import SuiteResult
 VITEST_VERSION = "2.1.3"
 PORT_ENTRY_FILE = "src/index.ts"
 PORT_SOURCE_GLOB = "src/**"
-ALL_TESTS_GLOB = "tests/**/*.test.ts"
-INTEGRATION_TEST_GLOB = "tests/**/grammars.test.ts"
 COVERAGE_PACKAGE = "@vitest/coverage-v8"
 COVERAGE_DIRECTORY = "coverage"
 COVERAGE_SUMMARY_FILE = "coverage-summary.json"
@@ -43,7 +40,6 @@ ALLOW_BUILD_FLAG = "--allow-build=esbuild"
 CONFIG_TEMPLATE = """export default {{
   test: {{
     include: {include},
-    exclude: {exclude},
     globals: true,
   }},
   esbuild: {{
@@ -60,33 +56,22 @@ CONFIG_TEMPLATE = """export default {{
 
 def run_vitest_suite(
     *,
-    test_suite_directory: Path,
     target: Path,
-    suite: str | None = None,
+    test_files: list[Path],
     adapt: bool = False,
     coverage: bool = False,
 ) -> SuiteResult:
-    """Run test_suite_directory's specs against target's built entry file.
+    """Run test_files under pinned vitest with `gbnf` aliased to target's `src/index.ts`.
 
-    Mirrors the derivation's own scaffolding config — `gbnf` aliased to
-    `src/index.ts` — rewritten with host-absolute paths: the scaffolding's alias is
-    baked for the sandbox's `/workspace` mount and is meaningless outside it. The
-    config is authored fresh rather than patched, since a full rewrite of both
-    knobs it carries is unavoidable either way.
+    The config is written into a scratch directory, which is vite's root and holds
+    every report.
 
     With `adapt`, the alias points at a generated shim over that entry file instead,
     and the rules the shim applied come back on the result.
 
-    The suite is copied into the scratch directory rather than pointed at in place —
-    the same first move the derivation's own README documents. Vite writes a
-    `.vite` transform cache next to whatever `root` resolves to (the config's own
-    directory, by default), so running with `root` left at test_suite_directory
-    writes that cache straight into the read-only derivation cache; copying first
-    keeps every write inside the scratch directory.
-
     Every target is transformed under one pinned `tsconfigRaw` rather than the tsconfig
     vite would find next to its files: the hand-written reference's tsconfig extends the
-    monorepo root's, which the derivation cache does not carry, and vite treats that
+    monorepo root's, which the prepared tree does not carry, and vite treats that
     unresolvable extends as a transform failure — the entry never loads and the suite
     collects nothing.
 
@@ -97,13 +82,7 @@ def run_vitest_suite(
     because the port sits outside that root, which the provider otherwise treats
     as nothing to measure and reports as zero.
     """
-    include, exclude = {
-        None: ([ALL_TESTS_GLOB], []),
-        "unit": ([ALL_TESTS_GLOB], [INTEGRATION_TEST_GLOB]),
-        "integration": ([INTEGRATION_TEST_GLOB], []),
-    }[suite]
     with tempfile.TemporaryDirectory() as scratch:
-        shutil.copytree(test_suite_directory, Path(scratch) / "tests")
         config_path = Path(scratch) / "vitest.config.mjs"
         report_path = Path(scratch) / "report.json"
         adapt_report_path = Path(scratch) / "adapt.json"
@@ -114,8 +93,7 @@ def run_vitest_suite(
             )
         config_path.write_text(
             CONFIG_TEMPLATE.format(
-                include=json.dumps(include),
-                exclude=json.dumps(exclude),
+                include=json.dumps([str(path) for path in test_files]),
                 tsconfig_raw=json.dumps(TSCONFIG_RAW),
                 alias=json.dumps(str(entry)),
             )
@@ -150,6 +128,7 @@ def run_vitest_suite(
                 "--coverage.enabled",
                 "--coverage.provider=v8",
                 "--coverage.allowExternal",
+                "--coverage.reportOnFailure",
                 f"--coverage.include={target / PORT_SOURCE_GLOB}",
                 *(f"--coverage.exclude={pattern}" for pattern in COVERAGE_EXCLUDE),
                 "--coverage.reporter=json-summary",

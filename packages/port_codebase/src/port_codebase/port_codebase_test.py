@@ -3,7 +3,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from port_codebase.port_codebase import PROMPT_PATH, port_codebase
+from port_codebase.port_codebase import DOCKERFILE, PROMPT_PATH, port_codebase
+
+AGENT_DOCKERFILE = "FROM node:24-slim\nRUN npm install -g some-cli\n"
 
 
 @pytest.fixture
@@ -20,9 +22,12 @@ def prompt_class():
 
 
 @pytest.fixture
-def agent():
+def agent(tmp_path):
     agent = Mock(name="agent")
     agent.command.side_effect = lambda prompt: f"cli {prompt}"
+    agent.dockerfile = tmp_path / "agent" / "Dockerfile"
+    agent.dockerfile.parent.mkdir()
+    agent.dockerfile.write_text(AGENT_DOCKERFILE)
     return agent
 
 
@@ -55,8 +60,31 @@ def describe_port_codebase():
     def it_runs_the_agents_command_for_the_rendered_prompt(call, botbox, prompt_class):
         call("Port it.\n")
 
-        prompt_class.assert_called_once_with(PROMPT_PATH, upstream="Port it.\n")
+        prompt_class.assert_called_once_with(
+            PROMPT_PATH,
+            agent_dockerfile=AGENT_DOCKERFILE.rstrip("\n"),
+            dockerfile=DOCKERFILE.read_text().rstrip("\n"),
+            upstream="Port it.\n",
+        )
         assert botbox.return_value.run.call_args.args == ("cli the rendered prompt",)
+
+    def it_shows_the_agent_both_dockerfiles_as_written(call, botbox):
+        call()
+
+        [command] = botbox.return_value.run.call_args.args
+        assert AGENT_DOCKERFILE.rstrip("\n") in command
+        assert DOCKERFILE.read_text().rstrip("\n") in command
+        assert command.index("FROM node:24-slim") < command.index("FROM botbox-claude")
+
+    def it_rereads_the_agents_dockerfile_on_every_call(call, botbox, agent):
+        call()
+        agent.dockerfile.write_text("FROM node:25-slim\n")
+
+        call()
+
+        [command] = botbox.return_value.run.call_args.args
+        assert "FROM node:25-slim" in command
+        assert "FROM node:24-slim" not in command
 
     def it_mounts_the_source_read_only_and_the_output_read_write(call, botbox, source, output):
         call()
