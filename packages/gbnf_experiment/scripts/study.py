@@ -17,6 +17,7 @@ from pathlib import Path
 from time import monotonic
 
 from botbox import ClaudeAgent
+from completed_runs import CONDITION, completed_runs
 
 from gbnf_experiment.condition_name import LABELS, condition_name
 from gbnf_experiment.prepare_filesystem.prepare_reference_implementation import (
@@ -52,12 +53,11 @@ def schedule(cells: list[dict], n: int | None, prior: Counter | None = None):
             yield round_number, cell
 
 
-def prior_successes(paths: list[Path]) -> Counter:
+def prior_successes(output: Path, study: str) -> Counter:
+    """Completed runs already under `output`, per cell key; they count toward --n."""
     return Counter(
-        cell_key(record["cell"])
-        for path in paths
-        for record in map(json.loads, path.read_text().splitlines())
-        if record["exit_code"] == 0
+        cell_key({key: bool(run[key]) if key in FLAGS else run[key] for key in CONDITION})
+        for run in completed_runs(output, study)
     )
 
 
@@ -213,15 +213,11 @@ def argument_parser(description: str) -> argparse.ArgumentParser:
         default="api-key",
         help="api-key bills ANTHROPIC_API_KEY; subscription copies the host's Claude login. Default: %(default)s.",
     )
-    parser.add_argument(
-        "--resume", nargs="+", type=Path, default=[], help="Earlier jsonl files whose exit-0 runs count toward --n."
-    )
     parser.add_argument("--runs", type=int, help="Stop submitting after this many runs. Default: unlimited.")
     return parser
 
 
-def main(study: str, cells: list[dict], args: argparse.Namespace, prior: Counter | None = None) -> None:
-    """`prior` counts successes already banked, per cell key; --resume logs add to it."""
+def main(study: str, cells: list[dict], args: argparse.Namespace) -> None:
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if args.auth == "subscription":
         if api_key:
@@ -230,7 +226,7 @@ def main(study: str, cells: list[dict], args: argparse.Namespace, prior: Counter
     elif not api_key:
         sys.exit("ANTHROPIC_API_KEY is unset or empty; pass it with `uv run --env-file`.")
     n = args.n or None
-    prior = (prior or Counter()) + prior_successes(args.resume)
+    prior = prior_successes(args.output, study)
     if n is not None:
         shortfalls = {cell_name(cell): max(n - prior[cell_key(cell)], 0) for cell in cells}
         print(
