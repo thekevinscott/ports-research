@@ -6,7 +6,6 @@ from pathlib import Path
 from dirsql._dirsql import DirSQL
 
 from src.Codebase import REFERENCE_CHECKOUT, Codebase, pinned_reference
-from src.matrix_run_ids import matrix_run_ids
 from src.run_table import completed_runs, is_v2
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -38,17 +37,14 @@ EXCLUDE_BY_LANGUAGE = {
     "javascript": [*EXCLUDE, "builder", "dev"],
 }
 
-def runs_under(root, table, *, include_nonzero_exit=False, matrices=None):
-    """Completed runs under root. Given matrix logs (names under root, or PORTS_MATRICES, comma-separated), V2 runs are only those the logs list; V1 runs are kept."""
+def runs_under(root, table, *, include_nonzero_exit=False, study=None):
+    """Completed runs under root: every V1 run, and the V2 runs whose manifest names the study (PORTS_STUDY, default v2-test-configurations)."""
     # A fresh DirSQL scan every run, so a run banked since the last refresh is picked up.
     db = DirSQL(str(root), tables=[table])
     runs = completed_runs(db, table.name, include_nonzero_exit=include_nonzero_exit)
-    if matrices is None:
-        matrices = [name.strip() for name in os.environ.get("PORTS_MATRICES", "").split(",") if name.strip()]
-    if not matrices or not any(is_v2(run) for run in runs):
-        return runs
-    listed = matrix_run_ids(Path(root), matrices)
-    return [run for run in runs if not is_v2(run) or run["run_id"] in listed]
+    if study is None:
+        study = os.environ.get("PORTS_STUDY", "v2-test-configurations")
+    return [run for run in runs if not is_v2(run) or run["study"] == study]
 
 
 def codebases_under(root, table):

@@ -19,13 +19,14 @@ V2_CONDITION = {
 }
 
 
-def write_v2_run(run_dir, exit_code=0):
+def write_v2_run(run_dir, exit_code=0, study="v2-test-configurations"):
     (run_dir / "ported_implementation" / "src").mkdir(parents=True)
     (run_dir / "ported_implementation" / "src" / "index.ts").write_text("export default 1;\n")
     manifest = {
         "timestamp": "2026-10-12T09:49:53Z",
         "completed_at": "2026-10-12T09:56:41Z",
         "exit_code": exit_code,
+        "study": study,
         "condition": V2_CONDITION,
         "harness": {"commit": "87066d86c7b5986f693a3cbea4350f4ec11fec4d", "dirty": False},
     }
@@ -55,14 +56,6 @@ def write_v1_run(run_dir):
     }
     (run_dir / "manifest.json").write_text(json.dumps(manifest))
     (run_dir / "result.json").write_text(json.dumps({"is_error": False, "duration_ms": 1}))
-
-
-def write_matrix(path, *run_ids):
-    # The driver records each run's directory where it ran, often another worktree.
-    path.write_text(
-        "".join(json.dumps({"run_directory": f"/elsewhere/data/runs/{run_id}", "exit_code": 0}) + "\n" for run_id in run_ids)
-        + json.dumps({"run_directory": None, "exit_code": 1}) + "\n"
-    )
 
 
 @pytest.fixture
@@ -103,38 +96,31 @@ def describe_runs_under():
         runs = runs_under(tmp_path, runs_table(), include_nonzero_exit=True)
         assert [(run["run_id"], run["exit_code"]) for run in runs] == [("killed", 137), ("ok", 0)]
 
-    def it_keeps_only_the_v2_runs_the_named_matrices_list(tmp_path):
-        write_v2_run(tmp_path / "study")
-        write_v2_run(tmp_path / "pilot")
-        write_matrix(tmp_path / "matrix-study.jsonl", "study")
-        runs = runs_under(tmp_path, runs_table(), matrices=["matrix-study.jsonl"])
-        assert [run["run_id"] for run in runs] == ["study"]
+    def it_keeps_only_the_v2_runs_of_the_named_study(tmp_path):
+        write_v2_run(tmp_path / "effort", study="v2-model-effort")
+        write_v2_run(tmp_path / "tests", study="v2-test-configurations")
+        runs = runs_under(tmp_path, runs_table(), study="v2-model-effort")
+        assert [run["run_id"] for run in runs] == ["effort"]
 
-    def it_keeps_v1_runs_whatever_the_matrices(tmp_path):
+    def it_keeps_v1_runs_whatever_the_study(tmp_path):
         write_v1_run(tmp_path / "v1")
-        write_v2_run(tmp_path / "pilot")
-        write_matrix(tmp_path / "matrix-study.jsonl")
-        runs = runs_under(tmp_path, runs_table(), matrices=["matrix-study.jsonl"])
+        write_v2_run(tmp_path / "effort", study="v2-model-effort")
+        runs = runs_under(tmp_path, runs_table(), study="v2-test-configurations")
         assert [run["run_id"] for run in runs] == ["v1"]
 
-    def it_reads_no_matrix_under_a_root_without_v2_runs(tmp_path):
-        # The reverse-port scan holds V1 runs only and none of the runs directory's matrix logs.
-        write_v1_run(tmp_path / "v1")
-        runs = runs_under(tmp_path, runs_table(), matrices=["matrix-study.jsonl"])
-        assert [run["run_id"] for run in runs] == ["v1"]
+    def it_drops_a_v2_run_whose_manifest_names_no_study(tmp_path):
+        write_v2_run(tmp_path / "pilot", study=None)
+        assert runs_under(tmp_path, runs_table()) == []
 
-    def it_reads_the_matrices_from_PORTS_MATRICES(tmp_path, monkeypatch):
-        write_v2_run(tmp_path / "study")
-        write_v2_run(tmp_path / "pilot")
-        write_v2_run(tmp_path / "refill")
-        write_matrix(tmp_path / "matrix-a.jsonl", "study")
-        write_matrix(tmp_path / "matrix-b.jsonl", "refill")
-        monkeypatch.setenv("PORTS_MATRICES", "matrix-a.jsonl, matrix-b.jsonl")
-        assert [run["run_id"] for run in runs_under(tmp_path, runs_table())] == ["refill", "study"]
-        assert [codebase.run_id for codebase in codebases_under(tmp_path, runs_table())] == ["refill", "study"]
+    def it_reads_the_study_from_PORTS_STUDY(tmp_path, monkeypatch, pinned_reference):
+        write_v2_run(tmp_path / "effort", study="v2-model-effort")
+        write_v2_run(tmp_path / "tests", study="v2-test-configurations")
+        monkeypatch.setenv("PORTS_STUDY", "v2-model-effort")
+        assert [run["run_id"] for run in runs_under(tmp_path, runs_table())] == ["effort"]
+        assert [codebase.run_id for codebase in codebases_under(tmp_path, runs_table())] == ["effort"]
 
-    def it_keeps_every_run_without_PORTS_MATRICES(tmp_path, monkeypatch):
-        monkeypatch.delenv("PORTS_MATRICES", raising=False)
-        write_v2_run(tmp_path / "study")
-        write_v2_run(tmp_path / "pilot")
-        assert [run["run_id"] for run in runs_under(tmp_path, runs_table())] == ["pilot", "study"]
+    def it_reads_the_test_configurations_study_without_PORTS_STUDY(tmp_path, monkeypatch):
+        monkeypatch.delenv("PORTS_STUDY", raising=False)
+        write_v2_run(tmp_path / "effort", study="v2-model-effort")
+        write_v2_run(tmp_path / "tests", study="v2-test-configurations")
+        assert [run["run_id"] for run in runs_under(tmp_path, runs_table())] == ["tests"]
