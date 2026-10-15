@@ -31,7 +31,7 @@ MODELS = (
     "claude-opus-5-5",
     "claude-sonnet-5-5",
     "claude-fable-5-1",
-    "claude-haiku-4-5-20251001",
+    "claude-haiku-5-5",
 )
 # The approved study: 16 cells a round, 12 rounds, 192 runs.
 DEFAULT_MODELS = ("claude-opus-5-5",)
