@@ -147,3 +147,9 @@ def describe_git_diff():
         b = write_tree(tmp_path.resolve() / "ts-b", {"src/m.ts": source})
         report = measure(a, b, language="typescript")
         assert (report["diff_ratio"], report["identical"], report["reference_lines"]) == (0.0, 1, 1)
+
+    def it_measures_a_javascript_pair_written_in_typescript_through_prettier(tmp_path):
+        a = write_tree(tmp_path.resolve() / "js-a", {"src/m.ts": "// note\nexport const f = (a:number)=>a+1\n"})
+        b = write_tree(tmp_path.resolve() / "js-b", {"src/m.ts": "export const f = (a: number) => a + 1;\n"})
+        report = measure(a, b, language="javascript")
+        assert (report["diff_ratio"], report["identical"], report["reference_lines"]) == (0.0, 1, 1)

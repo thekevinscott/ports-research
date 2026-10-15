@@ -102,6 +102,17 @@ def describe_measure_code_distance():
         assert report["token_levenshtein_raw"] == pytest.approx(3 / 14)
         assert report["char_levenshtein"] == pytest.approx(3 / 39)
 
+    def it_reports_the_typescript_distances_for_a_javascript_pair_written_in_typescript(typescript_pair):
+        a, b = typescript_pair
+        result = run_cli(
+            "--language", "javascript", "--a", str(a), "--b", str(b),
+            "--exclude", "*.test.ts", "--exclude", "node_modules",
+        )
+        assert result.returncode == 0, result.stderr
+        report = json.loads(result.stdout)
+        assert (report["file_count_a"], report["file_count_b"]) == (1, 1)
+        assert report["token_levenshtein_raw"] == pytest.approx(3 / 14)
+
     def it_is_zero_for_a_codebase_against_itself(python_pair):
         a, _ = python_pair
         result = run_cli("--language", "python", "--a", str(a), "--b", str(a))
