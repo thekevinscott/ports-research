@@ -46,7 +46,7 @@ uv run --env-file ../../.env python scripts/study_test_configurations.py
 | `--n` | `12` rounds. `0` runs until stopped. |
 | `-k`, `--parallel` | `4` concurrent jobs. Each job is one Docker container running the agent and its test runs. |
 | `--efforts` | `medium`. Comma-separated, e.g. `low,xhigh`. |
-| `--models` | `claude-opus-5-5`. Any of `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-fable-5-1`, `claude-haiku-4-5-20251001`. |
+| `--models` | `claude-opus-5-5`. Any of `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-fable-5-1`, `claude-haiku-5-5`. |
 | `--source-languages` | Both. |
 | `--cells` | All. Names are the manifest's condition name, as printed per run, e.g. `source-python_unit-tests_effort-medium_model-claude-opus-5-5`. |
 
