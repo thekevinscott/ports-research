@@ -9,6 +9,7 @@ from src.transcript_wall_ms import transcript_wall_ms
 RUNS_COLUMNS = {
     "run_id": "TEXT PRIMARY KEY",
     "run_dir": "TEXT",
+    "study": "TEXT",
     "timestamp": "TEXT",
     "completed_at": "TEXT",
     "source_language": "TEXT",
@@ -67,6 +68,7 @@ def _row(manifest_path: Path, manifest: dict) -> dict:
     return {
         "run_id": manifest_path.parent.name,
         "run_dir": str(manifest_path.parent),
+        "study": manifest.get("study"),
         "timestamp": manifest["timestamp"],
         "completed_at": manifest.get("completed_at"),
         "source_language": condition["source_language"],

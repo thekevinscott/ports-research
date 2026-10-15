@@ -1,17 +1,14 @@
 """Shared corpus selection for the notebook and embedding pair export."""
 
-import os
 from pathlib import Path
 
 from dirsql._dirsql import DirSQL
 
 from src.Codebase import REFERENCE_CHECKOUT, Codebase, pinned_reference
-from src.matrix_run_ids import matrix_run_ids
 from src.run_table import completed_runs, is_v2
 
 ROOT = Path(__file__).resolve().parents[3]
-# PORTS_RUNS_DIR points the scan at another runs directory, such as a scratch copy.
-DATA = Path(os.environ.get("PORTS_RUNS_DIR", ROOT / "data" / "runs"))
+DATA = ROOT / "data" / "runs"
 REVERSE = ROOT / "analysis" / "round-trip-experiment" / "reverse"
 # The pinned gbnf reference, one package per language.
 REFERENCE = REFERENCE_CHECKOUT / "packages" / "gbnf"
@@ -38,20 +35,15 @@ EXCLUDE_BY_LANGUAGE = {
     "javascript": [*EXCLUDE, "builder", "dev"],
 }
 
-def runs_under(root, table, *, include_nonzero_exit=False, matrices=None):
-    """Completed runs under root. Given matrix logs (names under root, or PORTS_MATRICES, comma-separated), V2 runs are only those the logs list; V1 runs are kept."""
+def runs_under(root, table, study, *, include_nonzero_exit=False):
+    """Completed runs under root: every V1 run, and the V2 runs whose manifest names the study."""
     # A fresh DirSQL scan every run, so a run banked since the last refresh is picked up.
     db = DirSQL(str(root), tables=[table])
     runs = completed_runs(db, table.name, include_nonzero_exit=include_nonzero_exit)
-    if matrices is None:
-        matrices = [name.strip() for name in os.environ.get("PORTS_MATRICES", "").split(",") if name.strip()]
-    if not matrices or not any(is_v2(run) for run in runs):
-        return runs
-    listed = matrix_run_ids(Path(root), matrices)
-    return [run for run in runs if not is_v2(run) or run["run_id"] in listed]
+    return [run for run in runs if not is_v2(run) or run["study"] == study]
 
 
-def codebases_under(root, table):
+def codebases_under(root, table, study):
     pinned_reference()
     return [
         Codebase.from_run(
@@ -59,6 +51,6 @@ def codebases_under(root, table):
             exclude=EXCLUDE_BY_LANGUAGE[row["target_language"]],
             reference=REFERENCE / row["target_language"],
         )
-        for row in runs_under(root, table)
+        for row in runs_under(root, table, study)
     ]
 
