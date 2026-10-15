@@ -26,11 +26,9 @@ from conftest import (
 # text here too, or the two sides drift together and prove nothing.
 UPSTREAM_PROMPT = (
     "Port the implementation under {source_language}/ to {target_language}.\n"
-    "There is no network access. uv, pytest, pnpm and vitest are installed.\n"
 )
 UPSTREAM_PROMPT_WITH_EVERY_SUITE = (
     "Port the implementation under python/ to typescript.\n"
-    "There is no network access. uv, pytest, pnpm and vitest are installed.\n"
     "\n"
     "The following test suites are included:\n"
     "\n"
@@ -40,7 +38,6 @@ UPSTREAM_PROMPT_WITH_EVERY_SUITE = (
 )
 UPSTREAM_PROMPT_WITH_EVERY_SUITE_FROM_JAVASCRIPT = (
     "Port the implementation under javascript/ to python.\n"
-    "There is no network access. uv, pytest, pnpm and vitest are installed.\n"
     "\n"
     "The following test suites are included:\n"
     "\n"
@@ -442,16 +439,6 @@ def describe_the_rendered_prompt():
         assert "python" in call["prompt"]
         assert "{" not in call["prompt"]
         assert "}" not in call["prompt"]
-
-    @pytest.mark.parametrize("source_language", ["python", "javascript"])
-    def it_states_the_environment_whichever_the_direction(
-        experiment, porting_calls, source_language
-    ):
-        experiment(source_language=source_language)
-        [call] = porting_calls
-        assert "There is no network access. uv, pytest, pnpm and vitest are installed.\n" in (
-            call["prompt"]
-        )
 
     def it_calls_javascript_typescript(experiment, porting_calls):
         experiment(source_language="python", include_target_integration_tests=True)

@@ -1,5 +1,2 @@
 Port the implementation under {source_language}/ to {target_language}.
-There is no network access beyond the model API. Package registries are blocked: uv, pnpm and npm cannot install anything. /input is read-only.
-pytest (with pytest-describe) and vitest are installed globally. Run them directly; `uv sync` fails, and so does `uv run` in any directory with a pyproject.toml.
-A vitest config under ESM ("type": "module" in package.json, or a .mjs file) cannot import vitest/config; a .cjs config can.
 {suites_information}
