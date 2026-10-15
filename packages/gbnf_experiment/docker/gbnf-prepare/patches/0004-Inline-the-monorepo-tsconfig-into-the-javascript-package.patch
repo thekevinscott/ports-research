@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: thekevinbot <248217931+thekevinbot@users.noreply.github.com>
+Date: Wed, 14 Oct 2026 23:24:15 -0400
+Subject: [PATCH 4/5] Inline the monorepo tsconfig into the javascript package
+
+---
+ packages/gbnf/javascript/tsconfig.json | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/packages/gbnf/javascript/tsconfig.json b/packages/gbnf/javascript/tsconfig.json
+index 2060e01..e72f04e 100755
+--- a/packages/gbnf/javascript/tsconfig.json
++++ b/packages/gbnf/javascript/tsconfig.json
+@@ -1,6 +1,13 @@
+ {
+-  "extends": "../../../tsconfig.json",
+   "compilerOptions": {
++    "lib": ["ESNext"],
++    "strict": true,
++    "experimentalDecorators": true,
++    "useDefineForClassFields": false,
++    "esModuleInterop": true,
++    "forceConsistentCasingInFileNames": true,
++    "strictNullChecks": true,
++    "skipLibCheck": true,
+     "target": "esnext",
+     "module": "nodenext",
+     "moduleResolution": "nodenext",
