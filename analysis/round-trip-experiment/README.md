@@ -110,8 +110,8 @@ existing directory and is resolved absolute.
   `~/.cache/ports/round-trip-experiment/derivations/<forward run id>/<derivation cache key>/source/<reverse source language>/`,
   build artefacts (`node_modules`, `__pycache__`, `.venv`, `.pytest_cache`, `dist`) left
   out, and symlinks the real derivation cache's `tests/` beside it. `assemble_reference_implementation`
-  cannot tell the staged tree from a derived one. The cache key is gbnf_experiment's own,
-  imported from its config. Prints one JSON object — `forward` (the forward run id and its
+  cannot tell the staged tree from a derived one. The cache key is the one gbnf_experiment
+  computes for the tree holding every test of the reverse source language. Prints one JSON object — `forward` (the forward run id and its
   condition), `condition` (the reverse one), `staged`, `reverse_root`, `argv`, `env`,
   `estimate` — and starts nothing.
 - **`run`** stages, launches `argv` as a subprocess with `env` over the inherited

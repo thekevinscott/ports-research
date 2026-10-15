@@ -19,14 +19,14 @@ COMMAND = {"argv": ["uv", "run", "run_gbnf_experiment"], "env": {"GBNF_EXPERIMEN
 RUN = Path("/data/20260909T001426Z_1c28aa33")
 STAGED = Path("/cache/staging/20260909T001426Z_1c28aa33/390bf534c55d496b")
 PLACES = dict(
-    derivation_cache_key="390bf534c55d496b",
+    derivation_cache_key=lambda source_language: "390bf534c55d496b",
     derivations_directory=Path("/cache/gbnf-experiment/derivations"),
     gbnf_experiment_directory=Path("/repo/packages/gbnf_experiment"),
     staging_directory=Path("/cache/staging"),
     reverse_directory=Path("/repo/analysis/round-trip-experiment/reverse"),
 )
 REVERSE_CONDITION = {
-    "source_language": "typescript",
+    "source_language": "javascript",
     "include_typescript_tests": True,
     "include_python_tests": True,
     "effort": "high",
@@ -80,11 +80,17 @@ def describe_reverse_leg():
     def it_stages_the_port_as_the_reverse_source_languages_derived_source(report, collaborators):
         assert collaborators["stage_port"].call_args.args == (RUN,)
         assert collaborators["stage_port"].call_args.kwargs == {
-            "source_language": "typescript",
+            "source_language": "javascript",
             "derivation_cache_key": "390bf534c55d496b",
             "derivations_directory": PLACES["derivations_directory"],
             "staging_directory": PLACES["staging_directory"],
         }
+
+    def it_keys_the_staging_by_the_reverse_source_language(collaborators):
+        asked = []
+        reverse_leg(RUN, **{**PLACES, "derivation_cache_key": lambda language: asked.append(language) or "k"})
+        assert asked == ["javascript"]
+        assert collaborators["stage_port"].call_args.kwargs["derivation_cache_key"] == "k"
 
     def it_checks_the_staged_derivation_against_the_reverse_condition(report, collaborators):
         collaborators["check_staged_derivation"].assert_called_once_with(STAGED, condition=REVERSE_CONDITION)
