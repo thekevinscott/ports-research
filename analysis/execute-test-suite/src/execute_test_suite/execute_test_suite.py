@@ -1,25 +1,26 @@
 import dataclasses
+import tempfile
 from pathlib import Path
 
 from execute_test_suite.locate_test_suite import locate_test_suite
 from execute_test_suite.run_pytest_suite import run_pytest_suite
 from execute_test_suite.run_vitest_suite import run_vitest_suite
+from execute_test_suite.stage_test_suite import stage_test_suite
 
 
 def execute_test_suite(
     *,
     language: str,
     target: Path,
-    derivations_directory: Path,
-    derivation_cache_key: str,
-    suite: str | None = None,
+    suite: str,
     adapt: bool = False,
     coverage: bool = False,
 ) -> dict:
-    """Run language's canonical gbnf test suite against one ported implementation.
+    """Run one of the pinned reference's gbnf test suites against one ported implementation.
 
-    `suite` narrows the run: "integration" is the grammar-fixtures test alone,
-    "unit" is everything else, None is the whole suite.
+    "integration" is every generated integration test; "unit" is the reference's
+    colocated unit tests. Either runs inside a scratch copy of `target` with the
+    suite's files overlaid at their reference paths.
 
     `adapt` grades through a per-language shim over the port's API surface and adds
     an `adapt.rules_fired` section naming the rules that applied. Off, the report
@@ -28,8 +29,7 @@ def execute_test_suite(
     `coverage` measures how much of `target`'s own source the run executed and adds
     a `coverage` section. `branch_pct` is null for a source that never branches.
 
-    `target` is graded, never written to: the suite runs from a scratch directory,
-    reading `target` and the derivation cache and writing its report elsewhere.
+    `target` and the prepared reference tree are read, never written to.
 
     The runner lookup is built here, not at module scope: a module-scope dict would
     capture `run_pytest_suite`/`run_vitest_suite` once at import time, so patching
@@ -40,18 +40,19 @@ def execute_test_suite(
         "typescript": run_vitest_suite,
         "javascript": run_vitest_suite,
     }
-    test_suite_directory = locate_test_suite(
-        language,
-        derivations_directory=derivations_directory,
-        derivation_cache_key=derivation_cache_key,
-    )
-    result = runners[language](
-        test_suite_directory=test_suite_directory,
-        target=target,
-        suite=suite,
-        adapt=adapt,
-        coverage=coverage,
-    )
+    test_suite_directory = locate_test_suite(language)
+    with tempfile.TemporaryDirectory() as scratch:
+        staged = Path(scratch) / "port"
+        test_files = stage_test_suite(
+            language=language,
+            suite=suite,
+            test_suite_directory=test_suite_directory,
+            target=target,
+            destination=staged,
+        )
+        result = runners[language](
+            target=staged, test_files=test_files, adapt=adapt, coverage=coverage
+        )
     counts = dataclasses.asdict(result)
     rules_fired = counts.pop("rules_fired")
     counts.pop("coverage")

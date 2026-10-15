@@ -24,6 +24,12 @@ def describe_coverage_result():
         )
         assert result.branch_pct is None
 
+    def it_reports_zero_for_a_run_that_measured_no_lines():
+        result = CoverageResult(
+            covered_lines=0, total_lines=0, covered_branches=0, total_branches=0
+        )
+        assert result.line_pct == 0.0
+
     def it_is_frozen():
         result = CoverageResult(
             covered_lines=1, total_lines=1, covered_branches=0, total_branches=0

@@ -7,10 +7,9 @@ from execute_test_suite.coverage_result import CoverageResult
 class SuiteResult:
     """Pass/fail counts from one test suite run.
 
-    `errors` is separate from `failed`: pytest's junit-xml distinguishes a test that
-    ran and asserted wrong from one that never ran (an import or fixture blew up
-    during collection). Vitest does not surface that distinction at the test level,
-    so a vitest-backed result always reports zero errors.
+    `errors` is separate from `failed`: a test that ran and asserted wrong is a
+    failure; a test file that never got to run a test (an import or fixture blew up
+    during collection) is an error.
 
     `rules_fired` names the adaptation rules a shim applied; empty on a strict run.
     `coverage` is None unless the run was asked to measure it.

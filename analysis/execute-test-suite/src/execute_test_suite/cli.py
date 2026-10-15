@@ -3,7 +3,6 @@ import sys
 from pathlib import Path
 
 import click
-from gbnf_experiment.config import prepare_cache_key, settings
 
 from execute_test_suite.execute_test_suite import execute_test_suite
 
@@ -19,10 +18,10 @@ from execute_test_suite.execute_test_suite import execute_test_suite
     type=click.Path(exists=True, file_okay=False, path_type=Path, resolve_path=True),
     required=True,
 )
-@click.option("--suite", type=click.Choice(["unit", "integration"]), default=None)
+@click.option("--suite", type=click.Choice(["unit", "integration"]), required=True)
 @click.option("--adapt", is_flag=True, default=False)
 @click.option("--coverage", is_flag=True, default=False)
-def cli(language: str, target: Path, suite: str | None, adapt: bool, coverage: bool) -> None:
+def cli(language: str, target: Path, suite: str, adapt: bool, coverage: bool) -> None:
     try:
         report = execute_test_suite(
             language=language,
@@ -30,8 +29,6 @@ def cli(language: str, target: Path, suite: str | None, adapt: bool, coverage: b
             suite=suite,
             adapt=adapt,
             coverage=coverage,
-            derivations_directory=settings.prepared_directory,
-            derivation_cache_key=prepare_cache_key,
         )
     except Exception as e:
         raise click.ClickException(str(e))
