@@ -15,3 +15,11 @@ The whitelist withholds `src/builder/`, but at the pin both Vite configs still n
 ## 0003-Drop-the-builder-from-the-javascript-manifest
 
 `packages/gbnf/javascript/package.json` is whitelisted so the agent can see how the suite imports the package, but at the pin it still advertised the withheld `src/builder/`: a `./builder` entry in `exports` pointing at `dist/builder/index.js` and `dist/builder/index.umd.cjs`, and three `path-exists ./dist/builder/*` assertions in the wireit `build:check` command. The whitelisted tree must not reference what the whitelist withholds, so the patch removes both. Same class as 0001.
+
+## 0004-Inline-the-monorepo-tsconfig-into-the-javascript-package
+
+`packages/gbnf/javascript/tsconfig.json` extends `../../../tsconfig.json`, the monorepo root. `/shared` holds `packages/gbnf` alone, so in the sandbox the path points at nothing and vitest's esbuild step fails to load every test file. The patch drops the `extends` line and copies in the eight parent options the child does not already set. Kevin, 2026-10-14: "Can we take the root tsconfig and include in the other tsconfig?"
+
+## 0005-Drop-the-builder-case-from-the-javascript-gbnf-test
+
+`src/gbnf.test.ts` imports the withheld `src/builder/template-tags.js` for one test case, so the whole file fails to load. The patch removes that import and that case and nothing else. Same class as 0001. Kevin, 2026-10-14: "Cut the case. Smallest targeted edits."
