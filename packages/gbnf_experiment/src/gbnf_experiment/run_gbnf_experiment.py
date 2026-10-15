@@ -16,6 +16,7 @@ PROMPT_PATH = Path(__file__).parent / "prompts" / "prompt.txt"
 def run_gbnf_experiment(
     *,
     agent: Agent,
+    study: str,
     source_language: str,
     include_unit_tests: bool,
     include_source_integration_tests: bool,
@@ -44,7 +45,7 @@ def run_gbnf_experiment(
         effort=agent.effort,
         model=agent.model,
     )
-    prepared_filesystem.write_manifest(agent, **condition)
+    prepared_filesystem.write_manifest(agent, study=study, **condition)
     try:
         result = port_codebase(
             agent=agent,
@@ -62,12 +63,12 @@ def run_gbnf_experiment(
             output=prepared_filesystem.ported_implementation_directory,
         )
     except Exception as e:
-        prepared_filesystem.write_result(None, agent, error=str(e), **condition)
+        prepared_filesystem.write_result(None, agent, study=study, error=str(e), **condition)
         raise
     for path, text in result.transcript.items():
         destination = prepared_filesystem.transcript_directory / path
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(text)
     prepared_filesystem.proxy_log.write_text(result.proxy)
-    prepared_filesystem.write_result(result, agent, **condition)
+    prepared_filesystem.write_result(result, agent, study=study, **condition)
     return prepared_filesystem.run_directory
