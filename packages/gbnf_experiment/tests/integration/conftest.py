@@ -32,17 +32,15 @@ def volume_source(volumes, target):
 
 @pytest.fixture
 def data_directory(tmp_path):
-    directory = tmp_path / "data"
-    with patch.object(settings, "data_directory", directory):
-        yield directory
+    return tmp_path / "data"
 
 
 @pytest.fixture(autouse=True)
 def prepared_directory(tmp_path):
     """The prepared corpus cache, redirected out of the user's real ~/.cache.
 
-    Autouse: the cache no longer sits under data_directory, so redirecting that
-    alone would leave any test that prepares writing into the host's cache.
+    Autouse: the cache sits outside the output directory, so pointing output at
+    tmp_path alone would leave any test that prepares writing into the host's cache.
     """
     directory = tmp_path / "cache" / "prepared"
     with patch.object(settings, "prepared_directory", directory):

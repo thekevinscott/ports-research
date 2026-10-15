@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from pathlib import Path
 
 from botbox import Agent, RunResult
 
@@ -17,6 +18,7 @@ class PreparedFilesystem:
         include_source_integration_tests: bool,
         include_target_integration_tests: bool,
         debug: bool,
+        output: Path,
     ):
         self.timestamp = datetime.now(UTC)
         # The extracted /shared, mounted as the agent's source as it is.
@@ -32,7 +34,7 @@ class PreparedFilesystem:
             for path in self.reference_implementation_directory.rglob("*")
             if path.is_file()
         )
-        self.run_directory = settings.data_directory / run_directory_name(self.timestamp)
+        self.run_directory = output / run_directory_name(self.timestamp)
         self.ported_implementation_directory = self.run_directory / "ported_implementation"
         self.ported_implementation_directory.mkdir(parents=True)
         self.transcript_directory = self.run_directory / "transcript"

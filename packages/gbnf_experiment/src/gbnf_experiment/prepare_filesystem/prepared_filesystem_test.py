@@ -44,7 +44,6 @@ def settings(tmp_path):
         "gbnf_experiment.prepare_filesystem.prepared_filesystem.settings", autospec=True
     ) as m:
         m.prepared_directory = tmp_path / "cache" / "prepared"
-        m.data_directory = tmp_path / "data"
         m.gbnf_commit = "13f1aca"
         yield m
 
@@ -88,13 +87,19 @@ def docker_module():
 
 
 @pytest.fixture
+def output(tmp_path):
+    return tmp_path / "data"
+
+
+@pytest.fixture
 def filesystem(
     settings,
     prepare_reference_implementation,
     subprocess_module,
     docker_module,
+    output,
 ):
-    return PreparedFilesystem(source_language="javascript", **TESTS, debug=False)
+    return PreparedFilesystem(source_language="javascript", **TESTS, debug=False, output=output)
 
 
 def manifest(filesystem) -> dict:
@@ -115,6 +120,15 @@ def describe_the_reference_implementation():
     def it_lists_every_file_in_it_relative_to_its_root(filesystem):
         filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
         assert manifest(filesystem)["reference_implementation"]["included"] == list(SHARED)
+
+
+def describe_the_run_directory():
+    def it_lands_in_the_output_directory_it_was_given(filesystem, output):
+        assert filesystem.run_directory.parent == output
+
+    def it_requires_an_output_directory(settings, prepare_reference_implementation):
+        with pytest.raises(TypeError, match="output"):
+            PreparedFilesystem(source_language="javascript", **TESTS, debug=False)
 
 
 def describe_the_manifest_at_the_start_of_the_run():
