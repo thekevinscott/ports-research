@@ -1,0 +1,7 @@
+# 2026-10-15T22:05Z — Exit 137 runs are systemd-oomd kills; exit 1 runs are API billing failures
+
+Kevin asked what exit 137 is and whether every non-zero exit is suspect. Both non-zero codes in the V2 data are infrastructure failures, not agent behaviour.
+
+- **Exit 137 (16 runs: 8 per V2 study).** `journalctl -u systemd-oomd` shows `Killed /system.slice/docker-<id>.scope due to memory used (~46.9 GB) / total (49.5 GB)` at the minute each 137 run completed: Oct 12 05:06Z, 05:55Z, 11:30Z, 11:53Z; Oct 15 06:56Z, 06:57Z, 16:00Z, 16:01Z, 16:24Z, 18:58Z, 20:07Z. One further 137 (19:26Z) was a manual `docker kill`. No kernel OOM entries. The harness and botbox set no memory limit and no timeout; `docker inspect` shows `Memory 0`. In every 137 run the last transcript entry is a Bash tool call running the agent's own fuzz or differential test over random grammars; the live Sonnet max container had `memory.peak` 18.6 GB. Five concurrent runs of that shape exceed the host's 46 GB and systemd-oomd kills whole containers. No result.json is written, so these runs never count as completed and the runner re-does the cell.
+- **Exit 1 (84 runs).** All have a result.json with `is_error: true`. v2-test-configurations, 67: "Credit balance is too low". v2-model-effort, 17: "You've hit your monthly spend limit". Both are the API key's billing, consistent with those runs having billed the key.
+- The notebook's completed predicate (`exit_code = 0 AND is_error = 0 AND error IS NULL AND completed_at IS NOT NULL`) already excludes every one of these.
