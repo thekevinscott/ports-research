@@ -38,18 +38,17 @@ def completed_run(experiment_data: Path, prepared_cache: Path) -> Path:
     """One real port, driven through the installed entry point. This bills.
 
     A subprocess rather than CliRunner because settings read the environment at
-    import, so redirecting the data directory only holds in a fresh
+    import, so redirecting the prepared cache only holds in a fresh
     interpreter. The command line is the whole public surface of this package,
     and every e2e assertion is made against what it leaves on disk.
     """
     result = subprocess.run(
-        ["uv", "run", "run_gbnf_experiment", "--source-language", "python"],
+        [
+            "uv", "run", "run_gbnf_experiment", "--source-language", "python",
+            "--study", "e2e", "--output", str(experiment_data),
+        ],
         cwd=PACKAGE_ROOT,
-        env={
-            **os.environ,
-            "GBNF_EXPERIMENT_DATA_DIRECTORY": str(experiment_data),
-            "GBNF_EXPERIMENT_PREPARED_DIRECTORY": str(prepared_cache),
-        },
+        env={**os.environ, "GBNF_EXPERIMENT_PREPARED_DIRECTORY": str(prepared_cache)},
         capture_output=True,
         text=True,
     )

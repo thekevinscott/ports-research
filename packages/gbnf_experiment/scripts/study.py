@@ -19,7 +19,6 @@ from time import monotonic
 from botbox import ClaudeAgent
 
 from gbnf_experiment.condition_name import LABELS, condition_name
-from gbnf_experiment.config import settings
 from gbnf_experiment.prepare_filesystem.prepare_reference_implementation import (
     prepare_reference_implementation,
 )
@@ -66,7 +65,7 @@ def now() -> str:
     return datetime.now(UTC).isoformat()
 
 
-def run_cell(round_number: int, cell: dict, *, study: str, api_key: str | None) -> dict:
+def run_cell(round_number: int, cell: dict, *, study: str, output: Path, api_key: str | None) -> dict:
     start = monotonic()
     record = {
         "round": round_number,
@@ -84,6 +83,7 @@ def run_cell(round_number: int, cell: dict, *, study: str, api_key: str | None) 
         run_directory = run_gbnf_experiment(
             agent=ClaudeAgent(model=cell["model"], effort=cell["effort"], api_key=api_key),
             study=study,
+            output=output,
             source_language=cell["source_language"],
             **{flag: cell[flag] for flag in FLAGS},
             debug=False,
@@ -126,11 +126,15 @@ def run_study(
     n: int | None,
     parallel: int,
     api_key: str | None,
-    out: Path,
+    log: Path,
+    output: Path,
     prior: Counter | None = None,
     runs: int | None = None,
 ) -> dict | None:
-    """Returns the first run that failed on credit or auth, after the in-flight runs finish."""
+    """Runs land in `output`, one record per run appended to `log`.
+
+    Returns the first run that failed on credit or auth, after the in-flight runs finish.
+    """
     # Concurrent prepares of one condition collide in its shared staging directory.
     for condition in {tuple((key, cell[key]) for key in ("source_language", *FLAGS)) for cell in cells}:
         prepare_reference_implementation(**dict(condition), debug=False)
@@ -140,14 +144,14 @@ def run_study(
     exit_codes = Counter()
     failures = 0
     in_flight = set()
-    with ProcessPoolExecutor(parallel, initializer=ignore_interrupts) as pool, out.open("a") as log:
+    with ProcessPoolExecutor(parallel, initializer=ignore_interrupts) as pool, log.open("a") as records:
         while True:
             while not stopping and len(in_flight) < parallel:
                 run = next(queue, None)
                 if run is None:
                     stopping = True
                 else:
-                    in_flight.add(pool.submit(run_cell, *run, study=study, api_key=api_key))
+                    in_flight.add(pool.submit(run_cell, *run, study=study, output=output, api_key=api_key))
             if not in_flight:
                 break
             try:
@@ -158,8 +162,8 @@ def run_study(
                 continue
             for future in done:
                 record = future.result()
-                log.write(json.dumps(record) + "\n")
-                log.flush()
+                records.write(json.dumps(record) + "\n")
+                records.flush()
                 print(
                     f"round {record['round']} {cell_name(record['cell'])}: "
                     f"exit_code={record['exit_code']} error={record['error']}",
@@ -187,6 +191,12 @@ def run_study(
 
 def argument_parser(description: str) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=description)
+    parser.add_argument(
+        "--output",
+        required=True,
+        type=Path,
+        help="Directory the runs and this study's jsonl land in. No default: runs belong in the root checkout's data/runs.",
+    )
     parser.add_argument(
         "--n", type=int, default=DEFAULT_ROUNDS, help="Rounds; 0 runs until stopped. Default: %(default)s."
     )
@@ -227,9 +237,12 @@ def main(study: str, cells: list[dict], args: argparse.Namespace) -> None:
             + f"; total {sum(shortfalls.values())}",
             file=sys.stderr,
         )
-    settings.data_directory.mkdir(parents=True, exist_ok=True)
-    out = settings.data_directory / f"matrix-{datetime.now(UTC):%Y%m%dT%H%M%SZ}.jsonl"
-    print(f"{study}: {len(cells)} cells; auth {args.auth}; writing {out}", file=sys.stderr)
-    stopped = run_study(study, cells, n=n, parallel=args.parallel, api_key=api_key, out=out, prior=prior, runs=args.runs)
+    output = args.output
+    output.mkdir(parents=True, exist_ok=True)
+    log = output / f"matrix-{datetime.now(UTC):%Y%m%dT%H%M%SZ}.jsonl"
+    print(f"{study}: {len(cells)} cells; auth {args.auth}; writing {log}", file=sys.stderr)
+    stopped = run_study(
+        study, cells, n=n, parallel=args.parallel, api_key=api_key, log=log, output=output, prior=prior, runs=args.runs
+    )
     if stopped:
         sys.exit(1)

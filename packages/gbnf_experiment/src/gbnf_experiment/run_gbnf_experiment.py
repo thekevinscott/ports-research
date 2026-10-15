@@ -17,6 +17,7 @@ def run_gbnf_experiment(
     *,
     agent: Agent,
     study: str,
+    output: Path,
     source_language: str,
     include_unit_tests: bool,
     include_source_integration_tests: bool,
@@ -29,7 +30,7 @@ def run_gbnf_experiment(
         include_target_integration_tests=include_target_integration_tests,
     )
     prepared_filesystem = PreparedFilesystem(
-        source_language=source_language, **tests, debug=debug
+        source_language=source_language, **tests, debug=debug, output=output
     )
     target = TARGET_LANGUAGES[source_language]
     condition = dict(

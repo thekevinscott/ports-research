@@ -34,13 +34,18 @@ def describe_cells():
 
 
 def describe_main():
-    def it_runs_the_forty_cells_as_v2_model_effort_for_twelve_rounds_by_default(study):
-        main([])
+    def it_runs_the_forty_cells_as_v2_model_effort_for_twelve_rounds_by_default(tmp_path, study):
+        main(["--output", str(tmp_path)])
         assert study.call_args.args == ("v2-model-effort", cells())
         assert study.call_args.kwargs["n"] == 12
 
-    def it_takes_the_shared_flags(study):
-        main(["--n", "3", "-k", "2", "--runs", "5"])
+    def it_requires_an_output_directory(study):
+        with pytest.raises(SystemExit):
+            main([])
+        study.assert_not_called()
+
+    def it_takes_the_shared_flags(tmp_path, study):
+        main(["--output", str(tmp_path), "--n", "3", "-k", "2", "--runs", "5"])
         assert (study.call_args.kwargs["n"], study.call_args.kwargs["parallel"], study.call_args.kwargs["runs"]) == (
             3,
             2,
