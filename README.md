@@ -104,7 +104,7 @@ Python 3.14 or later. No root workspace: `uv sync` in each
 package. The core packages chain through editable path deps: port_codebase
 -> agent-harness-sandbox, gbnf_experiment -> port_codebase,
 execute-test-suite -> gbnf_experiment. gbnf_experiment reads
-`GBNF_EXPERIMENT_*` env vars (pydantic-settings; among them `DATA_DIRECTORY`,
+`GBNF_EXPERIMENT_*` env vars (pydantic-settings; among them
 `PREPARED_DIRECTORY`, `GBNF_COMMIT`, `IMAGE_TAG`) and `XDG_CACHE_HOME` for
 the cache root.
 
