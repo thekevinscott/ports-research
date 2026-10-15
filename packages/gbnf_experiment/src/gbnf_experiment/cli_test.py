@@ -8,7 +8,9 @@ from gbnf_experiment.cli import cli
 
 
 RUN_DIRECTORY = Path("/pkg/data/20260906T142530Z_9f2b1c04")
-SOURCE_LANGUAGE = ["--source-language", "javascript"]
+STUDY = ["--study", "probe"]
+OUTPUT = ["--output", "/data/runs"]
+SOURCE_LANGUAGE = ["--source-language", "javascript", *STUDY, *OUTPUT]
 
 
 @pytest.fixture
@@ -42,6 +44,8 @@ def describe_cli():
         CliRunner().invoke(cli, SOURCE_LANGUAGE)
         gbnf_experiment.assert_called_once_with(
             agent=claude_agent.return_value,
+            study="probe",
+            output=Path("/data/runs"),
             source_language="javascript",
             include_unit_tests=False,
             include_source_integration_tests=False,
@@ -56,11 +60,11 @@ def describe_cli():
         gbnf_experiment.assert_not_called()
 
     def it_forwards_the_source_language(gbnf_experiment):
-        CliRunner().invoke(cli, ["--source-language", "python"])
+        CliRunner().invoke(cli, ["--source-language", "python", *STUDY, *OUTPUT])
         assert gbnf_experiment.call_args.kwargs["source_language"] == "python"
 
     def it_rejects_an_unsupported_source_language(gbnf_experiment):
-        result = CliRunner().invoke(cli, ["--source-language", "rust"])
+        result = CliRunner().invoke(cli, ["--source-language", "rust", *STUDY, *OUTPUT])
         assert result.exit_code != 0
         gbnf_experiment.assert_not_called()
 
@@ -84,6 +88,27 @@ def describe_cli():
         result = CliRunner().invoke(cli, [*SOURCE_LANGUAGE, flag])
         assert result.exit_code != 0
         gbnf_experiment.assert_not_called()
+
+    def it_requires_a_study(gbnf_experiment):
+        result = CliRunner().invoke(cli, ["--source-language", "javascript", *OUTPUT])
+        assert result.exit_code != 0
+        assert "--study" in result.output
+        gbnf_experiment.assert_not_called()
+
+    def it_forwards_the_study(gbnf_experiment):
+        CliRunner().invoke(cli, ["--source-language", "javascript", "--study", "v2-model-effort", *OUTPUT])
+        assert gbnf_experiment.call_args.kwargs["study"] == "v2-model-effort"
+
+    def it_requires_an_output_directory(gbnf_experiment):
+        """No default: a default landed runs in whichever checkout ran them."""
+        result = CliRunner().invoke(cli, ["--source-language", "javascript", *STUDY])
+        assert result.exit_code != 0
+        assert "--output" in result.output
+        gbnf_experiment.assert_not_called()
+
+    def it_forwards_the_output_directory_as_a_path(gbnf_experiment):
+        CliRunner().invoke(cli, ["--source-language", "javascript", *STUDY, "--output", "/elsewhere"])
+        assert gbnf_experiment.call_args.kwargs["output"] == Path("/elsewhere")
 
     def it_forwards_debug(gbnf_experiment):
         CliRunner().invoke(cli, [*SOURCE_LANGUAGE, "--debug"])

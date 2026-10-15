@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from pathlib import Path
 from itertools import count
 from time import sleep
 from unittest.mock import DEFAULT, Mock, patch
@@ -20,8 +21,12 @@ def settings(tmp_path):
         "gbnf_experiment.prepare_filesystem.prepared_filesystem.settings", autospec=True
     ) as m:
         m.prepared_directory = tmp_path / "cache" / "prepared"
-        m.data_directory = tmp_path / "data"
         yield m
+
+
+@pytest.fixture
+def output(tmp_path):
+    return tmp_path / "data"
 
 
 SHARED = {
@@ -90,6 +95,8 @@ AGENT = Mock(name="agent", model="claude-opus-5", effort="high")
 
 CONFIG = {
     "agent": AGENT,
+    "study": "v2-test-configurations",
+    "output": Path("/data/runs"),
     "source_language": "javascript",
     "include_unit_tests": False,
     "include_source_integration_tests": False,
@@ -104,9 +111,10 @@ def experiment(
     prepare_reference_implementation,
     run_directory_name,
     write_manifest,
+    output,
 ):
     def run(**kwargs):
-        return run_gbnf_experiment(**{**CONFIG, **kwargs})
+        return run_gbnf_experiment(**{**CONFIG, "output": output, **kwargs})
 
     return run
 
@@ -116,6 +124,8 @@ def describe_the_signature():
         "omitted",
         [
             "agent",
+            "study",
+            "output",
             "source_language",
             "include_unit_tests",
             "include_source_integration_tests",
@@ -146,7 +156,7 @@ def describe_run():
 
     def it_ports_the_prepared_reference(
         experiment,
-        settings,
+        output,
         prepare_reference_implementation,
         port_codebase,
     ):
@@ -155,7 +165,7 @@ def describe_run():
             prepare_reference_implementation.return_value
         )
         assert port_codebase.call_args.kwargs["output"] == (
-            settings.data_directory / RUN_DIRECTORY_NAME / "ported_implementation"
+            output / RUN_DIRECTORY_NAME / "ported_implementation"
         )
 
     def it_ports_with_the_agent_the_caller_chose(
@@ -238,14 +248,20 @@ def describe_run():
 
 
 def describe_the_run_directory():
-    def it_lands_directly_in_the_data_directory(
+    def it_lands_directly_in_the_output_directory(
         experiment,
-        settings,
+        output,
         prepare_reference_implementation,
         port_codebase,
     ):
         run_directory = experiment()
-        assert run_directory == settings.data_directory / RUN_DIRECTORY_NAME
+        assert run_directory == output / RUN_DIRECTORY_NAME
+
+    def it_lands_wherever_the_caller_points_output(
+        experiment, tmp_path, prepare_reference_implementation, port_codebase
+    ):
+        run_directory = experiment(output=tmp_path / "elsewhere")
+        assert run_directory == tmp_path / "elsewhere" / RUN_DIRECTORY_NAME
 
     def it_names_the_directory_from_the_timestamp_alone(
         experiment,
@@ -320,6 +336,15 @@ def describe_the_manifest():
     ):
         run_directory = experiment()
         assert {call.args for call in write_manifest.call_args_list} == {(run_directory,)}
+
+    def it_records_the_study_in_every_write(
+        experiment,
+        prepare_reference_implementation,
+        port_codebase,
+        write_manifest,
+    ):
+        experiment(study="v2-model-effort")
+        assert [call.kwargs["study"] for call in write_manifest.call_args_list] == ["v2-model-effort"] * 2
 
     def it_records_the_condition_that_ran(
         experiment,
@@ -441,14 +466,14 @@ def describe_the_result():
 
     def it_writes_no_result_when_the_port_dies(
         experiment,
-        settings,
+        output,
         prepare_reference_implementation,
         port_codebase,
     ):
         port_codebase.side_effect = RuntimeError("the container died")
         with pytest.raises(RuntimeError):
             experiment()
-        run_directory = settings.data_directory / RUN_DIRECTORY_NAME
+        run_directory = output / RUN_DIRECTORY_NAME
         assert not (run_directory / "result.json").exists()
 
     def it_banks_the_stdout_of_a_non_zero_exit(

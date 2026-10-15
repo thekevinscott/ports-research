@@ -11,10 +11,8 @@ CACHE_HOME = Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache")
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="GBNF_EXPERIMENT_")
 
-    # data/runs is the seam between packages/ and analysis/: written here, read there.
     # The prepared corpus is rebuildable from a pinned commit and the docker context,
     # so it is a cache, not evidence, and does not belong in the tree runs are banked in.
-    data_directory: Path = REPO_ROOT / "data" / "runs"
     prepared_directory: Path = CACHE_HOME / "ports" / "gbnf-experiment" / "prepared"
     root_directory: Path = PACKAGE_ROOT
     docker_directory: Path = PACKAGE_ROOT / "docker"

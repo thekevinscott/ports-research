@@ -8,6 +8,7 @@ from itertools import product
 import study
 from study import FLAGS, SOURCE_LANGUAGES
 
+STUDY = "v2-test-configurations"
 MODEL = "claude-opus-5-5"
 EFFORT = "medium"
 
@@ -20,7 +21,7 @@ def cells() -> list[dict]:
 
 
 def main(argv: list[str] | None = None) -> None:
-    study.main(cells(), study.argument_parser(__doc__).parse_args(argv))
+    study.main(STUDY, cells(), study.argument_parser(__doc__).parse_args(argv))
 
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from pathlib import Path
 
 from botbox import Agent, RunResult
 
@@ -17,6 +18,7 @@ class PreparedFilesystem:
         include_source_integration_tests: bool,
         include_target_integration_tests: bool,
         debug: bool,
+        output: Path,
     ):
         self.timestamp = datetime.now(UTC)
         # The extracted /shared, mounted as the agent's source as it is.
@@ -32,7 +34,7 @@ class PreparedFilesystem:
             for path in self.reference_implementation_directory.rglob("*")
             if path.is_file()
         )
-        self.run_directory = settings.data_directory / run_directory_name(self.timestamp)
+        self.run_directory = output / run_directory_name(self.timestamp)
         self.ported_implementation_directory = self.run_directory / "ported_implementation"
         self.ported_implementation_directory.mkdir(parents=True)
         self.transcript_directory = self.run_directory / "transcript"
@@ -42,10 +44,11 @@ class PreparedFilesystem:
     def proxy_log(self):
         return self.run_directory / "proxy.log"
 
-    def write_manifest(self, agent: Agent, **kwargs):
+    def write_manifest(self, agent: Agent, *, study: str, **kwargs):
         _write_manifest(
             self.run_directory,
             timestamp=self.timestamp,
+            study=study,
             condition={
                 **kwargs,
             },
@@ -56,7 +59,7 @@ class PreparedFilesystem:
         )
 
     def write_result(
-        self, result: RunResult | None, agent: Agent, error: str | None = None, **kwargs
+        self, result: RunResult | None, agent: Agent, *, study: str, error: str | None = None, **kwargs
     ):
         if result is not None:
             if result.stdout:
@@ -65,6 +68,7 @@ class PreparedFilesystem:
         _write_manifest(
             self.run_directory,
             timestamp=self.timestamp,
+            study=study,
             condition={
                 **kwargs,
             },

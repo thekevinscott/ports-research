@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import click
 
 from botbox import ClaudeAgent
@@ -12,6 +14,13 @@ DEFAULT_MODEL = "claude-opus-5"
     type=click.Choice(["javascript", "python"]),
     required=True,
 )
+@click.option("--study", required=True, help="Written into the run's manifest as its experiment name.")
+@click.option(
+    "--output",
+    required=True,
+    type=click.Path(path_type=Path),
+    help="Directory the run directory is created in. No default: runs belong in the root checkout's data/runs.",
+)
 @click.option("--include-unit-tests", is_flag=True, default=False)
 @click.option("--include-source-integration-tests", is_flag=True, default=False)
 @click.option("--include-target-integration-tests", is_flag=True, default=False)
@@ -21,6 +30,8 @@ DEFAULT_MODEL = "claude-opus-5"
 @click.option("--model", default=DEFAULT_MODEL, show_default=True)
 def cli(
     source_language: str,
+    study: str,
+    output: Path,
     include_unit_tests: bool,
     include_source_integration_tests: bool,
     include_target_integration_tests: bool,
@@ -32,6 +43,8 @@ def cli(
     try:
         run_directory = run_gbnf_experiment(
             agent=agent,
+            study=study,
+            output=output,
             source_language=source_language,
             include_unit_tests=include_unit_tests,
             include_source_integration_tests=include_source_integration_tests,

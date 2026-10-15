@@ -26,6 +26,7 @@ CONDITION = {
     "effort": "high",
     "model": "claude-opus-5",
 }
+STUDY = "v2-test-configurations"
 SHARED = (
     "javascript/package.json",
     "javascript/src/gbnf.ts",
@@ -43,7 +44,6 @@ def settings(tmp_path):
         "gbnf_experiment.prepare_filesystem.prepared_filesystem.settings", autospec=True
     ) as m:
         m.prepared_directory = tmp_path / "cache" / "prepared"
-        m.data_directory = tmp_path / "data"
         m.gbnf_commit = "13f1aca"
         yield m
 
@@ -87,13 +87,19 @@ def docker_module():
 
 
 @pytest.fixture
+def output(tmp_path):
+    return tmp_path / "data"
+
+
+@pytest.fixture
 def filesystem(
     settings,
     prepare_reference_implementation,
     subprocess_module,
     docker_module,
+    output,
 ):
-    return PreparedFilesystem(source_language="javascript", **TESTS, debug=False)
+    return PreparedFilesystem(source_language="javascript", **TESTS, debug=False, output=output)
 
 
 def manifest(filesystem) -> dict:
@@ -112,101 +118,120 @@ def describe_the_reference_implementation():
         )
 
     def it_lists_every_file_in_it_relative_to_its_root(filesystem):
-        filesystem.write_manifest(AGENT, **CONDITION)
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
         assert manifest(filesystem)["reference_implementation"]["included"] == list(SHARED)
+
+
+def describe_the_run_directory():
+    def it_lands_in_the_output_directory_it_was_given(filesystem, output):
+        assert filesystem.run_directory.parent == output
+
+    def it_requires_an_output_directory(settings, prepare_reference_implementation):
+        with pytest.raises(TypeError, match="output"):
+            PreparedFilesystem(source_language="javascript", **TESTS, debug=False)
 
 
 def describe_the_manifest_at_the_start_of_the_run():
     def it_exists_before_the_result_is_written(filesystem):
-        filesystem.write_manifest(AGENT, **CONDITION)
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
         assert (filesystem.run_directory / "manifest.json").is_file()
 
     def it_leaves_completed_at_null(filesystem):
-        filesystem.write_manifest(AGENT, **CONDITION)
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
         assert manifest(filesystem)["completed_at"] is None
 
     def it_shares_the_run_directory_s_timestamp(filesystem):
-        filesystem.write_manifest(AGENT, **CONDITION)
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
         assert manifest(filesystem)["timestamp"] == (
             filesystem.timestamp.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
         )
 
     def it_records_the_condition_it_was_given(filesystem):
-        filesystem.write_manifest(AGENT, **CONDITION)
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
         assert manifest(filesystem)["condition"] == CONDITION
+
+    def it_records_the_study_it_was_given(filesystem):
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
+        assert manifest(filesystem)["study"] == STUDY
 
 
 def describe_the_manifest_on_completion():
     def it_stamps_completed_at_in_the_same_iso8601_format(filesystem):
-        filesystem.write_manifest(AGENT, **CONDITION)
-        filesystem.write_result(run_result(), AGENT, **CONDITION)
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
+        filesystem.write_result(run_result(), AGENT, study=STUDY, **CONDITION)
         assert re.fullmatch(
             r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", manifest(filesystem)["completed_at"]
         )
 
     def it_stamps_completed_at_no_earlier_than_the_start(filesystem):
-        filesystem.write_manifest(AGENT, **CONDITION)
-        filesystem.write_result(run_result(), AGENT, **CONDITION)
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
+        filesystem.write_result(run_result(), AGENT, study=STUDY, **CONDITION)
         recorded = manifest(filesystem)
         assert recorded["completed_at"] >= recorded["timestamp"]
 
     def it_keeps_the_original_start_timestamp(filesystem):
-        filesystem.write_manifest(AGENT, **CONDITION)
-        filesystem.write_result(run_result(), AGENT, **CONDITION)
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
+        filesystem.write_result(run_result(), AGENT, study=STUDY, **CONDITION)
         assert manifest(filesystem)["timestamp"] == (
             filesystem.timestamp.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
         )
 
     def it_carries_no_error_key(filesystem):
-        filesystem.write_manifest(AGENT, **CONDITION)
-        filesystem.write_result(run_result(), AGENT, **CONDITION)
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
+        filesystem.write_result(run_result(), AGENT, study=STUDY, **CONDITION)
         assert "error" not in manifest(filesystem)
 
+    def it_keeps_the_study_and_the_condition_apart(filesystem):
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
+        filesystem.write_result(run_result(), AGENT, study=STUDY, **CONDITION)
+        recorded = manifest(filesystem)
+        assert (recorded["study"], recorded["condition"]) == (STUDY, CONDITION)
+
     def it_records_the_agent_s_exit_code(filesystem):
-        filesystem.write_manifest(AGENT, **CONDITION)
-        filesystem.write_result(run_result(exit_code=3), AGENT, **CONDITION)
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
+        filesystem.write_result(run_result(exit_code=3), AGENT, study=STUDY, **CONDITION)
         assert manifest(filesystem)["exit_code"] == 3
 
     def it_banks_the_agent_s_stdout_as_result_json(filesystem):
-        filesystem.write_result(run_result(stdout='{"num_turns": 4}'), AGENT, **CONDITION)
+        filesystem.write_result(run_result(stdout='{"num_turns": 4}'), AGENT, study=STUDY, **CONDITION)
         assert (filesystem.run_directory / "result.json").read_text() == '{"num_turns": 4}'
 
     def it_banks_the_agent_s_stderr_beside_the_result(filesystem):
-        filesystem.write_result(run_result(stderr="warning: x\n"), AGENT, **CONDITION)
+        filesystem.write_result(run_result(stderr="warning: x\n"), AGENT, study=STUDY, **CONDITION)
         assert (filesystem.run_directory / "stderr.txt").read_text() == "warning: x\n"
 
     def it_banks_an_empty_stderr_as_an_empty_file(filesystem):
-        filesystem.write_result(run_result(stderr=""), AGENT, **CONDITION)
+        filesystem.write_result(run_result(stderr=""), AGENT, study=STUDY, **CONDITION)
         assert (filesystem.run_directory / "stderr.txt").read_text() == ""
 
 
 def describe_the_manifest_on_failure():
     def it_stamps_completed_at(filesystem):
-        filesystem.write_manifest(AGENT, **CONDITION)
-        filesystem.write_result(None, AGENT, error="the container died", **CONDITION)
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
+        filesystem.write_result(None, AGENT, study=STUDY, error="the container died", **CONDITION)
         assert re.fullmatch(
             r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", manifest(filesystem)["completed_at"]
         )
 
     def it_marks_the_error(filesystem):
-        filesystem.write_manifest(AGENT, **CONDITION)
-        filesystem.write_result(None, AGENT, error="the container died", **CONDITION)
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
+        filesystem.write_result(None, AGENT, study=STUDY, error="the container died", **CONDITION)
         assert manifest(filesystem)["error"] == "the container died"
 
     def it_keeps_the_error_out_of_the_condition(filesystem):
-        filesystem.write_manifest(AGENT, **CONDITION)
-        filesystem.write_result(None, AGENT, error="the container died", **CONDITION)
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
+        filesystem.write_result(None, AGENT, study=STUDY, error="the container died", **CONDITION)
         assert manifest(filesystem)["condition"] == CONDITION
 
     def it_writes_no_result_json_without_a_result(filesystem):
-        filesystem.write_manifest(AGENT, **CONDITION)
-        filesystem.write_result(None, AGENT, error="the container died", **CONDITION)
+        filesystem.write_manifest(AGENT, study=STUDY, **CONDITION)
+        filesystem.write_result(None, AGENT, study=STUDY, error="the container died", **CONDITION)
         assert not (filesystem.run_directory / "result.json").exists()
 
     def it_writes_no_stderr_without_a_result(filesystem):
-        filesystem.write_result(None, AGENT, error="the container died", **CONDITION)
+        filesystem.write_result(None, AGENT, study=STUDY, error="the container died", **CONDITION)
         assert not (filesystem.run_directory / "stderr.txt").exists()
 
     def it_records_no_exit_code_without_a_result(filesystem):
-        filesystem.write_result(None, AGENT, error="the container died", **CONDITION)
+        filesystem.write_result(None, AGENT, study=STUDY, error="the container died", **CONDITION)
         assert "exit_code" not in manifest(filesystem)
