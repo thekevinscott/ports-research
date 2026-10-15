@@ -12,6 +12,12 @@ wheels = [
 ]
 
 [[package]]
+name = "bin-shim"
+version = "0.1.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/6a/fc/2e09f2de12c0937834fc3f2bacde597f6e25499b0bf4b3d71292b7dbf822/bin_shim-0.1.1.tar.gz", hash = "sha256:9972911c22754a5370f666245cbe5d9d9aa04d9f7289d166142c9c3c6ee3b8c3", size = 10431, upload-time = "2026-08-20T21:45:24.392Z" }
+
+[[package]]
 name = "botbox"
 version = "0.0.8"
 source = { registry = "https://pypi.org/simple" }
@@ -111,12 +117,29 @@ wheels = [
 ]
 
 [[package]]
+name = "dirsql"
+version = "0.4.113"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "bin-shim" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fc/f9/9878c1f0815efe3159dfac21ebee102feb12b5e3882548c7cee6fb82e348/dirsql-0.4.113.tar.gz", hash = "sha256:546633f05042ca2b8259d33bfa518938419f65dbae286426fb73073868fbd941", size = 648391, upload-time = "2026-10-14T14:25:29.894Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/82/03/a382d04183ee5633119bea5508fd89a1c9c83bff78f8fc0a8fe1b344dad7/dirsql-0.4.113-cp310-abi3-macosx_10_12_x86_64.whl", hash = "sha256:bbd1b58bb7e93b600d2e9d3a9d3bfe7da92c915da1fe2776ec6715d2deaa2b15", size = 3433357, upload-time = "2026-10-14T14:25:21.042Z" },
+    { url = "https://files.pythonhosted.org/packages/64/82/15675ffbce8a486ec9e2a723a10640ce43e4f3523f0fd0b7e25d45205dee/dirsql-0.4.113-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:c1cd0698141de80cedd902eebff8e1a4121cc27ec3e082ac1b7c2f84911e5a1d", size = 3249162, upload-time = "2026-10-14T14:25:23.314Z" },
+    { url = "https://files.pythonhosted.org/packages/bc/2a/cf42989e0e1370109b81b55bc09e9eecfa766d8f362c21dd2c5d2f093083/dirsql-0.4.113-cp310-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:8cc528943855136ce35d0442c81ab9f357d37d0621100ec5a64b9b789b5826ee", size = 3493792, upload-time = "2026-10-14T14:25:25.048Z" },
+    { url = "https://files.pythonhosted.org/packages/a0/d5/ad3dda5b56a788b1d80c27cfa0e3dd27b64038ed25f28061daba80646631/dirsql-0.4.113-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:2c688eb2efde0c70c1c356657f1f16bd97d97e509bcebb0da85099ea4d1f319f", size = 3683546, upload-time = "2026-10-14T14:25:26.783Z" },
+    { url = "https://files.pythonhosted.org/packages/b9/d9/303fccd47c54118c1e825c790bd5bdd933c86c9608c0127a0f2f4b124478/dirsql-0.4.113-cp310-abi3-win_amd64.whl", hash = "sha256:e762b888c2048fa663545c8cdd8778f4b5aeee232276de6b88af0d74aab9e2c3", size = 3635050, upload-time = "2026-10-14T14:25:28.185Z" },
+]
+
+[[package]]
 name = "gbnf-experiment"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "botbox" },
     { name = "click" },
+    { name = "dirsql" },
     { name = "port-codebase" },
     { name = "prompt" },
     { name = "pydantic-settings" },
@@ -135,6 +158,7 @@ dev = [
 requires-dist = [
     { name = "botbox", specifier = ">=0.0.8" },
     { name = "click", specifier = ">=8.5.0" },
+    { name = "dirsql", specifier = ">=0.4.110" },
     { name = "port-codebase", editable = "../port_codebase" },
     { name = "prompt", editable = "../prompt" },
     { name = "pydantic-settings", specifier = ">=2.15.0" },

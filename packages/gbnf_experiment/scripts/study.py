@@ -220,7 +220,8 @@ def argument_parser(description: str) -> argparse.ArgumentParser:
     return parser
 
 
-def main(study: str, cells: list[dict], args: argparse.Namespace) -> None:
+def main(study: str, cells: list[dict], args: argparse.Namespace, prior: Counter | None = None) -> None:
+    """`prior` counts successes already banked, per cell key; --resume logs add to it."""
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if args.auth == "subscription":
         if api_key:
@@ -229,7 +230,7 @@ def main(study: str, cells: list[dict], args: argparse.Namespace) -> None:
     elif not api_key:
         sys.exit("ANTHROPIC_API_KEY is unset or empty; pass it with `uv run --env-file`.")
     n = args.n or None
-    prior = prior_successes(args.resume)
+    prior = (prior or Counter()) + prior_successes(args.resume)
     if n is not None:
         shortfalls = {cell_name(cell): max(n - prior[cell_key(cell)], 0) for cell in cells}
         print(

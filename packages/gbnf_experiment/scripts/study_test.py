@@ -268,6 +268,12 @@ def describe_resume():
         main(STUDY, CELLS, parse(tmp_path, ["--resume", str(first), str(second)]))
         assert study.call_args.kwargs["prior"] == {cell_key(opus): 2, cell_key(sonnet): 1}
 
+    def it_adds_a_given_prior_to_the_resume_logs(tmp_path, study):
+        opus, sonnet = (next(cell for cell in CELLS if cell["model"] == model) for model in MODELS)
+        path = write_jsonl(tmp_path / "a.jsonl", [(opus, 0)])
+        main(STUDY, CELLS, parse(tmp_path, ["--resume", str(path)]), prior=Counter({cell_key(sonnet): 4}))
+        assert study.call_args.kwargs["prior"] == {cell_key(opus): 1, cell_key(sonnet): 4}
+
     def it_prints_each_cell_s_shortfall_and_the_total(tmp_path, study, capsys):
         opus = CELLS[0]
         path = write_jsonl(tmp_path / "a.jsonl", [(opus, 0)] * 5)
