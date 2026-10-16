@@ -88,7 +88,7 @@ def prepare():
 @pytest.fixture(autouse=True)
 def threads():
     # Mocks do not cross a process boundary, and only the main thread may set a signal handler.
-    with patch("study.ProcessPoolExecutor", lambda parallel, **_: ThreadPoolExecutor(parallel)):
+    with patch("study.ProcessPoolExecutor", lambda concurrency, **_: ThreadPoolExecutor(concurrency)):
         yield
 
 
@@ -125,7 +125,7 @@ def describe_schedule():
 def describe_run_study():
     def it_writes_one_line_per_run(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
-        run_study(STUDY, CELLS, n=2, parallel=2, api_key=API_KEY, log=out, output=tmp_path / "runs")
+        run_study(STUDY, CELLS, n=2, concurrency=2, api_key=API_KEY, log=out, output=tmp_path / "runs")
         assert len(read(out)) == 64
 
     def it_writes_the_cell_round_run_directory_exit_code_wall_time_and_usage(
@@ -133,7 +133,7 @@ def describe_run_study():
     ):
         out = tmp_path / "matrix.jsonl"
         [cell] = cells(efforts=("high",))[:1]
-        run_study(STUDY, [cell], n=1, parallel=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
+        run_study(STUDY, [cell], n=1, concurrency=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
         [line] = read(out)
         assert line["cell"] == cell
         assert line["cell"]["effort"] == "high"
@@ -147,7 +147,7 @@ def describe_run_study():
     def it_keeps_going_when_a_run_raises(tmp_path, gbnf_experiment, run_directory):
         gbnf_experiment.side_effect = [RuntimeError("boom"), *[run_directory] * 31]
         out = tmp_path / "matrix.jsonl"
-        run_study(STUDY, CELLS, n=1, parallel=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
+        run_study(STUDY, CELLS, n=1, concurrency=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
         lines = read(out)
         assert len(lines) == 32
         assert lines[0]["error"] == "boom"
@@ -156,7 +156,7 @@ def describe_run_study():
 
     def it_logs_runs_so_that_any_prefix_is_balanced_across_cells(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
-        run_study(STUDY, CELLS, n=3, parallel=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
+        run_study(STUDY, CELLS, n=3, concurrency=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
         counts = Counter({cell_name(cell): 0 for cell in CELLS})
         for line in read(out):
             counts[cell_name(line["cell"])] += 1
@@ -164,30 +164,30 @@ def describe_run_study():
 
     def it_writes_runs_in_round_order(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
-        run_study(STUDY, CELLS, n=2, parallel=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
+        run_study(STUDY, CELLS, n=2, concurrency=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
         rounds = [line["round"] for line in read(out)]
         assert rounds == [1] * 32 + [2] * 32
 
     def it_gives_each_agent_the_key_and_its_cell_s_model_and_effort(tmp_path, gbnf_experiment, claude_agent):
         two = [cell for cell in cells(efforts=("low", "xhigh")) if cell_name(cell) in NAMES]
-        run_study(STUDY, two, n=1, parallel=1, api_key=API_KEY, log=tmp_path / "m", output=tmp_path / "runs")
+        run_study(STUDY, two, n=1, concurrency=1, api_key=API_KEY, log=tmp_path / "m", output=tmp_path / "runs")
         assert sorted(c.kwargs["effort"] for c in claude_agent.call_args_list) == ["low", "xhigh"]
         for c in claude_agent.call_args_list:
             assert c.kwargs == {"model": MODELS[0], "effort": c.kwargs["effort"], "api_key": API_KEY}
 
     def it_points_every_run_at_the_output_directory(tmp_path, gbnf_experiment):
-        run_study(STUDY, CELLS[:3], n=1, parallel=1, api_key=API_KEY, log=tmp_path / "m", output=tmp_path / "runs")
+        run_study(STUDY, CELLS[:3], n=1, concurrency=1, api_key=API_KEY, log=tmp_path / "m", output=tmp_path / "runs")
         assert [c.kwargs["output"] for c in gbnf_experiment.call_args_list] == [tmp_path / "runs"] * 3
 
     def it_names_the_study_on_every_run(tmp_path, gbnf_experiment):
-        run_study("v2-model-effort", CELLS[:3], n=1, parallel=1, api_key=API_KEY, log=tmp_path / "m", output=tmp_path / "runs")
+        run_study("v2-model-effort", CELLS[:3], n=1, concurrency=1, api_key=API_KEY, log=tmp_path / "m", output=tmp_path / "runs")
         assert [c.kwargs["study"] for c in gbnf_experiment.call_args_list] == ["v2-model-effort"] * 3
 
     def it_warms_every_condition_before_the_first_run(tmp_path, gbnf_experiment, prepare):
         order = Mock()
         order.attach_mock(prepare, "prepare")
         order.attach_mock(gbnf_experiment, "run")
-        run_study(STUDY, CELLS, n=1, parallel=2, api_key=API_KEY, log=tmp_path / "m", output=tmp_path / "runs")
+        run_study(STUDY, CELLS, n=1, concurrency=2, api_key=API_KEY, log=tmp_path / "m", output=tmp_path / "runs")
         names = [name for name, _, _ in order.mock_calls]
         assert names[:16] == ["prepare"] * 16
         assert "prepare" not in names[16:]
@@ -240,12 +240,11 @@ def describe_main():
 
     def it_runs_four_jobs_at_once_by_default(tmp_path, study):
         main(STUDY, CELLS, parse(tmp_path, []))
-        assert study.call_args.kwargs["parallel"] == 4
+        assert study.call_args.kwargs["concurrency"] == 4
 
-    @pytest.mark.parametrize("flag", ["-k", "--parallel"])
-    def it_takes_k_as_the_number_of_concurrent_jobs(flag, tmp_path, study):
-        main(STUDY, CELLS, parse(tmp_path, [flag, "6"]))
-        assert study.call_args.kwargs["parallel"] == 6
+    def it_takes_concurrency_as_the_number_of_concurrent_jobs(tmp_path, study):
+        main(STUDY, CELLS, parse(tmp_path, ["--concurrency", "6"]))
+        assert study.call_args.kwargs["concurrency"] == 6
 
     def it_runs_until_stopped_at_n_zero(tmp_path, study):
         main(STUDY, CELLS, parse(tmp_path, ["--n", "0"]))
@@ -299,7 +298,7 @@ def describe_banked_runs():
 def describe_runs():
     def it_stops_submitting_after_n_runs_in_round_robin_order(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
-        run_study(STUDY, CELLS, n=2, parallel=2, api_key=API_KEY, log=out, output=tmp_path / "runs", runs=5)
+        run_study(STUDY, CELLS, n=2, concurrency=2, api_key=API_KEY, log=out, output=tmp_path / "runs", runs=5)
         lines = read(out)
         assert len(lines) == 5
         assert {line["round"] for line in lines} == {1}
@@ -316,7 +315,7 @@ def describe_runs():
 def describe_record():
     def it_writes_utc_start_and_finish_times(tmp_path, gbnf_experiment):
         out = tmp_path / "matrix.jsonl"
-        run_study(STUDY, CELLS[:1], n=1, parallel=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
+        run_study(STUDY, CELLS[:1], n=1, concurrency=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
         [line] = read(out)
         started, finished = (datetime.fromisoformat(line[key]) for key in ("started_at", "finished_at"))
         assert started.utcoffset().total_seconds() == 0
@@ -327,7 +326,7 @@ def describe_record():
             tmp_path, "long", {"is_error": False, "terminal_reason": "completed", "result": "x" * 1000}
         )
         out = tmp_path / "matrix.jsonl"
-        run_study(STUDY, CELLS[:1], n=1, parallel=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
+        run_study(STUDY, CELLS[:1], n=1, concurrency=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
         [line] = read(out)
         assert line["terminal_reason"] == "completed"
         assert line["result"] == "x" * 300
@@ -335,7 +334,7 @@ def describe_record():
     def it_writes_none_without_a_result_json(tmp_path, gbnf_experiment):
         gbnf_experiment.return_value = failed_run(tmp_path, "none")
         out = tmp_path / "matrix.jsonl"
-        run_study(STUDY, CELLS[:1], n=1, parallel=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
+        run_study(STUDY, CELLS[:1], n=1, concurrency=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
         [line] = read(out)
         assert (line["terminal_reason"], line["result"], line["usage"]) == (None, None, None)
 
@@ -355,7 +354,7 @@ def describe_fail_fast():
         exhausted = failed_run(tmp_path, "exhausted", result, stderr)
         gbnf_experiment.return_value = exhausted
         out = tmp_path / "matrix.jsonl"
-        stopped = run_study(STUDY, CELLS, n=2, parallel=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
+        stopped = run_study(STUDY, CELLS, n=2, concurrency=1, api_key=API_KEY, log=out, output=tmp_path / "runs")
         [line] = read(out)
         assert stopped == line
         assert f"STOPPED: round 1 {cell_name(line['cell'])} {exhausted}: " in capsys.readouterr().err
@@ -363,7 +362,7 @@ def describe_fail_fast():
     def it_lets_the_in_flight_runs_finish_and_names_the_first(tmp_path, gbnf_experiment, capsys):
         gbnf_experiment.return_value = failed_run(tmp_path, "exhausted", CREDIT)
         out = tmp_path / "matrix.jsonl"
-        stopped = run_study(STUDY, CELLS, n=2, parallel=4, api_key=API_KEY, log=out, output=tmp_path / "runs")
+        stopped = run_study(STUDY, CELLS, n=2, concurrency=4, api_key=API_KEY, log=out, output=tmp_path / "runs")
         lines = read(out)
         assert len(lines) == 4
         assert stopped == lines[0]
@@ -377,7 +376,7 @@ def describe_fail_fast():
             tmp_path, "other", {"is_error": True, "terminal_reason": "max_turns", "result": "too many turns"}
         )
         out = tmp_path / "matrix.jsonl"
-        assert run_study(STUDY, CELLS, n=1, parallel=2, api_key=API_KEY, log=out, output=tmp_path / "runs") is None
+        assert run_study(STUDY, CELLS, n=1, concurrency=2, api_key=API_KEY, log=out, output=tmp_path / "runs") is None
         assert len(read(out)) == 32
 
     def it_exits_non_zero_when_stopped(tmp_path, study):
@@ -389,7 +388,7 @@ def describe_fail_fast():
 
 def describe_auth():
     def it_gives_each_agent_no_key_on_subscription(tmp_path, gbnf_experiment, claude_agent):
-        run_study(STUDY, CELLS[:1], n=1, parallel=1, api_key=None, log=tmp_path / "m", output=tmp_path / "runs")
+        run_study(STUDY, CELLS[:1], n=1, concurrency=1, api_key=None, log=tmp_path / "m", output=tmp_path / "runs")
         assert claude_agent.call_args.kwargs["api_key"] is None
 
     def it_passes_no_key_on_subscription(tmp_path, monkeypatch, study):
