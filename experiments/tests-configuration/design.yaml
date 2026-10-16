@@ -10,5 +10,3 @@ varies:
   include_unit_tests: [false, true]
   include_source_integration_tests: [false, true]
   include_target_integration_tests: [false, true]
-cells: 16
-runs: 192
