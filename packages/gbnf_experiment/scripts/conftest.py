@@ -37,7 +37,7 @@ def repo(tmp_path) -> tuple[Path, dict[str, str]]:
     return root, commits
 
 
-def write_design(root: Path, name: str, study: str, prompt_since: str, completed_run: str = COMPLETED_RUN) -> None:
+def write_design(root: Path, name: str, study: str, prompt_since: str | list[str], completed_run: str = COMPLETED_RUN) -> None:
     directory = root / "experiments" / name
     directory.mkdir(parents=True)
     design = {"study": study, "runs_per_cell": 12, "completed_run": completed_run, "prompt_since": prompt_since}

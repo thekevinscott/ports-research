@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 from completed_runs import completed_runs
-from conftest import write_design
+from conftest import git, write_design
 
 STUDY = "v2-model-effort"
 CELL = {"source_language": "python", "model": "claude-opus-5-5", "effort": "low"}
@@ -62,3 +62,16 @@ def describe_completed_runs():
         bank(tmp_path / "runs", "since", commits["since"])
         with pytest.raises(ValueError, match=STUDY):
             completed_runs(tmp_path / "runs", STUDY, root=root)
+
+    def it_counts_a_run_descending_from_any_prompt_since_in_a_list(tmp_path, repo):
+        root, commits = repo
+        git(root, "checkout", "-q", "-b", "twin", commits["before"])
+        git(root, "commit", "-q", "--allow-empty", "-m", "twin")
+        twin = git(root, "rev-parse", "HEAD")
+        git(root, "commit", "-q", "--allow-empty", "-m", "after twin")
+        output = tmp_path / "runs"
+        bank(output, "after-twin", git(root, "rev-parse", "HEAD"))
+        bank(output, "after", commits["after"])
+        bank(output, "before", commits["before"])
+        write_design(root, "models-effort", STUDY, [commits["since"], twin])
+        assert run_ids(output, root) == ["after", "after-twin"]

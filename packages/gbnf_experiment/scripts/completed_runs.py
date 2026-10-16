@@ -40,4 +40,5 @@ def completed_runs(output: Path, study: str, root: Path = ROOT) -> list[dict]:
         return []
     sql = f"SELECT * FROM runs WHERE study = '{study}' AND harness_commit IS NOT NULL AND {spec['completed_run']}"
     runs = asyncio.run(query(output.parent, sql))
-    return [run for run in runs if is_descendant(root, str(spec["prompt_since"]), run["harness_commit"])]
+    since = spec["prompt_since"] if isinstance(spec["prompt_since"], list) else [spec["prompt_since"]]
+    return [run for run in runs if any(is_descendant(root, str(commit), run["harness_commit"]) for commit in since)]
