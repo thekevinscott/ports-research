@@ -2,6 +2,7 @@ study: v2-model-effort
 script: packages/gbnf_experiment/scripts/study_model_effort.py
 runs_per_cell: 12
 completed_run: exit_code = 0 AND is_error = 0 AND error IS NULL AND completed_at IS NOT NULL
+prompt_since: 3cc2947
 fixed:
   include_unit_tests: true
   include_source_integration_tests: true
