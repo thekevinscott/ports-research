@@ -1,9 +1,11 @@
+import shutil
 import subprocess
 from pathlib import Path
 
 import pytest
 import yaml
 
+DIRSQL_CONFIG = Path(__file__).resolve().parents[3] / "data" / ".dirsql.toml"
 COMPLETED_RUN = "exit_code = 0 AND is_error = 0 AND error IS NULL AND completed_at IS NOT NULL"
 
 
@@ -14,6 +16,12 @@ def git(root: Path, *args: str) -> str:
         capture_output=True,
         text=True,
     ).stdout.strip()
+
+
+@pytest.fixture(autouse=True)
+def dirsql_config(tmp_path):
+    """The committed runs table, beside the tests' `tmp_path / "runs"`."""
+    shutil.copy(DIRSQL_CONFIG, tmp_path / ".dirsql.toml")
 
 
 @pytest.fixture
