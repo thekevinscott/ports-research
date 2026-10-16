@@ -1,0 +1,13 @@
+study: v2-model-effort
+script: packages/gbnf_experiment/scripts/study_model_effort.py
+runs_per_cell: 12
+source_languages: [python, javascript]
+models: [claude-fable-5-1, claude-opus-5-5, claude-sonnet-5-5, claude-haiku-5-5]
+efforts: [low, medium, high, xhigh, max]
+tests:
+  include_unit_tests: true
+  include_source_integration_tests: true
+  include_target_integration_tests: false
+cells: 40
+runs: 480
+completed_run: exit_code = 0 AND is_error = 0 AND error IS NULL AND completed_at IS NOT NULL
