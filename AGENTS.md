@@ -121,6 +121,22 @@ them."
 - When asked "why is this here?", answer from the current need, not from
   history. If the only answer is history, that is the answer "it should go".
 
+## Experiment designs — always
+
+**`experiments/<name>/design.yaml` is the source of truth for a study's
+design, and it is always committed.** Kevin, 2026-10-16: "we always need to
+keep yaml updated as the source of truth, and committed."
+
+- Membership is decided by the design, not by a label: a cell is the first
+  `runs_per_cell` runs that satisfy `completed_run` and the prompt criterion
+  (`prompt_since`), ordered by completion time. The `study` field in a
+  manifest records intent at launch and nothing more.
+- Any change to what is being run (models, levels, prompt, test
+  configuration) lands in design.yaml in the same PR, before or with the
+  launch. A local edit to a study script that the design does not reflect is
+  a deviation; record it as a dated line in the design, not in a chat.
+- Scheduling order and concurrency are not design and do not go in the file.
+
 ## Journal — when something major happens
 
 `journal/` at the repo root is the append-only lab record. A run started or
