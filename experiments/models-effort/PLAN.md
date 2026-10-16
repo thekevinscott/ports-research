@@ -4,7 +4,7 @@ Question: how do the model and its effort level change the port, with the test c
 
 ## Design
 
-The grid is in [design.yaml](design.yaml); the script that runs it is `packages/gbnf_experiment/scripts/study_model_effort.py`. Four models (Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5) at five effort levels (low, medium, high, xhigh, max), both source languages, unit tests plus source integration tests, no target integration tests. 40 cells, 12 completed runs per cell, 480 runs. Prompt byte-identical to the test-configuration study's.
+The grid is in [design.yaml](design.yaml); the script that runs it is `packages/gbnf_experiment/scripts/study_model_effort.py`. Four models (Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5) at five effort levels (low, medium, high, xhigh, max), both source languages, unit tests plus source integration tests, no target integration tests. 40 cells, 12 completed runs per cell, 480 runs. Prompt: the 2026-10-15 rewrite (`prompt_since: 3cc2947` in design.yaml); the test-configuration study ran on the earlier prompt.
 
 A completed run is exit code 0 with no error and a completion time. Failed runs (OAuth revocation, oomd kill, request timeout) are not counted and are rerun. The runner counts banked completed runs per cell at startup and skips cells that already have 12.
 

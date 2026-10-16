@@ -2,6 +2,7 @@ study: v2-test-configurations
 script: packages/gbnf_experiment/scripts/study_test_configurations.py
 runs_per_cell: 12
 completed_run: exit_code = 0 AND is_error = 0 AND error IS NULL AND completed_at IS NOT NULL
+prompt_since: 353d5b3
 fixed:
   model: claude-opus-5-5
   effort: medium
