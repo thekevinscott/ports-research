@@ -124,7 +124,7 @@ def run_study(
     cells: list[dict],
     *,
     n: int | None,
-    parallel: int,
+    concurrency: int,
     api_key: str | None,
     log: Path,
     output: Path,
@@ -144,9 +144,9 @@ def run_study(
     exit_codes = Counter()
     failures = 0
     in_flight = set()
-    with ProcessPoolExecutor(parallel, initializer=ignore_interrupts) as pool, log.open("a") as records:
+    with ProcessPoolExecutor(concurrency, initializer=ignore_interrupts) as pool, log.open("a") as records:
         while True:
-            while not stopping and len(in_flight) < parallel:
+            while not stopping and len(in_flight) < concurrency:
                 run = next(queue, None)
                 if run is None:
                     stopping = True
@@ -201,8 +201,7 @@ def argument_parser(description: str) -> argparse.ArgumentParser:
         "--n", type=int, default=DEFAULT_ROUNDS, help="Rounds; 0 runs until stopped. Default: %(default)s."
     )
     parser.add_argument(
-        "-k",
-        "--parallel",
+        "--concurrency",
         type=int,
         default=4,
         help="Concurrent jobs; each is one Docker container running the agent and its test runs. Default: %(default)s.",
@@ -239,7 +238,7 @@ def main(study: str, cells: list[dict], args: argparse.Namespace) -> None:
     log = output / f"matrix-{datetime.now(UTC):%Y%m%dT%H%M%SZ}.jsonl"
     print(f"{study}: {len(cells)} cells; auth {args.auth}; writing {log}", file=sys.stderr)
     stopped = run_study(
-        study, cells, n=n, parallel=args.parallel, api_key=api_key, log=log, output=output, prior=prior, runs=args.runs
+        study, cells, n=n, concurrency=args.concurrency, api_key=api_key, log=log, output=output, prior=prior, runs=args.runs
     )
     if stopped:
         sys.exit(1)
