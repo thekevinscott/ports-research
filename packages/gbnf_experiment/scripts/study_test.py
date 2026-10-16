@@ -2,11 +2,14 @@ import json
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+from functools import partial
 from itertools import islice, product
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
+from completed_runs import completed_runs
+from conftest import write_design
 from study import FLAGS, SOURCE_LANGUAGES, argument_parser, cell_key, cell_name, main, run_study, schedule
 
 API_KEY = "sk-ant-test"
@@ -53,17 +56,34 @@ def failed_run(tmp_path: Path, name: str, result: dict | None = None, stderr: st
     return directory
 
 
-def banked_run(tmp_path: Path, name: str, cell: dict, study: str = STUDY, exit_code: int = 0, result: dict | None = None):
+def banked_run(
+    tmp_path: Path, name: str, cell: dict, commit: str, study: str = STUDY, exit_code: int = 0, result: dict | None = None
+):
     directory = tmp_path / "runs" / name
     directory.mkdir(parents=True)
-    manifest = {"study": study, "condition": cell, "exit_code": exit_code, "error": None, "completed_at": "2026-10-15"}
+    manifest = {
+        "study": study,
+        "condition": cell,
+        "exit_code": exit_code,
+        "error": None,
+        "completed_at": "2026-10-15",
+        "harness": {"commit": commit},
+    }
     (directory / "manifest.json").write_text(json.dumps(manifest))
     (directory / "result.json").write_text(json.dumps({"is_error": False} if result is None else result))
 
 
-def bank(tmp_path: Path, runs: list[tuple[dict, int]], study: str = STUDY) -> None:
+def bank(tmp_path: Path, runs: list[tuple[dict, int]], commit: str, study: str = STUDY) -> None:
     for i, (cell, code) in enumerate(runs):
-        banked_run(tmp_path, f"20261012T00000{i}Z_0000000{i}", cell, study, code)
+        banked_run(tmp_path, f"20261012T00000{i}Z_0000000{i}", cell, commit, study, code)
+
+
+@pytest.fixture(autouse=True)
+def prompt_since(repo):
+    root, commits = repo
+    write_design(root, "tests-configurations", STUDY, commits["since"])
+    with patch("study.completed_runs", partial(completed_runs, root=root)):
+        yield commits["since"]
 
 
 @pytest.fixture
@@ -268,17 +288,17 @@ def describe_banked_runs():
         runs = list(schedule(three, n=5, prior=prior))
         assert [r for r, _ in runs] == [1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5]
 
-    def it_counts_the_completed_runs_banked_under_output_per_full_cell(tmp_path, study):
+    def it_counts_the_completed_runs_banked_under_output_per_full_cell(tmp_path, study, prompt_since):
         opus, sonnet = (next(cell for cell in CELLS if cell["model"] == model) for model in MODELS)
-        bank(tmp_path, [(opus, 0), (opus, 1), (opus, 137), (sonnet, 0), (opus, 0)])
+        bank(tmp_path, [(opus, 0), (opus, 1), (opus, 137), (sonnet, 0), (opus, 0)], prompt_since)
         main(STUDY, CELLS, parse(tmp_path, []))
         assert study.call_args.kwargs["prior"] == {cell_key(opus): 2, cell_key(sonnet): 1}
 
-    def it_ignores_other_studies_and_runs_whose_result_is_an_error(tmp_path, study):
+    def it_ignores_other_studies_and_runs_whose_result_is_an_error(tmp_path, study, prompt_since):
         opus = CELLS[0]
-        bank(tmp_path, [(opus, 0)], study="v2-model-effort")
-        banked_run(tmp_path, "20261012T000009Z_00000009", opus, result=CREDIT)
-        banked_run(tmp_path, "20261012T000008Z_00000008", opus)
+        bank(tmp_path, [(opus, 0)], prompt_since, study="v2-model-effort")
+        banked_run(tmp_path, "20261012T000009Z_00000009", opus, prompt_since, result=CREDIT)
+        banked_run(tmp_path, "20261012T000008Z_00000008", opus, prompt_since)
         main(STUDY, CELLS, parse(tmp_path, []))
         assert study.call_args.kwargs["prior"] == {cell_key(opus): 1}
 
@@ -286,9 +306,9 @@ def describe_banked_runs():
         main(STUDY, CELLS, parse(tmp_path, []))
         assert study.call_args.kwargs["prior"] == Counter()
 
-    def it_prints_each_cell_s_shortfall_and_the_total(tmp_path, study, capsys):
+    def it_prints_each_cell_s_shortfall_and_the_total(tmp_path, study, capsys, prompt_since):
         opus = CELLS[0]
-        bank(tmp_path, [(opus, 0)] * 5)
+        bank(tmp_path, [(opus, 0)] * 5, prompt_since)
         main(STUDY, CELLS, parse(tmp_path, []))
         err = capsys.readouterr().err
         assert f"{cell_name(opus)}=7" in err
