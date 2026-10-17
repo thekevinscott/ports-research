@@ -52,6 +52,15 @@ def describe_settings():
     def it_reads_overrides_from_the_env_prefix(env_gbnf_commit):
         assert Settings().gbnf_commit == "deadbeef"
 
+    def it_has_a_blank_api_key_by_default(monkeypatch):
+        monkeypatch.delenv("GBNF_EXPERIMENT_API_KEY", raising=False)
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-host")
+        assert Settings().api_key == ""
+
+    def it_reads_the_api_key_from_its_env_prefix(monkeypatch):
+        monkeypatch.setenv("GBNF_EXPERIMENT_API_KEY", "sk-ant-test")
+        assert Settings().api_key == "sk-ant-test"
+
     def it_caches_the_prepared_corpus_outside_the_package_tree():
         """A rebuildable cache is not evidence; only runs belong under data/."""
         instance = Settings()

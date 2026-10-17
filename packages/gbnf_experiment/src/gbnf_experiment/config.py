@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     docker_directory: Path = PACKAGE_ROOT / "docker"
     # The merge of GBNF PR #81: nearest upstream ancestor of the v0 clone's local commits.
     gbnf_commit: str = "13f1aca495d11e160fffd68c4ba299a2415909d8"
+    # Blank runs on the host's Claude subscription. Set via the env, never committed.
+    api_key: str = ""
 
     @property
     def prepare_docker_directory(self) -> Path:

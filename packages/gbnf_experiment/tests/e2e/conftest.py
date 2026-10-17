@@ -11,10 +11,7 @@ PREPARED_CACHE = CACHE_HOME / "ports" / "gbnf-experiment" / "prepared"
 
 @pytest.fixture(scope="session")
 def experiment_data(tmp_path_factory) -> Path:
-    """A fresh data tree holding nothing but this session's runs.
-
-    Runs are the session's own, so nothing found there can be an earlier run's.
-    """
+    """A fresh working folder for this session's one run, as the runner gives each run."""
     return tmp_path_factory.mktemp("data")
 
 
@@ -44,14 +41,13 @@ def completed_run(experiment_data: Path, prepared_cache: Path) -> Path:
     """
     result = subprocess.run(
         [
-            "uv", "run", "run_gbnf_experiment", "--source-language", "python",
-            "--study", "e2e", "--output", str(experiment_data),
+            "uv", "run", "--project", str(PACKAGE_ROOT), "run_gbnf_experiment",
+            "--source-language", "python",
         ],
-        cwd=PACKAGE_ROOT,
+        cwd=experiment_data,
         env={**os.environ, "GBNF_EXPERIMENT_PREPARED_DIRECTORY": str(prepared_cache)},
         capture_output=True,
         text=True,
     )
     assert result.returncode == 0, result.stdout + result.stderr
-    [run_directory] = experiment_data.iterdir()
-    return run_directory
+    return experiment_data

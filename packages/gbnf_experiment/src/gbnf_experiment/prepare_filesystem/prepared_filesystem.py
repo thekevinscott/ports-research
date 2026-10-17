@@ -5,7 +5,6 @@ from botbox import Agent, RunResult
 
 from gbnf_experiment.config import settings
 from gbnf_experiment.prepare_filesystem.prepare_reference_implementation import prepare_reference_implementation
-from gbnf_experiment.prepare_filesystem.run_directory_name import run_directory_name
 from gbnf_experiment.prepare_filesystem.write_manifest import write_manifest as _write_manifest
 
 
@@ -18,7 +17,7 @@ class PreparedFilesystem:
         include_source_integration_tests: bool,
         include_target_integration_tests: bool,
         debug: bool,
-        output: Path,
+        run_directory: Path,
     ):
         self.timestamp = datetime.now(UTC)
         # The extracted /shared, mounted as the agent's source as it is.
@@ -34,7 +33,7 @@ class PreparedFilesystem:
             for path in self.reference_implementation_directory.rglob("*")
             if path.is_file()
         )
-        self.run_directory = output / run_directory_name(self.timestamp)
+        self.run_directory = run_directory
         self.ported_implementation_directory = self.run_directory / "ported_implementation"
         self.ported_implementation_directory.mkdir(parents=True)
         self.transcript_directory = self.run_directory / "transcript"
@@ -44,11 +43,10 @@ class PreparedFilesystem:
     def proxy_log(self):
         return self.run_directory / "proxy.log"
 
-    def write_manifest(self, agent: Agent, *, study: str, **kwargs):
+    def write_manifest(self, agent: Agent, **kwargs):
         _write_manifest(
             self.run_directory,
             timestamp=self.timestamp,
-            study=study,
             condition={
                 **kwargs,
             },
@@ -59,7 +57,7 @@ class PreparedFilesystem:
         )
 
     def write_result(
-        self, result: RunResult | None, agent: Agent, *, study: str, error: str | None = None, **kwargs
+        self, result: RunResult | None, agent: Agent, *, error: str | None = None, **kwargs
     ):
         if result is not None:
             if result.stdout:
@@ -68,7 +66,6 @@ class PreparedFilesystem:
         _write_manifest(
             self.run_directory,
             timestamp=self.timestamp,
-            study=study,
             condition={
                 **kwargs,
             },
