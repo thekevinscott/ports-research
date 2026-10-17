@@ -13,7 +13,7 @@ just reference
 
 `generate` writes `<count>` grammars to `grammars/<id>.gbnf`, their inputs to `inputs/<id>.json`, and `manifest.json` with the seed, count and generator version. The same seed writes the same bytes. Grammars draw on literals, escapes (`\x \u \U \t \r \n \" \\ \[ \]`), character classes with ranges and negation, rule references, guarded recursion, grouping, alternation, `* + ?`, comments, multi-line rules and CRLF line endings. About one in five is malformed. Inputs are the empty string, strings drawn from the grammar, and mutations of them.
 
-`run` writes one JSON line per pair: `grammar`, `input` (index into the input list), `outcome`, `error`. Each pair runs in its own subprocess with a 10 s timeout. Python imports `gbnf` with `PYTHONPATH=<implementation>`; typescript imports the default export of `<implementation>/src/index.ts` through tsx. The call is `GBNF(grammar, input)`.
+`run` writes one JSON line per pair: `grammar`, `input` (index into the input list), `outcome`, `error`. Each pair runs in its own subprocess with a 10 s timeout. Python's driver takes `<implementation>` as its argument, puts it on `sys.path` and imports `gbnf`; typescript imports the default export of `<implementation>/src/index.ts` through tsx. The call is `GBNF(grammar, input)`.
 
 - `accept`: the call returns and the state holds an end rule (`RuleEnd` in python, `type: "end"` in typescript).
 - `reject`: the call returns with no end rule, or raises `InputParseError`.

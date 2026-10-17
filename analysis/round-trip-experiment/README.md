@@ -135,10 +135,8 @@ suite have to exist and be non-empty. A missing cache-key directory reads as a c
 `PreparedFilesystem`, which would silently derive the real gbnf reference into it — a
 twenty-minute docker build against the wrong input.
 
-Two env assignments over the inherited environment are the whole redirection:
-`GBNF_EXPERIMENT_PREPARED_DIRECTORY=<staging>/<forward run id>`, whose one entry is the
-staged port under the harness's own cache key, and
-`GBNF_EXPERIMENT_DATA_DIRECTORY=<reverse>/<forward run id>` for the output.
+The harness is launched in the inherited environment, so nothing points it at the staged
+port or at `reverse/`. The reverse leg does not run against current `gbnf_experiment` (#193).
 
 The reverse condition is constant, whatever the forward cell was: the port is the source,
 the language is the one the forward run started from, both suites are included
@@ -153,10 +151,8 @@ Output layout, one root per forward run so a leg is findable whatever its exit s
 reverse/<forward run id>/<YYYYmmddTHHMMSSZ_xxxxxxxx>/   # ported_implementation/, transcript/, manifest.json, result.json
 ```
 
-`ROUND_TRIP_EXPERIMENT_REVERSE_DIRECTORY` (default `reverse/` here, tracked in git) moves that
-root; `ROUND_TRIP_EXPERIMENT_STAGING_DIRECTORY` (default
-`~/.cache/ports/round-trip-experiment/derivations`) moves the staged derivations, which are
-a cache and can be trashed once a leg is banked.
+That root is `reverse/` here, tracked in git. Staged derivations go to
+`~/.cache/ports/round-trip-experiment/derivations`, a cache that can be trashed once a leg is banked.
 
 ## Tests
 

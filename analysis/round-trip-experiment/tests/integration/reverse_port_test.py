@@ -11,7 +11,7 @@ PACKAGE_ROOT = Path(__file__).resolve().parents[2]
 GBNF_EXPERIMENT_ROOT = PACKAGE_ROOT.parents[1] / "packages" / "gbnf_experiment"
 DERIVATION_KEY = "d9464914dc2adf25"
 UV = shutil.which("uv")
-FORWARD_RUN_ID = "20260909T001426Z_1c28aa33"
+FORWARD_RUN_ID = "19700101T000000Z_00000000"
 FORWARD_CONDITION = {
     "name": "source-python_python-tests_effort-high_model-claude-opus-5",
     "source_language": "python",
@@ -45,13 +45,15 @@ def assistant(message_id: str, **usage) -> str:
 
 @pytest.fixture
 def places(tmp_path):
-    # The CLI writes to its fixed staging and reverse roots; the forward run id is fake, so
-    # its subdirectories there belong to this test alone.
+    # The CLI writes to its fixed staging and reverse roots, which hold banked runs; the
+    # forward run id is one no real run has, so its subdirectories there are this test's alone.
     places = {
         "derivations": tmp_path.resolve() / "gbnf-cache" / "derivations",
         "staging": Path.home() / ".cache" / "ports" / "round-trip-experiment" / "derivations",
         "reverse": PACKAGE_ROOT / "reverse",
     }
+    for root in ("staging", "reverse"):
+        assert not (places[root] / FORWARD_RUN_ID).exists()
     yield places
     for root in ("staging", "reverse"):
         shutil.rmtree(places[root] / FORWARD_RUN_ID, ignore_errors=True)
@@ -153,7 +155,7 @@ def describe_stage():
         assert not (places["reverse"] / forward_run.name).exists()
 
     def it_fails_with_a_message_when_the_run_has_no_port(env, derivation_cache, tmp_path):
-        bare = tmp_path.resolve() / "20260909T001426Z_00000000"
+        bare = tmp_path.resolve() / "19700101T000000Z_11111111"
         bare.mkdir()
         (bare / "manifest.json").write_text(json.dumps({"condition": FORWARD_CONDITION}))
         result = run_cli(env, "stage", "--run", str(bare))

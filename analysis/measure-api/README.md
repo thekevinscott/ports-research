@@ -13,7 +13,7 @@ just reference
 
 `generate` runs `measure-behavior generate` with the same seed and count, keeps its grammars and inputs (the empty string, strings drawn from the grammar, and their truncations, over-runs and edits), appends two random strings per grammar, and writes `manifest.json`. The same seed writes the same bytes.
 
-`run` writes one JSON line per case: `grammar`, `input` (index into the input list), `steps`, `crash`. Each case runs in its own subprocess with a 10 s timeout. Python imports `gbnf` with `PYTHONPATH=<implementation>`; typescript imports the default export of `<implementation>/src/index.ts` through tsx.
+`run` writes one JSON line per case: `grammar`, `input` (index into the input list), `steps`, `crash`. Each case runs in its own subprocess with a 10 s timeout. Python's driver takes `<implementation>` as its argument, puts it on `sys.path` and imports `gbnf`; typescript imports the default export of `<implementation>/src/index.ts` through tsx.
 
 A case's steps, in order: `construct` is `GBNF(grammar)`; `whole` is `add(input)` on that state; `prefix 1` to `prefix k` add the input one code point at a time, each to the previous state, for the first 16 code points. A step that returns records the state's rules as `{type, value}` (python: the rule's class name and `value`; typescript: the rule's `type` and `value`). A step that raises records `{class, pos}`, `pos` being the exception's integer `pos` or null. A raise at `construct` ends the case; a raise in the prefix steps ends them; a raise at `whole` does not stop the prefix steps. `crash` is null, or the timeout, or the subprocess's stderr when it exits non-zero or prints no steps.
 
