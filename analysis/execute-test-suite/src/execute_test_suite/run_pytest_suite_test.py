@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from unittest.mock import Mock, patch
 
@@ -11,8 +10,8 @@ from execute_test_suite.run_pytest_suite import (
     PYTEST_COV_VERSION,
     PYTEST_DESCRIBE_VERSION,
     PYTEST_VERSION,
-    REPORT_VARIABLE,
-    TARGET_VARIABLE,
+    REPORT_OPTION,
+    TARGET_OPTION,
     run_pytest_suite,
 )
 from execute_test_suite.suite_result import SuiteResult
@@ -23,6 +22,15 @@ TEST_FILES = [TARGET / "gbnf/parse_test.py", TARGET / "tests/generated/iteration
 
 def report_flag(argv):
     return next(arg for arg in argv if arg.startswith("--junit-xml="))
+
+
+def option(argv, name):
+    return next(arg for arg in argv if arg.startswith(f"{name}=")).removeprefix(f"{name}=")
+
+
+def ini_override(argv, name):
+    overrides = [argv[i + 1] for i, arg in enumerate(argv) if arg == "-o"]
+    return next(value for value in overrides if value.startswith(f"{name}=")).removeprefix(f"{name}=")
 
 
 def coverage_flag(argv):
@@ -108,10 +116,14 @@ def describe_run_pytest_suite():
         argv = subprocess_module.run.call_args.args[0]
         assert "--continue-on-collection-errors" in argv
 
-    def it_points_pythonpath_at_the_target(subprocess_module, parse_junit_report_function):
+    def it_puts_the_target_on_pytests_pythonpath(subprocess_module, parse_junit_report_function):
         run_pytest_suite(test_files=TEST_FILES, target=TARGET)
-        env = subprocess_module.run.call_args.kwargs["env"]
-        assert env["PYTHONPATH"] == str(TARGET)
+        argv = subprocess_module.run.call_args.args[0]
+        assert ini_override(argv, "pythonpath") == str(TARGET)
+
+    def it_runs_pytest_in_the_inherited_environment(subprocess_module, parse_junit_report_function):
+        run_pytest_suite(test_files=TEST_FILES, target=TARGET)
+        assert "env" not in subprocess_module.run.call_args.kwargs
 
     def it_runs_from_a_scratch_directory_not_the_target(
         subprocess_module, parse_junit_report_function
@@ -128,15 +140,13 @@ def describe_run_pytest_suite():
         parse_junit_report_function.assert_not_called()
 
     def describe_strict():
-        def it_loads_no_plugin_and_sets_no_adapt_variables(
+        def it_loads_no_plugin_and_passes_no_adapt_options(
             subprocess_module, parse_junit_report_function, read_adapt_report_function, captured
         ):
             run_pytest_suite(test_files=TEST_FILES, target=TARGET)
             argv = subprocess_module.run.call_args.args[0]
-            env = subprocess_module.run.call_args.kwargs["env"]
             assert ADAPT_PLUGIN not in argv
-            assert TARGET_VARIABLE not in env
-            assert REPORT_VARIABLE not in env
+            assert not any(arg.startswith((TARGET_OPTION, REPORT_OPTION)) for arg in argv)
             assert f"{ADAPT_PLUGIN}.py" not in captured["scratch_files"]
             read_adapt_report_function.assert_not_called()
 
@@ -157,18 +167,18 @@ def describe_run_pytest_suite():
             subprocess_module, parse_junit_report_function, read_adapt_report_function
         ):
             run_pytest_suite(test_files=TEST_FILES, target=TARGET, adapt=True)
-            env = subprocess_module.run.call_args.kwargs["env"]
+            argv = subprocess_module.run.call_args.args[0]
             cwd = subprocess_module.run.call_args.kwargs["cwd"]
-            assert env["PYTHONPATH"] == f"{TARGET}{os.pathsep}{cwd}"
+            assert ini_override(argv, "pythonpath") == f"{TARGET} {cwd}"
 
         def it_tells_the_plugin_where_the_target_and_the_report_are(
             subprocess_module, parse_junit_report_function, read_adapt_report_function
         ):
             run_pytest_suite(test_files=TEST_FILES, target=TARGET, adapt=True)
-            env = subprocess_module.run.call_args.kwargs["env"]
+            argv = subprocess_module.run.call_args.args[0]
             cwd = subprocess_module.run.call_args.kwargs["cwd"]
-            assert env[TARGET_VARIABLE] == str(TARGET)
-            assert Path(env[REPORT_VARIABLE]).is_relative_to(cwd)
+            assert option(argv, TARGET_OPTION) == str(TARGET)
+            assert Path(option(argv, REPORT_OPTION)).is_relative_to(cwd)
 
         def it_reads_the_fired_rules_from_the_plugins_report(
             subprocess_module, parse_junit_report_function, read_adapt_report_function
@@ -176,8 +186,8 @@ def describe_run_pytest_suite():
             result = run_pytest_suite(
                 test_files=TEST_FILES, target=TARGET, adapt=True
             )
-            env = subprocess_module.run.call_args.kwargs["env"]
-            read_adapt_report_function.assert_called_once_with(Path(env[REPORT_VARIABLE]))
+            argv = subprocess_module.run.call_args.args[0]
+            read_adapt_report_function.assert_called_once_with(Path(option(argv, REPORT_OPTION)))
             assert result.rules_fired == ("flat_module",)
             assert result.total == 1
 

@@ -1,11 +1,10 @@
 import dataclasses
-import os
 import shutil
 import subprocess
 import tempfile
 from pathlib import Path
 
-from execute_test_suite.adapt_python import REPORT_VARIABLE, TARGET_VARIABLE
+from execute_test_suite.adapt_python import REPORT_OPTION, TARGET_OPTION
 from execute_test_suite.coverage_result import CoverageResult
 from execute_test_suite.parse_coverage_json import parse_coverage_json
 from execute_test_suite.parse_junit_report import parse_junit_report
@@ -45,7 +44,7 @@ def run_pytest_suite(
 ) -> SuiteResult:
     """Run test_files under pinned pytest and pytest-describe, with target as the port root.
 
-    `PYTHONPATH=target` makes `import gbnf` find the port; pytest's own rootdir
+    pytest's `pythonpath` set to target makes `import gbnf` find the port; pytest's own rootdir
     insertion resolves the colocated tests' relative imports. The process runs from
     a scratch directory that holds its reports.
 
@@ -63,16 +62,17 @@ def run_pytest_suite(
     with tempfile.TemporaryDirectory() as scratch:
         report_path = Path(scratch) / "report.xml"
         adapt_report_path = Path(scratch) / "adapt.json"
-        env = {**os.environ, "PYTHONPATH": str(target)}
+        pythonpath = [target]
         plugin = []
         if adapt:
             shutil.copy(Path(__file__).with_name(f"{ADAPT_PLUGIN}.py"), scratch)
-            plugin = ["-p", ADAPT_PLUGIN]
-            env |= {
-                "PYTHONPATH": f"{target}{os.pathsep}{scratch}",
-                TARGET_VARIABLE: str(target),
-                REPORT_VARIABLE: str(adapt_report_path),
-            }
+            pythonpath.append(Path(scratch))
+            plugin = [
+                "-p",
+                ADAPT_PLUGIN,
+                f"{TARGET_OPTION}={target}",
+                f"{REPORT_OPTION}={adapt_report_path}",
+            ]
         coverage_path = Path(scratch) / "coverage.json"
         coverage_dependency = []
         coverage_flags = []
@@ -103,6 +103,8 @@ def run_pytest_suite(
                 "-m",
                 "pytest",
                 "--continue-on-collection-errors",
+                "-o",
+                f"pythonpath={' '.join(str(path) for path in pythonpath)}",
                 *plugin,
                 *(str(path) for path in test_files),
                 f"--junit-xml={report_path}",
@@ -110,7 +112,6 @@ def run_pytest_suite(
                 "-q",
             ],
             cwd=scratch,
-            env=env,
             capture_output=True,
             text=True,
         )
