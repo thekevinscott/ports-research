@@ -88,7 +88,7 @@ def launch():
 def places():
     with (
         patch("round_trip_experiment.reverse_port_cli.derivation_cache_key", autospec=True) as key,
-        patch("round_trip_experiment.reverse_port_cli.gbnf_settings") as gbnf,
+        patch("round_trip_experiment.reverse_port_cli.PREPARED_DIRECTORY", Path("/cache/gbnf-experiment/derivations")),
         patch("round_trip_experiment.reverse_port_cli.STAGING_DIRECTORY", Path("/cache/staging")),
         patch("round_trip_experiment.reverse_port_cli.REVERSE_DIRECTORY", Path("/pkg/reverse")),
         patch(
@@ -96,7 +96,6 @@ def places():
             Path("/repo/packages/gbnf_experiment"),
         ),
     ):
-        gbnf.prepared_directory = Path("/cache/gbnf-experiment/derivations")
         yield key
 
 

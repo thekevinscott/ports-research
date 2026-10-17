@@ -1,4 +1,4 @@
-from gbnf_experiment.config import compute_prepare_cache_key, settings
+from gbnf_experiment.config import GBNF_COMMIT, PREPARE_DOCKER_DIRECTORY, compute_prepare_cache_key
 from gbnf_experiment.prepare_filesystem.assemble_whitelist.assemble_whitelist import assemble_whitelist
 
 
@@ -7,8 +7,8 @@ def derivation_cache_key(source_language: str) -> str:
     every suite, so it stages under the key of the tree holding every test for its source.
     """
     return compute_prepare_cache_key(
-        settings.gbnf_commit,
-        settings.prepare_docker_directory,
+        GBNF_COMMIT,
+        PREPARE_DOCKER_DIRECTORY,
         assemble_whitelist(
             source_language,
             include_unit_tests=True,

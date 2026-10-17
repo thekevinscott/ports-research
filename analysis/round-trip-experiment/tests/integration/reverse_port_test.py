@@ -45,18 +45,19 @@ def assistant(message_id: str, **usage) -> str:
 
 @pytest.fixture
 def places(tmp_path):
-    # The CLI writes to its fixed staging and reverse roots, which hold banked runs; the
-    # forward run id is one no real run has, so its subdirectories there are this test's alone.
+    # The CLI reads and writes fixed roots that hold real trees and banked runs; each
+    # directory this test makes is asserted absent first, so teardown removes only its own.
     places = {
-        "derivations": tmp_path.resolve() / "gbnf-cache" / "derivations",
+        "derivations": Path.home() / ".cache" / "ports" / "gbnf-experiment" / "prepared",
         "staging": Path.home() / ".cache" / "ports" / "round-trip-experiment" / "derivations",
         "reverse": PACKAGE_ROOT / "reverse",
     }
-    for root in ("staging", "reverse"):
-        assert not (places[root] / FORWARD_RUN_ID).exists()
+    owned = [places["derivations"] / DERIVATION_KEY, places["staging"] / FORWARD_RUN_ID, places["reverse"] / FORWARD_RUN_ID]
+    for directory in owned:
+        assert not directory.exists()
     yield places
-    for root in ("staging", "reverse"):
-        shutil.rmtree(places[root] / FORWARD_RUN_ID, ignore_errors=True)
+    for directory in owned:
+        shutil.rmtree(directory, ignore_errors=True)
 
 
 @pytest.fixture
@@ -69,11 +70,8 @@ def derivation_cache(places):
 
 
 @pytest.fixture
-def env(places):
-    return {
-        **os.environ,
-        "GBNF_EXPERIMENT_PREPARED_DIRECTORY": str(places["derivations"]),
-    }
+def env():
+    return dict(os.environ)
 
 
 @pytest.fixture

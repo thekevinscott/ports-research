@@ -11,10 +11,9 @@ def harness():
     with (
         patch("round_trip_experiment.derivation_cache_key.assemble_whitelist", autospec=True) as whitelist,
         patch("round_trip_experiment.derivation_cache_key.compute_prepare_cache_key", autospec=True) as compute,
-        patch("round_trip_experiment.derivation_cache_key.settings") as settings,
+        patch("round_trip_experiment.derivation_cache_key.GBNF_COMMIT", "13f1aca"),
+        patch("round_trip_experiment.derivation_cache_key.PREPARE_DOCKER_DIRECTORY", Path("/repo/docker/gbnf-prepare")),
     ):
-        settings.gbnf_commit = "13f1aca"
-        settings.prepare_docker_directory = Path("/repo/docker/gbnf-prepare")
         whitelist.return_value = "+ rules\n"
         compute.return_value = "390bf534c55d496b"
         yield dict(whitelist=whitelist, compute=compute)
