@@ -24,7 +24,8 @@ gitignored.
 - Do all editing, building, and testing inside `.worktrees/<branch>/`.
 - **Run data lives only in the root checkout's `data/`.** Never read or write
   `.worktrees/*/data/`. Runs go through labnotes from the root checkout, which
-  files each one under `data/runs/<experiment>/<run>/`. `data/runs`,
+  files each one under `data/runs/<experiment>/<run>/`; the CLI's `--output`
+  is that run folder. `data/runs`,
   `data/sessions`, `data/orphans`, `data/judge` and `data/walkthroughs` are
   DVC-tracked: after `git pull`, run `dvc pull`; after banking runs,
   `dvc add data/runs`, commit the `.dvc` file, `dvc push`.

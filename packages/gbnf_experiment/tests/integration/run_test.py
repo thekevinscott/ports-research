@@ -459,39 +459,44 @@ def describe_cli():
         monkeypatch.setenv("HOME", str(home))
 
     @pytest.fixture
-    def working_folder(data_directory, monkeypatch):
-        folder = data_directory / "tests-configuration" / "brave-otter"
-        folder.mkdir(parents=True)
+    def working_folder(tmp_path, monkeypatch):
+        folder = tmp_path / "elsewhere"
+        folder.mkdir()
         monkeypatch.chdir(folder)
         return folder
 
-    def it_writes_the_run_into_the_working_folder(home, working_folder, docker_daemon):
-        result = CliRunner().invoke(cli, ["--source-language", "javascript"])
-        assert result.exit_code == 0, result.output
-        assert (working_folder / "manifest.json").is_file()
-        assert (working_folder / "ported_implementation" / "ported.py").is_file()
-        assert list(working_folder.parent.iterdir()) == [working_folder]
+    @pytest.fixture
+    def output(data_directory):
+        return data_directory / "tests-configuration" / "brave-otter"
 
-    def it_prepares_the_condition_its_flags_name(home, working_folder, docker_daemon, builds):
+    def it_writes_the_run_into_the_output(home, working_folder, output, docker_daemon):
+        result = CliRunner().invoke(cli, ["--source-language", "javascript", "--output", str(output)])
+        assert result.exit_code == 0, result.output
+        assert (output / "manifest.json").is_file()
+        assert (output / "ported_implementation" / "ported.py").is_file()
+        assert list(output.parent.iterdir()) == [output]
+        assert list(working_folder.iterdir()) == []
+
+    def it_prepares_the_condition_its_flags_name(home, working_folder, output, docker_daemon, builds):
         CliRunner().invoke(
             cli,
             [
                 "--source-language", "python", "--include-target-integration-tests", "1",
-                "--include-unit-tests", "0",
+                "--include-unit-tests", "0", "--output", str(output),
             ],
         )
         [build] = prepare_builds(builds)
         assert TARGET_INTEGRATION_RULE in build["build_args"]["RULES"].splitlines()
         assert UNIT_RULE not in build["build_args"]["RULES"].splitlines()
 
-    def it_exits_non_zero_when_the_agent_exits_non_zero(home, working_folder, docker_daemon, exit_code):
+    def it_exits_non_zero_when_the_agent_exits_non_zero(home, working_folder, output, docker_daemon, exit_code):
         exit_code[0] = 1
-        result = CliRunner().invoke(cli, ["--source-language", "javascript"])
+        result = CliRunner().invoke(cli, ["--source-language", "javascript", "--output", str(output)])
         assert result.exit_code != 0
-        assert json.loads((working_folder / "manifest.json").read_text())["exit_code"] == 1
+        assert json.loads((output / "manifest.json").read_text())["exit_code"] == 1
 
-    def it_exits_non_zero_when_the_result_is_an_error(home, working_folder, docker_daemon, port_result):
+    def it_exits_non_zero_when_the_result_is_an_error(home, working_folder, output, docker_daemon, port_result):
         """claude can exit 0 with is_error set; such a run must not count."""
         port_result.update(is_error=True)
-        result = CliRunner().invoke(cli, ["--source-language", "javascript"])
+        result = CliRunner().invoke(cli, ["--source-language", "javascript", "--output", str(output)])
         assert result.exit_code != 0

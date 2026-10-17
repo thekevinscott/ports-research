@@ -8,7 +8,7 @@ PACKAGE_ROOT = Path(__file__).resolve().parents[2]
 
 @pytest.fixture(scope="session")
 def experiment_data(tmp_path_factory) -> Path:
-    """A fresh working folder for this session's one run, as the runner gives each run."""
+    """A fresh run folder for this session's one run."""
     return tmp_path_factory.mktemp("data")
 
 
@@ -23,9 +23,9 @@ def completed_run(experiment_data: Path) -> Path:
     result = subprocess.run(
         [
             "uv", "run", "--project", str(PACKAGE_ROOT), "run_gbnf_experiment",
-            "--source-language", "python",
+            "--source-language", "python", "--output", str(experiment_data),
         ],
-        cwd=experiment_data,
+        cwd=PACKAGE_ROOT,
         capture_output=True,
         text=True,
     )

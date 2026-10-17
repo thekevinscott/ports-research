@@ -87,7 +87,7 @@ Each run lands in `data/runs/<experiment>/<run>/` with labnotes' `run.json`,
 (source language, test flags, effort, model), the gbnf commit, the sandbox
 image id and the harness commit. `result.json` is the agent CLI's JSON output
 (usage tokens, turns), not a score. labnotes runs each experiment from
-`experiments/<experiment>/experiment.toml`, one `run_gbnf_experiment` per run
+`experiments/<experiment>/experiment.toml`, one `run_gbnf_experiment --output .` per run
 in a fresh run folder; see `packages/gbnf_experiment/README.md` for its flags.
 
 ## Setup

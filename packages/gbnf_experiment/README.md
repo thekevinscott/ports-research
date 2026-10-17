@@ -7,18 +7,19 @@ CLI `run_gbnf_experiment`. Each invocation is one experimental condition: a sour
 - builds the prepare image in `docker/` for the condition: it clones gbnf at the pinned commit, applies `patches/`, generates both integration suites, and copies into `/shared` the files the condition's `RULES` admit, in gbnf's upstream layout (`javascript/`, `python/`);
 - extracts `/shared` to a cache entry keyed on the commit, `docker/` and `RULES`, one per condition;
 - hands that tree unchanged as the source, with a prompt and a `ClaudeAgent`, to `port_codebase`;
-- banks the `RunResult` into the working folder: `manifest.json` (with the agent's `exit_code`), `result.json` (the agent CLI's stdout), `stderr.txt` (its stderr), `transcript/` (the transcript files, at their paths relative to the agent's home), `proxy.log`.
+- banks the `RunResult` into `--output`: `manifest.json` (with the agent's `exit_code`), `result.json` (the agent CLI's stdout), `stderr.txt` (its stderr), `transcript/` (the transcript files, at their paths relative to the agent's home), `proxy.log`.
 
 The prompt names the source as `javascript/` or `python/`, the target language (`javascript` reads as `typescript`), and where each included suite sits. Paths in it are relative to the source directory.
 
-It writes into the folder it is run from, and exits non-zero when the agent exits non-zero, the result has `is_error`, or the manifest has an `error`. labnotes runs it once per run, from a fresh run folder, with each experiment's `command` from `experiments/<experiment>/experiment.toml`.
+It writes into `--output`, and exits non-zero when the agent exits non-zero, the result has `is_error`, or the manifest has an `error`. labnotes runs it once per run, from a fresh run folder, with each experiment's `command` from `experiments/<experiment>/experiment.toml`; those commands pass `--output .`.
 
 ```
-uv run --project packages/gbnf_experiment run_gbnf_experiment --source-language python --include-unit-tests 1 --include-source-integration-tests 1 --include-target-integration-tests 1
+uv run --project packages/gbnf_experiment run_gbnf_experiment --output /tmp/probe --source-language python --include-unit-tests 1 --include-source-integration-tests 1 --include-target-integration-tests 1
 ```
 
 | Flag | What it is |
 | --- | --- |
+| `--output` | Required, no default. The run folder itself, created if missing; no id or subfolder is picked. |
 | `--source-language` | `javascript` or `python`. The port goes to the other. |
 | `--include-unit-tests` | `0` or `1`, default `0`. Include the source's unit tests, beside the modules they test. |
 | `--include-source-integration-tests` | `0` or `1`, default `0`. Include the source's generated integration suite. |
