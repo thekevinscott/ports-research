@@ -35,15 +35,15 @@ EXCLUDE_BY_LANGUAGE = {
     "javascript": [*EXCLUDE, "builder", "dev"],
 }
 
-def runs_under(root, table, study, *, include_nonzero_exit=False):
-    """Completed runs under root: every V1 run, and the V2 runs whose manifest names the study."""
+def runs_under(root, table, experiment, *, include_nonzero_exit=False):
+    """Completed runs under root: every V1 run, and the V2 runs filed under the experiment."""
     # A fresh DirSQL scan every run, so a run banked since the last refresh is picked up.
     db = DirSQL(str(root), tables=[table])
     runs = completed_runs(db, table.name, include_nonzero_exit=include_nonzero_exit)
-    return [run for run in runs if not is_v2(run) or run["study"] == study]
+    return [run for run in runs if not is_v2(run) or run["experiment"] == experiment]
 
 
-def codebases_under(root, table, study):
+def codebases_under(root, table, experiment):
     pinned_reference()
     return [
         Codebase.from_run(
@@ -51,6 +51,6 @@ def codebases_under(root, table, study):
             exclude=EXCLUDE_BY_LANGUAGE[row["target_language"]],
             reference=REFERENCE / row["target_language"],
         )
-        for row in runs_under(root, table, study)
+        for row in runs_under(root, table, experiment)
     ]
 

@@ -109,6 +109,12 @@ def describe_run_rows():
         assert row["completed_at"] == "2026-09-10T04:50:25Z"
         assert row["error"] is None
 
+    def it_names_the_experiment_the_run_is_filed_under(tmp_path):
+        run_dir = write_run(tmp_path / "models-effort" / "brave-otter", V2_CONDITION, exit_code=0)
+        (row,) = run_rows(str(run_dir / "manifest.json"))
+        assert row["experiment"] == "models-effort"
+        assert "study" not in row
+
     def it_reads_the_result_and_the_transcript(tmp_path):
         run_dir = write_run(tmp_path / "run", FORWARD_CONDITION)
         (row,) = run_rows(str(run_dir / "manifest.json"))
@@ -193,8 +199,8 @@ def describe_reverse_run_rows():
 
 
 def describe_tables():
-    def it_globs_forward_runs_one_level_under_the_root():
-        assert runs_table().glob == "*/manifest.json"
+    def it_globs_forward_runs_under_their_experiment():
+        assert runs_table().glob == "*/*/manifest.json"
 
     def it_globs_reverse_runs_two_levels_under_the_root():
         assert reverse_runs_table().glob == "*/*/manifest.json"
@@ -224,43 +230,43 @@ def describe_completed_runs():
         assert [row["run_id"] for row in completed_runs(later, "reverse_runs")] == ["r1", "r2"]
 
     def it_keeps_v1_and_v2_runs_side_by_side(tmp_path):
-        write_run(tmp_path / "v1", FORWARD_CONDITION)
-        write_run(tmp_path / "v2", V2_CONDITION, exit_code=0)
+        write_run(tmp_path / "tests-configuration" / "v1", FORWARD_CONDITION)
+        write_run(tmp_path / "tests-configuration" / "v2", V2_CONDITION, exit_code=0)
         db = DirSQL(str(tmp_path), tables=[runs_table()])
         assert [row["run_id"] for row in completed_runs(db, "runs")] == ["v1", "v2"]
 
     def it_drops_a_v2_run_that_exited_nonzero(tmp_path):
-        write_run(tmp_path / "ok", V2_CONDITION, exit_code=0)
-        write_run(tmp_path / "killed", V2_CONDITION, exit_code=137)
+        write_run(tmp_path / "tests-configuration" / "ok", V2_CONDITION, exit_code=0)
+        write_run(tmp_path / "tests-configuration" / "killed", V2_CONDITION, exit_code=137)
         db = DirSQL(str(tmp_path), tables=[runs_table()])
         assert [row["run_id"] for row in completed_runs(db, "runs")] == ["ok"]
 
     def it_keeps_a_nonzero_exit_when_asked(tmp_path):
-        write_run(tmp_path / "ok", V2_CONDITION, exit_code=0)
-        write_run(tmp_path / "killed", V2_CONDITION, exit_code=137)
+        write_run(tmp_path / "tests-configuration" / "ok", V2_CONDITION, exit_code=0)
+        write_run(tmp_path / "tests-configuration" / "killed", V2_CONDITION, exit_code=137)
         db = DirSQL(str(tmp_path), tables=[runs_table()])
         rows = completed_runs(db, "runs", include_nonzero_exit=True)
         assert [row["run_id"] for row in rows] == ["killed", "ok"]
 
     def it_keeps_a_killed_run_without_a_result_when_asked(tmp_path):
-        write_run(tmp_path / "ok", V2_CONDITION, exit_code=0)
-        write_run(tmp_path / "killed", V2_CONDITION, exit_code=137, killed=True)
+        write_run(tmp_path / "tests-configuration" / "ok", V2_CONDITION, exit_code=0)
+        write_run(tmp_path / "tests-configuration" / "killed", V2_CONDITION, exit_code=137, killed=True)
         db = DirSQL(str(tmp_path), tables=[runs_table()])
         rows = completed_runs(db, "runs", include_nonzero_exit=True)
         assert [row["run_id"] for row in rows] == ["killed", "ok"]
 
     def it_keeps_an_api_error_run_when_asked(tmp_path):
-        write_run(tmp_path / "ok", V2_CONDITION, exit_code=0)
+        write_run(tmp_path / "tests-configuration" / "ok", V2_CONDITION, exit_code=0)
         write_run(
-            tmp_path / "failed", V2_CONDITION, exit_code=1, is_error=True, terminal_reason="api_error"
+            tmp_path / "tests-configuration" / "failed", V2_CONDITION, exit_code=1, is_error=True, terminal_reason="api_error"
         )
         db = DirSQL(str(tmp_path), tables=[runs_table()])
         rows = completed_runs(db, "runs", include_nonzero_exit=True)
         assert [row["run_id"] for row in rows] == ["failed", "ok"]
 
     def it_still_drops_an_unfinished_v2_run_when_asked(tmp_path):
-        write_run(tmp_path / "ok", V2_CONDITION, exit_code=0)
-        write_run(tmp_path / "running", V2_CONDITION, completed=False, killed=True)
+        write_run(tmp_path / "tests-configuration" / "ok", V2_CONDITION, exit_code=0)
+        write_run(tmp_path / "tests-configuration" / "running", V2_CONDITION, completed=False, killed=True)
         db = DirSQL(str(tmp_path), tables=[runs_table()])
         rows = completed_runs(db, "runs", include_nonzero_exit=True)
         assert [row["run_id"] for row in rows] == ["ok"]

@@ -1318,7 +1318,7 @@ def describe_pinned_reference():
             / "gbnf_experiment"
             / "config.py"
         )
-        assert f'gbnf_commit: str = "{codebase_module.GBNF_COMMIT}"' in config.read_text()
+        assert f'GBNF_COMMIT = "{codebase_module.GBNF_COMMIT}"' in config.read_text()
 
     def it_fetches_the_pin_and_applies_every_gbnf_prepare_patch(monkeypatch, tmp_path):
         monkeypatch.setattr(codebase_module, "REFERENCE_CHECKOUT", tmp_path / "pinned")
