@@ -1,0 +1,6 @@
+[experiments]
+path = "experiments/{experiment}"
+[files]
+path = "experiments/{experiment}/*.md"
+[runs]
+path = "data/runs/{experiment}/{run}"
