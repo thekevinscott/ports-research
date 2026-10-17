@@ -1,0 +1,6 @@
+outs:
+- md5: b8a7f7367d06e6e294909a56cae59bcf.dir
+  size: 786295
+  nfiles: 27
+  hash: md5
+  path: sessions
