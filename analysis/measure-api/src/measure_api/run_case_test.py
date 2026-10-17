@@ -1,12 +1,13 @@
 import json
 import signal
 import subprocess
+import sys
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
-from measure_api.run_case import PREFIX_CAP, TIMEOUT_SECONDS, run_case
+from measure_api.run_case import DRIVERS, PREFIX_CAP, TIMEOUT_SECONDS, run_case
 
 IMPLEMENTATION = Path("/impl")
 STEPS = [{"step": "construct", "rules": []}]
@@ -53,10 +54,16 @@ def describe_run_case():
         run_case("python", IMPLEMENTATION, "g", "i")
         assert process.communicate.call_args.kwargs["timeout"] == TIMEOUT_SECONDS
 
-    def it_puts_the_implementation_on_the_python_path(popen):
+    def it_hands_the_implementation_to_the_python_driver_without_writing_bytecode(popen):
         answered(popen)
         run_case("python", IMPLEMENTATION, "g", "i")
-        assert popen.call_args.kwargs["env"]["PYTHONPATH"] == str(IMPLEMENTATION)
+        assert popen.call_args.args[0] == [sys.executable, "-B", str(DRIVERS / "driver.py"), str(IMPLEMENTATION)]
+
+    def it_runs_the_driver_in_the_inherited_environment(popen):
+        answered(popen)
+        run_case("python", IMPLEMENTATION, "g", "i")
+        run_case("typescript", IMPLEMENTATION, "g", "i")
+        assert all("env" not in call.kwargs for call in popen.call_args_list)
 
     def it_hands_the_typescript_entry_to_the_driver(popen):
         answered(popen)
