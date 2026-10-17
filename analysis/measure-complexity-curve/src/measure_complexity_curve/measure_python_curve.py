@@ -14,7 +14,7 @@ def measure_python_curve(*, target: Path, corpus: list[dict], iterations: int) -
 
     That script's execution strategy — sys.path-insert target, then a bare
     `import gbnf` — is execute-test-suite's own host-subprocess strategy for
-    python ports (`PYTHONPATH=target`), not a second one invented for
+    python ports (target on pytest's `pythonpath`), not a second one invented for
     measurement.
 
     A single baseline measurement (`--iterations 0`, so the process still

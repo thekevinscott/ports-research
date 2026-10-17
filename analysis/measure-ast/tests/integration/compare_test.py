@@ -1,5 +1,4 @@
 import json
-import os
 import shutil
 import subprocess
 from itertools import chain
@@ -24,7 +23,6 @@ def run_compare(port: Path, reference: Path) -> dict:
             *chain.from_iterable(("--exclude", pattern) for pattern in EXCLUDE),
         ],
         cwd=PACKAGE_ROOT,
-        env=os.environ,
         capture_output=True,
         text=True,
     )

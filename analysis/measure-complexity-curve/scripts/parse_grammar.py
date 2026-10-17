@@ -5,7 +5,7 @@ from pathlib import Path
 # Not a package module: a subprocess entry point hyperfine shells out to, so it
 # is exempt from the one-function-per-file/colocated-test gate that governs
 # src/. Mirrors execute-test-suite's own host-subprocess execution strategy
-# (PYTHONPATH-style sys.path insertion, then a bare `import gbnf`) rather than
+# (sys.path insertion, then a bare `import gbnf`) rather than
 # inventing a second one.
 
 
