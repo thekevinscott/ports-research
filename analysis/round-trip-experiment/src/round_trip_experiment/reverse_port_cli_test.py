@@ -29,10 +29,6 @@ REPORT = {
     "staged": "/cache/staging/20260909T001426Z_1c28aa33/390bf534c55d496b",
     "reverse_root": "/pkg/reverse/20260909T001426Z_1c28aa33",
     "argv": ["uv", "run", "--directory", "/repo/packages/gbnf_experiment", "run_gbnf_experiment"],
-    "env": {
-        "GBNF_EXPERIMENT_PREPARED_DIRECTORY": "/cache/staging/20260909T001426Z_1c28aa33",
-        "GBNF_EXPERIMENT_DATA_DIRECTORY": "/pkg/reverse/20260909T001426Z_1c28aa33",
-    },
     "estimate": {"total_tokens": 4697263, "api_calls": 63, "duration_ms": 456517},
 }
 MANIFEST = {"timestamp": "2026-09-09T02:11:03Z", "forward": REPORT["forward"]}
@@ -93,15 +89,14 @@ def places():
     with (
         patch("round_trip_experiment.reverse_port_cli.derivation_cache_key", autospec=True) as key,
         patch("round_trip_experiment.reverse_port_cli.gbnf_settings") as gbnf,
-        patch("round_trip_experiment.reverse_port_cli.settings") as own,
+        patch("round_trip_experiment.reverse_port_cli.STAGING_DIRECTORY", Path("/cache/staging")),
+        patch("round_trip_experiment.reverse_port_cli.REVERSE_DIRECTORY", Path("/pkg/reverse")),
         patch(
             "round_trip_experiment.reverse_port_cli.GBNF_EXPERIMENT_ROOT",
             Path("/repo/packages/gbnf_experiment"),
         ),
     ):
         gbnf.prepared_directory = Path("/cache/gbnf-experiment/derivations")
-        own.staging_directory = Path("/cache/staging")
-        own.reverse_directory = Path("/pkg/reverse")
         yield key
 
 
@@ -186,10 +181,9 @@ def describe_run():
         invoke("run", "--run", str(forward_run))
         reverse_leg.assert_called_once()
 
-    def it_launches_run_gbnf_experiment_with_the_staged_environment(wired, launch, forward_run):
+    def it_launches_run_gbnf_experiment_with_the_inherited_environment(wired, launch, forward_run):
         invoke("run", "--run", str(forward_run))
-        assert launch.call_args.args == (REPORT["argv"],)
-        assert REPORT["env"].items() <= launch.call_args.kwargs["env"].items()
+        assert launch.call_args == ((REPORT["argv"],), {})
 
     def it_refuses_to_launch_when_the_staged_derivation_is_incomplete(wired, reverse_leg, launch, forward_run):
         reverse_leg.side_effect = ValueError("staged derivation is incomplete, refusing to launch")

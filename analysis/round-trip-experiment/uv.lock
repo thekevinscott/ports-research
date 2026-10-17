@@ -7,28 +7,6 @@ exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for 
 exclude-newer-span = "P3D"
 
 [[package]]
-name = "agent-harness-sandbox"
-version = "0.1.0"
-source = { editable = "../../packages/agent-harness-sandbox" }
-dependencies = [
-    { name = "click" },
-    { name = "python-on-whales" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "click", specifier = ">=8.5.0" },
-    { name = "python-on-whales", specifier = ">=0.81.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "coverage", specifier = ">=7.16.0" },
-    { name = "pytest", specifier = ">=9.1.1" },
-    { name = "pytest-describe", specifier = ">=3.2.0" },
-]
-
-[[package]]
 name = "aiohappyeyeballs"
 version = "2.7.1"
 source = { registry = "https://pypi.org/simple" }
@@ -135,6 +113,24 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/9a/8e/82a0fe20a541c03148528be8cac2408564a6c9a0cc7e9171802bc1d26985/attrs-26.1.0.tar.gz", hash = "sha256:d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c985eff32", size = 952055, upload-time = "2026-03-19T14:22:25.026Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/64/b4/17d4b0b2a2dc85a6df63d1157e028ed19f90d4cd97c36717afef2bc2f395/attrs-26.1.0-py3-none-any.whl", hash = "sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309", size = 67548, upload-time = "2026-03-19T14:22:23.645Z" },
+]
+
+[[package]]
+name = "bin-shim"
+version = "0.1.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/6a/fc/2e09f2de12c0937834fc3f2bacde597f6e25499b0bf4b3d71292b7dbf822/bin_shim-0.1.1.tar.gz", hash = "sha256:9972911c22754a5370f666245cbe5d9d9aa04d9f7289d166142c9c3c6ee3b8c3", size = 10431, upload-time = "2026-08-20T21:45:24.392Z" }
+
+[[package]]
+name = "botbox"
+version = "0.0.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "python-on-whales" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e1/c1/176bf5038fd15fb060a3716f72b941802257c48e7b3bbacb442a18020345/botbox-0.0.8.tar.gz", hash = "sha256:31988aad330dbafb281c49cdacc60d2c3f276e4c4952609079a7788c05c3ea70", size = 40257, upload-time = "2026-10-12T02:09:55.543Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e1/86/5de9901e9e674956174be701048e3715668c7678a77b4af9a21955d84c07/botbox-0.0.8-py3-none-any.whl", hash = "sha256:61fa3be7ffaafb11d7d1675307a363481d813253f1a93295368e16b292e349fc", size = 12128, upload-time = "2026-10-12T02:09:53.99Z" },
 ]
 
 [[package]]
@@ -258,6 +254,22 @@ wheels = [
 ]
 
 [[package]]
+name = "dirsql"
+version = "0.4.113"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "bin-shim" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fc/f9/9878c1f0815efe3159dfac21ebee102feb12b5e3882548c7cee6fb82e348/dirsql-0.4.113.tar.gz", hash = "sha256:546633f05042ca2b8259d33bfa518938419f65dbae286426fb73073868fbd941", size = 648391, upload-time = "2026-10-14T14:25:29.894Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/82/03/a382d04183ee5633119bea5508fd89a1c9c83bff78f8fc0a8fe1b344dad7/dirsql-0.4.113-cp310-abi3-macosx_10_12_x86_64.whl", hash = "sha256:bbd1b58bb7e93b600d2e9d3a9d3bfe7da92c915da1fe2776ec6715d2deaa2b15", size = 3433357, upload-time = "2026-10-14T14:25:21.042Z" },
+    { url = "https://files.pythonhosted.org/packages/64/82/15675ffbce8a486ec9e2a723a10640ce43e4f3523f0fd0b7e25d45205dee/dirsql-0.4.113-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:c1cd0698141de80cedd902eebff8e1a4121cc27ec3e082ac1b7c2f84911e5a1d", size = 3249162, upload-time = "2026-10-14T14:25:23.314Z" },
+    { url = "https://files.pythonhosted.org/packages/bc/2a/cf42989e0e1370109b81b55bc09e9eecfa766d8f362c21dd2c5d2f093083/dirsql-0.4.113-cp310-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:8cc528943855136ce35d0442c81ab9f357d37d0621100ec5a64b9b789b5826ee", size = 3493792, upload-time = "2026-10-14T14:25:25.048Z" },
+    { url = "https://files.pythonhosted.org/packages/a0/d5/ad3dda5b56a788b1d80c27cfa0e3dd27b64038ed25f28061daba80646631/dirsql-0.4.113-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:2c688eb2efde0c70c1c356657f1f16bd97d97e509bcebb0da85099ea4d1f319f", size = 3683546, upload-time = "2026-10-14T14:25:26.783Z" },
+    { url = "https://files.pythonhosted.org/packages/b9/d9/303fccd47c54118c1e825c790bd5bdd933c86c9608c0127a0f2f4b124478/dirsql-0.4.113-cp310-abi3-win_amd64.whl", hash = "sha256:e762b888c2048fa663545c8cdd8778f4b5aeee232276de6b88af0d74aab9e2c3", size = 3635050, upload-time = "2026-10-14T14:25:28.185Z" },
+]
+
+[[package]]
 name = "exit-codes"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -312,16 +324,22 @@ name = "gbnf-experiment"
 version = "0.1.0"
 source = { editable = "../../packages/gbnf_experiment" }
 dependencies = [
+    { name = "botbox" },
     { name = "click" },
+    { name = "dirsql" },
     { name = "port-codebase" },
+    { name = "prompt" },
     { name = "pydantic-settings" },
     { name = "python-on-whales" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "botbox", specifier = ">=0.0.8" },
     { name = "click", specifier = ">=8.5.0" },
+    { name = "dirsql", specifier = ">=0.4.110" },
     { name = "port-codebase", editable = "../../packages/port_codebase" },
+    { name = "prompt", editable = "../../packages/prompt" },
     { name = "pydantic-settings", specifier = ">=2.15.0" },
     { name = "python-on-whales", specifier = ">=0.81.0" },
 ]
@@ -331,6 +349,7 @@ dev = [
     { name = "coverage", specifier = ">=7.16.0" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-describe", specifier = ">=3.2.0" },
+    { name = "ruff", specifier = ">=0.17.0" },
 ]
 
 [[package]]
@@ -461,6 +480,7 @@ dev = [
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-describe", specifier = ">=3.2.0" },
     { name = "pytest-httpserver", specifier = ">=1.1.0" },
+    { name = "ruff", specifier = ">=0.17.0" },
     { name = "testing-conventions", specifier = ">=0.0.104" },
 ]
 
@@ -601,14 +621,16 @@ name = "port-codebase"
 version = "0.1.0"
 source = { editable = "../../packages/port_codebase" }
 dependencies = [
-    { name = "agent-harness-sandbox" },
+    { name = "botbox" },
     { name = "pathspec" },
+    { name = "prompt" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "agent-harness-sandbox", editable = "../../packages/agent-harness-sandbox" },
+    { name = "botbox", specifier = ">=0.0.4" },
     { name = "pathspec", specifier = ">=1.1.1" },
+    { name = "prompt", editable = "../../packages/prompt" },
 ]
 
 [package.metadata.requires-dev]
@@ -616,6 +638,22 @@ dev = [
     { name = "coverage", specifier = ">=7.16.0" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-describe", specifier = ">=3.2.0" },
+    { name = "ruff", specifier = ">=0.17.0" },
+]
+
+[[package]]
+name = "prompt"
+version = "0.1.0"
+source = { editable = "../../packages/prompt" }
+
+[package.metadata]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "coverage", specifier = ">=7.16.0" },
+    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-describe", specifier = ">=3.2.0" },
+    { name = "ruff", specifier = ">=0.17.0" },
 ]
 
 [[package]]
@@ -871,7 +909,6 @@ dependencies = [
     { name = "click" },
     { name = "gbnf-experiment" },
     { name = "measure-embedding" },
-    { name = "pydantic-settings" },
     { name = "rapidfuzz" },
     { name = "ruff" },
     { name = "tree-sitter" },
@@ -891,7 +928,6 @@ requires-dist = [
     { name = "click", specifier = ">=8.5.0" },
     { name = "gbnf-experiment", editable = "../../packages/gbnf_experiment" },
     { name = "measure-embedding", editable = "../measure-embedding" },
-    { name = "pydantic-settings", specifier = ">=2.15.0" },
     { name = "rapidfuzz", specifier = ">=3.0" },
     { name = "ruff", specifier = ">=0.14" },
     { name = "tree-sitter", specifier = ">=0.25.2,<0.26" },

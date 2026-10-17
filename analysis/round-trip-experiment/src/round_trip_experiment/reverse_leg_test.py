@@ -15,7 +15,7 @@ FORWARD_CONDITION = {
     "model": "claude-opus-5",
 }
 ESTIMATE = {"total_tokens": 4697263, "api_calls": 63, "duration_ms": 456517}
-COMMAND = {"argv": ["uv", "run", "run_gbnf_experiment"], "env": {"GBNF_EXPERIMENT_DATA_DIRECTORY": "/reverse"}}
+COMMAND = {"argv": ["uv", "run", "run_gbnf_experiment"]}
 RUN = Path("/data/20260909T001426Z_1c28aa33")
 STAGED = Path("/cache/staging/20260909T001426Z_1c28aa33/390bf534c55d496b")
 PLACES = dict(
@@ -102,16 +102,10 @@ def describe_reverse_leg():
         collaborators["reverse_command"].assert_not_called()
 
     def it_banks_the_leg_under_the_forward_runs_own_reverse_root(report, collaborators):
-        assert collaborators["reverse_command"].call_args.kwargs["reverse_run_root"] == (
-            PLACES["reverse_directory"] / RUN.name
-        )
         assert report["reverse_root"] == str(PLACES["reverse_directory"] / RUN.name)
 
-    def it_reads_the_reference_from_the_staged_derivations_root(report, collaborators):
-        assert collaborators["reverse_command"].call_args.kwargs["staged_derivations_directory"] == STAGED.parent
-
-    def it_reports_the_command_and_its_environment(report):
-        assert (report["argv"], report["env"]) == (COMMAND["argv"], COMMAND["env"])
+    def it_reports_the_command(report):
+        assert report["argv"] == COMMAND["argv"]
 
     def it_reports_the_reverse_condition_with_both_suites(report):
         assert report["condition"] == REVERSE_CONDITION

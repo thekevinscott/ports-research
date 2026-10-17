@@ -32,12 +32,7 @@ def reverse_leg(
     )
     check_staged_derivation(staged, condition=condition)
     reverse_run_root = reverse_directory / run_directory.name
-    command = reverse_command(
-        condition=condition,
-        staged_derivations_directory=staged.parent,
-        reverse_run_root=reverse_run_root,
-        gbnf_experiment_directory=gbnf_experiment_directory,
-    )
+    command = reverse_command(condition=condition, gbnf_experiment_directory=gbnf_experiment_directory)
     return {
         "forward": {"run_id": loaded["run_id"], "condition": loaded["condition"]},
         "condition": condition,
