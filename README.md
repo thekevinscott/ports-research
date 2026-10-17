@@ -81,19 +81,14 @@ the commands. The tools it drives sit beside it. CLI lines are abbreviated;
 
 ## Runs
 
-Each run lands in `data/runs/<timestamp>_<id>/` with
+Each run lands in `data/runs/<experiment>/<run>/` with labnotes' `run.json`,
 `manifest.json`, `ported_implementation/`, `transcript/`, `proxy.log`, and
 `result.json` once the run finishes. The manifest records the condition
 (source language, test flags, effort, model), the gbnf commit, the sandbox
 image id and the harness commit. `result.json` is the agent CLI's JSON output
-(usage tokens, turns), not a score. Start a run from `packages/gbnf_experiment`:
-
-```
-uv run run_gbnf_experiment --source-language python --include-python-tests --include-typescript-tests
-```
-
-Optional flags: `--model` (default `claude-opus-5`), `--effort` (default
-`high`), `--agent` (only `claude` is wired up), `--debug`.
+(usage tokens, turns), not a score. labnotes runs each experiment from
+`experiments/<experiment>/experiment.toml`, one `run_gbnf_experiment --output .` per run
+in a fresh run folder; see `packages/gbnf_experiment/README.md` for its flags.
 
 ## Setup
 
@@ -104,9 +99,7 @@ Python 3.14 or later. No root workspace: `uv sync` in each
 package. The core packages chain through editable path deps: port_codebase
 -> agent-harness-sandbox, gbnf_experiment -> port_codebase,
 execute-test-suite -> gbnf_experiment. gbnf_experiment reads
-`GBNF_EXPERIMENT_*` env vars (pydantic-settings; among them
-`PREPARED_DIRECTORY`, `GBNF_COMMIT`, `IMAGE_TAG`) and `XDG_CACHE_HOME` for
-the cache root.
+no env vars; its pin, cache path and `API_KEY` are constants in `config.py`.
 
 Auth: no API key env var. `ClaudeAgent` copies the host's
 `~/.claude/.credentials.json` into the sandbox, so the host needs a logged-in

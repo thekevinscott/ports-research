@@ -1,6 +1,5 @@
 from datetime import UTC, datetime
 from pathlib import Path
-from itertools import count
 from time import sleep
 from unittest.mock import DEFAULT, Mock, patch
 
@@ -12,21 +11,20 @@ from prompt import Prompt
 from gbnf_experiment.run_gbnf_experiment import PROMPT_PATH, run_gbnf_experiment
 
 
-RUN_DIRECTORY_NAME = "20260906T142530Z_00000000"
-
-
 @pytest.fixture
-def settings(tmp_path):
+def config(tmp_path):
     with patch(
-        "gbnf_experiment.prepare_filesystem.prepared_filesystem.settings", autospec=True
+        "gbnf_experiment.prepare_filesystem.prepared_filesystem.config", autospec=True
     ) as m:
-        m.prepared_directory = tmp_path / "cache" / "prepared"
+        m.PREPARED_DIRECTORY = tmp_path / "cache" / "prepared"
         yield m
 
 
 @pytest.fixture
-def output(tmp_path):
-    return tmp_path / "data"
+def run_directory(tmp_path):
+    directory = tmp_path / "data" / "runs" / "models-effort" / "brave-otter"
+    directory.mkdir(parents=True)
+    return directory
 
 
 SHARED = {
@@ -36,13 +34,13 @@ SHARED = {
 
 
 @pytest.fixture
-def prepare_reference_implementation(settings):
+def prepare_reference_implementation(config):
     """Returns the extracted /shared, a cache entry in upstream layout."""
     with patch(
         "gbnf_experiment.prepare_filesystem.prepared_filesystem.prepare_reference_implementation",
         autospec=True,
     ) as m:
-        shared = settings.prepared_directory / "key"
+        shared = config.PREPARED_DIRECTORY / "key"
         for name, text in SHARED.items():
             path = shared / name
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -72,17 +70,6 @@ def port_codebase():
 
 
 @pytest.fixture
-def run_directory_name():
-    with patch(
-        "gbnf_experiment.prepare_filesystem.prepared_filesystem.run_directory_name",
-        autospec=True,
-    ) as m:
-        tokens = count()
-        m.side_effect = lambda timestamp: f"20260906T142530Z_{next(tokens):08x}"
-        yield m
-
-
-@pytest.fixture
 def write_manifest():
     with patch(
         "gbnf_experiment.prepare_filesystem.prepared_filesystem._write_manifest",
@@ -95,8 +82,7 @@ AGENT = Mock(name="agent", model="claude-opus-5", effort="high")
 
 CONFIG = {
     "agent": AGENT,
-    "study": "v2-test-configurations",
-    "output": Path("/data/runs"),
+    "run_directory": Path("/data/runs/models-effort/brave-otter"),
     "source_language": "javascript",
     "include_unit_tests": False,
     "include_source_integration_tests": False,
@@ -107,14 +93,13 @@ CONFIG = {
 
 @pytest.fixture
 def experiment(
-    settings,
+    config,
     prepare_reference_implementation,
-    run_directory_name,
     write_manifest,
-    output,
+    run_directory,
 ):
     def run(**kwargs):
-        return run_gbnf_experiment(**{**CONFIG, "output": output, **kwargs})
+        return run_gbnf_experiment(**{**CONFIG, "run_directory": run_directory, **kwargs})
 
     return run
 
@@ -124,8 +109,7 @@ def describe_the_signature():
         "omitted",
         [
             "agent",
-            "study",
-            "output",
+            "run_directory",
             "source_language",
             "include_unit_tests",
             "include_source_integration_tests",
@@ -156,7 +140,7 @@ def describe_run():
 
     def it_ports_the_prepared_reference(
         experiment,
-        output,
+        run_directory,
         prepare_reference_implementation,
         port_codebase,
     ):
@@ -164,9 +148,7 @@ def describe_run():
         assert port_codebase.call_args.kwargs["source"] is (
             prepare_reference_implementation.return_value
         )
-        assert port_codebase.call_args.kwargs["output"] == (
-            output / RUN_DIRECTORY_NAME / "ported_implementation"
-        )
+        assert port_codebase.call_args.kwargs["output"] == run_directory / "ported_implementation"
 
     def it_ports_with_the_agent_the_caller_chose(
         experiment,
@@ -248,42 +230,36 @@ def describe_run():
 
 
 def describe_the_run_directory():
-    def it_lands_directly_in_the_output_directory(
+    def it_writes_into_the_folder_it_was_given(
         experiment,
-        output,
+        run_directory,
         prepare_reference_implementation,
         port_codebase,
     ):
-        run_directory = experiment()
-        assert run_directory == output / RUN_DIRECTORY_NAME
-
-    def it_lands_wherever_the_caller_points_output(
-        experiment, tmp_path, prepare_reference_implementation, port_codebase
-    ):
-        run_directory = experiment(output=tmp_path / "elsewhere")
-        assert run_directory == tmp_path / "elsewhere" / RUN_DIRECTORY_NAME
-
-    def it_names_the_directory_from_the_timestamp_alone(
-        experiment,
-        prepare_reference_implementation,
-        port_codebase,
-        run_directory_name,
-    ):
-        experiment(include_unit_tests=True)
-        assert run_directory_name.call_args.args[1:] == ()
-        assert run_directory_name.call_args.kwargs == {}
-
-    def it_stamps_the_name_with_the_current_utc_time(
-        experiment,
-        prepare_reference_implementation,
-        port_codebase,
-        run_directory_name,
-    ):
-        before = datetime.now(UTC)
         experiment()
-        stamped = run_directory_name.call_args.args[0]
-        assert stamped.tzinfo is not None
-        assert before <= stamped <= datetime.now(UTC)
+        assert sorted(path.name for path in run_directory.iterdir()) == [
+            "ported_implementation",
+            "proxy.log",
+            "result.json",
+            "stderr.txt",
+            "transcript",
+        ]
+
+    def it_creates_no_folder_of_its_own(
+        experiment,
+        run_directory,
+        prepare_reference_implementation,
+        port_codebase,
+    ):
+        experiment()
+        assert list(run_directory.parent.iterdir()) == [run_directory]
+
+    def it_returns_nothing(
+        experiment,
+        prepare_reference_implementation,
+        port_codebase,
+    ):
+        assert experiment() is None
 
     def it_exists_before_the_container_starts(
         experiment,
@@ -297,20 +273,13 @@ def describe_the_run_directory():
         experiment()
         assert seen["existed"] is True
 
-    def it_keeps_consecutive_runs_apart(
-        experiment,
-        settings,
-        prepare_reference_implementation,
-        port_codebase,
-    ):
-        assert experiment() != experiment()
-
     def it_banks_each_transcript_file_at_its_path_under_transcript(
         experiment,
         prepare_reference_implementation,
         port_codebase,
+        run_directory,
     ):
-        run_directory = experiment()
+        experiment()
         banked = {
             path.relative_to(run_directory / "transcript").as_posix(): path.read_text()
             for path in (run_directory / "transcript").rglob("*")
@@ -322,8 +291,9 @@ def describe_the_run_directory():
         experiment,
         prepare_reference_implementation,
         port_codebase,
+        run_directory,
     ):
-        run_directory = experiment()
+        experiment()
         assert (run_directory / "proxy.log").read_text() == PROXY_LOG
 
 
@@ -333,18 +303,19 @@ def describe_the_manifest():
         prepare_reference_implementation,
         port_codebase,
         write_manifest,
+        run_directory,
     ):
-        run_directory = experiment()
+        experiment()
         assert {call.args for call in write_manifest.call_args_list} == {(run_directory,)}
 
-    def it_records_the_study_in_every_write(
+    def it_records_no_study(
         experiment,
         prepare_reference_implementation,
         port_codebase,
         write_manifest,
     ):
-        experiment(study="v2-model-effort")
-        assert [call.kwargs["study"] for call in write_manifest.call_args_list] == ["v2-model-effort"] * 2
+        experiment()
+        assert ["study" in call.kwargs for call in write_manifest.call_args_list] == [False, False]
 
     def it_records_the_condition_that_ran(
         experiment,
@@ -370,13 +341,13 @@ def describe_the_manifest():
 
     def it_records_the_pinned_commit(
         experiment,
-        settings,
+        config,
         prepare_reference_implementation,
         port_codebase,
         write_manifest,
     ):
         experiment()
-        assert write_manifest.call_args.kwargs["gbnf_commit"] is settings.gbnf_commit
+        assert write_manifest.call_args.kwargs["gbnf_commit"] is config.GBNF_COMMIT
 
     def it_runs_and_records_the_agent_the_caller_chose(
         experiment,
@@ -391,18 +362,6 @@ def describe_the_manifest():
 
         assert port_codebase.call_args.kwargs["agent"] is chosen
         assert write_manifest.call_args.kwargs["image_tag"] is chosen.image
-
-    def it_shares_the_timestamp_with_the_directory_name(
-        experiment,
-        prepare_reference_implementation,
-        port_codebase,
-        run_directory_name,
-        write_manifest,
-    ):
-        experiment()
-        assert write_manifest.call_args.kwargs["timestamp"] is (
-            run_directory_name.call_args.args[0]
-        )
 
     def it_stamps_the_run_from_before_the_preparation(
         experiment,
@@ -448,8 +407,9 @@ def describe_the_banked_reference():
         experiment,
         prepare_reference_implementation,
         port_codebase,
+        run_directory,
     ):
-        run_directory = experiment()
+        experiment()
         assert not (run_directory / "reference_implementation").exists()
 
 
@@ -458,33 +418,34 @@ def describe_the_result():
         experiment,
         prepare_reference_implementation,
         port_codebase,
+        run_directory,
     ):
-        run_directory = experiment()
+        experiment()
         result = run_directory / "result.json"
         assert result.is_file()
         assert result.read_text() == RESULT_JSON
 
     def it_writes_no_result_when_the_port_dies(
         experiment,
-        output,
+        run_directory,
         prepare_reference_implementation,
         port_codebase,
     ):
         port_codebase.side_effect = RuntimeError("the container died")
         with pytest.raises(RuntimeError):
             experiment()
-        run_directory = output / RUN_DIRECTORY_NAME
         assert not (run_directory / "result.json").exists()
 
     def it_banks_the_stdout_of_a_non_zero_exit(
         experiment,
         prepare_reference_implementation,
         port_codebase,
+        run_directory,
     ):
         port_codebase.return_value = RunResult(
             stdout=RESULT_JSON, stderr="", exit_code=1, transcript={}, proxy="", container="container", image="image"
         )
-        run_directory = experiment()
+        experiment()
         assert (run_directory / "result.json").read_text() == RESULT_JSON
 
     def it_completes_the_manifest_with_the_error_when_the_port_dies(
@@ -515,9 +476,10 @@ def describe_the_result():
         experiment,
         prepare_reference_implementation,
         port_codebase,
+        run_directory,
     ):
         port_codebase.return_value = RunResult(
             stdout=RESULT_JSON, stderr="Error: rate limited\n", exit_code=1, transcript={}, proxy="", container="container", image="image"
         )
-        run_directory = experiment()
+        experiment()
         assert (run_directory / "stderr.txt").read_text() == "Error: rate limited\n"

@@ -11,7 +11,7 @@ from python_on_whales.exceptions import DockerException
 
 from gbnf_experiment import run_gbnf_experiment
 from gbnf_experiment.cli import cli
-from gbnf_experiment.config import settings
+from gbnf_experiment import config
 
 from conftest import (
     FAKE_CREDENTIALS,
@@ -52,7 +52,6 @@ TARGET_INTEGRATION_RULE = "+ /javascript/integration-tests/***"
 
 
 CONFIG = {
-    "study": "probe",
     "source_language": "python",
     "include_unit_tests": False,
     "include_source_integration_tests": False,
@@ -64,8 +63,11 @@ CONFIG = {
 @pytest.fixture
 def experiment(data_directory, docker_daemon, claude_home):
     def run(model="claude-opus-5", effort="high", **kwargs):
+        """Each call gets a fresh folder, as the runner gives each run one."""
         agent = ClaudeAgent(model=model, effort=effort, host_home=claude_home)
-        return run_gbnf_experiment(**{"agent": agent, "output": data_directory, **CONFIG, **kwargs})
+        run_directory = data_directory / f"run-{len(list(data_directory.glob('run-*')))}"
+        run_directory.mkdir(parents=True)
+        run_gbnf_experiment(**{"agent": agent, "run_directory": run_directory, **CONFIG, **kwargs})
 
     return run
 
@@ -80,14 +82,14 @@ def manifest(data_directory):
 
 
 def prepare_builds(builds) -> list[dict]:
-    return [build for build in builds if build["context"] == settings.prepare_docker_directory]
+    return [build for build in builds if build["context"] == config.PREPARE_DOCKER_DIRECTORY]
 
 
 def describe_the_prepare_image():
     def it_builds_at_the_pinned_commit(experiment, builds):
         experiment()
         [build] = prepare_builds(builds)
-        assert build["build_args"]["GBNF_COMMIT"] == settings.gbnf_commit
+        assert build["build_args"]["GBNF_COMMIT"] == config.GBNF_COMMIT
 
     @pytest.mark.parametrize(
         ("flags", "present"),
@@ -177,10 +179,7 @@ def describe_the_source():
         """data/ is a flat list of run directories and holds nothing else."""
         experiment()
         experiment(include_unit_tests=True)
-        assert all(
-            re.fullmatch(r"\d{8}T\d{6}Z_[0-9a-f]{8}", path.name) and path.is_dir()
-            for path in data_directory.iterdir()
-        )
+        assert sorted(path.name for path in data_directory.iterdir()) == ["run-0", "run-1"]
 
 
 def describe_the_port():
@@ -245,25 +244,18 @@ def describe_the_port():
 
 
 def describe_the_run_directory():
-    def it_creates_one_directory_per_run(experiment, data_directory):
+    def it_writes_into_the_folder_it_was_given(experiment, data_directory):
         experiment()
         [run_directory] = data_directory.iterdir()
-        assert (run_directory / "ported_implementation").is_dir()
-
-    def it_stamps_the_name_with_utc_and_a_random_token(experiment, data_directory):
-        experiment(include_unit_tests=True)
-        [run_directory] = data_directory.iterdir()
-        assert re.fullmatch(r"\d{8}T\d{6}Z_[0-9a-f]{8}", run_directory.name)
-
-    def it_keeps_consecutive_runs_apart(experiment, data_directory):
-        experiment()
-        experiment()
-        assert len(list(data_directory.iterdir())) == 2
-
-    def it_gives_two_conditions_two_directories(experiment, data_directory):
-        experiment(source_language="javascript")
-        experiment(source_language="python")
-        assert len(list(data_directory.iterdir())) == 2
+        assert run_directory.name == "run-0"
+        assert sorted(path.name for path in run_directory.iterdir()) == [
+            "manifest.json",
+            "ported_implementation",
+            "proxy.log",
+            "result.json",
+            "stderr.txt",
+            "transcript",
+        ]
 
     def it_runs_the_agent_container_once(experiment, porting_calls):
         experiment()
@@ -306,7 +298,6 @@ def describe_the_manifest():
             "timestamp",
             "completed_at",
             "exit_code",
-            "study",
             "condition",
             "derivation",
             "reference_implementation",
@@ -334,7 +325,7 @@ def describe_the_manifest():
 
     def it_records_the_pinned_commit(experiment, manifest):
         experiment()
-        assert manifest()["derivation"] == {"gbnf_commit": settings.gbnf_commit}
+        assert manifest()["derivation"] == {"gbnf_commit": config.GBNF_COMMIT}
 
     def it_identifies_the_sandbox_by_image_id_alone(
         experiment, manifest, sandbox_image_id
@@ -348,13 +339,6 @@ def describe_the_manifest():
         harness = manifest()["harness"]
         assert re.fullmatch(r"[0-9a-f]{40}", harness["commit"])
         assert isinstance(harness["dirty"], bool)
-
-    def it_matches_the_directory_it_was_written_into(experiment, manifest, data_directory):
-        experiment()
-        [run_directory] = data_directory.iterdir()
-        assert run_directory.name.startswith(
-            manifest()["timestamp"].replace("-", "").replace(":", "")
-        )
 
 
 def describe_a_run_that_exits_non_zero():
@@ -399,7 +383,7 @@ def describe_a_run_that_raises():
 
         def fail_unless_prepare(context, **options):
             builds.append({"context": Path(context), **options})
-            if Path(context) != settings.prepare_docker_directory:
+            if Path(context) != config.PREPARE_DOCKER_DIRECTORY:
                 raise DockerException(["docker", "build"], 1)
 
         docker.build.side_effect = fail_unless_prepare
@@ -474,23 +458,45 @@ def describe_cli():
         (home / ".claude" / ".credentials.json").write_text(FAKE_CREDENTIALS)
         monkeypatch.setenv("HOME", str(home))
 
-    def it_prints_where_the_run_landed(
-        home, data_directory, docker_daemon
-    ):
-        result = CliRunner().invoke(
-            cli, ["--source-language", "javascript", "--study", "probe", "--output", str(data_directory)]
-        )
-        [run_directory] = data_directory.iterdir()
-        assert f"Run directory: {run_directory}" in result.output
+    @pytest.fixture
+    def working_folder(tmp_path, monkeypatch):
+        folder = tmp_path / "elsewhere"
+        folder.mkdir()
+        monkeypatch.chdir(folder)
+        return folder
 
-    def it_prepares_the_condition_its_flags_name(home, data_directory, docker_daemon, builds):
+    @pytest.fixture
+    def output(data_directory):
+        return data_directory / "tests-configuration" / "brave-otter"
+
+    def it_writes_the_run_into_the_output(home, working_folder, output, docker_daemon):
+        result = CliRunner().invoke(cli, ["--source-language", "javascript", "--output", str(output)])
+        assert result.exit_code == 0, result.output
+        assert (output / "manifest.json").is_file()
+        assert (output / "ported_implementation" / "ported.py").is_file()
+        assert list(output.parent.iterdir()) == [output]
+        assert list(working_folder.iterdir()) == []
+
+    def it_prepares_the_condition_its_flags_name(home, working_folder, output, docker_daemon, builds):
         CliRunner().invoke(
             cli,
             [
-                "--source-language", "python", "--include-target-integration-tests",
-                "--study", "probe", "--output", str(data_directory),
+                "--source-language", "python", "--include-target-integration-tests", "1",
+                "--include-unit-tests", "0", "--output", str(output),
             ],
         )
         [build] = prepare_builds(builds)
         assert TARGET_INTEGRATION_RULE in build["build_args"]["RULES"].splitlines()
         assert UNIT_RULE not in build["build_args"]["RULES"].splitlines()
+
+    def it_exits_non_zero_when_the_agent_exits_non_zero(home, working_folder, output, docker_daemon, exit_code):
+        exit_code[0] = 1
+        result = CliRunner().invoke(cli, ["--source-language", "javascript", "--output", str(output)])
+        assert result.exit_code != 0
+        assert json.loads((output / "manifest.json").read_text())["exit_code"] == 1
+
+    def it_exits_non_zero_when_the_result_is_an_error(home, working_folder, output, docker_daemon, port_result):
+        """claude can exit 0 with is_error set; such a run must not count."""
+        port_result.update(is_error=True)
+        result = CliRunner().invoke(cli, ["--source-language", "javascript", "--output", str(output)])
+        assert result.exit_code != 0

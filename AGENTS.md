@@ -23,11 +23,12 @@ gitignored.
   No slashes, no spaces (e.g., `whitelist-assembly`, not `feat/whitelist-assembly`).
 - Do all editing, building, and testing inside `.worktrees/<branch>/`.
 - **Run data lives only in the root checkout's `data/`.** Never read or write
-  `.worktrees/*/data/`. Studies and the CLI always pass
-  `--output /home/duncan/work/code/research/ports/data/runs`. `data/runs`,
-  `data/judge` and `data/walkthroughs` are DVC-tracked: after `git pull`, run
-  `dvc pull`; after banking runs, `dvc add data/runs`, commit the `.dvc` file,
-  `dvc push`.
+  `.worktrees/*/data/`. Runs go through labnotes from the root checkout, which
+  files each one under `data/runs/<experiment>/<run>/`; the CLI's `--output`
+  is that run folder. `data/runs`,
+  `data/sessions`, `data/orphans`, `data/judge` and `data/walkthroughs` are
+  DVC-tracked: after `git pull`, run `dvc pull`; after banking runs,
+  `dvc add data/runs`, commit the `.dvc` file, `dvc push`.
 - **When the PR merges, clean up in this order.** Leaving stale worktrees and
   branches behind makes it impossible to see what is actually in flight.
   1. `cd` to the root checkout first. Never skip this — removing a worktree
@@ -123,18 +124,17 @@ them."
 
 ## Experiment designs — always
 
-**`experiments/<name>/design.yaml` is the source of truth for a study's
-design, and it is always committed.** Kevin, 2026-10-16: "we always need to
+**`experiments/<name>/experiment.toml` is the source of truth for an
+experiment's design, and it is always committed.** Kevin, 2026-10-16: "we always need to
 keep yaml updated as the source of truth, and committed."
 
-- Membership is decided by the design, not by a label: a cell is the first
-  `runs_per_cell` runs that satisfy `completed_run` and the prompt criterion
-  (`prompt_since`), ordered by completion time. The `study` field in a
-  manifest records intent at launch and nothing more.
+- Membership is the experiment folder: a run under
+  `data/runs/<experiment>/` belongs to it unless its `run.json` says
+  `excluded`. labnotes counts runs toward `repeats`.
 - Any change to what is being run (models, levels, prompt, test
-  configuration) lands in design.yaml in the same PR, before or with the
-  launch. A local edit to a study script that the design does not reflect is
-  a deviation; record it as a dated line in the design, not in a chat.
+  configuration) lands in experiment.toml in the same PR, before or with the
+  launch. A run made with a command the file does not reflect is a
+  deviation; record it as a dated line in the experiment's folder, not in a chat.
 - Scheduling order and concurrency are not design and do not go in the file.
 
 ## Journal — when something major happens

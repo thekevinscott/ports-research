@@ -4,7 +4,8 @@ from pathlib import Path
 
 from python_on_whales import docker
 
-from gbnf_experiment.config import compute_prepare_cache_key, settings
+from gbnf_experiment import config
+from gbnf_experiment.config import compute_prepare_cache_key
 from gbnf_experiment.prepare_filesystem.assemble_whitelist.assemble_whitelist import assemble_whitelist
 
 
@@ -23,15 +24,15 @@ def prepare_reference_implementation(
         include_source_integration_tests=include_source_integration_tests,
         include_target_integration_tests=include_target_integration_tests,
     )
-    key = compute_prepare_cache_key(settings.gbnf_commit, settings.prepare_docker_directory, rules)
-    output_directory = settings.prepared_directory / key
+    key = compute_prepare_cache_key(config.GBNF_COMMIT, config.PREPARE_DOCKER_DIRECTORY, rules)
+    output_directory = config.PREPARED_DIRECTORY / key
     if output_directory.exists():
         return output_directory
     tag = f"gbnf-prepare:{key}"
     docker.build(
-        settings.prepare_docker_directory,
+        config.PREPARE_DOCKER_DIRECTORY,
         tags=tag,
-        build_args={"GBNF_COMMIT": settings.gbnf_commit, "RULES": rules},
+        build_args={"GBNF_COMMIT": config.GBNF_COMMIT, "RULES": rules},
         progress="tty" if debug else False,
     )
     staging_directory = output_directory.with_name(output_directory.name + ".staging")

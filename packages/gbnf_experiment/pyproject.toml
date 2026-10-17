@@ -13,7 +13,6 @@ dependencies = [
     "dirsql>=0.4.110",
     "port_codebase",
     "prompt",
-    "pydantic-settings>=2.15.0",
     "python-on-whales>=0.81.0",
 ]
 

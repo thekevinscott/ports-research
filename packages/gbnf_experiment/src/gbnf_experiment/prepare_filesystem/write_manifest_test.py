@@ -24,7 +24,6 @@ CONDITION = {
 INCLUDED = ["javascript/package.json", "javascript/src/gbnf.ts"]
 CALL = {
     "timestamp": datetime(2026, 9, 6, 14, 25, 30, tzinfo=UTC),
-    "study": "v2-test-configurations",
     "condition": CONDITION,
     "included": INCLUDED,
     "image_tag": "botbox-claude:latest",
@@ -33,9 +32,9 @@ CALL = {
 
 
 @pytest.fixture
-def settings():
-    with patch("gbnf_experiment.prepare_filesystem.write_manifest.settings", autospec=True) as m:
-        m.root_directory = ROOT
+def config():
+    with patch("gbnf_experiment.prepare_filesystem.write_manifest.config", autospec=True) as m:
+        m.ROOT_DIRECTORY = ROOT
         yield m
 
 
@@ -45,7 +44,7 @@ def git_stdout():
 
 
 @pytest.fixture
-def subprocess_module(settings, git_stdout):
+def subprocess_module(config, git_stdout):
     with patch("gbnf_experiment.prepare_filesystem.write_manifest.subprocess", autospec=True) as m:
         m.run.side_effect = lambda argv, **kwargs: Mock(stdout=git_stdout[argv[3]])
         yield m
@@ -90,11 +89,10 @@ def describe_write_manifest():
     def it_returns_nothing(run_directory, subprocess_module, docker_module):
         assert write_manifest(run_directory, **CALL) is None
 
-    def it_writes_the_study_and_four_sections_beside_the_timestamps(manifest):
+    def it_writes_four_sections_beside_the_timestamps(manifest):
         assert list(manifest()) == [
             "timestamp",
             "completed_at",
-            "study",
             "condition",
             "derivation",
             "reference_implementation",
@@ -111,9 +109,6 @@ def describe_write_manifest():
 
     def it_records_the_condition_it_was_given(manifest):
         assert manifest()["condition"] == CONDITION
-
-    def it_records_the_study_it_was_given(manifest):
-        assert manifest(study="v2-model-effort")["study"] == "v2-model-effort"
 
     def it_records_the_error_it_was_given(manifest):
         assert manifest(error="the container died")["error"] == "the container died"

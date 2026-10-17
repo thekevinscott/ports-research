@@ -1,0 +1,7 @@
+command = "uv run --project packages/gbnf_experiment run_gbnf_experiment --include-unit-tests 1 --include-source-integration-tests 1 --include-target-integration-tests 0 --output ."
+repeats = 12
+
+[params]
+source-language = ["python", "javascript"]
+model = ["claude-fable-5-1", "claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5"]
+effort = ["low", "medium", "high", "xhigh", "max"]
