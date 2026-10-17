@@ -11,7 +11,7 @@ from python_on_whales.exceptions import DockerException
 
 from gbnf_experiment import run_gbnf_experiment
 from gbnf_experiment.cli import cli
-from gbnf_experiment.config import settings
+from gbnf_experiment import config
 
 from conftest import (
     FAKE_CREDENTIALS,
@@ -82,14 +82,14 @@ def manifest(data_directory):
 
 
 def prepare_builds(builds) -> list[dict]:
-    return [build for build in builds if build["context"] == settings.prepare_docker_directory]
+    return [build for build in builds if build["context"] == config.PREPARE_DOCKER_DIRECTORY]
 
 
 def describe_the_prepare_image():
     def it_builds_at_the_pinned_commit(experiment, builds):
         experiment()
         [build] = prepare_builds(builds)
-        assert build["build_args"]["GBNF_COMMIT"] == settings.gbnf_commit
+        assert build["build_args"]["GBNF_COMMIT"] == config.GBNF_COMMIT
 
     @pytest.mark.parametrize(
         ("flags", "present"),
@@ -325,7 +325,7 @@ def describe_the_manifest():
 
     def it_records_the_pinned_commit(experiment, manifest):
         experiment()
-        assert manifest()["derivation"] == {"gbnf_commit": settings.gbnf_commit}
+        assert manifest()["derivation"] == {"gbnf_commit": config.GBNF_COMMIT}
 
     def it_identifies_the_sandbox_by_image_id_alone(
         experiment, manifest, sandbox_image_id
@@ -383,7 +383,7 @@ def describe_a_run_that_raises():
 
         def fail_unless_prepare(context, **options):
             builds.append({"context": Path(context), **options})
-            if Path(context) != settings.prepare_docker_directory:
+            if Path(context) != config.PREPARE_DOCKER_DIRECTORY:
                 raise DockerException(["docker", "build"], 1)
 
         docker.build.side_effect = fail_unless_prepare

@@ -32,9 +32,9 @@ CALL = {
 
 
 @pytest.fixture
-def settings():
-    with patch("gbnf_experiment.prepare_filesystem.write_manifest.settings", autospec=True) as m:
-        m.root_directory = ROOT
+def config():
+    with patch("gbnf_experiment.prepare_filesystem.write_manifest.config", autospec=True) as m:
+        m.ROOT_DIRECTORY = ROOT
         yield m
 
 
@@ -44,7 +44,7 @@ def git_stdout():
 
 
 @pytest.fixture
-def subprocess_module(settings, git_stdout):
+def subprocess_module(config, git_stdout):
     with patch("gbnf_experiment.prepare_filesystem.write_manifest.subprocess", autospec=True) as m:
         m.run.side_effect = lambda argv, **kwargs: Mock(stdout=git_stdout[argv[3]])
         yield m

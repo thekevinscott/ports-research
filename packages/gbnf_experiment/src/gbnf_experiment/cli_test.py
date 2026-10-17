@@ -168,25 +168,25 @@ def describe_cli():
 
 
 @pytest.fixture(autouse=True)
-def settings():
-    with patch("gbnf_experiment.cli.settings", autospec=True) as m:
-        m.api_key = ""
+def config():
+    with patch("gbnf_experiment.cli.config", autospec=True) as m:
+        m.API_KEY = ""
         yield m
 
 
 def describe_auth():
-    def it_runs_on_the_subscription_when_the_configured_key_is_blank(gbnf_experiment, claude_agent, settings):
+    def it_runs_on_the_subscription_when_the_configured_key_is_blank(gbnf_experiment, claude_agent, config):
         invoke(SOURCE_LANGUAGE)
         assert claude_agent.call_args.kwargs["api_key"] is None
 
-    def it_never_passes_the_host_api_key(gbnf_experiment, claude_agent, settings, monkeypatch):
+    def it_never_passes_the_host_api_key(gbnf_experiment, claude_agent, config, monkeypatch):
         monkeypatch.setenv("ANTHROPIC_API_KEY", API_KEY)
         result = invoke(SOURCE_LANGUAGE)
         assert result.exit_code == 0, result.output
         assert claude_agent.call_args.kwargs["api_key"] is None
 
-    def it_bills_the_configured_key(gbnf_experiment, claude_agent, settings):
-        settings.api_key = API_KEY
+    def it_bills_the_configured_key(gbnf_experiment, claude_agent, config):
+        config.API_KEY = API_KEY
         invoke(SOURCE_LANGUAGE)
         assert claude_agent.call_args.kwargs["api_key"] == API_KEY
 

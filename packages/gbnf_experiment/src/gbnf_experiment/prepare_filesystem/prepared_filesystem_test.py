@@ -38,12 +38,12 @@ def run_result(stdout='{"is_error": false}', stderr="", exit_code=0) -> RunResul
 
 
 @pytest.fixture
-def settings(tmp_path):
+def config(tmp_path):
     with patch(
-        "gbnf_experiment.prepare_filesystem.prepared_filesystem.settings", autospec=True
+        "gbnf_experiment.prepare_filesystem.prepared_filesystem.config", autospec=True
     ) as m:
-        m.prepared_directory = tmp_path / "cache" / "prepared"
-        m.gbnf_commit = "13f1aca"
+        m.PREPARED_DIRECTORY = tmp_path / "cache" / "prepared"
+        m.GBNF_COMMIT = "13f1aca"
         yield m
 
 
@@ -68,7 +68,7 @@ def git_stdout():
 
 
 @pytest.fixture
-def subprocess_module(settings, git_stdout):
+def subprocess_module(config, git_stdout):
     with patch(
         "gbnf_experiment.prepare_filesystem.write_manifest.subprocess", autospec=True
     ) as m:
@@ -94,7 +94,7 @@ def run_directory(tmp_path):
 
 @pytest.fixture
 def filesystem(
-    settings,
+    config,
     prepare_reference_implementation,
     subprocess_module,
     docker_module,
@@ -130,7 +130,7 @@ def describe_the_run_directory():
     def it_lays_the_run_out_inside_it(filesystem, run_directory):
         assert sorted(path.name for path in run_directory.iterdir()) == ["ported_implementation", "transcript"]
 
-    def it_requires_a_run_directory(settings, prepare_reference_implementation):
+    def it_requires_a_run_directory(config, prepare_reference_implementation):
         with pytest.raises(TypeError, match="run_directory"):
             PreparedFilesystem(source_language="javascript", **TESTS, debug=False)
 

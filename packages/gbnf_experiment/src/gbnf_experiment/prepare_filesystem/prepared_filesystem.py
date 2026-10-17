@@ -3,7 +3,7 @@ from pathlib import Path
 
 from botbox import Agent, RunResult
 
-from gbnf_experiment.config import settings
+from gbnf_experiment import config
 from gbnf_experiment.prepare_filesystem.prepare_reference_implementation import prepare_reference_implementation
 from gbnf_experiment.prepare_filesystem.write_manifest import write_manifest as _write_manifest
 
@@ -52,7 +52,7 @@ class PreparedFilesystem:
             },
             included=self.included,
             image_tag=agent.image,
-            gbnf_commit=settings.gbnf_commit,
+            gbnf_commit=config.GBNF_COMMIT,
             completed_at=None,
         )
 
@@ -71,7 +71,7 @@ class PreparedFilesystem:
             },
             included=self.included,
             image_tag=agent.image,
-            gbnf_commit=settings.gbnf_commit,
+            gbnf_commit=config.GBNF_COMMIT,
             completed_at=datetime.now(UTC),
             exit_code=None if result is None else result.exit_code,
             error=error,

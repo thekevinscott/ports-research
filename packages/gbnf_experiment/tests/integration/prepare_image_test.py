@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 from python_on_whales import docker
 
-from gbnf_experiment.config import settings
+from gbnf_experiment import config
 from gbnf_experiment.prepare_filesystem.assemble_whitelist.assemble_whitelist import (
     assemble_whitelist,
 )
@@ -46,9 +46,9 @@ def describe_the_prepare_image():
         )
         tag = f"gbnf-prepare-test:{name}"
         docker.build(
-            settings.prepare_docker_directory,
+            config.PREPARE_DOCKER_DIRECTORY,
             tags=tag,
-            build_args={"GBNF_COMMIT": settings.gbnf_commit, "RULES": rules},
+            build_args={"GBNF_COMMIT": config.GBNF_COMMIT, "RULES": rules},
             progress=False,
         )
         output = docker.run(tag, ["find", "/shared", "-type", "f"], remove=True)

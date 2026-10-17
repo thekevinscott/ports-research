@@ -5,7 +5,7 @@ from pathlib import Path
 
 from python_on_whales import docker
 
-from gbnf_experiment.config import settings
+from gbnf_experiment import config
 
 ISO8601_UTC = "%Y-%m-%dT%H:%M:%SZ"
 MANIFEST_FILENAME = "manifest.json"
@@ -23,7 +23,7 @@ def write_manifest(
     exit_code: int | None = None,
     error: str | None = None,
 ) -> None:
-    git = ["git", "-C", str(settings.root_directory)]
+    git = ["git", "-C", str(config.ROOT_DIRECTORY)]
     manifest = {
         "timestamp": timestamp.astimezone(UTC).strftime(ISO8601_UTC),
         "completed_at": completed_at.astimezone(UTC).strftime(ISO8601_UTC)

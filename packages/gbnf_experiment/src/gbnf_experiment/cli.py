@@ -5,7 +5,7 @@ import click
 
 from botbox import ClaudeAgent
 
-from gbnf_experiment.config import settings
+from gbnf_experiment import config
 from gbnf_experiment.run_gbnf_experiment import run_gbnf_experiment
 
 DEFAULT_MODEL = "claude-opus-5"
@@ -49,7 +49,7 @@ def cli(
 ) -> None:
     """One run, written into the working folder."""
     run_directory = Path.cwd()
-    agent = ClaudeAgent(model=model, effort=effort, api_key=settings.api_key or None)
+    agent = ClaudeAgent(model=model, effort=effort, api_key=config.API_KEY or None)
     try:
         run_gbnf_experiment(
             agent=agent,

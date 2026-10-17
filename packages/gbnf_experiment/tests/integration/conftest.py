@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from gbnf_experiment.config import settings
+from gbnf_experiment import config
 
 # What the fake prepare container leaves in /shared: upstream layout, both
 # languages present the way a target-integration condition leaves them.
@@ -43,7 +43,7 @@ def prepared_directory(tmp_path):
     tmp_path alone would leave any test that prepares writing into the host's cache.
     """
     directory = tmp_path / "cache" / "prepared"
-    with patch.object(settings, "prepared_directory", directory):
+    with patch.object(config, "PREPARED_DIRECTORY", directory):
         yield directory
 
 

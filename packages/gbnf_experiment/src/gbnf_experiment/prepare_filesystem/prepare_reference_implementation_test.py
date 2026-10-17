@@ -29,14 +29,14 @@ KEY = fake_key("abc123", None, fake_rules("python", **FLAGS))
 
 
 @pytest.fixture
-def settings(tmp_path):
+def config(tmp_path):
     with patch(
-        "gbnf_experiment.prepare_filesystem.prepare_reference_implementation.settings",
+        "gbnf_experiment.prepare_filesystem.prepare_reference_implementation.config",
         autospec=True,
     ) as m:
-        m.prepare_docker_directory = tmp_path / "docker" / "gbnf-prepare"
-        m.prepared_directory = tmp_path / "prepared"
-        m.gbnf_commit = "abc123"
+        m.PREPARE_DOCKER_DIRECTORY = tmp_path / "docker" / "gbnf-prepare"
+        m.PREPARED_DIRECTORY = tmp_path / "prepared"
+        m.GBNF_COMMIT = "abc123"
         yield m
 
 
@@ -79,7 +79,7 @@ def docker():
 
 
 @pytest.fixture
-def prepare(settings, assemble_whitelist, compute_prepare_cache_key, docker):
+def prepare(config, assemble_whitelist, compute_prepare_cache_key, docker):
     def run(debug=False, **overrides) -> Path:
         return prepare_reference_implementation(**{**CONDITION, **overrides}, debug=debug)
 
@@ -98,21 +98,21 @@ def describe_prepare_reference_implementation():
             )
 
         def it_keys_the_cache_on_the_commit_the_docker_directory_and_the_rules(
-            prepare, settings, compute_prepare_cache_key
+            prepare, config, compute_prepare_cache_key
         ):
             prepare()
             compute_prepare_cache_key.assert_called_once_with(
-                "abc123", settings.prepare_docker_directory, fake_rules("python", **FLAGS)
+                "abc123", config.PREPARE_DOCKER_DIRECTORY, fake_rules("python", **FLAGS)
             )
 
     def describe_the_cache():
-        def it_returns_the_keyed_directory(prepare, settings):
-            assert prepare() == settings.prepared_directory / KEY
+        def it_returns_the_keyed_directory(prepare, config):
+            assert prepare() == config.PREPARED_DIRECTORY / KEY
 
-        def it_holds_one_entry_per_condition(prepare, settings):
+        def it_holds_one_entry_per_condition(prepare, config):
             prepare()
             prepare(include_target_integration_tests=True)
-            assert len(list(settings.prepared_directory.iterdir())) == 2
+            assert len(list(config.PREPARED_DIRECTORY.iterdir())) == 2
 
         def it_prepares_a_condition_once(prepare, docker):
             prepare()
@@ -120,12 +120,12 @@ def describe_prepare_reference_implementation():
             docker.build.assert_called_once()
             docker.run.assert_called_once()
 
-        def it_leaves_no_staging_directory_behind(prepare, settings):
+        def it_leaves_no_staging_directory_behind(prepare, config):
             prepare()
-            assert not list(settings.prepared_directory.glob("*.staging"))
+            assert not list(config.PREPARED_DIRECTORY.glob("*.staging"))
 
-        def it_discards_a_stale_staging_directory(prepare, settings):
-            staging = settings.prepared_directory / f"{KEY}.staging"
+        def it_discards_a_stale_staging_directory(prepare, config):
+            staging = config.PREPARED_DIRECTORY / f"{KEY}.staging"
             staging.mkdir(parents=True)
             (staging / "half-written.txt").write_text("interrupted")
 
@@ -133,20 +133,20 @@ def describe_prepare_reference_implementation():
 
             assert not (directory / "half-written.txt").exists()
 
-        def it_leaves_no_entry_when_the_extraction_fails(prepare, settings, docker):
+        def it_leaves_no_entry_when_the_extraction_fails(prepare, config, docker):
             docker.run.side_effect = RuntimeError("container failed")
             with pytest.raises(RuntimeError, match="container failed"):
                 prepare()
             assert not [
                 path
-                for path in settings.prepared_directory.iterdir()
+                for path in config.PREPARED_DIRECTORY.iterdir()
                 if not path.name.endswith(".staging")
             ]
 
     def describe_the_build():
-        def it_builds_the_prepare_docker_directory(prepare, settings, docker):
+        def it_builds_the_prepare_docker_directory(prepare, config, docker):
             prepare()
-            assert docker.build.call_args.args[0] == settings.prepare_docker_directory
+            assert docker.build.call_args.args[0] == config.PREPARE_DOCKER_DIRECTORY
 
         def it_passes_the_pinned_commit_and_the_rules(prepare, docker):
             prepare()
@@ -176,7 +176,7 @@ def describe_prepare_reference_implementation():
             prepare()
             assert docker.run.call_args.args[1] == ["cp", "-a", "/shared/.", "/prepared-output/"]
 
-        def it_mounts_a_writable_staging_directory(prepare, docker, settings):
+        def it_mounts_a_writable_staging_directory(prepare, docker, config):
             directory = prepare()
             [(source, mode)] = [
                 (source, mode)

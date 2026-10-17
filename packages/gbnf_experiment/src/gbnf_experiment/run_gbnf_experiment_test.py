@@ -12,11 +12,11 @@ from gbnf_experiment.run_gbnf_experiment import PROMPT_PATH, run_gbnf_experiment
 
 
 @pytest.fixture
-def settings(tmp_path):
+def config(tmp_path):
     with patch(
-        "gbnf_experiment.prepare_filesystem.prepared_filesystem.settings", autospec=True
+        "gbnf_experiment.prepare_filesystem.prepared_filesystem.config", autospec=True
     ) as m:
-        m.prepared_directory = tmp_path / "cache" / "prepared"
+        m.PREPARED_DIRECTORY = tmp_path / "cache" / "prepared"
         yield m
 
 
@@ -34,13 +34,13 @@ SHARED = {
 
 
 @pytest.fixture
-def prepare_reference_implementation(settings):
+def prepare_reference_implementation(config):
     """Returns the extracted /shared, a cache entry in upstream layout."""
     with patch(
         "gbnf_experiment.prepare_filesystem.prepared_filesystem.prepare_reference_implementation",
         autospec=True,
     ) as m:
-        shared = settings.prepared_directory / "key"
+        shared = config.PREPARED_DIRECTORY / "key"
         for name, text in SHARED.items():
             path = shared / name
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -93,7 +93,7 @@ CONFIG = {
 
 @pytest.fixture
 def experiment(
-    settings,
+    config,
     prepare_reference_implementation,
     write_manifest,
     run_directory,
@@ -341,13 +341,13 @@ def describe_the_manifest():
 
     def it_records_the_pinned_commit(
         experiment,
-        settings,
+        config,
         prepare_reference_implementation,
         port_codebase,
         write_manifest,
     ):
         experiment()
-        assert write_manifest.call_args.kwargs["gbnf_commit"] is settings.gbnf_commit
+        assert write_manifest.call_args.kwargs["gbnf_commit"] is config.GBNF_COMMIT
 
     def it_runs_and_records_the_agent_the_caller_chose(
         experiment,
