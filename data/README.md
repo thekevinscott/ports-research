@@ -4,15 +4,15 @@
 
 ## Querying with dirsql
 
-`.dirsql.toml` declares one table, `runs`. dirsql loads it only when told to (`-c`); the glob resolves against this directory, so the command works from anywhere. From the repo root:
+`.dirsql.toml` declares one table per file, `run_records` (`run.json`), `manifests` and `results`, and the view `runs` that joins them by `run_id`. One table per file because dirsql hands `on-file` its matches in batches, which can split one run's files across two calls. dirsql loads it only when told to (`-c`); the glob resolves against this directory, so the command works from anywhere. From the repo root:
 
 ```
 uvx dirsql --no-ignore -c data/.dirsql.toml "SELECT experiment, COUNT(*) FROM runs GROUP BY experiment"
 ```
 
-`--no-ignore` is required: `runs/` is DVC-tracked and gitignored, and dirsql skips gitignored files by default. `uv tool install dirsql` makes it `dirsql --no-ignore -c ...`. `jq` must be on PATH: the rows come from one `jq` call over every `run.json`, `manifest.json` and `result.json`.
+`--no-ignore` is required: `runs/` is DVC-tracked and gitignored, and dirsql skips gitignored files by default. `uv tool install dirsql` makes it `dirsql --no-ignore -c ...`. `jq` must be on PATH: each table's rows come from `jq` over its file.
 
-`runs`: one row per run directory, `run.json`, the manifest and `result.json` merged.
+`runs`: one row per run with a manifest, `run.json` and `result.json` joined on.
 
 | From | Columns |
 | --- | --- |

@@ -1,35 +1,53 @@
 # SQL over the run data. From the repo root: uvx dirsql --no-ignore -c data/.dirsql.toml "<sql>". See README.md.
+# One table per file: dirsql hands on-file its matches in batches that can split a run's files.
 
 [[table]]
-name = "runs"
-glob = "runs/*/*/*.json"
+name = "run_records"
+glob = "runs/*/*/run.json"
 on-file = """jq -c -n '
-  [inputs | {experiment: (input_filename | split("/")[-3]), dir: (input_filename | split("/")[-2]),
-             file: (input_filename | split("/")[-1]), d: .}]
-  | group_by([.experiment, .dir])[]
-  | (map(select(.file == "manifest.json").d)[0] // {}) as $m
-  | (map(select(.file == "result.json").d)[0] // {}) as $r
-  | (map(select(.file == "run.json").d)[0] // {}) as $j
-  | {run_id: .[0].dir, experiment: .[0].experiment}
-    + ($m | del(.exit_code, .study)) + ($m.condition // {})
-    + {container_exit_code: $m.exit_code,
-       harness_commit: $m.harness.commit, harness_dirty: $m.harness.dirty,
-       sandbox_image_id: $m.sandbox.image_id, gbnf_commit: $m.derivation.gbnf_commit,
-       reference_files: $m.reference_implementation.included}
-    + $r + ($r.usage // {})
-    + {thinking_tokens: $r.usage.output_tokens_details.thinking_tokens, model_usage: $r.modelUsage}
-    + {exit_code: $j.exit_code, excluded: ($j.excluded // false), reason: $j.reason,
-       created: $j.created, ended: $j.ended}
+  inputs | {run_id: (input_filename | split("/")[-2]), experiment: (input_filename | split("/")[-3]),
+            exit_code, excluded: (.excluded // false), reason, created, ended}
 '"""
 ddl = """
-CREATE TABLE runs (
+CREATE TABLE run_records (
+  run_id TEXT PRIMARY KEY, experiment TEXT,
+  exit_code INTEGER, excluded INTEGER, reason TEXT, created TEXT, ended TEXT
+);
+"""
+
+[[table]]
+name = "manifests"
+glob = "runs/*/*/manifest.json"
+on-file = """jq -c -n '
+  inputs | {run_id: (input_filename | split("/")[-2]), experiment: (input_filename | split("/")[-3])}
+    + (del(.exit_code, .study)) + (.condition // {})
+    + {container_exit_code: .exit_code,
+       harness_commit: .harness.commit, harness_dirty: .harness.dirty,
+       sandbox_image_id: .sandbox.image_id, gbnf_commit: .derivation.gbnf_commit,
+       reference_files: .reference_implementation.included}
+'"""
+ddl = """
+CREATE TABLE manifests (
   run_id TEXT PRIMARY KEY, experiment TEXT, timestamp TEXT, completed_at TEXT,
-  exit_code INTEGER, excluded INTEGER, reason TEXT, created TEXT, ended TEXT,
   container_exit_code INTEGER, error TEXT,
   name TEXT, source_language TEXT, target_language TEXT, model TEXT, effort TEXT,
   include_unit_tests INTEGER, include_source_integration_tests INTEGER, include_target_integration_tests INTEGER,
   include_python_tests INTEGER, include_typescript_tests INTEGER,
-  harness_commit TEXT, harness_dirty INTEGER, sandbox_image_id TEXT, gbnf_commit TEXT, reference_files TEXT,
+  harness_commit TEXT, harness_dirty INTEGER, sandbox_image_id TEXT, gbnf_commit TEXT, reference_files TEXT
+);
+"""
+
+[[table]]
+name = "results"
+glob = "runs/*/*/result.json"
+on-file = """jq -c -n '
+  inputs | {run_id: (input_filename | split("/")[-2])}
+    + . + (.usage // {})
+    + {thinking_tokens: .usage.output_tokens_details.thinking_tokens, model_usage: .modelUsage}
+'"""
+ddl = """
+CREATE TABLE results (
+  run_id TEXT PRIMARY KEY,
   is_error INTEGER, terminal_reason TEXT, stop_reason TEXT, subtype TEXT, api_error TEXT, api_error_status INTEGER,
   num_turns INTEGER, queued_turn_count INTEGER, result_index INTEGER, safety_stops INTEGER,
   duration_ms INTEGER, duration_api_ms INTEGER, ttft_ms INTEGER, ttft_stream_ms INTEGER,
@@ -40,4 +58,23 @@ CREATE TABLE runs (
   session_id TEXT, uuid TEXT, result TEXT,
   usage TEXT, model_usage TEXT, subagent_stats TEXT, permission_denials TEXT, origin TEXT
 );
+CREATE VIEW runs AS
+  SELECT m.run_id, m.experiment, j.exit_code, j.excluded, j.reason, j.created, j.ended,
+         m.timestamp, m.completed_at, m.container_exit_code, m.error,
+         m.name, m.source_language, m.target_language, m.model, m.effort,
+         m.include_unit_tests, m.include_source_integration_tests, m.include_target_integration_tests,
+         m.include_python_tests, m.include_typescript_tests,
+         m.harness_commit, m.harness_dirty, m.sandbox_image_id, m.gbnf_commit, m.reference_files,
+         r.is_error, r.terminal_reason, r.stop_reason, r.subtype, r.api_error, r.api_error_status,
+         r.num_turns, r.queued_turn_count, r.result_index, r.safety_stops,
+         r.duration_ms, r.duration_api_ms, r.ttft_ms, r.ttft_stream_ms,
+         r.time_to_request_ms, r.first_content_frame_ms,
+         r.input_tokens, r.output_tokens, r.cache_creation_input_tokens, r.cache_read_input_tokens,
+         r.thinking_tokens, r.speed, r.service_tier, r.inference_geo,
+         r.fast_mode_state, r.fast_mode_disabled_reason,
+         r.session_id, r.uuid, r.result,
+         r.usage, r.model_usage, r.subagent_stats, r.permission_denials, r.origin
+  FROM manifests m
+  LEFT JOIN run_records j ON j.run_id = m.run_id
+  LEFT JOIN results r ON r.run_id = m.run_id;
 """
