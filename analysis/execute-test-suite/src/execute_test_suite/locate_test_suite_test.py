@@ -17,7 +17,11 @@ def settings(tmp_path):
     )
     (mock.prepared_directory / CACHE_KEY / "python").mkdir(parents=True)
     (mock.prepared_directory / CACHE_KEY / "javascript").mkdir(parents=True)
-    with patch("execute_test_suite.locate_test_suite.settings", mock):
+    with (
+        patch("execute_test_suite.locate_test_suite.GBNF_COMMIT", mock.gbnf_commit),
+        patch("execute_test_suite.locate_test_suite.PREPARE_DOCKER_DIRECTORY", mock.prepare_docker_directory),
+        patch("execute_test_suite.locate_test_suite.PREPARED_DIRECTORY", mock.prepared_directory),
+    ):
         yield mock
 
 

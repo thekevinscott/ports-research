@@ -12,8 +12,6 @@ CONDITION = {
     "model": "claude-opus-5",
 }
 PLACES = dict(
-    staged_derivations_directory=Path("/cache/round-trip-experiment/derivations/20260909T001426Z_1c28aa33"),
-    reverse_run_root=Path("/repo/analysis/round-trip-experiment/reverse/20260909T001426Z_1c28aa33"),
     gbnf_experiment_directory=Path("/repo/packages/gbnf_experiment"),
 )
 
@@ -42,18 +40,5 @@ def describe_reverse_command():
         command = reverse_command(condition={**CONDITION, "include_python_tests": False}, **PLACES)
         assert "--include-python-tests" not in command["argv"]
 
-    def it_reads_the_reference_from_the_staged_derivations_root(command):
-        assert command["env"]["GBNF_EXPERIMENT_PREPARED_DIRECTORY"] == (
-            "/cache/round-trip-experiment/derivations/20260909T001426Z_1c28aa33"
-        )
-
-    def it_banks_the_run_under_the_forward_runs_own_reverse_root(command):
-        assert command["env"]["GBNF_EXPERIMENT_DATA_DIRECTORY"] == (
-            "/repo/analysis/round-trip-experiment/reverse/20260909T001426Z_1c28aa33"
-        )
-
-    def it_sets_no_other_environment(command):
-        assert set(command["env"]) == {
-            "GBNF_EXPERIMENT_PREPARED_DIRECTORY",
-            "GBNF_EXPERIMENT_DATA_DIRECTORY",
-        }
+    def it_sets_no_environment(command):
+        assert set(command) == {"argv"}

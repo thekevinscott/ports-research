@@ -11,6 +11,7 @@ PACKAGE_ROOT = Path(__file__).resolve().parents[2]
 GBNF_EXPERIMENT_ROOT = PACKAGE_ROOT.parents[1] / "packages" / "gbnf_experiment"
 DERIVATION_KEY = "d9464914dc2adf25"
 UV = shutil.which("uv")
+FORWARD_RUN_ID = "19700101T000000Z_00000000"
 FORWARD_CONDITION = {
     "name": "source-python_python-tests_effort-high_model-claude-opus-5",
     "source_language": "python",
@@ -44,12 +45,19 @@ def assistant(message_id: str, **usage) -> str:
 
 @pytest.fixture
 def places(tmp_path):
-    root = tmp_path.resolve()
-    return {
-        "derivations": root / "gbnf-cache" / "derivations",
-        "staging": root / "round-trip-cache" / "derivations",
-        "reverse": root / "reverse",
+    # The CLI reads and writes fixed roots that hold real trees and banked runs; each
+    # directory this test makes is asserted absent first, so teardown removes only its own.
+    places = {
+        "derivations": Path.home() / ".cache" / "ports" / "gbnf-experiment" / "prepared",
+        "staging": Path.home() / ".cache" / "ports" / "round-trip-experiment" / "derivations",
+        "reverse": PACKAGE_ROOT / "reverse",
     }
+    owned = [places["derivations"] / DERIVATION_KEY, places["staging"] / FORWARD_RUN_ID, places["reverse"] / FORWARD_RUN_ID]
+    for directory in owned:
+        assert not directory.exists()
+    yield places
+    for directory in owned:
+        shutil.rmtree(directory, ignore_errors=True)
 
 
 @pytest.fixture
@@ -62,18 +70,13 @@ def derivation_cache(places):
 
 
 @pytest.fixture
-def env(places):
-    return {
-        **os.environ,
-        "GBNF_EXPERIMENT_PREPARED_DIRECTORY": str(places["derivations"]),
-        "ROUND_TRIP_EXPERIMENT_STAGING_DIRECTORY": str(places["staging"]),
-        "ROUND_TRIP_EXPERIMENT_REVERSE_DIRECTORY": str(places["reverse"]),
-    }
+def env():
+    return dict(os.environ)
 
 
 @pytest.fixture
 def forward_run(tmp_path):
-    directory = tmp_path.resolve() / "20260909T001426Z_1c28aa33"
+    directory = tmp_path.resolve() / FORWARD_RUN_ID
     port = directory / "ported_implementation"
     (port / "src").mkdir(parents=True)
     (port / "src" / "index.ts").write_text("export const f = () => 1;\n")
@@ -140,25 +143,17 @@ def describe_stage():
             "--model", "claude-opus-5",
         ]
 
-    def it_points_the_harness_at_the_staged_derivation_and_the_forward_runs_reverse_root(
-        staged_report, places, forward_run
-    ):
-        assert staged_report["env"] == {
-            "GBNF_EXPERIMENT_PREPARED_DIRECTORY": str(places["staging"] / forward_run.name),
-            "GBNF_EXPERIMENT_DATA_DIRECTORY": str(places["reverse"] / forward_run.name),
-        }
-
     def it_estimates_the_leg_from_the_forward_runs_own_transcript(staged_report):
         assert staged_report["estimate"] == {"total_tokens": 1115, "api_calls": 1, "duration_ms": 456517}
 
     def it_names_the_forward_run_it_came_from(staged_report, forward_run):
         assert staged_report["forward"] == {"run_id": forward_run.name, "condition": FORWARD_CONDITION}
 
-    def it_banks_nothing(staged_report, places):
-        assert not places["reverse"].exists()
+    def it_banks_nothing(staged_report, places, forward_run):
+        assert not (places["reverse"] / forward_run.name).exists()
 
     def it_fails_with_a_message_when_the_run_has_no_port(env, derivation_cache, tmp_path):
-        bare = tmp_path.resolve() / "20260909T001426Z_00000000"
+        bare = tmp_path.resolve() / "19700101T000000Z_11111111"
         bare.mkdir()
         (bare / "manifest.json").write_text(json.dumps({"condition": FORWARD_CONDITION}))
         result = run_cli(env, "stage", "--run", str(bare))
@@ -196,7 +191,7 @@ def describe_record():
 
 def describe_run():
     @pytest.fixture
-    def harness_stub(tmp_path):
+    def harness_stub(tmp_path, places):
         directory = tmp_path.resolve() / "bin"
         directory.mkdir()
         stub = directory / "uv"
@@ -204,13 +199,12 @@ def describe_run():
             "\n".join(
                 [
                     f"#!{sys.executable}",
-                    "import json, os, sys",
+                    "import json, sys",
                     "from pathlib import Path",
-                    "run = Path(os.environ['GBNF_EXPERIMENT_DATA_DIRECTORY']) / '20260909T021103Z_9f0a1b2c'",
+                    f"run = Path({str(places['reverse'] / FORWARD_RUN_ID)!r}) / '20260909T021103Z_9f0a1b2c'",
                     "run.mkdir(parents=True)",
                     f"run.joinpath('manifest.json').write_text(json.dumps({HARNESS_MANIFEST!r}, indent=2) + chr(10))",
                     "run.joinpath('argv.json').write_text(json.dumps(sys.argv))",
-                    "run.joinpath('env.json').write_text(json.dumps({k: v for k, v in os.environ.items() if k.startswith('GBNF_EXPERIMENT_')}))",
                 ]
             )
             + "\n"
@@ -232,11 +226,6 @@ def describe_run():
         argv = json.loads((Path(report["run_directory"]) / "argv.json").read_text())
         assert argv[1:] == report["argv"][1:]
 
-    def it_launches_the_harness_against_the_staged_derivation(report, places, forward_run):
-        launched = json.loads((Path(report["run_directory"]) / "env.json").read_text())
-        assert launched["GBNF_EXPERIMENT_PREPARED_DIRECTORY"] == str(places["staging"] / forward_run.name)
-        assert launched["GBNF_EXPERIMENT_DATA_DIRECTORY"] == str(places["reverse"] / forward_run.name)
-
     def it_banks_the_leg_under_the_forward_run(report, places, forward_run):
         assert report["run_directory"] == str(places["reverse"] / forward_run.name / "20260909T021103Z_9f0a1b2c")
 
@@ -250,4 +239,4 @@ def describe_run():
         assert result.returncode != 0
         assert "refusing to launch" in result.stderr
         assert "tests/python" in result.stderr
-        assert not places["reverse"].exists()
+        assert not (places["reverse"] / forward_run.name).exists()

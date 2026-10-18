@@ -1,8 +1,9 @@
-# Runs one {grammar, input} pair through the `gbnf` on PYTHONPATH and prints {outcome, error}.
+# Runs one {grammar, input} pair through the `gbnf` under argv[1] and prints {outcome, error}.
 # Stdlib only: it runs in whatever interpreter loads the implementation.
 import json
 import sys
 
+sys.path.insert(0, sys.argv[1])
 pair = json.load(sys.stdin)
 stdout, sys.stdout = sys.stdout, sys.stderr
 

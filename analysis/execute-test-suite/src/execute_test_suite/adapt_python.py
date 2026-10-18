@@ -8,13 +8,12 @@ the whole python policy; `fired` collects the names that applied this session.
 import importlib
 import importlib.util
 import json
-import os
 import sys
 from pathlib import Path
 
 RULES = ("flat_module", "state_add", "exception_eq")
-TARGET_VARIABLE = "EXECUTE_TEST_SUITE_ADAPT_TARGET"
-REPORT_VARIABLE = "EXECUTE_TEST_SUITE_ADAPT_REPORT"
+TARGET_OPTION = "--adapt-target"
+REPORT_OPTION = "--adapt-report"
 
 fired: set[str] = set()
 
@@ -71,8 +70,13 @@ def exception_eq(module) -> bool:
     return patched
 
 
+def pytest_addoption(parser) -> None:
+    parser.addoption(TARGET_OPTION, help="The port root to adapt.")
+    parser.addoption(REPORT_OPTION, help="Where to write the rules that fired.")
+
+
 def pytest_configure(config) -> None:
-    target = Path(os.environ[TARGET_VARIABLE])
+    target = Path(config.getoption("adapt_target"))
     try:
         if flat_module(target):
             fired.add("flat_module")
@@ -85,6 +89,6 @@ def pytest_configure(config) -> None:
 
 
 def pytest_sessionfinish(session) -> None:
-    Path(os.environ[REPORT_VARIABLE]).write_text(
+    Path(session.config.getoption("adapt_report")).write_text(
         json.dumps({"rules_fired": [rule for rule in RULES if rule in fired]})
     )

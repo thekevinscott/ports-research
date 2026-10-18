@@ -1,5 +1,4 @@
 import json
-import os
 import subprocess
 from pathlib import Path
 
@@ -13,7 +12,6 @@ def run_cli(*args):
     return subprocess.run(
         ["uv", "run", "measure-code-distance", "git-diff", *args],
         cwd=PACKAGE_ROOT,
-        env=os.environ,
         capture_output=True,
         text=True,
     )

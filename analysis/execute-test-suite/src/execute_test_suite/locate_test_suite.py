@@ -1,6 +1,11 @@
 from pathlib import Path
 
-from gbnf_experiment.config import compute_prepare_cache_key, settings
+from gbnf_experiment.config import (
+    GBNF_COMMIT,
+    PREPARE_DOCKER_DIRECTORY,
+    PREPARED_DIRECTORY,
+    compute_prepare_cache_key,
+)
 from gbnf_experiment.prepare_filesystem.assemble_whitelist.assemble_whitelist import (
     assemble_whitelist,
 )
@@ -17,8 +22,8 @@ def locate_test_suite(language: str) -> Path:
     """
     tree = TREE_NAMES[language]
     key = compute_prepare_cache_key(
-        settings.gbnf_commit,
-        settings.prepare_docker_directory,
+        GBNF_COMMIT,
+        PREPARE_DOCKER_DIRECTORY,
         assemble_whitelist(
             tree,
             include_unit_tests=True,
@@ -26,7 +31,7 @@ def locate_test_suite(language: str) -> Path:
             include_target_integration_tests=False,
         ),
     )
-    directory = settings.prepared_directory / key / tree
+    directory = PREPARED_DIRECTORY / key / tree
     if not directory.is_dir():
         raise FileNotFoundError(
             f"no {language} test suite at {directory} — has gbnf_experiment prepared it yet?"

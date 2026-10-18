@@ -12,11 +12,9 @@ TSX = "tsx@4.19.2"
 
 def run_pair(language: str, implementation: Path, grammar: str, text: str) -> dict:
     if language == "python":
-        command = [sys.executable, str(DRIVERS / "driver.py")]
-        env = {**os.environ, "PYTHONPATH": str(implementation), "PYTHONDONTWRITEBYTECODE": "1"}
+        command = [sys.executable, "-B", str(DRIVERS / "driver.py"), str(implementation)]
     else:
         command = ["pnpm", "--silent", "dlx", TSX, str(DRIVERS / "driver.mts"), str(implementation / "src" / "index.ts")]
-        env = dict(os.environ)
     # Its own session, so a timeout kills pnpm's node child along with pnpm.
     process = subprocess.Popen(
         command,
@@ -24,7 +22,6 @@ def run_pair(language: str, implementation: Path, grammar: str, text: str) -> di
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
-        env=env,
         start_new_session=True,
     )
     try:

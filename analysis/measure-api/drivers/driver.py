@@ -1,8 +1,9 @@
-# Steps one {grammar, input, chunks} case through the `gbnf` on PYTHONPATH and prints the steps.
+# Runs one {grammar, input, chunks} case through the `gbnf` under argv[1] and prints the steps.
 # Stdlib only: it runs in whatever interpreter loads the implementation.
 import json
 import sys
 
+sys.path.insert(0, sys.argv[1])
 case = json.load(sys.stdin)
 stdout, sys.stdout = sys.stdout, sys.stderr
 

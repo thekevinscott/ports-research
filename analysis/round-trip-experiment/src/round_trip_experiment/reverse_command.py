@@ -4,13 +4,8 @@ from pathlib import Path
 def reverse_command(
     *,
     condition: dict,
-    staged_derivations_directory: Path,
-    reverse_run_root: Path,
     gbnf_experiment_directory: Path,
 ) -> dict:
-    """Both roots the harness reads are env-backed, so the reverse leg is a plain
-    run_gbnf_experiment invocation with its two directories moved.
-    """
     flags = [
         flag
         for flag, wanted in (
@@ -27,8 +22,4 @@ def reverse_command(
             "--effort", condition["effort"],
             "--model", condition["model"],
         ],
-        "env": {
-            "GBNF_EXPERIMENT_PREPARED_DIRECTORY": str(staged_derivations_directory),
-            "GBNF_EXPERIMENT_DATA_DIRECTORY": str(reverse_run_root),
-        },
     }

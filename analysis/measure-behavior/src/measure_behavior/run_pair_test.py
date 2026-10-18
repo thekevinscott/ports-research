@@ -1,12 +1,13 @@
 import json
 import signal
 import subprocess
+import sys
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
-from measure_behavior.run_pair import TIMEOUT_SECONDS, run_pair
+from measure_behavior.run_pair import DRIVERS, TIMEOUT_SECONDS, run_pair
 
 IMPLEMENTATION = Path("/impl")
 
@@ -46,10 +47,16 @@ def describe_run_pair():
         assert json.loads(process.communicate.call_args.args[0]) == {"grammar": 'root ::= "a"', "input": "a"}
         assert process.communicate.call_args.kwargs["timeout"] == TIMEOUT_SECONDS
 
-    def it_puts_the_implementation_on_the_python_path(popen):
+    def it_hands_the_implementation_to_the_python_driver_without_writing_bytecode(popen):
         accepted(popen)
         run_pair("python", IMPLEMENTATION, "g", "i")
-        assert popen.call_args.kwargs["env"]["PYTHONPATH"] == str(IMPLEMENTATION)
+        assert popen.call_args.args[0] == [sys.executable, "-B", str(DRIVERS / "driver.py"), str(IMPLEMENTATION)]
+
+    def it_runs_the_driver_in_the_inherited_environment(popen):
+        accepted(popen)
+        run_pair("python", IMPLEMENTATION, "g", "i")
+        run_pair("typescript", IMPLEMENTATION, "g", "i")
+        assert all("env" not in call.kwargs for call in popen.call_args_list)
 
     def it_hands_the_typescript_entry_to_the_driver(popen):
         accepted(popen)

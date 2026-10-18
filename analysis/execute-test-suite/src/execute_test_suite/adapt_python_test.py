@@ -7,11 +7,12 @@ import pytest
 
 import execute_test_suite.adapt_python as adapt_python
 from execute_test_suite.adapt_python import (
-    REPORT_VARIABLE,
+    REPORT_OPTION,
     RULES,
-    TARGET_VARIABLE,
+    TARGET_OPTION,
     exception_eq,
     flat_module,
+    pytest_addoption,
     pytest_configure,
     pytest_sessionfinish,
     state_add,
@@ -179,12 +180,23 @@ def describe_exception_eq():
         assert exception_eq(module_with(Plain=Plain, value=3)) is False
 
 
+def options(**values):
+    return types.SimpleNamespace(getoption=lambda name: values[name])
+
+
+def describe_pytest_addoption():
+    def it_registers_the_target_and_report_options():
+        parser = pytest.Parser()
+        pytest_addoption(parser)
+        parsed = parser.parse([f"{TARGET_OPTION}=/port", f"{REPORT_OPTION}=/scratch/adapt.json"])
+        assert (parsed.adapt_target, parsed.adapt_report) == ("/port", "/scratch/adapt.json")
+
+
 def describe_pytest_configure():
-    def it_runs_every_rule_against_the_port_named_in_the_environment(
-        flat_target, fired, forget_gbnf, monkeypatch
+    def it_runs_every_rule_against_the_port_named_by_the_target_option(
+        flat_target, fired, forget_gbnf
     ):
-        monkeypatch.setenv(TARGET_VARIABLE, str(flat_target))
-        pytest_configure(None)
+        pytest_configure(options(adapt_target=str(flat_target)))
         gbnf = sys.modules["gbnf"]
         state = gbnf.GBNF("root")
         assert isinstance(state + "a", type(state))
@@ -192,30 +204,26 @@ def describe_pytest_configure():
         assert fired == {"flat_module", "state_add", "exception_eq"}
 
     def it_imports_a_gbnf_package_from_the_path(package_target, fired, forget_gbnf, monkeypatch):
-        monkeypatch.setenv(TARGET_VARIABLE, str(package_target))
         monkeypatch.syspath_prepend(str(package_target))
-        pytest_configure(None)
+        pytest_configure(options(adapt_target=str(package_target)))
         assert "flat_module" not in fired
         assert fired == {"exception_eq"}
 
     def it_leaves_the_suite_to_fail_as_it_would_when_gbnf_cannot_be_imported(
-        tmp_path, fired, forget_gbnf, monkeypatch
+        tmp_path, fired, forget_gbnf
     ):
-        monkeypatch.setenv(TARGET_VARIABLE, str(tmp_path))
-        pytest_configure(None)
+        pytest_configure(options(adapt_target=str(tmp_path)))
         assert fired == set()
 
 
 def describe_pytest_sessionfinish():
-    def it_writes_the_fired_rules_in_report_order(tmp_path, fired, monkeypatch):
+    def it_writes_the_fired_rules_in_report_order(tmp_path, fired):
         report = tmp_path / "adapt.json"
-        monkeypatch.setenv(REPORT_VARIABLE, str(report))
         fired.update({"exception_eq", "flat_module"})
-        pytest_sessionfinish(None)
+        pytest_sessionfinish(types.SimpleNamespace(config=options(adapt_report=str(report))))
         assert json.loads(report.read_text()) == {"rules_fired": ["flat_module", "exception_eq"]}
 
-    def it_writes_an_empty_list_when_nothing_fired(tmp_path, fired, monkeypatch):
+    def it_writes_an_empty_list_when_nothing_fired(tmp_path, fired):
         report = tmp_path / "adapt.json"
-        monkeypatch.setenv(REPORT_VARIABLE, str(report))
-        pytest_sessionfinish(None)
+        pytest_sessionfinish(types.SimpleNamespace(config=options(adapt_report=str(report))))
         assert json.loads(report.read_text()) == {"rules_fired": []}

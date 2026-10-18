@@ -1,12 +1,11 @@
 import json
-import os
 import subprocess
 from pathlib import Path
 
 import click
-from gbnf_experiment.config import PACKAGE_ROOT as GBNF_EXPERIMENT_ROOT, settings as gbnf_settings
+from gbnf_experiment.config import PACKAGE_ROOT as GBNF_EXPERIMENT_ROOT, PREPARED_DIRECTORY
 
-from round_trip_experiment.config import settings
+from round_trip_experiment.config import REVERSE_DIRECTORY, STAGING_DIRECTORY
 from round_trip_experiment.derivation_cache_key import derivation_cache_key
 from round_trip_experiment.load_run import load_run
 from round_trip_experiment.record_forward import record_forward
@@ -50,7 +49,7 @@ def run(forward_run: Path) -> None:
         report = leg(forward_run)
         root = Path(report["reverse_root"])
         before = {path.name for path in root.iterdir()} if root.is_dir() else set()
-        launched = subprocess.run(report["argv"], env={**os.environ, **report["env"]})
+        launched = subprocess.run(report["argv"])
         banked = reverse_run_directory(root, before=before)
         if banked is not None:
             record_forward(banked, **report["forward"])
@@ -69,8 +68,8 @@ def leg(forward_run: Path) -> dict:
     return reverse_leg(
         forward_run,
         derivation_cache_key=derivation_cache_key,
-        derivations_directory=gbnf_settings.prepared_directory,
+        derivations_directory=PREPARED_DIRECTORY,
         gbnf_experiment_directory=GBNF_EXPERIMENT_ROOT,
-        staging_directory=settings.staging_directory,
-        reverse_directory=settings.reverse_directory,
+        staging_directory=STAGING_DIRECTORY,
+        reverse_directory=REVERSE_DIRECTORY,
     )

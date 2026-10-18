@@ -10,7 +10,6 @@ requires-python = ">=3.14"
 dependencies = [
     "click>=8.5.0",
     "gbnf_experiment",
-    "pydantic-settings>=2.15.0",
     # 0.26.0 corrupts memory under CPython 3.14: SIGBUS mid-walk or SIGSEGV in GC at exit.
     "tree-sitter>=0.25.2,<0.26",
     "tree-sitter-python>=0.25.0",

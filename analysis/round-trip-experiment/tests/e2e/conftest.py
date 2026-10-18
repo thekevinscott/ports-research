@@ -1,10 +1,9 @@
 import json
-import os
 from pathlib import Path
 
 import pytest
 
-CACHE_HOME = Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache")
+CACHE_HOME = Path.home() / ".cache"
 REFERENCE_SOURCE = CACHE_HOME / "ports" / "gbnf-experiment" / "derivations" / "af673dbe41be73ce" / "source"
 GBNF_EXPERIMENT_DATA = Path(__file__).resolve().parents[4] / "data" / "runs"
 
