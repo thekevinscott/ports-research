@@ -88,9 +88,6 @@ def launch():
 def places():
     with (
         patch("round_trip_experiment.reverse_port_cli.derivation_cache_key", autospec=True) as key,
-        patch("round_trip_experiment.reverse_port_cli.PREPARED_DIRECTORY", Path("/cache/gbnf-experiment/derivations")),
-        patch("round_trip_experiment.reverse_port_cli.STAGING_DIRECTORY", Path("/cache/staging")),
-        patch("round_trip_experiment.reverse_port_cli.REVERSE_DIRECTORY", Path("/pkg/reverse")),
         patch(
             "round_trip_experiment.reverse_port_cli.GBNF_EXPERIMENT_ROOT",
             Path("/repo/packages/gbnf_experiment"),
@@ -102,6 +99,9 @@ def places():
 @pytest.fixture
 def wired(reverse_leg, load_run, record_forward, banked, launch, places):
     return None
+
+
+FOLDERS = ("--cache-directory", "/cache", "--output", "/out")
 
 
 def invoke(*args):
@@ -118,29 +118,40 @@ def describe_stage():
         result = invoke("stage", "--run", str(tmp_path / "nowhere"))
         assert result.exit_code != 0
 
-    def it_stages_the_leg_with_the_configured_places(wired, reverse_leg, places, forward_run):
-        invoke("stage", "--run", str(forward_run))
+    def it_requires_an_output(wired, forward_run):
+        result = invoke("stage", "--run", str(forward_run), "--cache-directory", "/cache")
+        assert result.exit_code != 0
+        assert "--output" in result.output
+
+    def it_stages_the_leg_under_the_given_folders(wired, reverse_leg, places, forward_run):
+        invoke("stage", "--run", str(forward_run), *FOLDERS)
         assert reverse_leg.call_args.args == (forward_run,)
         assert reverse_leg.call_args.kwargs == {
             "derivation_cache_key": places,
-            "derivations_directory": Path("/cache/gbnf-experiment/derivations"),
+            "derivations_directory": Path("/cache/ports/gbnf-experiment/prepared"),
             "gbnf_experiment_directory": Path("/repo/packages/gbnf_experiment"),
-            "staging_directory": Path("/cache/staging"),
-            "reverse_directory": Path("/pkg/reverse"),
+            "staging_directory": Path("/cache/ports/round-trip-experiment/derivations"),
+            "reverse_directory": Path("/out"),
         }
 
+    def it_defaults_the_cache_directory_to_the_home_cache(wired, reverse_leg, forward_run):
+        invoke("stage", "--run", str(forward_run), "--output", "/out")
+        cache = Path.home() / ".cache"
+        assert reverse_leg.call_args.kwargs["derivations_directory"] == cache / "ports" / "gbnf-experiment" / "prepared"
+        assert reverse_leg.call_args.kwargs["staging_directory"] == cache / "ports" / "round-trip-experiment" / "derivations"
+
     def it_prints_the_command_and_the_estimate(wired, forward_run):
-        result = invoke("stage", "--run", str(forward_run))
+        result = invoke("stage", "--run", str(forward_run), *FOLDERS)
         assert json.loads(result.output) == REPORT
         assert result.exit_code == 0
 
     def it_launches_nothing(wired, launch, forward_run):
-        invoke("stage", "--run", str(forward_run))
+        invoke("stage", "--run", str(forward_run), *FOLDERS)
         launch.assert_not_called()
 
     def it_renders_errors_as_click_errors(wired, reverse_leg, forward_run):
         reverse_leg.side_effect = FileNotFoundError("ported_implementation")
-        result = invoke("stage", "--run", str(forward_run))
+        result = invoke("stage", "--run", str(forward_run), *FOLDERS)
         assert result.exit_code != 0
         assert "ported_implementation" in result.output
 
@@ -176,23 +187,34 @@ def describe_record():
 
 
 def describe_run():
+    def it_requires_an_output(wired, forward_run):
+        result = invoke("run", "--run", str(forward_run))
+        assert result.exit_code != 0
+        assert "--output" in result.output
+
+    def it_stages_the_leg_under_the_given_folders(wired, reverse_leg, forward_run):
+        invoke("run", "--run", str(forward_run), *FOLDERS)
+        assert reverse_leg.call_args.kwargs["derivations_directory"] == Path("/cache/ports/gbnf-experiment/prepared")
+        assert reverse_leg.call_args.kwargs["staging_directory"] == Path("/cache/ports/round-trip-experiment/derivations")
+        assert reverse_leg.call_args.kwargs["reverse_directory"] == Path("/out")
+
     def it_stages_the_leg_before_launching(wired, reverse_leg, forward_run):
-        invoke("run", "--run", str(forward_run))
+        invoke("run", "--run", str(forward_run), *FOLDERS)
         reverse_leg.assert_called_once()
 
     def it_launches_run_gbnf_experiment_with_the_inherited_environment(wired, launch, forward_run):
-        invoke("run", "--run", str(forward_run))
+        invoke("run", "--run", str(forward_run), *FOLDERS)
         assert launch.call_args == ((REPORT["argv"],), {})
 
     def it_refuses_to_launch_when_the_staged_derivation_is_incomplete(wired, reverse_leg, launch, forward_run):
         reverse_leg.side_effect = ValueError("staged derivation is incomplete, refusing to launch")
-        result = invoke("run", "--run", str(forward_run))
+        result = invoke("run", "--run", str(forward_run), *FOLDERS)
         assert result.exit_code != 0
         assert "refusing to launch" in result.output
         launch.assert_not_called()
 
     def it_records_the_forward_run_on_the_leg_it_banked(wired, record_forward, forward_run):
-        invoke("run", "--run", str(forward_run))
+        invoke("run", "--run", str(forward_run), *FOLDERS)
         record_forward.assert_called_once_with(
             BANKED,
             run_id="20260909T001426Z_1c28aa33",
@@ -201,17 +223,17 @@ def describe_run():
 
     def it_records_a_failed_leg_that_still_banked_a_directory(wired, launch, record_forward, forward_run):
         launch.return_value = CompletedProcess(REPORT["argv"], 1)
-        result = invoke("run", "--run", str(forward_run))
+        result = invoke("run", "--run", str(forward_run), *FOLDERS)
         record_forward.assert_called_once()
         assert result.exit_code == 1
 
     def it_records_nothing_when_the_leg_banked_no_directory(wired, banked, record_forward, forward_run):
         banked.return_value = None
-        result = invoke("run", "--run", str(forward_run))
+        result = invoke("run", "--run", str(forward_run), *FOLDERS)
         record_forward.assert_not_called()
         assert json.loads(result.output)["run_directory"] is None
 
     def it_prints_the_leg_it_banked(wired, forward_run):
-        result = invoke("run", "--run", str(forward_run))
+        result = invoke("run", "--run", str(forward_run), *FOLDERS)
         assert json.loads(result.output) == {**REPORT, "run_directory": str(BANKED), "returncode": 0}
         assert result.exit_code == 0
