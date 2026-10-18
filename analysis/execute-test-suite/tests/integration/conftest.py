@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
-from gbnf_experiment.config import compute_prepare_cache_key, settings
+from gbnf_experiment.config import GBNF_COMMIT, PREPARE_DOCKER_DIRECTORY, compute_prepare_cache_key
 from gbnf_experiment.prepare_filesystem.assemble_whitelist.assemble_whitelist import (
     assemble_whitelist,
 )
@@ -112,17 +112,17 @@ def write_tree(directory: Path, files: dict[str, str]) -> Path:
 @pytest.fixture(autouse=True)
 def prepared_directory(tmp_path):
     """Synthetic prepared reference trees, at the keys the CLI computes, under a patched
-    `settings.prepared_directory`.
+    `PREPARED_DIRECTORY`.
 
-    The CLI takes no parameter for the prepared tree's location, so the setting is
-    patched at its own binding; the same carve-out gbnf_experiment's own
+    The CLI takes no parameter for the prepared tree's location, so the constant is
+    patched where locate_test_suite binds it; the same carve-out gbnf_experiment's own
     tests/integration/conftest.py takes for the same field.
     """
     directory = tmp_path / "prepared"
     for tree, files in REFERENCE_TREES.items():
         key = compute_prepare_cache_key(
-            settings.gbnf_commit,
-            settings.prepare_docker_directory,
+            GBNF_COMMIT,
+            PREPARE_DOCKER_DIRECTORY,
             assemble_whitelist(
                 tree,
                 include_unit_tests=True,
@@ -131,7 +131,7 @@ def prepared_directory(tmp_path):
             ),
         )
         write_tree(directory / key / tree, files)
-    with patch.object(settings, "prepared_directory", directory):
+    with patch("execute_test_suite.locate_test_suite.PREPARED_DIRECTORY", directory):
         yield directory
 
 
