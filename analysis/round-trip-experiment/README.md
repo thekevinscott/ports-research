@@ -116,10 +116,9 @@ by invocation. `--run` and `--forward` take an existing directory; every path op
   out, and symlinks the real derivation cache's `tests/` beside it. `assemble_reference_implementation`
   cannot tell the staged tree from a derived one. The cache key is the one gbnf_experiment
   computes for the tree holding every test of the reverse source language. Prints one JSON object — `forward` (the forward run id and its
-  condition), `condition` (the reverse one), `staged`, `reverse_root`, `argv`, `env`,
+  condition), `condition` (the reverse one), `staged`, `reverse_root`, `argv`,
   `estimate` — and starts nothing.
-- **`run`** stages, launches `argv` as a subprocess with `env` over the inherited
-  environment, then records. The reverse run directory is found by diffing the output root
+- **`run`** stages, launches `argv` as a subprocess, then records. The reverse run directory is found by diffing the output root
   around the launch, because the harness prints its path only when the run succeeds; a
   failed leg is banked and joined back all the same. Prints the stage report plus
   `run_directory` and `returncode`, and exits with the harness's own status.
