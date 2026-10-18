@@ -11,7 +11,7 @@ PACKAGE_ROOT = Path(__file__).resolve().parents[2]
 GBNF_EXPERIMENT_ROOT = PACKAGE_ROOT.parents[1] / "packages" / "gbnf_experiment"
 DERIVATION_KEY = "d9464914dc2adf25"
 UV = shutil.which("uv")
-FORWARD_RUN_ID = "19700101T000000Z_00000000"
+FORWARD_RUN_ID = "20260909T001426Z_1c28aa33"
 FORWARD_CONDITION = {
     "name": "source-python_python-tests_effort-high_model-claude-opus-5",
     "source_language": "python",
@@ -45,19 +45,17 @@ def assistant(message_id: str, **usage) -> str:
 
 @pytest.fixture
 def places(tmp_path):
-    # The CLI reads and writes fixed roots that hold real trees and banked runs; each
-    # directory this test makes is asserted absent first, so teardown removes only its own.
-    places = {
-        "derivations": Path.home() / ".cache" / "ports" / "gbnf-experiment" / "prepared",
-        "staging": Path.home() / ".cache" / "ports" / "round-trip-experiment" / "derivations",
-        "reverse": PACKAGE_ROOT / "reverse",
+    cache = tmp_path.resolve() / "cache"
+    return {
+        "cache": cache,
+        "derivations": cache / "ports" / "gbnf-experiment" / "prepared",
+        "staging": cache / "ports" / "round-trip-experiment" / "derivations",
+        "reverse": tmp_path.resolve() / "out",
     }
-    owned = [places["derivations"] / DERIVATION_KEY, places["staging"] / FORWARD_RUN_ID, places["reverse"] / FORWARD_RUN_ID]
-    for directory in owned:
-        assert not directory.exists()
-    yield places
-    for directory in owned:
-        shutil.rmtree(directory, ignore_errors=True)
+
+
+def folders(places):
+    return ["--cache-directory", str(places["cache"]), "--output", str(places["reverse"])]
 
 
 @pytest.fixture
@@ -76,7 +74,7 @@ def env():
 
 @pytest.fixture
 def forward_run(tmp_path):
-    directory = tmp_path.resolve() / FORWARD_RUN_ID
+    directory = tmp_path.resolve() / "runs" / FORWARD_RUN_ID
     port = directory / "ported_implementation"
     (port / "src").mkdir(parents=True)
     (port / "src" / "index.ts").write_text("export const f = () => 1;\n")
@@ -92,6 +90,11 @@ def forward_run(tmp_path):
     return directory
 
 
+def written_outside():
+    roots = [Path.home() / ".cache" / "ports" / "round-trip-experiment" / "derivations", PACKAGE_ROOT / "reverse"]
+    return {(path, path.stat().st_mtime_ns) for root in roots if root.is_dir() for path in root.glob("*/*")}
+
+
 def run_cli(env, *args):
     return subprocess.run(
         [UV, "run", "reverse-port", *args],
@@ -103,8 +106,8 @@ def run_cli(env, *args):
 
 
 @pytest.fixture
-def staged_report(env, derivation_cache, forward_run):
-    result = run_cli(env, "stage", "--run", str(forward_run))
+def staged_report(env, places, derivation_cache, forward_run):
+    result = run_cli(env, "stage", "--run", str(forward_run), *folders(places))
     assert result.returncode == 0, result.stderr
     return json.loads(result.stdout)
 
@@ -152,11 +155,17 @@ def describe_stage():
     def it_banks_nothing(staged_report, places, forward_run):
         assert not (places["reverse"] / forward_run.name).exists()
 
-    def it_fails_with_a_message_when_the_run_has_no_port(env, derivation_cache, tmp_path):
-        bare = tmp_path.resolve() / "19700101T000000Z_11111111"
-        bare.mkdir()
+    def it_writes_nowhere_but_the_given_folders(env, places, derivation_cache, forward_run):
+        before = written_outside()
+        result = run_cli(env, "stage", "--run", str(forward_run), *folders(places))
+        assert result.returncode == 0, result.stderr
+        assert written_outside() == before
+
+    def it_fails_with_a_message_when_the_run_has_no_port(env, places, derivation_cache, tmp_path):
+        bare = tmp_path.resolve() / "runs" / "20260909T002206Z_273cf6b9"
+        bare.mkdir(parents=True)
         (bare / "manifest.json").write_text(json.dumps({"condition": FORWARD_CONDITION}))
-        result = run_cli(env, "stage", "--run", str(bare))
+        result = run_cli(env, "stage", "--run", str(bare), *folders(places))
         assert result.returncode != 0
         assert result.stdout == ""
         assert "ported_implementation" in result.stderr
@@ -217,8 +226,8 @@ def describe_run():
         return {**env, "PATH": f"{harness_stub}{os.pathsep}{env['PATH']}"}
 
     @pytest.fixture
-    def report(stubbed_env, derivation_cache, forward_run):
-        result = run_cli(stubbed_env, "run", "--run", str(forward_run))
+    def report(stubbed_env, places, derivation_cache, forward_run):
+        result = run_cli(stubbed_env, "run", "--run", str(forward_run), *folders(places))
         assert result.returncode == 0, result.stdout + result.stderr
         return json.loads(result.stdout)
 
@@ -234,8 +243,14 @@ def describe_run():
         assert {key: written[key] for key in HARNESS_MANIFEST} == HARNESS_MANIFEST
         assert written["forward"] == {"run_id": forward_run.name, "condition": FORWARD_CONDITION}
 
+    def it_writes_nowhere_but_the_given_folders(stubbed_env, places, derivation_cache, forward_run):
+        before = written_outside()
+        result = run_cli(stubbed_env, "run", "--run", str(forward_run), *folders(places))
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert written_outside() == before
+
     def it_refuses_to_launch_when_the_staged_derivation_is_incomplete(stubbed_env, places, forward_run):
-        result = run_cli(stubbed_env, "run", "--run", str(forward_run))
+        result = run_cli(stubbed_env, "run", "--run", str(forward_run), *folders(places))
         assert result.returncode != 0
         assert "refusing to launch" in result.stderr
         assert "tests/python" in result.stderr

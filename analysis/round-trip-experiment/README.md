@@ -95,27 +95,30 @@ the port moved or renamed is one rename, not an add and a delete.
 ## reverse-port
 
 ```
-reverse-port stage  --run <forward run dir>
+reverse-port stage  --run <forward run dir> --output <dir> [--cache-directory <dir>]
 reverse-port record --run <reverse run dir> --forward <forward run dir>
-reverse-port run    --run <forward run dir>
+reverse-port run    --run <forward run dir> --output <dir> [--cache-directory <dir>]
 ```
 
 The reverse leg: a banked port goes back through the unmodified harness into the
 language it came from, so it can be measured against the original reference in that
 language. No file under `packages/gbnf_experiment/` is touched; the harness is reused
-by invocation, with the two roots it reads moved by env var. Every path option takes an
-existing directory and is resolved absolute.
+by invocation. `--run` and `--forward` take an existing directory; every path option is resolved absolute.
+
+- `--cache-directory`, default `~/.cache`. The derivation cache is read from
+  `<cache>/ports/gbnf-experiment/prepared`, where gbnf_experiment prepares it, and staged
+  derivations go to `<cache>/ports/round-trip-experiment/derivations`.
+- `--output`, required. Where back-translations bank.
 
 - **`stage`** copies `<forward run>/ported_implementation/` to
-  `~/.cache/ports/round-trip-experiment/derivations/<forward run id>/<derivation cache key>/source/<reverse source language>/`,
+  `<cache>/ports/round-trip-experiment/derivations/<forward run id>/<derivation cache key>/source/<reverse source language>/`,
   build artefacts (`node_modules`, `__pycache__`, `.venv`, `.pytest_cache`, `dist`) left
   out, and symlinks the real derivation cache's `tests/` beside it. `assemble_reference_implementation`
   cannot tell the staged tree from a derived one. The cache key is the one gbnf_experiment
   computes for the tree holding every test of the reverse source language. Prints one JSON object — `forward` (the forward run id and its
-  condition), `condition` (the reverse one), `staged`, `reverse_root`, `argv`, `env`,
+  condition), `condition` (the reverse one), `staged`, `reverse_root`, `argv`,
   `estimate` — and starts nothing.
-- **`run`** stages, launches `argv` as a subprocess with `env` over the inherited
-  environment, then records. The reverse run directory is found by diffing the output root
+- **`run`** stages, launches `argv` as a subprocess, then records. The reverse run directory is found by diffing the output root
   around the launch, because the harness prints its path only when the run succeeds; a
   failed leg is banked and joined back all the same. Prints the stage report plus
   `run_directory` and `returncode`, and exits with the harness's own status.
@@ -136,7 +139,7 @@ suite have to exist and be non-empty. A missing cache-key directory reads as a c
 twenty-minute docker build against the wrong input.
 
 The harness is launched in the inherited environment, so nothing points it at the staged
-port or at `reverse/`. The reverse leg does not run against current `gbnf_experiment` (#193).
+port or at `--output`. The reverse leg does not run against current `gbnf_experiment` (#193).
 
 The reverse condition is constant, whatever the forward cell was: the port is the source,
 the language is the one the forward run started from, both suites are included
@@ -148,16 +151,15 @@ from a forward one — the output path and the `forward` key are the discriminat
 Output layout, one root per forward run so a leg is findable whatever its exit status:
 
 ```
-reverse/<forward run id>/<YYYYmmddTHHMMSSZ_xxxxxxxx>/   # ported_implementation/, transcript/, manifest.json, result.json
+<output>/<forward run id>/<YYYYmmddTHHMMSSZ_xxxxxxxx>/   # ported_implementation/, transcript/, manifest.json, result.json
 ```
 
-That root is `reverse/` here, tracked in git. Staged derivations go to
-`~/.cache/ports/round-trip-experiment/derivations`, a cache that can be trashed once a leg is banked.
+Staged derivations are a cache that can be trashed once a leg is banked.
 
 ## Tests
 
 `just test-unit`, `just test-integration`, `just test-e2e`. Integration drives the CLIs as
-subprocesses over fixture directories under `tmp_path`; for `reverse-port run` the harness
+subprocesses over fixture directories under `tmp_path`, with `--cache-directory` and `--output` there too; for `reverse-port run` the harness
 is a stub first on `PATH`, so the tier launches no container and starts no model. E2e drives
 them over the derived gbnf references in `~/.cache` and the first completed run under
 `data/runs`, and skips when either is absent. A billed e2e reverse leg
