@@ -50,9 +50,8 @@ def run_gbnf_experiment(
         effort=agent.effort,
         model=agent.model,
     )
-    prepared_filesystem.write_manifest(agent, **condition)
-    with prepared_filesystem:
-        result = prepared_filesystem.result = port_codebase(
+    with prepared_filesystem.recording(agent, **condition) as run:
+        result = run.result = port_codebase(
             agent=agent,
             prompt=str(
                 Prompt(

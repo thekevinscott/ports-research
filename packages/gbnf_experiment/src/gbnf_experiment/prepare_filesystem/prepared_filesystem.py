@@ -38,38 +38,13 @@ class PreparedFilesystem:
         self.ported_implementation_directory.mkdir(parents=True)
         self.transcript_directory = self.run_directory / "transcript"
         self.transcript_directory.mkdir()
-        self.result: RunResult | None = None
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.write_result(
-            self.result,
-            self.agent,
-            error=None if exc_value is None else str(exc_value),
-            **self.condition,
-        )
-        return False
 
     @property
     def proxy_log(self):
         return self.run_directory / "proxy.log"
 
-    def write_manifest(self, agent: Agent, **kwargs):
-        self.agent = agent
-        self.condition = kwargs
-        _write_manifest(
-            self.run_directory,
-            timestamp=self.timestamp,
-            condition={
-                **kwargs,
-            },
-            included=self.included,
-            image_tag=agent.image,
-            gbnf_commit=config.GBNF_COMMIT,
-            completed_at=None,
-        )
+    def recording(self, agent: Agent, **condition) -> "Recording":
+        return Recording(self, agent, condition)
 
     def write_result(
         self, result: RunResult | None, agent: Agent, *, error: str | None = None, **kwargs
@@ -91,3 +66,32 @@ class PreparedFilesystem:
             exit_code=None if result is None else result.exit_code,
             error=error,
         )
+
+
+class Recording:
+    def __init__(self, filesystem: PreparedFilesystem, agent: Agent, condition: dict):
+        self.filesystem = filesystem
+        self.agent = agent
+        self.condition = condition
+        self.result: RunResult | None = None
+
+    def __enter__(self):
+        _write_manifest(
+            self.filesystem.run_directory,
+            timestamp=self.filesystem.timestamp,
+            condition=dict(self.condition),
+            included=self.filesystem.included,
+            image_tag=self.agent.image,
+            gbnf_commit=config.GBNF_COMMIT,
+            completed_at=None,
+        )
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.filesystem.write_result(
+            self.result,
+            self.agent,
+            error=None if exc_value is None else str(exc_value),
+            **self.condition,
+        )
+        return False
