@@ -1,4 +1,4 @@
-command = "uv run --project packages/gbnf_experiment run_gbnf_experiment --model claude-opus-5-5 --effort medium --output ."
+command = "uv run --project packages/gbnf_experiment run_gbnf_experiment --model claude-opus-5-5 --effort medium --output {run_dir}"
 repeats = 12
 
 [params]
