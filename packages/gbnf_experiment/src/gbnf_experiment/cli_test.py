@@ -12,15 +12,9 @@ API_KEY = "sk-ant-test"
 SOURCE_LANGUAGE = ["--source-language", "javascript"]
 
 
-def bank(manifest: dict | None = None, result: dict | None = None):
+def bank(*, run_directory, **_kwargs):
     """What run_gbnf_experiment leaves in the run folder."""
-
-    def write(*, run_directory, **_kwargs):
-        (run_directory / "manifest.json").write_text(json.dumps({"exit_code": 0, **(manifest or {})}))
-        if result is not None:
-            (run_directory / "result.json").write_text(json.dumps(result))
-
-    return write
+    (run_directory / "manifest.json").write_text(json.dumps({"exit_code": 0}))
 
 
 @pytest.fixture(autouse=True)
@@ -41,7 +35,7 @@ def output(tmp_path):
 @pytest.fixture
 def gbnf_experiment():
     with patch("gbnf_experiment.cli.run_gbnf_experiment", autospec=True) as m:
-        m.side_effect = bank(result={"is_error": False})
+        m.side_effect = bank
         yield m
 
 
@@ -190,11 +184,6 @@ def describe_cli():
         invoke([*SOURCE_LANGUAGE, "--model", "claude-sonnet-4-5"])
         assert claude_agent.call_args.kwargs["model"] == "claude-sonnet-4-5"
 
-    def it_renders_sdk_errors_as_click_errors(gbnf_experiment, invoke):
-        gbnf_experiment.side_effect = RuntimeError("no results report")
-        result = invoke(SOURCE_LANGUAGE)
-        assert result.exit_code == 1
-        assert "no results report" in result.output
 
 
 @pytest.fixture(autouse=True)
@@ -231,15 +220,9 @@ def describe_the_exit_code():
     def it_exits_zero_on_a_clean_run(gbnf_experiment, invoke):
         assert invoke(SOURCE_LANGUAGE).exit_code == 0
 
-    def it_exits_non_zero_when_the_agent_exits_non_zero(gbnf_experiment, invoke):
-        gbnf_experiment.side_effect = bank(manifest={"exit_code": 137})
-        assert invoke(SOURCE_LANGUAGE).exit_code != 0
-
-    def it_exits_non_zero_when_the_result_is_an_error(gbnf_experiment, invoke):
-        """claude can exit 0 with is_error set; that run must not count toward repeats."""
-        gbnf_experiment.side_effect = bank(result={"is_error": True})
-        assert invoke(SOURCE_LANGUAGE).exit_code != 0
-
-    def it_exits_non_zero_when_the_manifest_carries_an_error(gbnf_experiment, invoke):
-        gbnf_experiment.side_effect = bank(manifest={"error": "the container died"}, result={"is_error": False})
-        assert invoke(SOURCE_LANGUAGE).exit_code != 0
+    def it_exits_one_with_the_run_s_exception_uncaught(gbnf_experiment, invoke):
+        died = RuntimeError("API Error: 429 rate limited")
+        gbnf_experiment.side_effect = died
+        result = invoke(SOURCE_LANGUAGE)
+        assert result.exit_code == 1
+        assert result.exception is died

@@ -8,7 +8,7 @@ import pytest
 from botbox import RunResult
 from prompt import Prompt
 
-from gbnf_experiment.run_gbnf_experiment import PROMPT_PATH, run_gbnf_experiment
+from gbnf_experiment.run_gbnf_experiment import PROMPT_PATH, AgentFailed, run_gbnf_experiment
 
 
 @pytest.fixture
@@ -445,8 +445,20 @@ def describe_the_result():
         port_codebase.return_value = RunResult(
             stdout=RESULT_JSON, stderr="", exit_code=1, transcript={}, proxy="", container="container", image="image"
         )
-        experiment()
+        with pytest.raises(AgentFailed):
+            experiment()
         assert (run_directory / "result.json").read_text() == RESULT_JSON
+
+    def it_propagates_the_port_s_exception_unchanged(
+        experiment,
+        prepare_reference_implementation,
+        port_codebase,
+    ):
+        died = RuntimeError("the container died")
+        port_codebase.side_effect = died
+        with pytest.raises(RuntimeError) as raised:
+            experiment()
+        assert raised.value is died
 
     def it_completes_the_manifest_with_the_error_when_the_port_dies(
         experiment,
@@ -469,7 +481,8 @@ def describe_the_result():
         port_codebase.return_value = RunResult(
             stdout=RESULT_JSON, stderr="", exit_code=1, transcript={}, proxy="", container="container", image="image"
         )
-        experiment()
+        with pytest.raises(AgentFailed):
+            experiment()
         assert write_manifest.call_args.kwargs["exit_code"] == 1
 
     def it_banks_the_agent_s_stderr_beside_the_result(
@@ -481,5 +494,48 @@ def describe_the_result():
         port_codebase.return_value = RunResult(
             stdout=RESULT_JSON, stderr="Error: rate limited\n", exit_code=1, transcript={}, proxy="", container="container", image="image"
         )
-        experiment()
+        with pytest.raises(AgentFailed):
+            experiment()
         assert (run_directory / "stderr.txt").read_text() == "Error: rate limited\n"
+
+
+ERROR_RESULT_JSON = (
+    '{"type": "result", "subtype": "success", "is_error": true,'
+    ' "api_error_status": 429, "result": "API Error: 429 rate limited"}'
+)
+
+
+def describe_a_failed_agent():
+    @pytest.fixture
+    def failed(port_codebase):
+        port_codebase.return_value = RunResult(
+            stdout=ERROR_RESULT_JSON, stderr="", exit_code=0, transcript=TRANSCRIPT, proxy=PROXY_LOG, container="container", image="image"
+        )
+
+    def it_raises_with_the_agent_s_error_text(experiment, failed):
+        with pytest.raises(AgentFailed, match="API Error: 429 rate limited"):
+            experiment()
+
+    def it_raises_when_the_agent_exits_non_zero(experiment, port_codebase):
+        port_codebase.return_value = RunResult(
+            stdout=RESULT_JSON, stderr="", exit_code=137, transcript={}, proxy="", container="container", image="image"
+        )
+        with pytest.raises(AgentFailed):
+            experiment()
+
+    def it_banks_every_artifact_before_raising(experiment, failed, run_directory):
+        with pytest.raises(AgentFailed):
+            experiment()
+        assert (run_directory / "result.json").read_text() == ERROR_RESULT_JSON
+        assert (run_directory / "proxy.log").read_text() == PROXY_LOG
+        assert {
+            path.relative_to(run_directory / "transcript").as_posix()
+            for path in (run_directory / "transcript").rglob("*")
+            if path.is_file()
+        } == set(TRANSCRIPT)
+
+    def it_records_the_error_text_in_the_manifest(experiment, failed, write_manifest):
+        with pytest.raises(AgentFailed):
+            experiment()
+        assert write_manifest.call_args.kwargs["error"] == "API Error: 429 rate limited"
+        assert write_manifest.call_args.kwargs["completed_at"] is not None
