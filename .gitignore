@@ -45,3 +45,6 @@ node_modules/
 /data/judge
 /data/walkthroughs
 /.dvc/
+
+# labnotes runner daemon socket, present while runs are going.
+/.labnotes.sock
