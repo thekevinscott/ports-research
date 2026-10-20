@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from botbox import Agent
@@ -11,6 +12,10 @@ TARGET_LANGUAGES = {"javascript": "python", "python": "javascript"}
 # The library half of the prompt. port_codebase frames the task; only this
 # package knows how it laid the source directory out.
 PROMPT_PATH = Path(__file__).parent / "prompts" / "prompt.txt"
+
+
+class AgentFailed(Exception):
+    pass
 
 
 def run_gbnf_experiment(
@@ -46,8 +51,8 @@ def run_gbnf_experiment(
         model=agent.model,
     )
     prepared_filesystem.write_manifest(agent, **condition)
-    try:
-        result = port_codebase(
+    with prepared_filesystem:
+        result = prepared_filesystem.result = port_codebase(
             agent=agent,
             prompt=str(
                 Prompt(
@@ -62,12 +67,11 @@ def run_gbnf_experiment(
             source=prepared_filesystem.reference_implementation_directory,
             output=prepared_filesystem.ported_implementation_directory,
         )
-    except Exception as e:
-        prepared_filesystem.write_result(None, agent, error=str(e), **condition)
-        raise
-    for path, text in result.transcript.items():
-        destination = prepared_filesystem.transcript_directory / path
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_text(text)
-    prepared_filesystem.proxy_log.write_text(result.proxy)
-    prepared_filesystem.write_result(result, agent, **condition)
+        for path, text in result.transcript.items():
+            destination = prepared_filesystem.transcript_directory / path
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_text(text)
+        prepared_filesystem.proxy_log.write_text(result.proxy)
+        report = json.loads(result.stdout) if result.stdout else {}
+        if report.get("is_error") or result.exit_code != 0:
+            raise AgentFailed(report.get("result", f"the agent exited {result.exit_code}"))

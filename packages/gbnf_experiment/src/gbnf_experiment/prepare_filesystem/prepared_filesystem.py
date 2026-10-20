@@ -38,12 +38,27 @@ class PreparedFilesystem:
         self.ported_implementation_directory.mkdir(parents=True)
         self.transcript_directory = self.run_directory / "transcript"
         self.transcript_directory.mkdir()
+        self.result: RunResult | None = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.write_result(
+            self.result,
+            self.agent,
+            error=None if exc_value is None else str(exc_value),
+            **self.condition,
+        )
+        return False
 
     @property
     def proxy_log(self):
         return self.run_directory / "proxy.log"
 
     def write_manifest(self, agent: Agent, **kwargs):
+        self.agent = agent
+        self.condition = kwargs
         _write_manifest(
             self.run_directory,
             timestamp=self.timestamp,

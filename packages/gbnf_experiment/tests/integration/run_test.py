@@ -351,26 +351,41 @@ def describe_a_run_that_exits_non_zero():
         )
         exit_code[0] = 1
 
+    def it_raises_with_the_agent_s_error_text(experiment, dead_port):
+        with pytest.raises(Exception, match="You've hit your monthly spend limit"):
+            experiment()
+
     def it_banks_the_result_the_agent_printed(experiment, data_directory, dead_port):
-        experiment()
+        with pytest.raises(Exception):
+            experiment()
         [run_directory] = data_directory.iterdir()
         result = json.loads((run_directory / "result.json").read_text())
         assert result["is_error"] is True
         assert result["api_error_status"] == 429
 
-    def it_records_no_error_in_the_manifest(experiment, manifest, dead_port):
-        experiment()
-        assert "error" not in manifest()
+    def it_banks_the_transcript_and_proxy_log(experiment, data_directory, dead_port):
+        with pytest.raises(Exception):
+            experiment()
+        [run_directory] = data_directory.iterdir()
+        assert (run_directory / "transcript" / TRANSCRIPT_PATH).read_text() == TRANSCRIPT
+        assert (run_directory / "proxy.log").read_text() == PROXY_LOG
+
+    def it_records_the_error_text_in_the_manifest(experiment, manifest, dead_port):
+        with pytest.raises(Exception):
+            experiment()
+        assert manifest()["error"] == "You've hit your monthly spend limit"
 
     def it_records_the_exit_code_in_the_manifest(experiment, manifest, dead_port):
-        experiment()
+        with pytest.raises(Exception):
+            experiment()
         assert manifest()["exit_code"] == 1
 
     def it_banks_the_agent_s_stderr_beside_the_result(
         experiment, data_directory, dead_port, agent_stderr
     ):
         agent_stderr[0] = b"Error: 429\n"
-        experiment()
+        with pytest.raises(Exception):
+            experiment()
         [run_directory] = data_directory.iterdir()
         assert (run_directory / "stderr.txt").read_text() == "Error: 429\n"
 
@@ -499,3 +514,10 @@ def describe_cli():
         port_result.update(is_error=True)
         result = CliRunner().invoke(cli, ["--source-language", "javascript", "--output", str(output)])
         assert result.exit_code != 0
+
+    def it_exits_one_with_the_agent_s_error_text_uncaught(home, working_folder, output, docker_daemon, port_result):
+        port_result.update(is_error=True, api_error_status=429, result="API Error: 429 rate limited")
+        result = CliRunner().invoke(cli, ["--source-language", "javascript", "--output", str(output)])
+        assert result.exit_code == 1
+        assert "API Error: 429 rate limited" in str(result.exception)
+        assert (output / "result.json").is_file()

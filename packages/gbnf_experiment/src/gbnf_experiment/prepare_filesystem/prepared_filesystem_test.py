@@ -238,3 +238,35 @@ def describe_the_manifest_on_failure():
     def it_records_no_exit_code_without_a_result(filesystem):
         filesystem.write_result(None, AGENT, error="the container died", **CONDITION)
         assert "exit_code" not in manifest(filesystem)
+
+
+def describe_the_with_block():
+    def it_completes_the_run_with_the_result_it_was_given(filesystem):
+        filesystem.write_manifest(AGENT, **CONDITION)
+        with filesystem:
+            filesystem.result = run_result(stdout='{"num_turns": 4}', exit_code=0)
+        recorded = manifest(filesystem)
+        assert recorded["completed_at"] is not None
+        assert recorded["exit_code"] == 0
+        assert "error" not in recorded
+        assert (filesystem.run_directory / "result.json").read_text() == '{"num_turns": 4}'
+
+    def it_records_the_exception_in_flight_and_lets_it_propagate(filesystem):
+        filesystem.write_manifest(AGENT, **CONDITION)
+        died = RuntimeError("the container died")
+        with pytest.raises(RuntimeError) as raised:
+            with filesystem:
+                raise died
+        assert raised.value is died
+        assert manifest(filesystem)["error"] == "the container died"
+        assert manifest(filesystem)["completed_at"] is not None
+
+    def it_banks_the_result_alongside_the_error(filesystem):
+        filesystem.write_manifest(AGENT, **CONDITION)
+        with pytest.raises(RuntimeError):
+            with filesystem:
+                filesystem.result = run_result(stdout='{"is_error": true}', exit_code=1)
+                raise RuntimeError("API Error: 429")
+        assert (filesystem.run_directory / "result.json").read_text() == '{"is_error": true}'
+        assert manifest(filesystem)["exit_code"] == 1
+        assert manifest(filesystem)["error"] == "API Error: 429"
