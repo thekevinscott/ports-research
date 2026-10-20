@@ -1,5 +1,6 @@
 [experiments]
 path = "experiments/{experiment}"
+mode = "fill"
 [files]
 path = "experiments/{experiment}/*.md"
 [runs]
