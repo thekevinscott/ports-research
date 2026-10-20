@@ -5,9 +5,8 @@ from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
-from botbox import ClaudeAgent
+from botbox import ClaudeAgent, DockerException
 from python_on_whales import docker
-from python_on_whales.exceptions import DockerException
 
 from gbnf_experiment import run_gbnf_experiment
 from gbnf_experiment.cli import cli

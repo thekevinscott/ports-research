@@ -15,6 +15,6 @@ ENV NODE_PATH=/usr/local/lib/node_modules
 # ESM resolution ignores NODE_PATH but walks up to /node_modules.
 RUN mkdir /node_modules \
     && for package in /usr/local/lib/node_modules/*; do ln -s "$package" /node_modules/; done \
-    && chown node /node_modules
+    && chown user /node_modules
 
-USER node
+USER user

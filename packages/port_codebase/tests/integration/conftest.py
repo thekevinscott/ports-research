@@ -16,6 +16,7 @@ class Daemon:
     def __init__(self) -> None:
         self.builds: list[dict[str, Any]] = []
         self.runs: list[dict[str, Any]] = []
+        self.removed: list[str] = []
         self.stdout = b""
         self.exit_code = 0
 
@@ -40,7 +41,7 @@ def docker(daemon: Daemon) -> Iterator[None]:
         patch("python_on_whales.docker.logs", autospec=True) as logs,
         patch("python_on_whales.docker.wait", autospec=True) as wait,
         patch("python_on_whales.docker.network", autospec=True) as network,
-        patch("python_on_whales.docker.container", autospec=True),
+        patch("python_on_whales.docker.container", autospec=True) as container,
         patch("python_on_whales.utils.run", autospec=True),
     ):
         network.docker_cmd = ["docker"]
@@ -49,11 +50,16 @@ def docker(daemon: Daemon) -> Iterator[None]:
             daemon.builds.append({"context": Path(context), **options})
 
         def record_run(image: str, command: Sequence[str] = (), **options: Any) -> MagicMock:
-            daemon.runs.append({"image": image, "command": list(command), **options})
-            return MagicMock(name=image)
+            handle = MagicMock(name=image)
+            daemon.runs.append({"image": image, "command": list(command), "handle": handle, **options})
+            return handle
+
+        def record_remove(containers: Sequence[str], **_options: Any) -> None:
+            daemon.removed.extend(containers)
 
         build.side_effect = record_build
         run.side_effect = record_run
         logs.side_effect = lambda *_args, **_options: iter([("stdout", daemon.stdout)])
         wait.side_effect = lambda *_args: daemon.exit_code
+        container.remove.side_effect = record_remove
         yield

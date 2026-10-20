@@ -70,6 +70,7 @@ def describe_port_codebase():
             "--output-format",
             "json",
             "--dangerously-skip-permissions",
+            "--strict-mcp-config",
             "--model",
             "claude-opus-5",
             "--effort",
@@ -88,3 +89,8 @@ def describe_port_codebase():
         run()
 
         assert output.is_dir()
+
+    def it_removes_its_container_once_the_run_returns(run, daemon):
+        run()
+
+        assert daemon.removed == [str(daemon.agent["handle"])]

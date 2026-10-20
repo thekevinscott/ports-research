@@ -16,7 +16,7 @@ SHARED = (
     "python/pyproject.toml",
 )
 SANDBOX_IMAGE_ID = "sha256:fake-sandbox-image"
-AGENT_HOME = "/home/node"
+AGENT_HOME = "/home/user"
 PROXY_IMAGE = "botbox-proxy:latest"
 PREPARE_IMAGE = "gbnf-prepare:"
 TRANSCRIPT_PATH = ".claude/projects/-target/session.jsonl"

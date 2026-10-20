@@ -23,8 +23,9 @@ def port_codebase(*, agent: Agent, prompt: str, source: Path, output: Path) -> R
         dockerfile=DOCKERFILE.read_text().rstrip("\n"),
         upstream=prompt,
     )
-    return Botbox(agent, dockerfile=DOCKERFILE).run(
-        agent.command(str(rendered)),
-        mounts=((source, "/input", "ro"), (output, "/target", "rw")),
-        workdir="/target",
-    )
+    with Botbox(agent, dockerfile=DOCKERFILE) as box:
+        return box.run(
+            agent.command(str(rendered)),
+            mounts=((source, "/input", "ro"), (output, "/target", "rw")),
+            workdir="/target",
+        )

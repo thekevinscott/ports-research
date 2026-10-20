@@ -11,6 +11,7 @@ AGENT_DOCKERFILE = "FROM node:24-slim\nRUN npm install -g some-cli\n"
 @pytest.fixture
 def botbox():
     with patch("port_codebase.port_codebase.Botbox", autospec=True) as mock:
+        mock.return_value.__enter__.return_value = mock.return_value
         yield mock
 
 
