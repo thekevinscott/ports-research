@@ -8,7 +8,7 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "botbox>=0.0.17",
+    "botbox>=0.0.19",
     "pathspec>=1.1.1",
     "prompt",
 ]

@@ -8,6 +8,14 @@ exclude-newer-span = "P3D"
 
 [options.exclude-newer-package]
 botbox = false
+cachetta = false
+coaxer = false
+curtaincall = false
+dirsql = false
+labnotes = false
+lamp-the-djinn = false
+pyskillet = false
+repo-name-checker = false
 
 [[package]]
 name = "annotated-types"
@@ -26,14 +34,14 @@ sdist = { url = "https://files.pythonhosted.org/packages/6a/fc/2e09f2de12c093783
 
 [[package]]
 name = "botbox"
-version = "0.0.17"
+version = "0.0.19"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "python-on-whales" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/73/e1/4359b2ed8954ab4f4dc9e4abbb9b789f057f7b55cc4e5dc35c99a7fadcc3/botbox-0.0.17.tar.gz", hash = "sha256:9bbb76e5836db3aad65a8527d01126bdf9b253d6d4e926ba519a2e9eaa4f9e32", size = 43030, upload-time = "2026-10-20T11:41:40.476Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/43/43/aab2be98f251e4bb5d1c29cf89754cf302fa29960bd2166f490eb12b8849/botbox-0.0.19.tar.gz", hash = "sha256:8a613b0769c85caf8405c60d222a8b58a5e4f80e9dcc555a231fed2177a4e92d", size = 43522, upload-time = "2026-10-21T00:32:52.852Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/61/80/7646fd2cd1b4aa523cd5c5357e5a68ee60628b9f720eea7c3158e14d0fd9/botbox-0.0.17-py3-none-any.whl", hash = "sha256:d69028009946e8833f9c419021bf895f40d3f75df0e4112c553d179e73ccfa4b", size = 16929, upload-time = "2026-10-20T11:41:38.987Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/b1/5927564127c8734e940f48a7eda9b451639cdfa0dc29e1e8464c6ba75200/botbox-0.0.19-py3-none-any.whl", hash = "sha256:2493fd2c5ce8be15dba8de14fec6c854663c789a033c591a41d3f01eec70a33e", size = 17267, upload-time = "2026-10-21T00:32:51.282Z" },
 ]
 
 [[package]]
@@ -162,7 +170,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "botbox", specifier = ">=0.0.17" },
+    { name = "botbox", specifier = ">=0.0.19" },
     { name = "click", specifier = ">=8.5.0" },
     { name = "dirsql", specifier = ">=0.4.110" },
     { name = "port-codebase", editable = "../port_codebase" },
@@ -226,7 +234,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "botbox", specifier = ">=0.0.17" },
+    { name = "botbox", specifier = ">=0.0.19" },
     { name = "pathspec", specifier = ">=1.1.1" },
     { name = "prompt", editable = "../prompt" },
 ]
