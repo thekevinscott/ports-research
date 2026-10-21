@@ -40,8 +40,7 @@ node_modules/
 # Snapshots of data/ taken before it moved to DVC; too big for the repo.
 *.zip
 
-# Run data, tracked by DVC (data/*.dvc); dvc pull restores it.
-/data/runs
+# Tracked by DVC (*.dvc); dvc pull restores it.
 /data/judge
 /data/walkthroughs
 /.dvc/
