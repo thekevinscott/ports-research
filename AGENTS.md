@@ -22,13 +22,13 @@ gitignored.
 - Branch names use **dashes only**: lowercase letters, digits, and `-`.
   No slashes, no spaces (e.g., `whitelist-assembly`, not `feat/whitelist-assembly`).
 - Do all editing, building, and testing inside `.worktrees/<branch>/`.
-- **Run data lives only in the root checkout's `data/`.** Never read or write
-  `.worktrees/*/data/`. Runs go through labnotes from the root checkout, which
-  files each one under `data/runs/<experiment>/<run>/`; the CLI's `--output`
-  is that run folder. `data/runs`,
+- **Run data lives only in the root checkout's `data/` and `experiments/*/runs/`.** Never read or write
+  `.worktrees/*/data/` or `.worktrees/*/experiments/*/runs/`. Runs go through labnotes from the root checkout, which
+  files each one under `experiments/<experiment>/runs/<run>/`; the CLI's `--output`
+  is that run folder. Each `experiments/<experiment>/runs`,
   `data/sessions`, `data/orphans`, `data/judge` and `data/walkthroughs` are
   DVC-tracked: after `git pull`, run `dvc pull`; after banking runs,
-  `dvc add data/runs`, commit the `.dvc` file, `dvc push`.
+  `dvc add experiments/<experiment>/runs`, commit the `.dvc` file, `dvc push`.
 - **When the PR merges, clean up in this order.** Leaving stale worktrees and
   branches behind makes it impossible to see what is actually in flight.
   1. `cd` to the root checkout first. Never skip this — removing a worktree
@@ -129,7 +129,7 @@ experiment's design, and it is always committed.** Kevin, 2026-10-16: "we always
 keep yaml updated as the source of truth, and committed."
 
 - Membership is the experiment folder: a run under
-  `data/runs/<experiment>/` belongs to it unless its `run.json` says
+  `experiments/<experiment>/runs/` belongs to it unless its `run.json` says
   `excluded`. labnotes counts runs toward `repeats`.
 - Any change to what is being run (models, levels, prompt, test
   configuration) lands in experiment.toml in the same PR, before or with the

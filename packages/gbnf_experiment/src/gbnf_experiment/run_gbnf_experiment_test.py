@@ -82,7 +82,7 @@ AGENT = Mock(name="agent", model="claude-opus-5", effort="high")
 
 CONFIG = {
     "agent": AGENT,
-    "run_directory": Path("/data/runs/models-effort/brave-otter"),
+    "run_directory": Path("/experiments/v2-models-effort/runs/brave-otter"),
     "source_language": "javascript",
     "include_unit_tests": False,
     "include_source_integration_tests": False,

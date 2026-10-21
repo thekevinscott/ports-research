@@ -16,14 +16,14 @@ Kevin, 2026-10-15: "Burn through this 5 hour chunk and the next one please" ... 
 
 - Subscription only: `API_KEY` stays blank in `gbnf_experiment/config.py`. Kevin, 2026-10-15: "I specifically said NOT TO USE the api key!"
 - `--concurrency 5`. Kevin, 2026-10-15: "Let's run it with 5 concurrent."
-- Runs bank in `data/runs/models-effort/<id>/`, tracked by DVC. Session logs from the old scheduler are in `data/sessions/`.
+- Runs bank in `experiments/v2-models-effort/runs/<id>/`, tracked by DVC. Session logs from the old scheduler are in `data/sessions/`.
 
 ## Progress
 
 Report completed and remaining against 12 per cell, then the per-cell table, all four models included:
 
 ```
-uvx dirsql --no-ignore -c data/.dirsql.toml "SELECT model, effort, source_language, COUNT(*) AS n FROM runs WHERE experiment='models-effort' AND exit_code=0 AND excluded IS NOT 1 GROUP BY model, effort, source_language"
+uvx dirsql --no-ignore -c experiments/.dirsql.toml "SELECT model, effort, source_language, COUNT(*) AS n FROM runs WHERE experiment='v2-models-effort' AND exit_code=0 AND excluded IS NOT 1 GROUP BY model, effort, source_language"
 ```
 
 Launches, stops and failures are journal entries under `journal/`, dated 2026-10-15 and later.

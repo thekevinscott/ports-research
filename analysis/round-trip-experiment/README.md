@@ -162,5 +162,5 @@ Staged derivations are a cache that can be trashed once a leg is banked.
 subprocesses over fixture directories under `tmp_path`, with `--cache-directory` and `--output` there too; for `reverse-port run` the harness
 is a stub first on `PATH`, so the tier launches no container and starts no model. E2e drives
 them over the derived gbnf references in `~/.cache` and the first completed run under
-`data/runs`, and skips when either is absent. A billed e2e reverse leg
+`experiments/*/runs`, and skips when either is absent. A billed e2e reverse leg
 is deliberately absent until the pilot is approved.

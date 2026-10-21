@@ -12,7 +12,7 @@ language.
 
 Two halves. `packages/` holds the code that produces a port. `analysis/` holds
 the code that reads ports after the fact. Neither imports the other;
-`data/runs/` is the seam, written by the first and read by the second.
+`experiments/*/runs/` is the seam, written by the first and read by the second.
 `literature/` is the paper corpus and the tools that harvest it.
 
 ## packages/
@@ -36,7 +36,7 @@ Three packages, each configuring the one above it.
   gbnf. Runs necessary pre-work such as generating the test suite (the
   gbnf-prepare image in `docker/gbnf-prepare`, cached under
   `~/.cache/ports/gbnf-experiment/prepared/`). Otherwise minimal. CLI
-  `run_gbnf_experiment`; each invocation writes one run directory under `data/`.
+  `run_gbnf_experiment`; each invocation writes one run directory under `experiments/`.
 
 ## Reference provenance
 
@@ -57,7 +57,7 @@ same.
 
 ## analysis/
 
-`analysis/notebook` is the marimo notebook over `data/runs`; its README has
+`analysis/notebook` is the marimo notebook over `experiments/*/runs`; its README has
 the commands. The tools it drives sit beside it. CLI lines are abbreviated;
 `--help` has the full usage.
 
@@ -81,7 +81,7 @@ the commands. The tools it drives sit beside it. CLI lines are abbreviated;
 
 ## Runs
 
-Each run lands in `data/runs/<experiment>/<run>/` with labnotes' `run.json`,
+Each run lands in `experiments/<experiment>/runs/<run>/` with labnotes' `run.json`,
 `manifest.json`, `ported_implementation/`, `transcript/`, `proxy.log`, and
 `result.json` once the run finishes. The manifest records the condition
 (source language, test flags, effort, model), the gbnf commit, the sandbox

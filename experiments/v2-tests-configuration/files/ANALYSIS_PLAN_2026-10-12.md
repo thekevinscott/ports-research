@@ -9,7 +9,7 @@ Checked boxes are merged. Open PRs are named.
 - [x] Study design: 16 cells (2 source languages x 3 test flags: `include_unit_tests`, `include_source_integration_tests`, `include_target_integration_tests`), model claude-opus-5-5, effort medium, 12 runs per cell (PR #117).
 - [x] Resume, batch cap, fail-fast on billing or auth errors (PR #120).
 - [ ] All 192 runs with exit 0 banked (study 1: 119; study 2 in progress).
-- [ ] Run directories and matrix jsonl files in the main checkout's `data/runs/`.
+- [ ] Run directories and matrix jsonl files in the main checkout's `experiments/v2-tests-configuration/runs/`.
 - [ ] Exclusion rule written down: non-zero exit (api_error, exit 137) excluded from every forward table, counted in a sidebar.
 
 ## Measures

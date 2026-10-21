@@ -60,7 +60,7 @@ def _ddl(name: str, columns: dict[str, str]) -> str:
     return f"CREATE TABLE {name} ({', '.join(f'{c} {t}' for c, t in columns.items())})"
 
 
-def _row(manifest_path: Path, manifest: dict) -> dict:
+def _row(manifest_path: Path, manifest: dict, experiment: str) -> dict:
     result_path = manifest_path.parent / "result.json"
     result = json.loads(result_path.read_text()) if result_path.is_file() else {}
     tokens = transcript_usage(manifest_path.parent)
@@ -68,7 +68,7 @@ def _row(manifest_path: Path, manifest: dict) -> dict:
     return {
         "run_id": manifest_path.parent.name,
         "run_dir": str(manifest_path.parent),
-        "experiment": manifest_path.parent.parent.name,
+        "experiment": experiment,
         "timestamp": manifest["timestamp"],
         "completed_at": manifest.get("completed_at"),
         "source_language": condition["source_language"],
@@ -91,7 +91,7 @@ def _row(manifest_path: Path, manifest: dict) -> dict:
 
 def run_rows(path: str) -> list[dict]:
     manifest_path = Path(path)
-    return [_row(manifest_path, json.loads(manifest_path.read_text()))]
+    return [_row(manifest_path, json.loads(manifest_path.read_text()), manifest_path.parents[2].name)]
 
 
 def reverse_run_rows(path: str) -> list[dict]:
@@ -101,7 +101,7 @@ def reverse_run_rows(path: str) -> list[dict]:
     condition = forward["condition"]
     return [
         {
-            **_row(manifest_path, manifest),
+            **_row(manifest_path, manifest, manifest_path.parent.parent.name),
             "forward_run_id": forward["run_id"],
             "forward_source_language": condition["source_language"],
             "forward_target_language": condition["target_language"],
@@ -115,7 +115,7 @@ def runs_table() -> Table:
     return Table(
         name="runs",
         ddl=_ddl("runs", RUNS_COLUMNS),
-        glob="*/*/manifest.json",
+        glob="v2-*/runs/*/manifest.json",
         on_file=run_rows,
     )
 

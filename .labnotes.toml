@@ -2,6 +2,6 @@
 path = "experiments/{experiment}"
 mode = "matrix"
 [files]
-path = "experiments/{experiment}/*.md"
+path = "experiments/{experiment}/files/"
 [runs]
-path = "data/runs/{experiment}/{run}"
+path = "experiments/{experiment}/runs/{run}"
