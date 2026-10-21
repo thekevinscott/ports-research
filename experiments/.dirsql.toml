@@ -1,11 +1,11 @@
-# SQL over the run data. From the repo root: uvx dirsql --no-ignore -c data/.dirsql.toml "<sql>". See README.md.
+# SQL over the run data. From the repo root: uvx dirsql --no-ignore -c experiments/.dirsql.toml "<sql>". See README.md.
 # One table per file: dirsql hands on-file its matches in batches that can split a run's files.
 
 [[table]]
 name = "run_records"
-glob = "runs/*/*/run.json"
+glob = "*/runs/*/run.json"
 on-file = """jq -c -n '
-  inputs | {run_id: (input_filename | split("/")[-2]), experiment: (input_filename | split("/")[-3]),
+  inputs | {run_id: (input_filename | split("/")[-2]), experiment: (input_filename | split("/")[-4]),
             exit_code, excluded: (.excluded // false), reason, created, ended}
 '"""
 ddl = """
@@ -17,9 +17,9 @@ CREATE TABLE run_records (
 
 [[table]]
 name = "manifests"
-glob = "runs/*/*/manifest.json"
+glob = "*/runs/*/manifest.json"
 on-file = """jq -c -n '
-  inputs | {run_id: (input_filename | split("/")[-2]), experiment: (input_filename | split("/")[-3])}
+  inputs | {run_id: (input_filename | split("/")[-2]), experiment: (input_filename | split("/")[-4])}
     + (del(.exit_code, .study)) + (.condition // {})
     + {container_exit_code: .exit_code,
        harness_commit: .harness.commit, harness_dirty: .harness.dirty,
@@ -39,7 +39,7 @@ CREATE TABLE manifests (
 
 [[table]]
 name = "results"
-glob = "runs/*/*/result.json"
+glob = "*/runs/*/result.json"
 on-file = """jq -c -n '
   inputs | {run_id: (input_filename | split("/")[-2])}
     + . + (.usage // {})
