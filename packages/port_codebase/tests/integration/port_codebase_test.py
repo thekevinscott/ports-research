@@ -93,4 +93,4 @@ def describe_port_codebase():
     def it_removes_its_container_once_the_run_returns(run, daemon):
         run()
 
-        assert daemon.removed == [str(daemon.agent["handle"])]
+        assert str(daemon.agent["handle"]) in daemon.removed

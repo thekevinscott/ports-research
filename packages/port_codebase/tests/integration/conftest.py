@@ -54,8 +54,8 @@ def docker(daemon: Daemon) -> Iterator[None]:
             daemon.runs.append({"image": image, "command": list(command), "handle": handle, **options})
             return handle
 
-        def record_remove(containers: Sequence[str], **_options: Any) -> None:
-            daemon.removed.extend(containers)
+        def record_remove(containers: str | Sequence[str], **_options: Any) -> None:
+            daemon.removed.extend([containers] if isinstance(containers, str) else containers)
 
         build.side_effect = record_build
         run.side_effect = record_run
