@@ -34,14 +34,14 @@ sdist = { url = "https://files.pythonhosted.org/packages/6a/fc/2e09f2de12c093783
 
 [[package]]
 name = "botbox"
-version = "0.0.19"
+version = "0.0.20"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "python-on-whales" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/43/43/aab2be98f251e4bb5d1c29cf89754cf302fa29960bd2166f490eb12b8849/botbox-0.0.19.tar.gz", hash = "sha256:8a613b0769c85caf8405c60d222a8b58a5e4f80e9dcc555a231fed2177a4e92d", size = 43522, upload-time = "2026-10-21T00:32:52.852Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ba/73/de040ca924d63b3422e1cdcb9fb34631de78d51123fe3895b3b056685dc6/botbox-0.0.20.tar.gz", hash = "sha256:d34171325c0f0edc1fb4fc0bbc9ed2f8086560498e0f08fdfd57ac1b469e4538", size = 43598, upload-time = "2026-10-21T00:55:49.623Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ef/b1/5927564127c8734e940f48a7eda9b451639cdfa0dc29e1e8464c6ba75200/botbox-0.0.19-py3-none-any.whl", hash = "sha256:2493fd2c5ce8be15dba8de14fec6c854663c789a033c591a41d3f01eec70a33e", size = 17267, upload-time = "2026-10-21T00:32:51.282Z" },
+    { url = "https://files.pythonhosted.org/packages/5c/a3/3c0354fd33f1d3e2465340cb474fd661eceacb4d2b19e174e972d7e0a569/botbox-0.0.20-py3-none-any.whl", hash = "sha256:f1faec68c0b0261fae67626d42a2e162486687b2cc07f930d2250769d072214d", size = 17370, upload-time = "2026-10-21T00:55:48.355Z" },
 ]
 
 [[package]]
@@ -170,7 +170,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "botbox", specifier = ">=0.0.19" },
+    { name = "botbox", specifier = ">=0.0.20" },
     { name = "click", specifier = ">=8.5.0" },
     { name = "dirsql", specifier = ">=0.4.110" },
     { name = "port-codebase", editable = "../port_codebase" },
@@ -234,7 +234,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "botbox", specifier = ">=0.0.19" },
+    { name = "botbox", specifier = ">=0.0.20" },
     { name = "pathspec", specifier = ">=1.1.1" },
     { name = "prompt", editable = "../prompt" },
 ]
