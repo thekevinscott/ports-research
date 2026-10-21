@@ -76,7 +76,7 @@ With target tests, 88 of 96 ports are driven. Without them: 20 of 24 with no tes
 
 Rerunning the driver on four unit-only ports: both javascript → python ports crashed on all 799 pairs, with `ImportError: cannot import name 'RuleEnd' from 'gbnf'` and `ModuleNotFoundError: No module named 'gbnf'`. Both python → javascript ports loaded, matched all 77 grammar errors, and rejected the other 722 inputs: their end state is not the reference's `type: "end"`.
 
-This does not show that the other ports behave wrongly behind their own interface; that needs a per-port adapter or the judge. The [methodology review](https://github.com/thekevinscott/ports-research/blob/main/experiments/tests-configuration/REVIEW_2026-10-12-methodology.md) records this as B1 (behaviour) and A2 (API). Measure definitions: [behaviour](https://github.com/thekevinscott/ports-research/blob/3e610fb80bcc3d51cb93142c5b732e2c08fad64b/analysis/measure-behavior/README.md), [API](https://github.com/thekevinscott/ports-research/blob/3e610fb80bcc3d51cb93142c5b732e2c08fad64b/analysis/measure-api/README.md).
+This does not show that the other ports behave wrongly behind their own interface; that needs a per-port adapter or the judge. The [methodology review](https://github.com/thekevinscott/ports-research/blob/43557b4/experiments/tests-configuration/REVIEW_2026-10-12-methodology.md) records this as B1 (behaviour) and A2 (API). Measure definitions: [behaviour](https://github.com/thekevinscott/ports-research/blob/3e610fb80bcc3d51cb93142c5b732e2c08fad64b/analysis/measure-behavior/README.md), [API](https://github.com/thekevinscott/ports-research/blob/3e610fb80bcc3d51cb93142c5b732e2c08fad64b/analysis/measure-api/README.md).
 
 All charts and tables for this section: [appendix](APPENDIX.md#held-out-behaviour).
 
@@ -134,7 +134,7 @@ Medians per condition.
 | source + target | 1.1 | 3 | 0 | 1.3 | 3 | 1 |
 | all | 2.7 | 11 | 22 | 3.1 | 10 | 23 |
 
-Wall time is left out: in 48 of the 192 runs, all given unit tests, the recorded duration covers only the run's last turn (4 to 22 seconds) because a background task's notification started another turn after the first result; the transcripts span 6 to 41 minutes. The [methodology review](https://github.com/thekevinscott/ports-research/blob/main/experiments/tests-configuration/REVIEW_2026-10-12-methodology.md) records this as X5; the notebook now times runs from the transcript.
+Wall time is left out: in 48 of the 192 runs, all given unit tests, the recorded duration covers only the run's last turn (4 to 22 seconds) because a background task's notification started another turn after the first result; the transcripts span 6 to 41 minutes. The [methodology review](https://github.com/thekevinscott/ports-research/blob/43557b4/experiments/tests-configuration/REVIEW_2026-10-12-methodology.md) records this as X5; the notebook now times runs from the transcript.
 
 Tokens, all 192 runs, flag on against flag off:
 
@@ -311,7 +311,7 @@ Their definitions: [appendix](APPENDIX.md#not-yet-measured).
 
 ## What this report does not do
 
-The readings above are the agent's; conclusions are drawn with Kevin. It does not measure reference diff similarity (no JavaScript target in `measure-code-distance`) or test pass rates (`execute-test-suite` finds no V2 suite). The [methodology review](https://github.com/thekevinscott/ports-research/blob/main/experiments/tests-configuration/REVIEW_2026-10-12-methodology.md) records the measurement limits.
+The readings above are the agent's; conclusions are drawn with Kevin. It does not measure reference diff similarity (no JavaScript target in `measure-code-distance`) or test pass rates (`execute-test-suite` finds no V2 suite). The [methodology review](https://github.com/thekevinscott/ports-research/blob/43557b4/experiments/tests-configuration/REVIEW_2026-10-12-methodology.md) records the measurement limits.
 
 ## How this was made
 

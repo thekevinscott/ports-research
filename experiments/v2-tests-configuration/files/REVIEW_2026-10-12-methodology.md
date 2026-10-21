@@ -95,7 +95,7 @@ Severity: weakens.
 #### X4. **The notebook selects runs by what is in the directory, not by study.**
 Measure: the set of V2 runs every V2 table and chart is computed over.
 Evidence:
-- The notebook takes every completed run under `data/runs` (`analysis/notebook/src/corpus.py`, `runs_under`).
+- The notebook takes every completed run under `experiments/v2-tests-configuration/runs` (`analysis/notebook/src/corpus.py`, `runs_under`).
 - On the analysis machine that gives 196 V2 exit-0 runs, and one cell has 16 runs, not 12. Four of them are pilot runs outside the five study matrices.
 - The report (PR #162) had to build a hardlinked runs directory to get the study's 192 runs.
 Why it matters: per-cell n and every V2 number depend on which runs happen to be in the directory.
