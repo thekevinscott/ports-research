@@ -19,7 +19,7 @@ V2_CONDITION = {
 }
 
 
-EXPERIMENT = "tests-configuration"
+EXPERIMENT = "v2-tests-configuration"
 
 
 def write_v2_run(run_dir, exit_code=0):
@@ -69,48 +69,48 @@ def pinned_reference():
 
 def describe_codebases_under():
     def it_builds_a_codebase_for_a_javascript_port(tmp_path, pinned_reference):
-        write_v2_run(tmp_path / EXPERIMENT / "20261012T094953Z_370ab98a")
+        write_v2_run(tmp_path / EXPERIMENT / "runs" / "20261012T094953Z_370ab98a")
         (codebase,) = codebases_under(tmp_path, runs_table(), EXPERIMENT)
         assert codebase.language == "javascript"
         assert codebase.file_count == 1
 
     def it_measures_a_javascript_port_against_the_pinned_javascript_reference(tmp_path, pinned_reference):
-        write_v2_run(tmp_path / EXPERIMENT / "20261012T094953Z_370ab98a")
+        write_v2_run(tmp_path / EXPERIMENT / "runs" / "20261012T094953Z_370ab98a")
         (codebase,) = codebases_under(tmp_path, runs_table(), EXPERIMENT)
         pinned_reference.assert_called_once_with()
         assert codebase.reference == REFERENCE_CHECKOUT / "packages" / "gbnf" / "javascript"
 
     def it_leaves_the_javascript_build_tooling_out_as_for_typescript(tmp_path, pinned_reference):
-        write_v2_run(tmp_path / EXPERIMENT / "20261012T094953Z_370ab98a")
+        write_v2_run(tmp_path / EXPERIMENT / "runs" / "20261012T094953Z_370ab98a")
         (codebase,) = codebases_under(tmp_path, runs_table(), EXPERIMENT)
         assert {"builder", "dev"} <= set(codebase.exclude)
 
     def it_keeps_only_the_v2_codebases_of_the_named_experiment(tmp_path, pinned_reference):
-        write_v2_run(tmp_path / "models-effort" / "effort")
-        write_v2_run(tmp_path / EXPERIMENT / "tests")
-        assert [codebase.run_id for codebase in codebases_under(tmp_path, runs_table(), "models-effort")] == ["effort"]
+        write_v2_run(tmp_path / "v2-models-effort" / "runs" / "effort")
+        write_v2_run(tmp_path / EXPERIMENT / "runs" / "tests")
+        assert [codebase.run_id for codebase in codebases_under(tmp_path, runs_table(), "v2-models-effort")] == ["effort"]
 
 
 def describe_runs_under():
     def it_lists_exit_zero_runs(tmp_path):
-        write_v2_run(tmp_path / EXPERIMENT / "ok")
-        write_v2_run(tmp_path / EXPERIMENT / "killed", exit_code=137)
+        write_v2_run(tmp_path / EXPERIMENT / "runs" / "ok")
+        write_v2_run(tmp_path / EXPERIMENT / "runs" / "killed", exit_code=137)
         assert [run["run_id"] for run in runs_under(tmp_path, runs_table(), EXPERIMENT)] == ["ok"]
 
     def it_lists_killed_runs_when_asked(tmp_path):
-        write_v2_run(tmp_path / EXPERIMENT / "ok")
-        write_v2_run(tmp_path / EXPERIMENT / "killed", exit_code=137)
+        write_v2_run(tmp_path / EXPERIMENT / "runs" / "ok")
+        write_v2_run(tmp_path / EXPERIMENT / "runs" / "killed", exit_code=137)
         runs = runs_under(tmp_path, runs_table(), EXPERIMENT, include_nonzero_exit=True)
         assert [(run["run_id"], run["exit_code"]) for run in runs] == [("killed", 137), ("ok", 0)]
 
     def it_keeps_only_the_v2_runs_of_the_named_experiment(tmp_path):
-        write_v2_run(tmp_path / "models-effort" / "effort")
-        write_v2_run(tmp_path / EXPERIMENT / "tests")
-        runs = runs_under(tmp_path, runs_table(), "models-effort")
+        write_v2_run(tmp_path / "v2-models-effort" / "runs" / "effort")
+        write_v2_run(tmp_path / EXPERIMENT / "runs" / "tests")
+        runs = runs_under(tmp_path, runs_table(), "v2-models-effort")
         assert [run["run_id"] for run in runs] == ["effort"]
 
     def it_keeps_v1_runs_whatever_the_experiment(tmp_path):
-        write_v1_run(tmp_path / "v1-forward" / "v1")
-        write_v2_run(tmp_path / "models-effort" / "effort")
+        write_v1_run(tmp_path / "v2-models-effort" / "runs" / "v1")
+        write_v2_run(tmp_path / "v2-models-effort" / "runs" / "effort")
         runs = runs_under(tmp_path, runs_table(), EXPERIMENT)
         assert [run["run_id"] for run in runs] == ["v1"]
