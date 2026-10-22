@@ -18,7 +18,7 @@ class AgentFailed(Exception):
     pass
 
 
-def run_gbnf_experiment(
+async def run_gbnf_experiment(
     *,
     agent: Agent,
     run_directory: Path,
@@ -51,7 +51,7 @@ def run_gbnf_experiment(
         model=agent.model,
     )
     with prepared_filesystem.recording(agent, **condition) as run:
-        result = run.result = port_codebase(
+        result = run.result = await port_codebase(
             agent=agent,
             prompt=str(
                 Prompt(

@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 
 import click
@@ -44,12 +45,14 @@ def cli(
     run_directory = output.resolve()
     run_directory.mkdir(parents=True, exist_ok=True)
     agent = ClaudeAgent(model=model, effort=effort, api_key=config.API_KEY or None)
-    run_gbnf_experiment(
-        agent=agent,
-        run_directory=run_directory,
-        source_language=source_language,
-        include_unit_tests=include_unit_tests == "1",
-        include_source_integration_tests=include_source_integration_tests == "1",
-        include_target_integration_tests=include_target_integration_tests == "1",
-        debug=debug,
+    asyncio.run(
+        run_gbnf_experiment(
+            agent=agent,
+            run_directory=run_directory,
+            source_language=source_language,
+            include_unit_tests=include_unit_tests == "1",
+            include_source_integration_tests=include_source_integration_tests == "1",
+            include_target_integration_tests=include_target_integration_tests == "1",
+            debug=debug,
+        )
     )
