@@ -8,7 +8,7 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "botbox>=0.0.20",
+    "botbox>=0.1,<0.2",
     "click>=8.5.0",
     "dirsql>=0.4.110",
     "port_codebase",
@@ -31,6 +31,7 @@ prompt = { path = "../prompt", editable = true }
 dev = [
     "coverage>=7.16.0",
     "pytest>=9.1.1",
+    "pytest-asyncio>=1.0",
     "pytest-describe>=3.2.0",
     "ruff>=0.17.0",
 ]
@@ -40,3 +41,6 @@ select = ["TID252"]
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

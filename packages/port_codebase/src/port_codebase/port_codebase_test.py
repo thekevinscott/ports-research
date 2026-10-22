@@ -11,7 +11,7 @@ AGENT_DOCKERFILE = "FROM node:24-slim\nRUN npm install -g some-cli\n"
 @pytest.fixture
 def botbox():
     with patch("port_codebase.port_codebase.Botbox", autospec=True) as mock:
-        mock.return_value.__enter__.return_value = mock.return_value
+        mock.return_value.__aenter__.return_value = mock.return_value
         yield mock
 
 
@@ -46,20 +46,20 @@ def output(tmp_path):
 
 @pytest.fixture
 def call(botbox, agent, source, output):
-    def call(prompt="Port it.\n"):
-        return port_codebase(agent=agent, prompt=prompt, source=source, output=output)
+    async def call(prompt="Port it.\n"):
+        return await port_codebase(agent=agent, prompt=prompt, source=source, output=output)
 
     return call
 
 
 def describe_port_codebase():
-    def it_builds_the_box_from_the_packaged_dockerfile(call, botbox, agent):
-        call()
+    async def it_builds_the_box_from_the_packaged_dockerfile(call, botbox, agent):
+        await call()
 
         botbox.assert_called_once_with(agent, dockerfile=Path(__file__).parent / "Dockerfile")
 
-    def it_runs_the_agents_command_for_the_rendered_prompt(call, botbox, prompt_class):
-        call("Port it.\n")
+    async def it_runs_the_agents_command_for_the_rendered_prompt(call, botbox, prompt_class):
+        await call("Port it.\n")
 
         prompt_class.assert_called_once_with(
             PROMPT_PATH,
@@ -69,55 +69,55 @@ def describe_port_codebase():
         )
         assert botbox.return_value.run.call_args.args == ("cli the rendered prompt",)
 
-    def it_shows_the_agent_both_dockerfiles_as_written(call, botbox):
-        call()
+    async def it_shows_the_agent_both_dockerfiles_as_written(call, botbox):
+        await call()
 
         [command] = botbox.return_value.run.call_args.args
         assert AGENT_DOCKERFILE.rstrip("\n") in command
         assert DOCKERFILE.read_text().rstrip("\n") in command
         assert command.index("FROM node:24-slim") < command.index("FROM botbox-claude")
 
-    def it_rereads_the_agents_dockerfile_on_every_call(call, botbox, agent):
-        call()
+    async def it_rereads_the_agents_dockerfile_on_every_call(call, botbox, agent):
+        await call()
         agent.dockerfile.write_text("FROM node:25-slim\n")
 
-        call()
+        await call()
 
         [command] = botbox.return_value.run.call_args.args
         assert "FROM node:25-slim" in command
         assert "FROM node:24-slim" not in command
 
-    def it_mounts_the_source_read_only_and_the_output_read_write(call, botbox, source, output):
-        call()
+    async def it_mounts_the_source_read_only_and_the_output_read_write(call, botbox, source, output):
+        await call()
 
         assert botbox.return_value.run.call_args.kwargs["mounts"] == (
             (source, "/input", "ro"),
             (output, "/target", "rw"),
         )
 
-    def it_starts_in_the_output(call, botbox):
-        call()
+    async def it_starts_in_the_output(call, botbox):
+        await call()
 
         assert botbox.return_value.run.call_args.kwargs["workdir"] == "/target"
 
-    def it_returns_the_run_result_unchanged(call, botbox):
-        assert call() is botbox.return_value.run.return_value
+    async def it_returns_the_run_result_unchanged(call, botbox):
+        assert await call() is botbox.return_value.run.return_value
 
-    def it_creates_a_missing_output(call, output):
-        call()
+    async def it_creates_a_missing_output(call, output):
+        await call()
 
         assert output.is_dir()
 
-    def it_accepts_an_existing_output(call, output):
+    async def it_accepts_an_existing_output(call, output):
         output.mkdir(parents=True)
 
-        call()
+        await call()
 
         assert output.is_dir()
 
-    def it_refuses_a_missing_source_before_creating_the_output(botbox, agent, tmp_path, output):
+    async def it_refuses_a_missing_source_before_creating_the_output(botbox, agent, tmp_path, output):
         with pytest.raises(FileNotFoundError):
-            port_codebase(agent=agent, prompt="Port it.", source=tmp_path / "gone", output=output)
+            await port_codebase(agent=agent, prompt="Port it.", source=tmp_path / "gone", output=output)
 
         assert not output.exists()
         botbox.assert_not_called()

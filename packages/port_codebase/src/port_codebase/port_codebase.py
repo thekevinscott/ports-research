@@ -8,7 +8,7 @@ PROMPT_PATH = Path(__file__).parent / "prompts" / "prompt.txt"
 DOCKERFILE = Path(__file__).parent / "Dockerfile"
 
 
-def port_codebase(*, agent: Agent, prompt: str, source: Path, output: Path) -> RunResult:
+async def port_codebase(*, agent: Agent, prompt: str, source: Path, output: Path) -> RunResult:
     """Run the agent on `prompt` with `source` at /input (ro) and `output` at /target (rw).
 
     The prompt carries both Dockerfiles as they are on disk at call time, so the agent
@@ -23,8 +23,8 @@ def port_codebase(*, agent: Agent, prompt: str, source: Path, output: Path) -> R
         dockerfile=DOCKERFILE.read_text().rstrip("\n"),
         upstream=prompt,
     )
-    with Botbox(agent, dockerfile=DOCKERFILE) as box:
-        return box.run(
+    async with Botbox(agent, dockerfile=DOCKERFILE) as box:
+        return await box.run(
             agent.command(str(rendered)),
             mounts=((source, "/input", "ro"), (output, "/target", "rw")),
             workdir="/target",

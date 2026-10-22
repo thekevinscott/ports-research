@@ -34,7 +34,7 @@ SHARED = (
 
 
 def run_result(stdout='{"is_error": false}', stderr="", exit_code=0) -> RunResult:
-    return RunResult(stdout=stdout, stderr=stderr, exit_code=exit_code, transcript={}, proxy="", container="container", image="image")
+    return RunResult(stdout=stdout, stderr=stderr, exit_code=exit_code, transcript={}, proxy="", image="image")
 
 
 @pytest.fixture

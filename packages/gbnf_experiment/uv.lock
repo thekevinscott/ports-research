@@ -34,14 +34,11 @@ sdist = { url = "https://files.pythonhosted.org/packages/6a/fc/2e09f2de12c093783
 
 [[package]]
 name = "botbox"
-version = "0.0.20"
+version = "0.1.1"
 source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "python-on-whales" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ba/73/de040ca924d63b3422e1cdcb9fb34631de78d51123fe3895b3b056685dc6/botbox-0.0.20.tar.gz", hash = "sha256:d34171325c0f0edc1fb4fc0bbc9ed2f8086560498e0f08fdfd57ac1b469e4538", size = 43598, upload-time = "2026-10-21T00:55:49.623Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4a/72/ab9dae1b72f4277c16d432ba8a2ecde5ccc09a79aa7d2a658c14c8ee4032/botbox-0.1.1.tar.gz", hash = "sha256:704aff2aec5fce9405527ba00a3018f8562befa5e57e52283d3b2a6cb1bc459d", size = 45362, upload-time = "2026-10-22T14:39:20.297Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5c/a3/3c0354fd33f1d3e2465340cb474fd661eceacb4d2b19e174e972d7e0a569/botbox-0.0.20-py3-none-any.whl", hash = "sha256:f1faec68c0b0261fae67626d42a2e162486687b2cc07f930d2250769d072214d", size = 17370, upload-time = "2026-10-21T00:55:48.355Z" },
+    { url = "https://files.pythonhosted.org/packages/3a/86/9fd1d565c6c888fb42209526af3b31c01fadda905315f87ffe36617d8da3/botbox-0.1.1-py3-none-any.whl", hash = "sha256:48a6867543d32f46f325e4383110a10a3e3ac96a670c93aeb86b38eeb6da4e32", size = 35604, upload-time = "2026-10-22T14:39:19.064Z" },
 ]
 
 [[package]]
@@ -164,13 +161,14 @@ dependencies = [
 dev = [
     { name = "coverage" },
     { name = "pytest" },
+    { name = "pytest-asyncio" },
     { name = "pytest-describe" },
     { name = "ruff" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "botbox", specifier = ">=0.0.20" },
+    { name = "botbox", specifier = ">=0.1,<0.2" },
     { name = "click", specifier = ">=8.5.0" },
     { name = "dirsql", specifier = ">=0.4.110" },
     { name = "port-codebase", editable = "../port_codebase" },
@@ -182,6 +180,7 @@ requires-dist = [
 dev = [
     { name = "coverage", specifier = ">=7.16.0" },
     { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-asyncio", specifier = ">=1.0" },
     { name = "pytest-describe", specifier = ">=3.2.0" },
     { name = "ruff", specifier = ">=0.17.0" },
 ]
@@ -234,7 +233,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "botbox", specifier = ">=0.0.20" },
+    { name = "botbox", specifier = ">=0.1,<0.2" },
     { name = "pathspec", specifier = ">=1.1.1" },
     { name = "prompt", editable = "../prompt" },
 ]
@@ -243,6 +242,7 @@ requires-dist = [
 dev = [
     { name = "coverage", specifier = ">=7.16.0" },
     { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-asyncio", specifier = ">=1.0" },
     { name = "pytest-describe", specifier = ">=3.2.0" },
     { name = "ruff", specifier = ">=0.17.0" },
 ]
@@ -341,6 +341,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/e4/47/b9efed96c114afcfa3c9d3fe98a76a1d14c74a9e266d397cf6eb64be5e01/pytest-9.1.1.tar.gz", hash = "sha256:1088fbde8f2b49d95a549a195707afa7a76a3ce9bcadc26b6d71f0ffda5fe313", size = 1636369, upload-time = "2026-06-19T10:58:32.857Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/24/25/1de2678b631f5a49215c6c96fff41ba892b0a34df68d6d80292b1b48aa7f/pytest-9.1.1-py3-none-any.whl", hash = "sha256:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c", size = 386536, upload-time = "2026-06-19T10:58:31.347Z" },
+]
+
+[[package]]
+name = "pytest-asyncio"
+version = "1.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/43/7c/d36d04db312ecf4298932ef77e6e4a9e8ad017906e24e34f0b0c361a2473/pytest_asyncio-1.4.0.tar.gz", hash = "sha256:c6c0d2259945122819f171a32ecea2c349ead889ee28176caaf492143424be42", size = 58514, upload-time = "2026-05-26T09:56:04.083Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/03/e2/08a497ef684b88559c9cc5f4ad53a37e7b99e727094a86d6ea32536d5d3c/pytest_asyncio-1.4.0-py3-none-any.whl", hash = "sha256:933ca923a23075a87fb7070c0ec272a6848489824d887c85c812670932835aa1", size = 16930, upload-time = "2026-05-26T09:56:02.576Z" },
 ]
 
 [[package]]
