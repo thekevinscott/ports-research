@@ -12,6 +12,7 @@ from pathlib import Path
 import pytest
 
 RUN_DIRECTORY_NAME = re.compile(r"\d{8}T\d{6}Z_[0-9a-f]{8}")
+FIXTURES = Path(__file__).parent / "fixtures"
 
 
 @pytest.fixture
@@ -43,6 +44,11 @@ def describe_the_manifest():
             path.startswith("python/")
             for path in manifest["reference_implementation"]["included"]
         )
+
+    def it_records_exactly_the_files_the_prepare_image_extracts(manifest: dict):
+        listing = FIXTURES / "python_unit-false_source-integration-false_target-integration-false.txt"
+        expected = listing.read_text().splitlines()
+        assert manifest["reference_implementation"]["included"] == sorted(expected)
 
     def it_records_the_exit_code(manifest: dict):
         assert manifest["exit_code"] == 0
