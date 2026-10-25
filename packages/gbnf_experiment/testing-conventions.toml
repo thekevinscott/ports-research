@@ -6,7 +6,7 @@ reason = "re-export barrel; run_gbnf_experiment is tested in its own module"
 [[python.exempt]]
 path = "tests/integration/conftest.py"
 rules = ["no-first-party-patch", "no-constant-patch"]
-reason = "docker and the agent's host home are external boundaries (container runtime, host home); docker is patched once on python_on_whales' shared client, which the prepare build and extraction and botbox's build and runs all reach, and once at the manifest's image-id lookup; settings.prepared_directory is redirected so the suite never writes to the user's ~/.cache (runs land in the output directory each test passes)"
+reason = "docker, botbox and the agent's host home are external boundaries (container runtime, sandbox, host home); docker is patched on python_on_whales' shared client, which the prepare build and extraction reach, and at the manifest's image-id lookup; Botbox is faked where port_codebase imports it; settings.prepared_directory is redirected so the suite never writes to the user's ~/.cache (runs land in the output directory each test passes)"
 
 [[python.exempt]]
 path = "gbnf_experiment/cli_test.py"

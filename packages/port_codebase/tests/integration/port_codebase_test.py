@@ -31,38 +31,35 @@ def output(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def run(agent, source, output):
-    def run():
-        return port_codebase(agent=agent, prompt="Port it.", source=source, output=output)
+    async def run():
+        return await port_codebase(agent=agent, prompt="Port it.", source=source, output=output)
 
     return run
 
 
 def describe_port_codebase():
-    def it_builds_its_image_from_the_packaged_dockerfile(run, daemon):
-        run()
+    async def it_builds_its_box_from_the_packaged_dockerfile(run, box, agent):
+        await run()
 
-        [layer] = [b for b in daemon.builds if b["file"] == PACKAGE / "Dockerfile"]
-        assert layer["context"] == PACKAGE
-        assert daemon.agent["image"] == layer["tags"]
+        assert box.boxes == [{"agent": agent, "dockerfile": PACKAGE / "Dockerfile", "allow": ()}]
 
-    def it_mounts_the_source_read_only_and_the_output_read_write(run, daemon, source, output):
-        run()
+    async def it_mounts_the_source_read_only_and_the_output_read_write(run, box, source, output):
+        await run()
 
-        volumes = daemon.agent["volumes"]
-        assert (str(source.resolve()), "/input", "ro") in volumes
-        assert (str(output.resolve()), "/target", "rw") in volumes
+        [call] = box.runs
+        assert call["mounts"] == ((source, "/input", "ro"), (output, "/target", "rw"))
 
-    def it_starts_in_the_output(run, daemon):
-        run()
+    async def it_starts_in_the_output(run, box):
+        await run()
 
-        assert daemon.agent["workdir"] == "/target"
+        [call] = box.runs
+        assert call["workdir"] == "/target"
 
-    def it_runs_claude_on_the_system_prompt_with_the_callers_appended(run, daemon):
-        run()
+    async def it_runs_claude_on_the_system_prompt_with_the_callers_appended(run, box):
+        await run()
 
-        [shell, flag, command] = daemon.agent["command"]
-        assert (shell, flag) == ("sh", "-c")
-        words = shlex.split(command)
+        [call] = box.runs
+        words = shlex.split(call["command"])
         assert words[:2] == ["claude", "-p"]
         assert words[2].startswith("You are porting software from one language to another.")
         assert words[2].endswith("\n\nPort it.\n")
@@ -77,20 +74,15 @@ def describe_port_codebase():
             "high",
         ]
 
-    def it_returns_what_the_container_printed(run, daemon):
-        daemon.stdout = b'{"is_error": false}'
-        daemon.exit_code = 3
+    async def it_returns_what_the_box_printed(run, box):
+        box.stdout = '{"is_error": false}'
+        box.exit_code = 3
 
-        result = run()
+        result = await run()
 
         assert (result.stdout, result.exit_code) == ('{"is_error": false}', 3)
 
-    def it_creates_the_output_before_mounting_it(run, output):
-        run()
+    async def it_creates_the_output_before_mounting_it(run, output):
+        await run()
 
         assert output.is_dir()
-
-    def it_removes_its_container_once_the_run_returns(run, daemon):
-        run()
-
-        assert daemon.agent["name"] in daemon.removed

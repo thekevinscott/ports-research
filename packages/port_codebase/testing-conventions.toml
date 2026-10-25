@@ -12,3 +12,8 @@ reason = "not this package's test — it is the suite that ships inside the fixt
 path = "tests/fixtures/two_number_adder/tests/python/add_test.py"
 rules = ["unknown-tier"]
 reason = "same: fixture payload, mounted as the reference's own suite, never collected by this package's pytest"
+
+[[python.exempt]]
+path = "tests/integration/conftest.py"
+rules = ["no-first-party-patch"]
+reason = "botbox is the external boundary (sandbox); Botbox is faked where port_codebase imports it"

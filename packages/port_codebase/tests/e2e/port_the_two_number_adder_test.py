@@ -88,7 +88,7 @@ def ported(tmp_path_factory, two_number_adder: Path):
     """Port the fixture once per direction and hand the same result to every test."""
     sessions: dict[str, Port] = {}
 
-    def port(source_language: str) -> Port:
+    async def port(source_language: str) -> Port:
         if source_language in sessions:
             return sessions[source_language]
 
@@ -107,7 +107,7 @@ def ported(tmp_path_factory, two_number_adder: Path):
         )
         sessions[source_language] = session
         try:
-            session.result = port_codebase(
+            session.result = await port_codebase(
                 agent=ClaudeAgent(model=MODEL, effort="high"),
                 prompt=PROMPT.format(target_language=target_language),
                 source=source,
@@ -136,57 +136,57 @@ def proxied_hosts(log: str) -> tuple[set[str], set[str], set[str]]:
 
 @pytest.mark.parametrize("source_language", ["typescript", "python"])
 def describe_porting_the_two_number_adder():
-    def it_exits_cleanly(ported, source_language):
-        session = ported(source_language)
+    async def it_exits_cleanly(ported, source_language):
+        session = await ported(source_language)
         assert session.failure is None, session.failure
         assert session.result.exit_code == 0, session.result.stderr
 
-    def it_finishes_the_session(ported, source_language):
-        assert ported(source_language).claude()["is_error"] is False
+    async def it_finishes_the_session(ported, source_language):
+        assert (await ported(source_language)).claude()["is_error"] is False
 
-    def it_returns_a_session_transcript(ported, source_language):
-        session = ported(source_language)
+    async def it_returns_a_session_transcript(ported, source_language):
+        session = await ported(source_language)
         assert session.failure is None, session.failure
         sessions = [k for k, v in session.result.transcript.items() if k.endswith(".jsonl") and v]
         assert sessions, f"no non-empty .jsonl in {list(session.result.transcript)}"
 
-    def it_keys_the_transcript_by_its_path_under_claude_projects(ported, source_language):
-        session = ported(source_language)
+    async def it_keys_the_transcript_by_its_path_under_claude_projects(ported, source_language):
+        session = await ported(source_language)
         assert session.failure is None, session.failure
         assert session.result.transcript
         assert all(k.startswith(".claude/projects/") for k in session.result.transcript)
 
-    def it_returns_the_proxy_log(ported, source_language):
-        session = ported(source_language)
+    async def it_returns_the_proxy_log(ported, source_language):
+        session = await ported(source_language)
         assert session.failure is None, session.failure
         assert session.result.proxy.strip(), "the proxy log is empty"
 
-    def it_admits_only_the_anthropic_api(ported, source_language):
-        session = ported(source_language)
+    async def it_admits_only_the_anthropic_api(ported, source_language):
+        session = await ported(source_language)
         assert session.failure is None, session.failure
         requested, connected, refused = proxied_hosts(session.result.proxy)
         assert connected == {ADMITTED}, session.result.proxy
         assert requested - {ADMITTED} <= refused, session.result.proxy
 
-    def it_creates_the_output(ported, source_language):
-        session = ported(source_language)
+    async def it_creates_the_output(ported, source_language):
+        session = await ported(source_language)
         assert session.output_existed_before is False
         assert session.output.is_dir()
 
-    def it_leaves_the_port_in_the_output(ported, source_language):
-        session = ported(source_language)
+    async def it_leaves_the_port_in_the_output(ported, source_language):
+        session = await ported(source_language)
         assert session.failure is None, session.failure
         written = [p for p in session.output.rglob("*") if p.is_file()]
         assert written, f"nothing came back out of {session.output}"
 
-    def it_leaves_the_port_owned_by_the_host_user(ported, source_language):
-        session = ported(source_language)
+    async def it_leaves_the_port_owned_by_the_host_user(ported, source_language):
+        session = await ported(source_language)
         assert session.failure is None, session.failure
         owners = {p.stat().st_uid for p in session.output.rglob("*")}
         assert owners == {os.getuid()}
 
-    def it_leaves_the_source_untouched(ported, source_language):
-        session = ported(source_language)
+    async def it_leaves_the_source_untouched(ported, source_language):
+        session = await ported(source_language)
         assert session.failure is None, session.failure
         assert tree_hash(session.source) == session.source_hash_before
 
@@ -194,11 +194,11 @@ def describe_porting_the_two_number_adder():
 def describe_a_missing_source():
     """Free: raises before any container starts, so no session is billed."""
 
-    def it_raises_and_creates_no_output(tmp_path):
+    async def it_raises_and_creates_no_output(tmp_path):
         output = tmp_path / "output"
 
         with pytest.raises(FileNotFoundError):
-            port_codebase(
+            await port_codebase(
                 agent=ClaudeAgent(model=MODEL, effort="high"),
                 prompt="Port it.",
                 source=tmp_path / "missing",

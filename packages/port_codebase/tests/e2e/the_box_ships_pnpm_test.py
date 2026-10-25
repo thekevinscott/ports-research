@@ -14,11 +14,11 @@ PNPM = "9.4.0"
 
 
 def describe_the_box():
-    def it_ships_pnpm(tmp_path):
+    async def it_ships_pnpm(tmp_path):
         source = tmp_path / "source"
         source.mkdir()
 
-        result = port_codebase(
+        result = await port_codebase(
             agent=ClaudeAgent(model=MODEL, effort="high"),
             prompt="Print the output of `pnpm --version` and nothing else.",
             source=source,

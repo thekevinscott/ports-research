@@ -16,7 +16,7 @@ The image ships Python 3.14.3, uv 0.12.10, pytest 9.1.1 with pytest-describe 3.2
 from botbox import ClaudeAgent
 from port_codebase import port_codebase
 
-result = port_codebase(
+result = await port_codebase(
     agent=ClaudeAgent(model="claude-opus-5", effort="high"),
     prompt="`Port it to python. `tests/` is the suite for the port.",
     source=Path("./reference"),
@@ -29,7 +29,7 @@ print(result.proxy)       # the proxy log
 ```
 
 ```python
-port_codebase(
+async def port_codebase(
     *,
     agent: Agent,
     prompt: str,

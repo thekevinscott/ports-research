@@ -81,8 +81,8 @@ def reference(tmp_path: Path) -> Path:
 
 def describe_the_box():
     @pytest.mark.parametrize("name", list(COMMANDS))
-    def it_runs_the_references_own_test_command(reference, tmp_path, name):
-        result = port_codebase(
+    async def it_runs_the_references_own_test_command(reference, tmp_path, name):
+        result = await port_codebase(
             agent=Shell(COMMANDS[name]),
             prompt="",
             source=reference,
