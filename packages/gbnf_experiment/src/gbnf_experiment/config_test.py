@@ -23,8 +23,8 @@ def describe_config():
     def it_pins_the_gbnf_commit():
         assert config.GBNF_COMMIT == "13f1aca495d11e160fffd68c4ba299a2415909d8"
 
-    def it_has_a_blank_api_key():
-        assert config.API_KEY == ""
+    def it_has_no_api_key_constant():
+        assert not hasattr(config, "API_KEY")
 
     def it_reads_nothing_from_the_environment():
         assert not hasattr(config, "Settings")

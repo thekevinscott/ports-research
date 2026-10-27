@@ -159,6 +159,7 @@ dependencies = [
     { name = "dirsql" },
     { name = "port-codebase" },
     { name = "prompt" },
+    { name = "python-dotenv" },
     { name = "python-on-whales" },
 ]
 
@@ -178,6 +179,7 @@ requires-dist = [
     { name = "dirsql", specifier = ">=0.4.110" },
     { name = "port-codebase", editable = "../port_codebase" },
     { name = "prompt", editable = "../prompt" },
+    { name = "python-dotenv", specifier = ">=1.2.4" },
     { name = "python-on-whales", specifier = ">=0.81.0" },
 ]
 
@@ -388,6 +390,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c2/87/87d60fcacee9b003a78c802034fca975ec1ee5e744788ff98aa0b25cbbdc/pytest_describe-3.2.0.tar.gz", hash = "sha256:8697f9818c330c80312c28c731022618ac96d0dab3b5238116c4a7d0cd187d9f", size = 15042, upload-time = "2026-06-12T21:29:00.66Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e1/40/dc0a52e0d1213a847ac7ce493ce49109fe62986e31d4b2587bd22052e1eb/pytest_describe-3.2.0-py3-none-any.whl", hash = "sha256:ea4ef9968145d017847b0e705d058b1ea35ea35c59b5adf4a34378c418ac455a", size = 11732, upload-time = "2026-06-12T21:28:59.378Z" },
+]
+
+[[package]]
+name = "python-dotenv"
+version = "1.2.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/74/26/2fbeedb218a787a5eea551c7532cac4e009f83d689dd2faa0d0353473f86/python_dotenv-1.2.4.tar.gz", hash = "sha256:f0d53e69935a851c0dcc78f3ab7aaccd8cabef0b92382b576b824212902873c0", size = 60824, upload-time = "2026-10-01T05:36:10Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/60/d1/38f3a3405989a89ac18390803e70c6ad7c7760da4f9b83cbeca0c44a0c72/python_dotenv-1.2.4-py3-none-any.whl", hash = "sha256:42269a8a5b3fd54ffa6f3d84b18abed50064717576b4ecf03dc4a55d8aa04fdc", size = 23266, upload-time = "2026-10-01T05:36:08.633Z" },
 ]
 
 [[package]]

@@ -187,16 +187,23 @@ def describe_cli():
 
 
 @pytest.fixture(autouse=True)
-def config():
+def config(tmp_path):
     with patch("gbnf_experiment.cli.config", autospec=True) as m:
-        m.API_KEY = ""
+        m.REPO_ROOT = tmp_path
         yield m
 
 
 def describe_auth():
-    def it_runs_on_the_subscription_when_the_configured_key_is_blank(gbnf_experiment, claude_agent, config, invoke):
-        invoke(SOURCE_LANGUAGE)
+    @pytest.mark.parametrize("auth_option", [[], ["--auth", "subscription"]])
+    def it_runs_on_the_subscription_without_reading_env(gbnf_experiment, claude_agent, config, invoke, auth_option):
+        (config.REPO_ROOT / ".env").write_text(f"ANTHROPIC_API_KEY={API_KEY}\n")
+        with patch("gbnf_experiment.cli.dotenv_values", create=True) as read_env:
+            result = invoke([*SOURCE_LANGUAGE, *auth_option])
+        assert result.exit_code == 0, result.output
+        read_env.assert_not_called()
         assert claude_agent.call_args.kwargs["api_key"] is None
+        assert "*** auth: subscription ***" in result.output
+        assert API_KEY not in result.output
 
     def it_never_passes_the_host_api_key(gbnf_experiment, claude_agent, config, monkeypatch, invoke):
         monkeypatch.setenv("ANTHROPIC_API_KEY", API_KEY)
@@ -204,14 +211,27 @@ def describe_auth():
         assert result.exit_code == 0, result.output
         assert claude_agent.call_args.kwargs["api_key"] is None
 
-    def it_bills_the_configured_key(gbnf_experiment, claude_agent, config, invoke):
-        config.API_KEY = API_KEY
-        invoke(SOURCE_LANGUAGE)
+    def it_bills_the_key_from_the_repo_env(gbnf_experiment, claude_agent, config, invoke):
+        (config.REPO_ROOT / ".env").write_text(f"ANTHROPIC_API_KEY={API_KEY}\n")
+        result = invoke([*SOURCE_LANGUAGE, "--auth", "api"])
+        assert result.exit_code == 0, result.output
         assert claude_agent.call_args.kwargs["api_key"] == API_KEY
+        assert "*** auth: api ***" in result.output
+        assert API_KEY not in result.output
 
-    @pytest.mark.parametrize("option", ["--auth", "--api-key"])
-    def it_has_no_auth_option(gbnf_experiment, option, invoke):
-        result = invoke([*SOURCE_LANGUAGE, option, "subscription"])
+    @pytest.mark.parametrize("contents", [None, "OTHER=value\n", "ANTHROPIC_API_KEY=\n", 'ANTHROPIC_API_KEY="   "\n'])
+    def it_rejects_api_mode_without_a_key(gbnf_experiment, claude_agent, config, monkeypatch, invoke, contents):
+        monkeypatch.setenv("ANTHROPIC_API_KEY", API_KEY)
+        if contents is not None:
+            (config.REPO_ROOT / ".env").write_text(contents)
+        result = invoke([*SOURCE_LANGUAGE, "--auth", "api"])
+        assert result.exit_code != 0
+        assert "ANTHROPIC_API_KEY" in result.output
+        claude_agent.assert_not_called()
+        gbnf_experiment.assert_not_called()
+
+    def it_rejects_an_unknown_auth_mode(gbnf_experiment, invoke):
+        result = invoke([*SOURCE_LANGUAGE, "--auth", "other"])
         assert result.exit_code != 0
         gbnf_experiment.assert_not_called()
 
