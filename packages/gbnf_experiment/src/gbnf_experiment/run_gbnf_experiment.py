@@ -65,12 +65,9 @@ async def run_gbnf_experiment(
             ),
             source=prepared_filesystem.reference_implementation_directory,
             output=prepared_filesystem.ported_implementation_directory,
+            artifacts=run_directory,
         )
-        for path, text in result.transcript.items():
-            destination = prepared_filesystem.transcript_directory / path
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            destination.write_text(text)
-        prepared_filesystem.proxy_log.write_text(result.proxy)
-        report = json.loads(result.stdout) if result.stdout else {}
+        stdout = (run_directory / "stdout.txt").read_text()
+        report = json.loads(stdout) if stdout else {}
         if report.get("is_error") or result.exit_code != 0:
             raise AgentFailed(report.get("result", f"the agent exited {result.exit_code}"))

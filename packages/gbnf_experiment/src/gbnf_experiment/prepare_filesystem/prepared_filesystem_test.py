@@ -33,8 +33,8 @@ SHARED = (
 )
 
 
-def run_result(stdout='{"is_error": false}', stderr="", exit_code=0) -> RunResult:
-    return RunResult(stdout=stdout, stderr=stderr, exit_code=exit_code, transcript={}, proxy="", image="image")
+def run_result(stdout='{"is_error": false}', stderr="", exit_code=0) -> tuple[RunResult, str, str]:
+    return RunResult(exit_code=exit_code), stdout, stderr
 
 
 @pytest.fixture
@@ -107,15 +107,22 @@ def manifest(filesystem) -> dict:
     return json.loads((filesystem.run_directory / "manifest.json").read_text())
 
 
-def complete(filesystem, result: RunResult) -> None:
+def complete(filesystem, result: tuple[RunResult, str, str]) -> None:
+    run_result, stdout, stderr = result
+    (filesystem.run_directory / "stdout.txt").write_text(stdout)
+    (filesystem.run_directory / "stderr.txt").write_text(stderr)
     with filesystem.recording(AGENT, **CONDITION) as run:
-        run.result = result
+        run.result = run_result
 
 
-def fail(filesystem, error: str, result: RunResult | None = None) -> None:
+def fail(filesystem, error: str, result: tuple[RunResult, str, str] | None = None) -> None:
+    if result is not None:
+        run_result, stdout, stderr = result
+        (filesystem.run_directory / "stdout.txt").write_text(stdout)
+        (filesystem.run_directory / "stderr.txt").write_text(stderr)
     with pytest.raises(RuntimeError, match=error):
         with filesystem.recording(AGENT, **CONDITION) as run:
-            run.result = result
+            run.result = result[0] if result is not None else None
             raise RuntimeError(error)
 
 

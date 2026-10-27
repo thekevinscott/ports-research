@@ -52,7 +52,7 @@ class Shell:
     image = ClaudeAgent.image
     dockerfile = ClaudeAgent.dockerfile
     home = ClaudeAgent.home
-    transcripts = ClaudeAgent.transcripts
+    sessions_dir = ClaudeAgent.sessions_dir
     allow: tuple[str, ...] = ()
 
     def __init__(self, command: str) -> None:
@@ -87,8 +87,11 @@ def describe_the_box():
             prompt="",
             source=reference,
             output=tmp_path / "output",
+            artifacts=tmp_path / "artifacts",
         )
 
-        print(f"\n[box] {name}: exit={result.exit_code}\n{result.stdout[-1500:]}\n{result.stderr[-1500:]}")
+        stdout = (tmp_path / "artifacts" / "stdout.txt").read_text()
+        stderr = (tmp_path / "artifacts" / "stderr.txt").read_text()
+        print(f"\n[box] {name}: exit={result.exit_code}\n{stdout[-1500:]}\n{stderr[-1500:]}")
         assert result.exit_code == 0
-        assert "1 passed" in result.stdout
+        assert "1 passed" in stdout

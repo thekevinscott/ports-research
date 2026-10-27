@@ -52,21 +52,38 @@ class Port:
 
     source: Path
     output: Path
+    artifacts: Path
     source_hash_before: str
     output_existed_before: bool
     result: RunResult | None = None
     failure: Exception | None = None
 
+    @property
+    def stdout(self) -> str:
+        return (self.artifacts / "stdout.txt").read_text()
+
+    @property
+    def stderr(self) -> str:
+        return (self.artifacts / "stderr.txt").read_text()
+
+    @property
+    def transcripts(self) -> list[Path]:
+        return list((self.artifacts / "transcripts").rglob("*.jsonl"))
+
+    @property
+    def proxy(self) -> str:
+        return (self.artifacts / "proxy.log").read_text()
+
     def claude(self) -> dict:
         """Claude's JSON result, parsed from stdout."""
         assert self.failure is None, self.failure
-        return json.loads(self.result.stdout)
+        return json.loads(self.stdout)
 
     def summary(self) -> str:
         if self.failure is not None:
             return f"the session failed: {self.failure}"
         try:
-            claude = json.loads(self.result.stdout)
+            claude = json.loads(self.stdout)
         except json.JSONDecodeError:
             return f"exit_code={self.result.exit_code} stdout is not JSON"
         usage = claude.get("usage") or {}
@@ -102,6 +119,7 @@ def ported(tmp_path_factory, two_number_adder: Path):
         session = Port(
             source=source,
             output=output,
+            artifacts=root / "artifacts",
             source_hash_before=tree_hash(source),
             output_existed_before=output.exists(),
         )
@@ -112,15 +130,16 @@ def ported(tmp_path_factory, two_number_adder: Path):
                 prompt=PROMPT.format(target_language=target_language),
                 source=source,
                 output=output,
+                artifacts=session.artifacts,
             )
         except Exception as failure:  # noqa: BLE001
             session.failure = failure
         print(f"\n[live] {source_language} -> {target_language}: {session.summary()}")
         print(f"[live] port at {session.output}")
         if session.result is not None:
-            print(f"[live] transcript files: {list(session.result.transcript)}")
-            print(f"[live] stderr: {session.result.stderr}")
-            print(f"[live] stdout: {session.result.stdout[:2000]}")
+            print(f"[live] transcript files: {session.transcripts}")
+            print(f"[live] stderr: {session.stderr}")
+            print(f"[live] stdout: {session.stdout[:2000]}")
         return session
 
     return port
@@ -139,7 +158,7 @@ def describe_porting_the_two_number_adder():
     async def it_exits_cleanly(ported, source_language):
         session = await ported(source_language)
         assert session.failure is None, session.failure
-        assert session.result.exit_code == 0, session.result.stderr
+        assert session.result.exit_code == 0, session.stderr
 
     async def it_finishes_the_session(ported, source_language):
         assert (await ported(source_language)).claude()["is_error"] is False
@@ -147,26 +166,26 @@ def describe_porting_the_two_number_adder():
     async def it_returns_a_session_transcript(ported, source_language):
         session = await ported(source_language)
         assert session.failure is None, session.failure
-        sessions = [k for k, v in session.result.transcript.items() if k.endswith(".jsonl") and v]
-        assert sessions, f"no non-empty .jsonl in {list(session.result.transcript)}"
+        sessions = [path for path in session.transcripts if path.stat().st_size]
+        assert sessions, f"no non-empty .jsonl in {session.transcripts}"
 
-    async def it_keys_the_transcript_by_its_path_under_claude_projects(ported, source_language):
+    async def it_keeps_the_transcript_in_the_artifact_directory(ported, source_language):
         session = await ported(source_language)
         assert session.failure is None, session.failure
-        assert session.result.transcript
-        assert all(k.startswith(".claude/projects/") for k in session.result.transcript)
+        assert session.transcripts
+        assert all(path.is_relative_to(session.artifacts / "transcripts") for path in session.transcripts)
 
     async def it_returns_the_proxy_log(ported, source_language):
         session = await ported(source_language)
         assert session.failure is None, session.failure
-        assert session.result.proxy.strip(), "the proxy log is empty"
+        assert session.proxy.strip(), "the proxy log is empty"
 
     async def it_admits_only_the_anthropic_api(ported, source_language):
         session = await ported(source_language)
         assert session.failure is None, session.failure
-        requested, connected, refused = proxied_hosts(session.result.proxy)
-        assert connected == {ADMITTED}, session.result.proxy
-        assert requested - {ADMITTED} <= refused, session.result.proxy
+        requested, connected, refused = proxied_hosts(session.proxy)
+        assert connected == {ADMITTED}, session.proxy
+        assert requested - {ADMITTED} <= refused, session.proxy
 
     async def it_creates_the_output(ported, source_language):
         session = await ported(source_language)
@@ -203,6 +222,7 @@ def describe_a_missing_source():
                 prompt="Port it.",
                 source=tmp_path / "missing",
                 output=output,
+                artifacts=tmp_path / "artifacts",
             )
 
         assert not output.exists()

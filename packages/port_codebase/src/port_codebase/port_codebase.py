@@ -8,7 +8,9 @@ PROMPT_PATH = Path(__file__).parent / "prompts" / "prompt.txt"
 DOCKERFILE = Path(__file__).parent / "Dockerfile"
 
 
-async def port_codebase(*, agent: Agent, prompt: str, source: Path, output: Path) -> RunResult:
+async def port_codebase(
+    *, agent: Agent, prompt: str, source: Path, output: Path, artifacts: Path
+) -> RunResult:
     """Run the agent on `prompt` with `source` at /input (ro) and `output` at /target (rw).
 
     The prompt carries both Dockerfiles as they are on disk at call time, so the agent
@@ -28,4 +30,5 @@ async def port_codebase(*, agent: Agent, prompt: str, source: Path, output: Path
             agent.command(str(rendered)),
             mounts=((source, "/input", "ro"), (output, "/target", "rw")),
             workdir="/target",
+            output=artifacts,
         )

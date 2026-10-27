@@ -7,7 +7,7 @@ CLI `run_gbnf_experiment`. Each invocation is one experimental condition: a sour
 - builds the prepare image in `docker/` for the condition: it clones gbnf at the pinned commit, applies `patches/`, generates both integration suites, and copies into `/shared` the files the condition's `RULES` admit, in gbnf's upstream layout (`javascript/`, `python/`);
 - extracts `/shared` to a cache entry keyed on the commit, `docker/` and `RULES`, one per condition;
 - hands that tree unchanged as the source, with a prompt and a `ClaudeAgent`, to `port_codebase`;
-- banks the `RunResult` into `--output`: `manifest.json` (with the agent's `exit_code`), `result.json` (the agent CLI's stdout), `stderr.txt` (its stderr), `transcript/` (the transcript files, at their paths relative to the agent's home), `proxy.log`.
+- banks botbox's output into `--output`: `manifest.json` (with the agent's `exit_code`), `result.json` (the agent CLI's stdout), `stderr.txt` (its stderr), `transcript/` (the transcript files, at their paths relative to the agent's home), `proxy.log`.
 
 The prompt names the source as `javascript/` or `python/`, the target language (`javascript` reads as `typescript`), and where each included suite sits. Paths in it are relative to the source directory.
 

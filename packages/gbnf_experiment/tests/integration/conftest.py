@@ -132,7 +132,7 @@ def botbox(porting_calls, port_result, exit_code, agent_stderr, box_error):
         async def __aexit__(self, *exc_info):
             return None
 
-        async def run(self, command, *, mounts=(), workdir=None):
+        async def run(self, command, *, mounts=(), workdir=None, output):
             porting_calls.append(
                 {
                     "prompt": shlex.split(command)[2],
@@ -148,14 +148,13 @@ def botbox(porting_calls, port_result, exit_code, agent_stderr, box_error):
                 }
             )
             (volume_source(mounts, "/target") / "ported.py").write_text("class GBNF: ...")
-            return RunResult(
-                stdout=json.dumps(port_result),
-                stderr=agent_stderr[0],
-                exit_code=exit_code[0],
-                transcript={TRANSCRIPT_PATH: TRANSCRIPT},
-                proxy=PROXY_LOG,
-                image="botbox-claude:latest",
-            )
+            (output / "stdout.txt").write_text(json.dumps(port_result))
+            (output / "stderr.txt").write_text(agent_stderr[0])
+            (output / "proxy.log").write_text(PROXY_LOG)
+            transcript = output / "transcripts" / Path(TRANSCRIPT_PATH).relative_to(".claude/projects")
+            transcript.parent.mkdir(parents=True, exist_ok=True)
+            transcript.write_text(TRANSCRIPT)
+            return RunResult(exit_code=exit_code[0])
 
     with patch("port_codebase.port_codebase.Botbox", FakeBotbox):
         yield
