@@ -1,6 +1,5 @@
 from datetime import UTC, datetime
 from pathlib import Path
-from shutil import rmtree
 
 from botbox import Agent, RunResult
 
@@ -55,13 +54,9 @@ class PreparedFilesystem:
                     stdout.unlink()
             sessions = self.run_directory / "transcripts"
             if sessions.exists():
-                for path in sessions.rglob("*.jsonl"):
-                    if not path.is_file() or path.is_symlink():
-                        continue
-                    destination = self.transcript_directory / agent.sessions_dir / path.relative_to(sessions)
-                    destination.parent.mkdir(parents=True, exist_ok=True)
-                    path.rename(destination)
-                rmtree(sessions)
+                destination = self.transcript_directory / agent.sessions_dir
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                sessions.rename(destination)
         _write_manifest(
             self.run_directory,
             timestamp=self.timestamp,

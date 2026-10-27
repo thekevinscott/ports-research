@@ -11,7 +11,6 @@ from pathlib import Path
 
 import pytest
 
-RUN_DIRECTORY_NAME = re.compile(r"\d{8}T\d{6}Z_[0-9a-f]{8}")
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
@@ -21,13 +20,11 @@ def manifest(completed_run: Path) -> dict:
 
 
 def describe_the_run_directory():
-    def it_lands_one_directory_in_the_data_tree(
+    def it_writes_directly_into_the_requested_output_folder(
         completed_run: Path, experiment_data: Path
     ):
-        assert list(experiment_data.iterdir()) == [completed_run]
-
-    def it_is_stamped_with_utc_and_a_random_token(completed_run: Path):
-        assert RUN_DIRECTORY_NAME.fullmatch(completed_run.name)
+        assert (experiment_data / "manifest.json").is_file()
+        assert not list(experiment_data.glob("*/manifest.json"))
 
 
 def describe_the_manifest():
