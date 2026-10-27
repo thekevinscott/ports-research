@@ -33,7 +33,6 @@ PROMPT = (
     "The library to port is in `source/`. Port it to {target_language}.\n"
     "The suite for the port is in `tests/`. Run it and iterate until green.\n"
 )
-ADMITTED = "api.anthropic.com"
 
 
 def tree_hash(root: Path) -> str:
@@ -149,7 +148,7 @@ def proxied_hosts(log: str) -> tuple[set[str], set[str], set[str]]:
     """The hosts the proxy log names as requested, connected to, and refused."""
     requested = set(re.findall(r"CONNECT ([^\s:]+):\d+", log))
     connected = set(re.findall(r'Established connection to host "([^"]+)"', log))
-    refused = set(re.findall(r'refused on filtered domain "([^"]+)"', log))
+    refused = set(re.findall(r'Proxying refused on filtered url "([^":]+):\d+"', log))
     return requested, connected, refused
 
 
@@ -180,12 +179,12 @@ def describe_porting_the_two_number_adder():
         assert session.failure is None, session.failure
         assert session.proxy.strip(), "the proxy log is empty"
 
-    async def it_admits_only_the_anthropic_api(ported, source_language):
+    async def it_refuses_direct_proxy_connections(ported, source_language):
         session = await ported(source_language)
         assert session.failure is None, session.failure
         requested, connected, refused = proxied_hosts(session.proxy)
-        assert connected == {ADMITTED}, session.proxy
-        assert requested - {ADMITTED} <= refused, session.proxy
+        assert not connected, session.proxy
+        assert requested <= refused, session.proxy
 
     async def it_creates_the_output(ported, source_language):
         session = await ported(source_language)

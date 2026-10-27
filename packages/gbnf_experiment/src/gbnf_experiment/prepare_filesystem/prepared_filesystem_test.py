@@ -14,6 +14,7 @@ IMAGE_ID = "sha256:" + "b" * 64
 
 AGENT = Mock(name="agent")
 AGENT.image = "botbox-claude:latest"
+AGENT.sessions_dir = ".claude/projects"
 
 TESTS = {
     "include_unit_tests": False,
@@ -179,6 +180,18 @@ def describe_the_manifest_at_the_start_of_the_run():
 
 
 def describe_the_manifest_on_completion():
+    def it_preserves_non_jsonl_files_in_the_transcript_tree(filesystem):
+        source = filesystem.run_directory / "transcripts" / "-target" / "session" / "tool-results" / "result.txt"
+        source.parent.mkdir(parents=True)
+        source.write_text("tool output")
+
+        complete(filesystem, run_result())
+
+        banked = filesystem.transcript_directory / AGENT.sessions_dir / source.relative_to(
+            filesystem.run_directory / "transcripts"
+        )
+        assert banked.read_text() == "tool output"
+
     def it_stamps_completed_at_in_the_same_iso8601_format(filesystem):
         complete(filesystem, run_result())
         assert re.fullmatch(

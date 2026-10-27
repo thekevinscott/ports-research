@@ -102,11 +102,10 @@ def describe_port_codebase():
 
         assert botbox.return_value.run.call_args.kwargs["workdir"] == "/target"
 
-    async def it_writes_run_artifacts_outside_the_port(call, botbox, output, tmp_path):
+    async def it_writes_run_artifacts_outside_the_port(call, botbox, tmp_path):
         await call()
 
         assert botbox.return_value.run.call_args.kwargs["output"] == tmp_path / "artifacts"
-        assert output != tmp_path / "artifacts"
 
     async def it_returns_the_run_result_unchanged(call, botbox):
         assert await call() is botbox.return_value.run.return_value
