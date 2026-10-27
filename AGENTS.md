@@ -57,8 +57,12 @@ locally again. Only on Github via PRs."
   PR silently grows. When work depends on an unmerged PR, wait for it to land,
   rebase, then open the next one. Small PRs come from doing the work in
   sequence, not from stacking.
-- The only exception is an explicit, specific instruction from Kevin to merge a
-  named PR. That instruction is always his to initiate, and it is rare.
+- **Bank-only PRs merge without review.** Kevin, 2026-10-27: "Bank only prs
+  can always be auto merged". A bank-only PR changes nothing but `.dvc`
+  pointer files. Merge it on GitHub once its push to the DVC remote has
+  succeeded.
+- The only other exception is an explicit, specific instruction from Kevin to
+  merge a named PR. That instruction is always his to initiate, and it is rare.
 
 ## Design — before writing any code
 
