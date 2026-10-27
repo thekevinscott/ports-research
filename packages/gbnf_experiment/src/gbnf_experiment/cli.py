@@ -2,6 +2,7 @@ import asyncio
 from pathlib import Path
 
 import click
+from dotenv import dotenv_values
 
 from botbox import ClaudeAgent
 
@@ -31,6 +32,7 @@ INCLUDE = click.Choice(["0", "1"])
 # Both free text: claude errors on an unknown model or effort instead of warning and running the default.
 @click.option("--effort", default="high", show_default=True)
 @click.option("--model", default=DEFAULT_MODEL, show_default=True)
+@click.option("--auth", type=click.Choice(["subscription", "api"]), default="subscription")
 def cli(
     source_language: str,
     include_unit_tests: str,
@@ -40,11 +42,21 @@ def cli(
     debug: bool,
     effort: str,
     model: str,
+    auth: str,
 ) -> None:
     """One run, written into --output."""
+    click.echo(f"*** auth: {auth} ***")
+    api_key = None
+    if auth == "api":
+        env_path = config.REPO_ROOT / ".env"
+        if not env_path.is_file():
+            raise click.ClickException(f"Missing {env_path}; ANTHROPIC_API_KEY is required for --auth api")
+        api_key = dotenv_values(env_path, interpolate=False).get("ANTHROPIC_API_KEY")
+        if not api_key or not api_key.strip():
+            raise click.ClickException(f"Missing or blank ANTHROPIC_API_KEY in {env_path}")
     run_directory = output.resolve()
     run_directory.mkdir(parents=True, exist_ok=True)
-    agent = ClaudeAgent(model=model, effort=effort, api_key=config.API_KEY or None)
+    agent = ClaudeAgent(model=model, effort=effort, api_key=api_key)
     asyncio.run(
         run_gbnf_experiment(
             agent=agent,

@@ -13,8 +13,6 @@ DOCKER_DIRECTORY = PACKAGE_ROOT / "docker"
 PREPARE_DOCKER_DIRECTORY = DOCKER_DIRECTORY / "gbnf-prepare"
 # The merge of GBNF PR #81: nearest upstream ancestor of the v0 clone's local commits.
 GBNF_COMMIT = "13f1aca495d11e160fffd68c4ba299a2415909d8"
-# Blank runs on the host's Claude subscription.
-API_KEY = ""
 
 
 def compute_prepare_cache_key(gbnf_commit: str, docker_directory: Path, rules: str) -> str:
