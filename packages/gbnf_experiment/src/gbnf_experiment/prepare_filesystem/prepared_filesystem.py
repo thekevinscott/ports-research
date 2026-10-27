@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
 from pathlib import Path
+from shutil import rmtree
 
 from botbox import Agent, RunResult
 
@@ -39,10 +40,6 @@ class PreparedFilesystem:
         self.transcript_directory = self.run_directory / "transcript"
         self.transcript_directory.mkdir()
 
-    @property
-    def proxy_log(self):
-        return self.run_directory / "proxy.log"
-
     def recording(self, agent: Agent, **condition) -> "Recording":
         return Recording(self, agent, condition)
 
@@ -50,9 +47,21 @@ class PreparedFilesystem:
         self, result: RunResult | None, agent: Agent, *, error: str | None = None, **kwargs
     ):
         if result is not None:
-            if result.stdout:
-                (self.run_directory / "result.json").write_text(result.stdout)
-            (self.run_directory / "stderr.txt").write_text(result.stderr)
+            stdout = self.run_directory / "stdout.txt"
+            if stdout.exists():
+                if stdout.stat().st_size:
+                    stdout.rename(self.run_directory / "result.json")
+                else:
+                    stdout.unlink()
+            sessions = self.run_directory / "transcripts"
+            if sessions.exists():
+                for path in sessions.rglob("*.jsonl"):
+                    if not path.is_file() or path.is_symlink():
+                        continue
+                    destination = self.transcript_directory / agent.sessions_dir / path.relative_to(sessions)
+                    destination.parent.mkdir(parents=True, exist_ok=True)
+                    path.rename(destination)
+                rmtree(sessions)
         _write_manifest(
             self.run_directory,
             timestamp=self.timestamp,

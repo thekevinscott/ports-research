@@ -32,7 +32,9 @@ def output(tmp_path: Path) -> Path:
 @pytest.fixture
 def run(agent, source, output):
     async def run():
-        return await port_codebase(agent=agent, prompt="Port it.", source=source, output=output)
+        return await port_codebase(
+            agent=agent, prompt="Port it.", source=source, output=output, artifacts=output.parent / "artifacts"
+        )
 
     return run
 
@@ -74,13 +76,15 @@ def describe_port_codebase():
             "high",
         ]
 
-    async def it_returns_what_the_box_printed(run, box):
+    async def it_keeps_the_box_result_and_writes_its_output_separately(run, box, output):
         box.stdout = '{"is_error": false}'
         box.exit_code = 3
 
         result = await run()
 
-        assert (result.stdout, result.exit_code) == ('{"is_error": false}', 3)
+        assert result.exit_code == 3
+        assert (output.parent / "artifacts" / "stdout.txt").read_text() == '{"is_error": false}'
+        assert box.runs[0]["output"] == output.parent / "artifacts"
 
     async def it_creates_the_output_before_mounting_it(run, output):
         await run()

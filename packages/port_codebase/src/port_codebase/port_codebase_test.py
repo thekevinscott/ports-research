@@ -45,9 +45,11 @@ def output(tmp_path):
 
 
 @pytest.fixture
-def call(botbox, agent, source, output):
+def call(botbox, agent, source, output, tmp_path):
     async def call(prompt="Port it.\n"):
-        return await port_codebase(agent=agent, prompt=prompt, source=source, output=output)
+        return await port_codebase(
+            agent=agent, prompt=prompt, source=source, output=output, artifacts=tmp_path / "artifacts"
+        )
 
     return call
 
@@ -100,6 +102,12 @@ def describe_port_codebase():
 
         assert botbox.return_value.run.call_args.kwargs["workdir"] == "/target"
 
+    async def it_writes_run_artifacts_outside_the_port(call, botbox, output, tmp_path):
+        await call()
+
+        assert botbox.return_value.run.call_args.kwargs["output"] == tmp_path / "artifacts"
+        assert output != tmp_path / "artifacts"
+
     async def it_returns_the_run_result_unchanged(call, botbox):
         assert await call() is botbox.return_value.run.return_value
 
@@ -117,7 +125,10 @@ def describe_port_codebase():
 
     async def it_refuses_a_missing_source_before_creating_the_output(botbox, agent, tmp_path, output):
         with pytest.raises(FileNotFoundError):
-            await port_codebase(agent=agent, prompt="Port it.", source=tmp_path / "gone", output=output)
+            await port_codebase(
+                agent=agent, prompt="Port it.", source=tmp_path / "gone",
+                output=output, artifacts=tmp_path / "artifacts"
+            )
 
         assert not output.exists()
         botbox.assert_not_called()

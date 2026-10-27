@@ -23,7 +23,10 @@ def describe_the_box():
             prompt="Print the output of `pnpm --version` and nothing else.",
             source=source,
             output=tmp_path / "output",
+            artifacts=tmp_path / "artifacts",
         )
 
-        print(f"\n[live] stdout: {result.stdout[:2000]}")
-        assert PNPM in json.loads(result.stdout)["result"]
+        stdout = (tmp_path / "artifacts" / "stdout.txt").read_text()
+        print(f"\n[live] stdout: {stdout[:2000]}")
+        assert result.exit_code == 0
+        assert PNPM in json.loads(stdout)["result"]

@@ -55,9 +55,7 @@ TRANSCRIPT = {
     ".claude/projects/-target/session/subagents/agent-1.jsonl": '{"type": "assistant"}\n',
 }
 PROXY_LOG = "CONNECT api.anthropic.com:443\n"
-RUN_RESULT = RunResult(
-    stdout=RESULT_JSON, stderr="", exit_code=0, transcript=TRANSCRIPT, proxy=PROXY_LOG, image="image"
-)
+RUN_RESULT = RunResult(exit_code=0)
 
 
 @pytest.fixture
@@ -66,6 +64,23 @@ def port_codebase():
         "gbnf_experiment.run_gbnf_experiment.port_codebase", autospec=True
     ) as m:
         m.return_value = RUN_RESULT
+        m.stdout = RESULT_JSON
+        m.stderr = ""
+        m.transcript = TRANSCRIPT
+        m.proxy = PROXY_LOG
+
+        def fake_port(**kwargs):
+            output = kwargs["artifacts"]
+            (output / "stdout.txt").write_text(m.stdout)
+            (output / "stderr.txt").write_text(m.stderr)
+            (output / "proxy.log").write_text(m.proxy)
+            for name, content in m.transcript.items():
+                transcript = output / "transcripts" / Path(name).relative_to(".claude/projects")
+                transcript.parent.mkdir(parents=True, exist_ok=True)
+                transcript.write_text(content)
+            return m.return_value
+
+        m.side_effect = fake_port
         yield m
 
 
@@ -79,6 +94,7 @@ def write_manifest():
 
 
 AGENT = Mock(name="agent", model="claude-opus-5", effort="high")
+AGENT.sessions_dir = ".claude/projects"
 
 CONFIG = {
     "agent": AGENT,
@@ -156,6 +172,7 @@ def describe_run():
         port_codebase,
     ):
         chosen = Mock(name="chosen", model="claude-sonnet-4-5", effort="max")
+        chosen.sessions_dir = ".claude/projects"
         await experiment(agent=chosen)
         assert port_codebase.call_args.kwargs["agent"] is chosen
 
@@ -267,9 +284,10 @@ def describe_the_run_directory():
         port_codebase,
     ):
         seen = {}
+        original = port_codebase.side_effect
         port_codebase.side_effect = lambda **kwargs: seen.update(
             existed=kwargs["output"].is_dir()
-        ) or DEFAULT
+        ) or original(**kwargs)
         await experiment()
         assert seen["existed"] is True
 
@@ -323,8 +341,10 @@ def describe_the_manifest():
         port_codebase,
         write_manifest,
     ):
+        chosen = Mock(name="agent", model="claude-sonnet-4-5", effort="low")
+        chosen.sessions_dir = ".claude/projects"
         await experiment(
-            agent=Mock(name="agent", model="claude-sonnet-4-5", effort="low"),
+            agent=chosen,
             source_language="python",
             include_source_integration_tests=True,
         )
@@ -357,6 +377,7 @@ def describe_the_manifest():
     ):
         """The manifest's image id has to name the harness the port actually ran under."""
         chosen = Mock(name="chosen", model="claude-sonnet-4-5", effort="max")
+        chosen.sessions_dir = ".claude/projects"
 
         await experiment(agent=chosen)
 
@@ -387,7 +408,8 @@ def describe_the_manifest():
         write_manifest,
     ):
         order = []
-        port_codebase.side_effect = lambda **kwargs: order.append("port") or DEFAULT
+        original = port_codebase.side_effect
+        port_codebase.side_effect = lambda **kwargs: order.append("port") or original(**kwargs)
         write_manifest.side_effect = lambda *args, **kwargs: order.append("manifest")
         await experiment()
         assert order == ["manifest", "port", "manifest"]
@@ -442,9 +464,7 @@ def describe_the_result():
         port_codebase,
         run_directory,
     ):
-        port_codebase.return_value = RunResult(
-            stdout=RESULT_JSON, stderr="", exit_code=1, transcript={}, proxy="", image="image"
-        )
+        port_codebase.return_value = RunResult(exit_code=1)
         with pytest.raises(AgentFailed):
             await experiment()
         assert (run_directory / "result.json").read_text() == RESULT_JSON
@@ -478,9 +498,7 @@ def describe_the_result():
         port_codebase,
         write_manifest,
     ):
-        port_codebase.return_value = RunResult(
-            stdout=RESULT_JSON, stderr="", exit_code=1, transcript={}, proxy="", image="image"
-        )
+        port_codebase.return_value = RunResult(exit_code=1)
         with pytest.raises(AgentFailed):
             await experiment()
         assert write_manifest.call_args.kwargs["exit_code"] == 1
@@ -491,9 +509,8 @@ def describe_the_result():
         port_codebase,
         run_directory,
     ):
-        port_codebase.return_value = RunResult(
-            stdout=RESULT_JSON, stderr="Error: rate limited\n", exit_code=1, transcript={}, proxy="", image="image"
-        )
+        port_codebase.return_value = RunResult(exit_code=1)
+        port_codebase.stderr = "Error: rate limited\n"
         with pytest.raises(AgentFailed):
             await experiment()
         assert (run_directory / "stderr.txt").read_text() == "Error: rate limited\n"
@@ -508,18 +525,15 @@ ERROR_RESULT_JSON = (
 def describe_a_failed_agent():
     @pytest.fixture
     def failed(port_codebase):
-        port_codebase.return_value = RunResult(
-            stdout=ERROR_RESULT_JSON, stderr="", exit_code=0, transcript=TRANSCRIPT, proxy=PROXY_LOG, image="image"
-        )
+        port_codebase.return_value = RunResult(exit_code=0)
+        port_codebase.stdout = ERROR_RESULT_JSON
 
     async def it_raises_with_the_agent_s_error_text(experiment, failed):
         with pytest.raises(AgentFailed, match="API Error: 429 rate limited"):
             await experiment()
 
     async def it_raises_when_the_agent_exits_non_zero(experiment, port_codebase):
-        port_codebase.return_value = RunResult(
-            stdout=RESULT_JSON, stderr="", exit_code=137, transcript={}, proxy="", image="image"
-        )
+        port_codebase.return_value = RunResult(exit_code=137)
         with pytest.raises(AgentFailed):
             await experiment()
 

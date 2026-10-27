@@ -26,11 +26,11 @@ class FakeBotbox:
     async def __aexit__(self, *exc_info: Any) -> None:
         return None
 
-    async def run(self, command: str, *, mounts: Any = (), workdir: str | None = None) -> RunResult:
-        self.runs.append({"command": command, "mounts": mounts, "workdir": workdir})
-        return RunResult(
-            stdout=self.stdout, stderr="", exit_code=self.exit_code, transcript={}, proxy="", image="image"
-        )
+    async def run(self, command: str, *, mounts: Any = (), workdir: str | None = None, output: Path) -> RunResult:
+        self.runs.append({"command": command, "mounts": mounts, "workdir": workdir, "output": output})
+        output.mkdir(parents=True, exist_ok=True)
+        (output / "stdout.txt").write_text(self.stdout)
+        return RunResult(exit_code=self.exit_code)
 
 
 @pytest.fixture(autouse=True)
