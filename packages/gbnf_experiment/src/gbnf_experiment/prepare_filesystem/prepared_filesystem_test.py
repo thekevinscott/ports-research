@@ -34,8 +34,10 @@ SHARED = (
 )
 
 
-def run_result(stdout='{"is_error": false}', stderr="", exit_code=0) -> tuple[RunResult, str, str]:
-    return RunResult(exit_code=exit_code), stdout, stderr
+def run_result(
+    stdout='{"is_error": false}', stderr="", exit_code=0, oom_killed=None
+) -> tuple[RunResult, str, str]:
+    return RunResult(exit_code=exit_code, oom_killed=oom_killed), stdout, stderr
 
 
 @pytest.fixture
@@ -220,6 +222,11 @@ def describe_the_manifest_on_completion():
     def it_records_the_agent_s_exit_code(filesystem):
         complete(filesystem, run_result(exit_code=3))
         assert manifest(filesystem)["exit_code"] == 3
+
+    @pytest.mark.parametrize("oom_killed", [True, False, None])
+    def it_records_whether_the_agent_was_oom_killed(filesystem, oom_killed):
+        complete(filesystem, run_result(exit_code=137, oom_killed=oom_killed))
+        assert manifest(filesystem)["oom_killed"] is oom_killed
 
     def it_banks_the_agent_s_stdout_as_result_json(filesystem):
         complete(filesystem, run_result(stdout='{"num_turns": 4}'))

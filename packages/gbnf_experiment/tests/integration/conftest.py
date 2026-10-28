@@ -107,6 +107,12 @@ def exit_code() -> list:
 
 
 @pytest.fixture
+def oom_killed() -> list:
+    """Docker's OOM record for the agent container, as the box reports it."""
+    return [None]
+
+
+@pytest.fixture
 def agent_stderr() -> list:
     """What the agent writes to stderr."""
     return [""]
@@ -119,7 +125,7 @@ def box_error() -> list:
 
 
 @pytest.fixture(autouse=True)
-def botbox(boxes, porting_calls, port_result, exit_code, agent_stderr, box_error):
+def botbox(boxes, porting_calls, port_result, exit_code, oom_killed, agent_stderr, box_error):
     """Botbox, faked where port_codebase imports it.
 
     Standing in for the model, the run writes a plausible port into /target and
@@ -161,7 +167,7 @@ def botbox(boxes, porting_calls, port_result, exit_code, agent_stderr, box_error
             transcript = output / "transcripts" / Path(TRANSCRIPT_PATH).relative_to(".claude/projects")
             transcript.parent.mkdir(parents=True, exist_ok=True)
             transcript.write_text(TRANSCRIPT)
-            return RunResult(exit_code=exit_code[0])
+            return RunResult(exit_code=exit_code[0], oom_killed=oom_killed[0])
 
     with patch("port_codebase.port_codebase.Botbox", FakeBotbox):
         yield

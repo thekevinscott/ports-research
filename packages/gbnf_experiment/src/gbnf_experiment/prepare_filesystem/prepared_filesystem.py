@@ -68,6 +68,7 @@ class PreparedFilesystem:
             gbnf_commit=config.GBNF_COMMIT,
             completed_at=datetime.now(UTC),
             exit_code=None if result is None else result.exit_code,
+            oom_killed=None if result is None else result.oom_killed,
             error=error,
         )
 

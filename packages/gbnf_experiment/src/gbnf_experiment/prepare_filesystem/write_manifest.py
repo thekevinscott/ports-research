@@ -21,6 +21,7 @@ def write_manifest(
     gbnf_commit: str,
     completed_at: datetime | None = None,
     exit_code: int | None = None,
+    oom_killed: bool | None = None,
     error: str | None = None,
 ) -> None:
     git = ["git", "-C", str(config.ROOT_DIRECTORY)]
@@ -29,7 +30,7 @@ def write_manifest(
         "completed_at": completed_at.astimezone(UTC).strftime(ISO8601_UTC)
         if completed_at
         else None,
-        **({"exit_code": exit_code} if exit_code is not None else {}),
+        **({"exit_code": exit_code, "oom_killed": oom_killed} if exit_code is not None else {}),
         **({"error": error} if error is not None else {}),
         "condition": condition,
         "derivation": {
