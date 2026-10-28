@@ -123,6 +123,13 @@ def describe_write_manifest():
         """The start of a run, and a run that raised: no agent exit to record."""
         assert "exit_code" not in manifest()
 
+    @pytest.mark.parametrize("oom_killed", [True, False, None])
+    def it_records_the_oom_record_beside_the_exit_code(manifest, oom_killed):
+        assert manifest(exit_code=137, oom_killed=oom_killed)["oom_killed"] is oom_killed
+
+    def it_carries_no_oom_record_without_an_exit_code(manifest):
+        assert "oom_killed" not in manifest()
+
     def it_records_the_pinned_commit(manifest):
         assert manifest()["derivation"] == {"gbnf_commit": "13f1aca"}
 

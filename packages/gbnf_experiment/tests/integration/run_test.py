@@ -297,12 +297,19 @@ def describe_the_manifest():
             "timestamp",
             "completed_at",
             "exit_code",
+            "oom_killed",
             "condition",
             "derivation",
             "reference_implementation",
             "sandbox",
             "harness",
         }
+
+    @pytest.mark.parametrize("killed", [True, False, None])
+    async def it_records_the_box_s_oom_record_as_is(experiment, manifest, oom_killed, killed):
+        oom_killed[0] = killed
+        await experiment()
+        assert manifest()["oom_killed"] is killed
 
     async def it_records_the_condition_that_ran(experiment, manifest):
         await experiment(
