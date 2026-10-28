@@ -79,6 +79,12 @@ def prepare_calls() -> list:
 
 
 @pytest.fixture
+def boxes() -> list:
+    """Every Botbox opened, as the keyword arguments it was built with."""
+    return []
+
+
+@pytest.fixture
 def builds() -> list:
     return []
 
@@ -113,7 +119,7 @@ def box_error() -> list:
 
 
 @pytest.fixture(autouse=True)
-def botbox(porting_calls, port_result, exit_code, agent_stderr, box_error):
+def botbox(boxes, porting_calls, port_result, exit_code, agent_stderr, box_error):
     """Botbox, faked where port_codebase imports it.
 
     Standing in for the model, the run writes a plausible port into /target and
@@ -121,8 +127,9 @@ def botbox(porting_calls, port_result, exit_code, agent_stderr, box_error):
     """
 
     class FakeBotbox:
-        def __init__(self, agent, *, dockerfile=None, allow=()):
+        def __init__(self, agent, *, dockerfile=None, allow=(), memory=None):
             self.agent = agent
+            boxes.append({"dockerfile": dockerfile, "allow": allow, "memory": memory})
 
         async def __aenter__(self):
             if box_error:

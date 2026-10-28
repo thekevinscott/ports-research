@@ -48,7 +48,12 @@ def output(tmp_path):
 def call(botbox, agent, source, output, tmp_path):
     async def call(prompt="Port it.\n"):
         return await port_codebase(
-            agent=agent, prompt=prompt, source=source, output=output, artifacts=tmp_path / "artifacts"
+            agent=agent,
+            prompt=prompt,
+            source=source,
+            output=output,
+            artifacts=tmp_path / "artifacts",
+            memory="8g",
         )
 
     return call
@@ -58,7 +63,15 @@ def describe_port_codebase():
     async def it_builds_the_box_from_the_packaged_dockerfile(call, botbox, agent):
         await call()
 
-        botbox.assert_called_once_with(agent, dockerfile=Path(__file__).parent / "Dockerfile")
+        botbox.assert_called_once_with(agent, dockerfile=Path(__file__).parent / "Dockerfile", memory="8g")
+
+    async def it_requires_a_memory_cap(botbox, agent, source, output, tmp_path):
+        with pytest.raises(TypeError, match="memory"):
+            await port_codebase(
+                agent=agent, prompt="Port it.", source=source, output=output, artifacts=tmp_path / "artifacts"
+            )
+
+        botbox.assert_not_called()
 
     async def it_runs_the_agents_command_for_the_rendered_prompt(call, botbox, prompt_class):
         await call("Port it.\n")
@@ -126,7 +139,7 @@ def describe_port_codebase():
         with pytest.raises(FileNotFoundError):
             await port_codebase(
                 agent=agent, prompt="Port it.", source=tmp_path / "gone",
-                output=output, artifacts=tmp_path / "artifacts"
+                output=output, artifacts=tmp_path / "artifacts", memory="8g"
             )
 
         assert not output.exists()

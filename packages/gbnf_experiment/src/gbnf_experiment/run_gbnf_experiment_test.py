@@ -104,6 +104,7 @@ CONFIG = {
     "include_source_integration_tests": False,
     "include_target_integration_tests": False,
     "debug": False,
+    "memory": "8g",
 }
 
 
@@ -131,6 +132,7 @@ def describe_the_signature():
             "include_source_integration_tests",
             "include_target_integration_tests",
             "debug",
+            "memory",
         ],
     )
     def it_requires_every_option(omitted):
@@ -175,6 +177,10 @@ def describe_run():
         chosen.sessions_dir = ".claude/projects"
         await experiment(agent=chosen)
         assert port_codebase.call_args.kwargs["agent"] is chosen
+
+    async def it_ports_under_the_memory_cap_the_caller_chose(experiment, port_codebase):
+        await experiment(memory="4g")
+        assert port_codebase.call_args.kwargs["memory"] == "4g"
 
     async def it_forwards_debug_to_the_preparation_only(
         experiment,

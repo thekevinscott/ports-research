@@ -69,6 +69,7 @@ def describe_cli():
             include_source_integration_tests=False,
             include_target_integration_tests=False,
             debug=False,
+            memory="8g",
         )
 
     def it_requires_a_source_language(gbnf_experiment, invoke):
@@ -157,6 +158,13 @@ def describe_cli():
     def it_forwards_debug(gbnf_experiment, invoke):
         invoke([*SOURCE_LANGUAGE, "--debug"])
         assert gbnf_experiment.call_args.kwargs["debug"] is True
+
+    def it_forwards_the_memory_cap(gbnf_experiment, invoke):
+        invoke([*SOURCE_LANGUAGE, "--memory", "4g"])
+        assert gbnf_experiment.call_args.kwargs["memory"] == "4g"
+
+    def it_names_the_default_memory_cap_in_the_help(gbnf_experiment, invoke):
+        assert "8g" in invoke(["--help"]).output
 
     def it_builds_a_claude_agent_on_the_default_model_and_effort(gbnf_experiment, claude_agent, invoke):
         invoke(SOURCE_LANGUAGE)

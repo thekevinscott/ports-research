@@ -33,6 +33,7 @@ INCLUDE = click.Choice(["0", "1"])
 @click.option("--effort", default="high", show_default=True)
 @click.option("--model", default=DEFAULT_MODEL, show_default=True)
 @click.option("--auth", type=click.Choice(["subscription", "api"]), default="subscription")
+@click.option("--memory", default="8g", show_default=True, help="The agent container's memory cap, in Docker's size format.")
 def cli(
     source_language: str,
     include_unit_tests: str,
@@ -43,6 +44,7 @@ def cli(
     effort: str,
     model: str,
     auth: str,
+    memory: str,
 ) -> None:
     """One run, written into --output."""
     click.echo(f"*** auth: {auth} ***")
@@ -66,5 +68,6 @@ def cli(
             include_source_integration_tests=include_source_integration_tests == "1",
             include_target_integration_tests=include_target_integration_tests == "1",
             debug=debug,
+            memory=memory,
         )
     )
