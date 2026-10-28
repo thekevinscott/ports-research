@@ -1,9 +1,13 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 
+const props = defineProps({
+  initialMeasure: { type: String, default: 'wall_minutes' },
+  showSetupFootnote: { type: Boolean, default: false },
+})
 const rows = ref([])
 const setupCounts = ref(null)
-const selected = ref('wall_minutes')
+const selected = ref(props.initialMeasure)
 const choices = [
   ['wall_minutes', 'Wall time'],
   ['file_count', 'Files'],
@@ -79,8 +83,8 @@ const panels = computed(() => directions.map(direction => ({
       </div>
     </div>
     <div v-else class="loading">Loading run measurements…</div>
-    <div class="scale">0 <span>max {{ formatted(maximum) }} · {{ rows.length }} successful runs</span></div>
-    <div v-if="setupCounts" class="setup-footnote">
+    <div class="scale">0 <span>max {{ formatted(maximum) }} · {{ rows.length }} ports</span></div>
+    <div v-if="showSetupFootnote && setupCounts" class="setup-footnote">
       <div>Prompt Dockerfile text changed: botbox 0.0.20 → 0.1.1 → 0.1.72.</div>
       <div>Fable low: {{ setupCounts['claude-fable-5-1'].low.before_236 }} before #236, {{ setupCounts['claude-fable-5-1'].low.after_236 }} after #236 (0.1.1); Fable high: {{ setupCounts['claude-fable-5-1'].high.before_236 }} before #236, {{ setupCounts['claude-fable-5-1'].high.after_236 }} after #236 (0.1.1).</div>
       <div>Opus high: {{ setupCounts['claude-opus-5-5'].high.before_236 }} before #236, {{ setupCounts['claude-opus-5-5'].high.after_241 }} after #241 (0.1.72); every other low / medium / high cell: all runs before #236.</div>

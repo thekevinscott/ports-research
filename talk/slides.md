@@ -9,157 +9,227 @@ layout: cover
 
 # Can an Agent<br>Port a Codebase?
 
+<div class="cover-question">Can an agent turn out a reasonably faithful port?</div>
+
 <div class="cover-meta">Kevin Scott</div>
 
 ---
 
-<div class="eyebrow">01 · THE QUESTION</div>
+<div class="eyebrow">SETUP</div>
 
-# For those of us without a datacenter at our disposal, how realistic are these code translation efforts?
+# One library, two languages
 
-<div class="subline">Bun: Zig → Rust &nbsp;·&nbsp; Mistral: Fortran → C++</div>
-
-<div class="quote-bottom">“Can an agent take a smaller repo running on a personal laptop and turn out a reasonably faithful port?”</div>
-
----
-
-<div class="eyebrow">02 · V1 EXPERIMENT</div>
-
-# The experiment
-
-<div class="setup-grid">
+<div class="setup-flow">
   <div><strong>gbnf</strong><span>Handwritten Python + TypeScript</span></div>
-  <div><strong>Sandbox</strong><span>Target implementation hidden</span></div>
-  <div><strong>claude-opus-5</strong><span>High effort</span></div>
-  <div><strong>40 ports</strong><span>2 directions × 4 test conditions × 5</span></div>
+  <div><strong>Agent</strong><span>Sandboxed port · one language to the other</span></div>
+  <div><strong>Compare</strong><span>Agent port ↔ handwritten implementation</span></div>
 </div>
 
 <div class="source">Published article · 2026-09-15</div>
 
 ---
+layout: section
+---
 
-<div class="eyebrow">03 · V1 EXPERIMENT</div>
+<div class="section-index">A / V1</div>
 
-# The Agent, Uh, Finds a Way
+# The Agent, Uh,<br>Finds a Way
+
+<div class="section-subtitle">__pycache__</div>
+
+---
+
+<div class="eyebrow">A · WHAT WE ASKED</div>
+
+# Port Python → TypeScript
+
+<div class="big-steps">
+  <div><strong>Python source</strong><span>Visible to the agent</span></div>
+  <div><strong>TypeScript target</strong><span>Hidden from the agent</span></div>
+  <div><strong>Tests</strong><span>Withheld in selected conditions</span></div>
+</div>
+
+<div class="source">Published article · V1 · claude-opus-5, high effort</div>
+
+---
+
+<div class="eyebrow">A · WHAT IT PRODUCED</div>
+
+# It found the missing tests
 
 <div class="leak-word">__pycache__</div>
 
-<div class="leak-lines">
-  <p>“The agents discovered the <code>__pycache__</code> folders and were able to reconstruct the missing tests.”</p>
-  <p>“Eight saw the bytecode, four used it.”</p>
+<div class="leak-lines">“The agents discovered the <code>__pycache__</code> folders and were able to reconstruct the missing tests.”</div>
+
+<a class="memory-link" href="https://github.com/thekevinscott/ports-research/blob/v1.1/packages/gbnf-experiment/data/20260909T005215Z_9a3e20fe/transcript/-workspace/memory/gbnf-reference-tests-in-pycache.md">Agent transcript memory: gbnf-reference-tests-in-pycache.md ↗</a>
+
+<div class="source">Published article · agent transcript memory file</div>
+
+---
+
+<div class="eyebrow">A · WHAT EVALUATION SHOWED</div>
+
+# Eight saw the bytecode. Four used it.
+
+<div class="result-split">
+  <div><strong>8</strong><span>saw the bytecode</span></div>
+  <div><strong>4</strong><span>used it</span></div>
+  <div><strong>½</strong><span>test-setup results discarded</span></div>
 </div>
 
-<div class="source">Python → TypeScript only · Published article</div>
+<div class="result-note">Cached test bytecode reached the agent when tests were meant to be withheld.</div>
+
+<div class="source">Python → TypeScript · Published article</div>
 
 ---
 
-<div class="eyebrow">04 · V1 RESULTS</div>
+<div class="eyebrow">A · TAKEAWAY</div>
 
-# The ports were smaller and faster
+# Lesson
 
-<div class="four-charts">
-  <div><img src="/size-python-to-typescript.svg"><span>Python → TypeScript · size</span></div>
-  <div><img src="/size-typescript-to-python.svg"><span>TypeScript → Python · size</span></div>
-  <div><img src="/ladder-ref-ratio-python-to-typescript.svg"><span>Python → TypeScript · speed</span></div>
-  <div><img src="/ladder-ref-ratio-typescript-to-python.svg"><span>TypeScript → Python · speed</span></div>
+<div class="lesson-todo">TODO: Kevin</div>
+
+---
+layout: section
+---
+
+<div class="section-index">B / V2</div>
+
+# What do tests change?
+
+<div class="section-subtitle">Tests configuration</div>
+
+---
+
+<div class="eyebrow">B · WHAT WE ASKED</div>
+
+# Three test flags
+
+<div class="flag-grid">
+  <div><strong>unit</strong><span>Source-language unit tests</span></div>
+  <div><strong>source</strong><span>Source-language integration tests</span></div>
+  <div><strong>target</strong><span>Target-language integration tests</span></div>
 </div>
 
-<div class="source">Published article · 40 ports · speed on completed rungs · size outliers not shown: 146 files; 2,075 LOC</div>
+<div class="study-line">claude-opus-5-5 · medium · 2 directions × 8 combinations × 12 = 192 ports</div>
+
+<div class="source">Test-inclusion report · 2026-10-12 · n=192</div>
 
 ---
 
-<div class="eyebrow">05 · V1 RESULTS</div>
+<div class="eyebrow">B · WHAT IT PRODUCED</div>
 
-# My handwritten implementation was the outlier
+# Unit tests: more work, more code
 
-<div class="outlier-grid">
-  <div class="heatmap"><img src="/port-to-port-matrix-python-to-typescript.svg"><span>Python → TypeScript · final column: handwritten reference</span></div>
-  <div class="embedding">
-    <div class="table-title">Embedding distance ↓</div>
-    <table>
-      <thead><tr><th>Direction</th><th>Port ↔ port</th><th>Port ↔ reference</th></tr></thead>
-      <tbody>
-        <tr><td>Py → TS</td><td>0.0171</td><td>0.0416</td></tr>
-        <tr><td>TS → Py</td><td>0.0447</td><td>0.0656</td></tr>
-      </tbody>
-    </table>
-    <p>“Most ports cluster closer to each other than they do to my implementation.”</p>
-  </div>
+<div class="finding-line"><strong>2.9M / 1.2M</strong><span>median tokens · unit on / off</span></div>
+<div class="finding-line"><strong>22.5 / 1</strong><span>own test files · unit tests on / off</span></div>
+<div class="finding-line"><strong>0.78 / 0.75</strong><span>reference functions paired · unit on / off</span></div>
+
+<img class="finding-chart" src="/tests-total-tokens.png">
+
+<div class="source">Test-inclusion report · 2026-10-12 · n=192 · chart: total tokens</div>
+
+---
+
+<div class="eyebrow">B · WHAT EVALUATION SHOWED</div>
+
+# Interface, then behaviour
+
+<div class="two-findings">
+  <div><strong>Target tests: 88 / 96 driven</strong><span>No tests: 20 / 24 · unit or source only: 18 / 72</span><img src="/tests-behavior-agreement.png"></div>
+  <div><strong>Driven ports: 97.5% / 99.4%</strong><span>Median behaviour · Py → JS / JS → Py · exception: 86.1% (n=3)</span><img src="/tests-behavior-driven.png"></div>
 </div>
 
-<div class="source">Published article · pairwise line similarity and embedding distance</div>
+<div class="source">Test-inclusion report · 2026-10-12 · n=192 · held-out behaviour</div>
 
 ---
 
-<div class="eyebrow">06 · FAITHFULNESS</div>
+<div class="eyebrow">B · TAKEAWAY</div>
 
-# What constitutes a faithful port?
+# Lesson
 
-<div class="examples">
-  <div><strong>Type exports</strong><span>“Python libraries often don't do this.”</span></div>
-  <div><strong>Operator overloading</strong><span>“JavaScript does not support operator overloading.”</span></div>
-  <div><strong>Sync / async</strong><span>“Should the Python port offer both sync and async versions?”</span></div>
+<div class="lesson-todo">TODO: Kevin</div>
+
+---
+layout: section
+---
+
+<div class="section-index">C / V2</div>
+
+# Models × effort
+
+<div class="section-subtitle">Low · medium · high</div>
+
+---
+
+<div class="eyebrow">C · WHAT WE ASKED</div>
+
+# Four models × three efforts
+
+<div class="model-grid">
+  <div>fable-5-1</div><div>opus-5-5</div><div>sonnet-5-5</div><div>haiku-5-5</div>
 </div>
 
-<div class="source">Published article</div>
+<div class="study-line">Python ↔ JavaScript · low / medium / high · 12 ports per model × effort × direction</div>
+
+<div class="source">v2-models-effort design · 2026-10-28 · xhigh / max omitted</div>
 
 ---
 
-<div class="eyebrow">07 · V2 DESIGN</div>
+<div class="eyebrow">C · WHAT IT PRODUCED</div>
 
-# Two studies
+# Port size · files and LOC
 
-<div class="studies">
-  <div>
-    <h2>Tests configuration</h2>
-    <p>claude-opus-5-5 · medium</p>
-    <p>unit / source / target test flags</p>
-    <strong>2 directions × 8 × 12 = 192</strong>
-  </div>
-  <div>
-    <h2>Models × effort</h2>
-    <p>fable-5-1 · opus-5-5 · sonnet-5-5 · haiku-5-5</p>
-    <p>low · medium · high</p>
-    <strong>12 per cell, per direction · design</strong>
-  </div>
+<ModelsEffortChart initial-measure="file_count" />
+
+<div class="source">v2-models-effort · n=12 per cell and direction · 2026-10-28</div>
+
+---
+
+<div class="eyebrow">C · WHAT EVALUATION SHOWED</div>
+
+# Wall time and tokens
+
+<ModelsEffortChart show-setup-footnote />
+
+<div class="source">v2-models-effort · n=12 per cell and direction · 2026-10-28</div>
+
+---
+
+<div class="eyebrow">C · TAKEAWAY</div>
+
+# Lesson
+
+<div class="lesson-todo">TODO: Kevin</div>
+
+---
+
+<div class="eyebrow">BACKUP · V1 RESULTS</div>
+
+# Smaller, faster; my code was the outlier
+
+<div class="backup-grid">
+  <div><img src="/size-python-to-typescript.svg"><span>Size · Python → TypeScript</span></div>
+  <div><img src="/ladder-ref-ratio-python-to-typescript.svg"><span>Speed · Python → TypeScript</span></div>
+  <div><img src="/port-to-port-matrix-python-to-typescript.svg"><span>Similarity · Python → TypeScript</span></div>
 </div>
 
-<div class="source">V2 experiment designs · 2026-10-28</div>
+<div class="backup-numbers">Embedding distance · port ↔ port <b>0.0171</b> · port ↔ reference <b>0.0416</b></div>
+
+<div class="source">Published article · V1 · Python → TypeScript</div>
 
 ---
 
-<div class="eyebrow">08 · V2 TESTS CONFIGURATION</div>
-
-# Tests change the port in three ways
-
-<div class="findings">
-  <div><strong>Driven ports</strong><p>Target tests: <b>88 / 96</b><br>None: <b>20 / 24</b><br>Unit or source only: <b>18 / 72</b></p></div>
-  <div><strong>Median behaviour · driven</strong><p>Py → JS: <b>97.5%</b><br>JS → Py: <b>99.4%</b><br>JS → Py, unit + source: <b>86.1%</b> (n=3)</p></div>
-  <div><strong>Unit tests · on / off</strong><p>Median tokens: <b>2.9M / 1.2M</b><br>Paired share: <b>0.78 / 0.75</b></p></div>
-</div>
-
-<img class="tests-chart" src="/tests-total-tokens.png">
-
-<div class="source">Test-inclusion report · 2026-10-12 · n = 192 successful runs</div>
-
----
-
-<div class="eyebrow">09 · V2 MODELS × EFFORT</div>
-
-# Models × effort · runs to date
-
-<ModelsEffortChart />
-
-<div class="source">v2-models-effort · successful, non-excluded runs · low / medium / high only · measured 2026-10-28</div>
-
----
-
-<div class="eyebrow">10 · OPEN QUESTION</div>
+<div class="eyebrow">CLOSE</div>
 
 # What makes for a faithful port?
 
 <div class="closing-quote">“So I think we need a more holistic measure of what it means to be ‘faithful’.”</div>
 
-<div class="closing-secondary">“How faithful are the ports? That, I think, is still to be determined.”</div>
+<div class="source">V2 draft</div>
 
-<div class="source">V2 draft · Published article</div>
+---
+layout: section
+---
+
+# Questions
