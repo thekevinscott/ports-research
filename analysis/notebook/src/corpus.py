@@ -9,6 +9,8 @@ from src.run_table import completed_runs, is_v2
 
 ROOT = Path(__file__).resolve().parents[3]
 DATA = ROOT / "experiments"
+# Which V2 experiment the notebook reads: "v2-tests-configuration" or "v2-models-effort".
+EXPERIMENT = "v2-tests-configuration"
 REVERSE = ROOT / "analysis" / "round-trip-experiment" / "reverse"
 # The pinned gbnf reference, one package per language.
 REFERENCE = REFERENCE_CHECKOUT / "packages" / "gbnf"

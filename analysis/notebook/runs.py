@@ -26,16 +26,16 @@ def _():
 
 
     from src.corpus import (
-        DATA, REVERSE, REFERENCE, EXCLUDE_BY_LANGUAGE, codebases_under, runs_under,
+        DATA, EXPERIMENT, REVERSE, REFERENCE, EXCLUDE_BY_LANGUAGE, codebases_under, runs_under,
     )
     from src.full_table import full_table
     from src.stats import compare, spearman
 
-    # V2 runs of the v2-tests-configuration experiment only.
+    # V2 runs of one experiment only; EXPERIMENT in src/corpus.py picks it.
     codebases = [
-        codebase for codebase in codebases_under(DATA, runs_table(), "v2-tests-configuration") if is_v2(codebase.run)
+        codebase for codebase in codebases_under(DATA, runs_table(), EXPERIMENT) if is_v2(codebase.run)
     ]
-    reverse_codebases = codebases_under(REVERSE, reverse_runs_table(), "v2-tests-configuration")
+    reverse_codebases = codebases_under(REVERSE, reverse_runs_table(), EXPERIMENT)
     # The reverse runs are V1; their V1 prepared reference is gone and the pin has no typescript package.
     for codebase in reverse_codebases:
         codebase.reference = None
@@ -244,7 +244,7 @@ def _():
     )
     # Every finished V2 attempt, the non-zero exits the tables above exclude among them.
     v2_attempts = pl.DataFrame(
-        [run for run in runs_under(DATA, runs_table(), "v2-tests-configuration", include_nonzero_exit=True) if is_v2(run)],
+        [run for run in runs_under(DATA, runs_table(), EXPERIMENT, include_nonzero_exit=True) if is_v2(run)],
         schema_overrides=V2_STRINGS,
     )
 
