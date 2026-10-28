@@ -180,7 +180,7 @@ layout: section
 
 ---
 
-<div class="eyebrow">BACKUP · V1 · __pycache__ · WHAT WE ASKED</div>
+<div class="eyebrow">BACKUP · V1 · __pycache__</div>
 
 # Port Python → TypeScript
 
@@ -194,7 +194,7 @@ layout: section
 
 ---
 
-<div class="eyebrow">BACKUP · V1 · __pycache__ · WHAT IT PRODUCED</div>
+<div class="eyebrow">BACKUP · V1 · __pycache__</div>
 
 # It found the missing tests
 
@@ -208,7 +208,7 @@ layout: section
 
 ---
 
-<div class="eyebrow">BACKUP · V1 · __pycache__ · WHAT EVALUATION SHOWED</div>
+<div class="eyebrow">BACKUP · V1 · __pycache__</div>
 
 # Eight saw the bytecode. Four used it.
 
