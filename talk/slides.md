@@ -83,10 +83,10 @@ layout: section
 
 <div class="two-findings">
   <div><strong>Target tests: 88 / 96 driven</strong><span>No tests: 20 / 24 · unit or source only: 18 / 72</span><img src="/tests-behavior-agreement.png"></div>
-  <div><strong>Driven ports: 97.5% / 99.4%</strong><span>Median behaviour · Py → JS / JS → Py · exception: 86.1% (n=3)</span><img src="/tests-behavior-driven.png"></div>
+  <div><strong>Driven: 119 / 126 at the ceiling</strong><span>97.5% / 99.4% = 779 / 799 and 794 / 799 · the 25 left are my reference's bugs · 4 ports carried the source's bug · 3 had their own</span><img src="/tests-behavior-driven.png"></div>
 </div>
 
-<div class="source">Test-inclusion report · 2026-10-12 · n=192 · held-out behaviour</div>
+<div class="source">Test-inclusion report · 2026-10-12 · n=192 · held-out behaviour · three-way port / source / target comparison 2026-10-28</div>
 
 ---
 
