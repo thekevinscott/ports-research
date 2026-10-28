@@ -373,7 +373,7 @@ class Codebase:
         self.run_id = run_id
         self.reference = None if reference is None else Path(reference)
         self.run: dict | None = None
-        rows = DirSQL(str(self.path)).query(FILES_SQL)
+        rows = DirSQL(str(self.path), no_ignore=True).query(FILES_SQL)
         self.files = pl.DataFrame(
             [row for row in rows if not self._excluded(row["path"])], schema=FILES_SCHEMA
         )
