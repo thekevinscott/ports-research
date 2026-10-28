@@ -119,7 +119,7 @@ layout: section
 
 <div class="eyebrow">B · WHAT IT PRODUCED</div>
 
-# Unit tests: more work, more code
+# Unit tests: far more work, structure nudged
 
 <div class="finding-line"><strong>2.9M / 1.2M</strong><span>median tokens · unit on / off</span></div>
 <div class="finding-line"><strong>22.5 / 1</strong><span>own test files · unit tests on / off</span></div>
