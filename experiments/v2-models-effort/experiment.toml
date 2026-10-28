@@ -1,4 +1,4 @@
-command = "uv run --project packages/gbnf_experiment run_gbnf_experiment --include-unit-tests 1 --include-source-integration-tests 1 --include-target-integration-tests 0 --output {run_dir} --memory 8g"
+command = "uv run --project packages/gbnf_experiment run_gbnf_experiment --include-unit-tests 1 --include-source-integration-tests 1 --include-target-integration-tests 0 --output {run_dir}"
 repeats = 12
 
 [params]
