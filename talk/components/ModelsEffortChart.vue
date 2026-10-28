@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 
 const rows = ref([])
+const setupCounts = ref(null)
 const selected = ref('wall_minutes')
 const choices = [
   ['wall_minutes', 'Wall time'],
@@ -19,11 +20,16 @@ const efforts = ['low', 'medium', 'high']
 const directions = ['python→javascript', 'javascript→python']
 
 onMounted(async () => {
-  const response = await fetch('/models-effort-runs.csv')
+  const [response, countsResponse] = await Promise.all([
+    fetch('/models-effort-runs.csv'),
+    fetch('/models-effort-setup-counts.json'),
+  ])
   if (!response.ok) throw new Error(`metrics CSV: HTTP ${response.status}`)
+  if (!countsResponse.ok) throw new Error(`setup counts: HTTP ${countsResponse.status}`)
   const [header, ...lines] = (await response.text()).trim().split(/\r?\n/)
   const keys = header.split(',')
   rows.value = lines.map(line => Object.fromEntries(keys.map((key, index) => [key, line.split(',')[index]])))
+  setupCounts.value = await countsResponse.json()
 })
 
 const maximum = computed(() => Math.max(1, ...rows.value.map(row => Number(row[selected.value]) || 0)))
@@ -74,11 +80,16 @@ const panels = computed(() => directions.map(direction => ({
     </div>
     <div v-else class="loading">Loading run measurements…</div>
     <div class="scale">0 <span>max {{ formatted(maximum) }} · {{ rows.length }} successful runs</span></div>
+    <div v-if="setupCounts" class="setup-footnote">
+      <div>Prompt Dockerfile text changed: botbox 0.0.20 → 0.1.1 → 0.1.72.</div>
+      <div>Fable low: {{ setupCounts['claude-fable-5-1'].low.before_236 }} before #236, {{ setupCounts['claude-fable-5-1'].low.after_236 }} after #236 (0.1.1); Fable high: {{ setupCounts['claude-fable-5-1'].high.before_236 }} before #236, {{ setupCounts['claude-fable-5-1'].high.after_236 }} after #236 (0.1.1).</div>
+      <div>Opus high: {{ setupCounts['claude-opus-5-5'].high.before_236 }} before #236, {{ setupCounts['claude-opus-5-5'].high.after_241 }} after #241 (0.1.72); every other low / medium / high cell: all runs before #236.</div>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.metrics { margin-top: -7px; }
+.metrics { margin-top: -17px; }
 .metric-tabs { display:flex; align-items:center; gap:6px; margin-bottom:9px; }
 .metric-tabs button { border:1px solid #cdd6de; background:#fff; border-radius:16px; padding:4px 11px; font-size:12px; font-weight:700; color:#415369; cursor:pointer; }
 .metric-tabs button.active { background:#17243a; color:#fff; border-color:#17243a; }
@@ -86,11 +97,12 @@ const panels = computed(() => directions.map(direction => ({
 .panels { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
 .panel { background:#fff; border:1px solid #dbe0e4; border-radius:7px; padding:7px 11px 9px; }
 .panel h3 { font-size:14px; color:#17243a; margin:0 0 4px; }
-.metric-row { display:grid; grid-template-columns:46px 42px 31px 1fr 48px; align-items:center; height:22px; gap:2px; font-size:10px; border-top:1px solid #eef0f1; }
+.metric-row { display:grid; grid-template-columns:46px 42px 31px 1fr 48px; align-items:center; height:19.5px; gap:2px; font-size:10px; border-top:1px solid #eef0f1; }
 .metric-row .model { font-weight:700; }
 .metric-row .effort, .metric-row .n { color:#61718a; }
 .metric-row svg { width:100%; height:20px; overflow:visible; }
 .metric-row strong { text-align:right; font-size:10px; }
 .loading { min-height:300px; display:grid; place-items:center; }
 .scale { color:#61718a; font-size:10px; margin-top:6px; display:flex; justify-content:space-between; }
+.setup-footnote { color:#61718a; font-size:9.5px; line-height:1.3; margin-top:7px; }
 </style>

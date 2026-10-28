@@ -12,6 +12,7 @@ import argparse
 import csv
 import json
 import sys
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
@@ -29,6 +30,8 @@ MODELS = (
     "claude-haiku-5-5",
 )
 EFFORTS = ("low", "medium", "high")
+PR_236_MERGED = datetime.fromisoformat("2026-10-25T19:13:00+00:00")
+PR_241_MERGED = datetime.fromisoformat("2026-10-27T02:36:00+00:00")
 COLUMNS = (
     "run_id",
     "model",
@@ -47,12 +50,22 @@ def minutes(start: str, end: str) -> float:
     return round((ended - created).total_seconds() / 60, 3)
 
 
+def setup(created: str) -> str:
+    timestamp = datetime.fromisoformat(created.replace("Z", "+00:00"))
+    if timestamp < PR_236_MERGED:
+        return "before_236"
+    if timestamp < PR_241_MERGED:
+        return "after_236"
+    return "after_241"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--runs-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     rows = []
+    setup_counts = Counter()
     for run_json in sorted(args.runs_root.glob("*/run.json")):
         run = json.loads(run_json.read_text())
         params = run.get("params") or {}
@@ -65,6 +78,7 @@ def main() -> None:
         ):
             continue
         run_dir = run_json.parent
+        setup_counts[(params["model"], params["effort"], setup(run["created"]))] += 1
         target = "javascript" if params["source-language"] == "python" else "python"
         port = run_dir / "ported_implementation"
         if not port.is_dir():
@@ -90,7 +104,20 @@ def main() -> None:
         writer = csv.DictWriter(out, fieldnames=COLUMNS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
+    counts_path = args.output.with_name("models-effort-setup-counts.json")
+    counts = {
+        model: {
+            effort: {
+                stage: setup_counts[(model, effort, stage)]
+                for stage in ("before_236", "after_236", "after_241")
+            }
+            for effort in EFFORTS
+        }
+        for model in MODELS
+    }
+    counts_path.write_text(json.dumps(counts, indent=2) + "\n")
     print(f"wrote {len(rows)} runs to {args.output}", flush=True)
+    print(f"wrote setup counts to {counts_path}", flush=True)
 
 
 if __name__ == "__main__":
