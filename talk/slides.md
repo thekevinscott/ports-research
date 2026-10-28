@@ -64,7 +64,7 @@ layout: cover
   <div><img src="/ladder-ref-ratio-typescript-to-python.svg"><span>TypeScript → Python · speed</span></div>
 </div>
 
-<div class="source">Published article · 40 ports · speed on completed rungs</div>
+<div class="source">Published article · 40 ports · speed on completed rungs · size outliers not shown: 146 files; 2,075 LOC</div>
 
 ---
 
@@ -133,9 +133,9 @@ layout: cover
 # Tests change the port in three ways
 
 <div class="findings">
-  <div><strong>Target tests</strong><p>Driver runs <b>88 / 96</b> with target tests; <b>20 / 24</b> with none; <b>18 / 72</b> with unit or source tests only.</p></div>
-  <div><strong>Behind the interface</strong><p>Median behaviour agreement: <b>97.5%</b> Py → JS, <b>99.4%</b> JS → Py, among driven ports.</p></div>
-  <div><strong>Unit tests</strong><p>Median tokens: <b>2.9M</b> with unit tests, <b>1.2M</b> without.</p></div>
+  <div><strong>Driven ports</strong><p>Target tests: <b>88 / 96</b><br>None: <b>20 / 24</b><br>Unit or source only: <b>18 / 72</b></p></div>
+  <div><strong>Median behaviour · driven</strong><p>Py → JS: <b>97.5%</b><br>JS → Py: <b>99.4%</b><br>JS → Py, unit + source: <b>86.1%</b> (n=3)</p></div>
+  <div><strong>Unit tests · on / off</strong><p>Median tokens: <b>2.9M / 1.2M</b><br>Paired share: <b>0.78 / 0.75</b></p></div>
 </div>
 
 <img class="tests-chart" src="/tests-total-tokens.png">
