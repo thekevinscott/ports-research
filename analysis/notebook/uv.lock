@@ -106,14 +106,15 @@ sdist = { url = "https://files.pythonhosted.org/packages/6a/fc/2e09f2de12c093783
 
 [[package]]
 name = "botbox"
-version = "0.0.8"
+version = "0.1.78"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "python-on-whales" },
+    { name = "json5" },
+    { name = "posix-tools" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e1/c1/176bf5038fd15fb060a3716f72b941802257c48e7b3bbacb442a18020345/botbox-0.0.8.tar.gz", hash = "sha256:31988aad330dbafb281c49cdacc60d2c3f276e4c4952609079a7788c05c3ea70", size = 40257, upload-time = "2026-10-12T02:09:55.543Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/89/30/b91fa6126f5601a8e31bdd456699ede75b6b6261ba038ef46c7f818740bd/botbox-0.1.78.tar.gz", hash = "sha256:20cfba1bf8286b866aef3d867338cad264a952f4e6ea456794a0d4c70ec6c130", size = 70084, upload-time = "2026-10-28T15:19:55.798Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e1/86/5de9901e9e674956174be701048e3715668c7678a77b4af9a21955d84c07/botbox-0.0.8-py3-none-any.whl", hash = "sha256:61fa3be7ffaafb11d7d1675307a363481d813253f1a93295368e16b292e349fc", size = 12128, upload-time = "2026-10-12T02:09:53.99Z" },
+    { url = "https://files.pythonhosted.org/packages/4d/10/b911dd7c5a71d81f183e44f9033f02d18c4cbabf985e856e195b2b544e4f/botbox-0.1.78-py3-none-any.whl", hash = "sha256:efd010b16705cb1a4b94b24cd84beba7d6b948b54feb8db4e8242dfaa2046e03", size = 63340, upload-time = "2026-10-28T15:19:54.198Z" },
 ]
 
 [[package]]
@@ -219,18 +220,18 @@ wheels = [
 
 [[package]]
 name = "dirsql"
-version = "0.4.39"
+version = "0.4.119"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bin-shim" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/bf/f7/84fe75e7f8b2119966cb789986d94ac80dc50a397bbcb4108dc258ac1291/dirsql-0.4.39.tar.gz", hash = "sha256:f8f2bd578020d689eb77c007b033126efecbfb87c651ae650a6de20a382e23b3", size = 470173, upload-time = "2026-09-05T12:16:41.639Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fc/23/ad705ee57be42b53f8ca7e1f15c180ad8bc6fb161a26d386f0b26b480ca5/dirsql-0.4.119.tar.gz", hash = "sha256:4ece5f042621a8da94c3dea3099a03774b8b5d25711cce185cb81919acf20c10", size = 709029, upload-time = "2026-10-20T13:03:55.696Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/22/ca/5ba4304479143dc45612f2a5fc712e7e2dcaaef01a40352e8740e0382eca/dirsql-0.4.39-cp310-abi3-macosx_10_12_x86_64.whl", hash = "sha256:1e154e3ce7c588127d3117c695f822010cb642277582fc7eb0ea6df16652a565", size = 2981314, upload-time = "2026-09-05T12:16:33.838Z" },
-    { url = "https://files.pythonhosted.org/packages/57/77/2467296b6433032484625555fbfa8c20cc4d60b8ab588ebaa69c107123f8/dirsql-0.4.39-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:7709b4f2b0ef3c041460f2a8742c9c77334e4578a9670f9bc72e1abe9ecdc5ab", size = 2809219, upload-time = "2026-09-05T12:16:35.49Z" },
-    { url = "https://files.pythonhosted.org/packages/a5/be/56036468a1c9f52b2c7de0da272b6f5e2779a6320c81beffd87ca579d76a/dirsql-0.4.39-cp310-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:3eb2e11e34826f225f140d97503d54b66e472c5ce3dc0e3502961b152582c0f2", size = 3003334, upload-time = "2026-09-05T12:16:37.064Z" },
-    { url = "https://files.pythonhosted.org/packages/55/4e/6e2ae890a353512e9743a3bdd13a2d7d296268143e965863a08192c71523/dirsql-0.4.39-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:5c28ac5553926206759628d6e695cac697a1bacf2fde4921358b4ac771e65ecf", size = 3169755, upload-time = "2026-09-05T12:16:38.472Z" },
-    { url = "https://files.pythonhosted.org/packages/a5/d3/3de248c4d2b280ad5063535c4a8b4fc23ee7143d8d5ddebc9a777d5dbce3/dirsql-0.4.39-cp310-abi3-win_amd64.whl", hash = "sha256:d3f700ece6baca667cc441bdf655b34cbe54f88218cddb6f8540c619e5f0e9b2", size = 3115885, upload-time = "2026-09-05T12:16:40.068Z" },
+    { url = "https://files.pythonhosted.org/packages/a6/4c/de2540daaf759895f34cbe385ac5bd02cd74baf5734c839e1d6f123d380f/dirsql-0.4.119-cp310-abi3-macosx_10_12_x86_64.whl", hash = "sha256:5ad9e850f9bedf3c3dbb8c342616933a4b55a09618a2b24cb385c793c973786b", size = 3542936, upload-time = "2026-10-20T13:03:47.045Z" },
+    { url = "https://files.pythonhosted.org/packages/98/e1/54e6802353326a005e73897ea4eafded5f247ff006cd0baf5b48fc97bcde/dirsql-0.4.119-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:d96993f2fb3e0e6e0dfe3de5322460f34bd3c43921fb6058bc404e873e7b87ab", size = 3344283, upload-time = "2026-10-20T13:03:49.418Z" },
+    { url = "https://files.pythonhosted.org/packages/ab/e7/35be60725d1ad0545a0508f022cd83fb52fe491b4771e0829d73e307f9a1/dirsql-0.4.119-cp310-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:5259a03c7775dee072acb5733c7908f1f4067938a0650d9f85941c73dce62a98", size = 3580755, upload-time = "2026-10-20T13:03:50.924Z" },
+    { url = "https://files.pythonhosted.org/packages/91/42/67a69673a9fc060d4aee083a54792667e73824b01c43b6cf5c6d3ed5ad9a/dirsql-0.4.119-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:065df7dd298315f4a750997342bfcca1aa1c4a22778b72d887bd1da194f15015", size = 3776316, upload-time = "2026-10-20T13:03:52.497Z" },
+    { url = "https://files.pythonhosted.org/packages/5c/d8/437998e53857915357a2e76431443fa1bf1bafd96ef76f5ea260da1671d5/dirsql-0.4.119-cp310-abi3-win_amd64.whl", hash = "sha256:d3d5daf4b4ee8af1ebbf9f3d04d980a7506d8163e826771dd87478372dc17ef1", size = 3759771, upload-time = "2026-10-20T13:03:54.157Z" },
 ]
 
 [[package]]
@@ -249,19 +250,21 @@ source = { editable = "../../packages/gbnf_experiment" }
 dependencies = [
     { name = "botbox" },
     { name = "click" },
+    { name = "dirsql" },
     { name = "port-codebase" },
     { name = "prompt" },
-    { name = "pydantic-settings" },
+    { name = "python-dotenv" },
     { name = "python-on-whales" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "botbox", specifier = ">=0.0.8" },
+    { name = "botbox", specifier = ">=0.1.77,<0.2" },
     { name = "click", specifier = ">=8.5.0" },
+    { name = "dirsql", specifier = ">=0.4.110" },
     { name = "port-codebase", editable = "../../packages/port_codebase" },
     { name = "prompt", editable = "../../packages/prompt" },
-    { name = "pydantic-settings", specifier = ">=2.15.0" },
+    { name = "python-dotenv", specifier = ">=1.2.4" },
     { name = "python-on-whales", specifier = ">=0.81.0" },
 ]
 
@@ -269,6 +272,7 @@ requires-dist = [
 dev = [
     { name = "coverage", specifier = ">=7.16.0" },
     { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-asyncio", specifier = ">=1.0" },
     { name = "pytest-describe", specifier = ">=3.2.0" },
     { name = "ruff", specifier = ">=0.17.0" },
 ]
@@ -367,6 +371,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/d5/1d/537ab090f302b838943a1b56497dd53059b9a9b46a074936470173a2e207/joblib-1.6.0.tar.gz", hash = "sha256:2ccc96785b12046c08fd6d55839c12857831b54a3c1673ffadd2f04bfc4eda03", size = 327903, upload-time = "2026-08-31T09:39:04.122Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/18/53/84099323c2ec4be98d935f63c033ac4151ee83836ca1050ede3b3aadf155/joblib-1.6.0-py3-none-any.whl", hash = "sha256:3dbbf9f6e4b592a2357b854608e980fe6390d131d7a82f011a377ef2ebef7aba", size = 306115, upload-time = "2026-08-31T09:39:02.298Z" },
+]
+
+[[package]]
+name = "json5"
+version = "0.17.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/16/1f/58a4d7ee466f81bc3c7337036380fc6d49de3afb7855d74f8121b1e89b32/json5-0.17.3.tar.gz", hash = "sha256:8d0278ad34ebaa9c3af76d9519274811830224a2d1cd5af156dbd067f461b8a4", size = 54234, upload-time = "2026-10-09T21:19:28.335Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ae/39/e689b616c4279a821d5842a8a85c1874540f8d58e35028df93f2182120c2/json5-0.17.3-py3-none-any.whl", hash = "sha256:2c8b22a893c35cd6a3c5ccbf1dd1c7d02c25dc1b5897fea658f9bf08c2e05f9a", size = 34809, upload-time = "2026-10-09T21:19:27.357Z" },
 ]
 
 [[package]]
@@ -708,7 +721,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "botbox", specifier = ">=0.0.4" },
+    { name = "botbox", specifier = ">=0.1.77,<0.2" },
     { name = "pathspec", specifier = ">=1.1.1" },
     { name = "prompt", editable = "../../packages/prompt" },
 ]
@@ -717,8 +730,18 @@ requires-dist = [
 dev = [
     { name = "coverage", specifier = ">=7.16.0" },
     { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-asyncio", specifier = ">=1.0" },
     { name = "pytest-describe", specifier = ">=3.2.0" },
     { name = "ruff", specifier = ">=0.17.0" },
+]
+
+[[package]]
+name = "posix-tools"
+version = "0.0.10"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/4b/85/c7fa03485a6a5bf1ea148ab4311c692755bc0549736f0983f8ab5320d20b/posix_tools-0.0.10.tar.gz", hash = "sha256:b8235614ccec1a8ed8f3ec85532a666203d72dcd33ac838c2c6a5493d41bf290", size = 28590, upload-time = "2026-10-26T01:53:26.772Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7d/4c/aee0336f197751dfecdcbd7082bd582121248848e17b75cd550695010e56/posix_tools-0.0.10-py3-none-any.whl", hash = "sha256:c73d07b754a8f3942b1b98a671c30f57785f8445785917f94e883c3cc492da7c", size = 5421, upload-time = "2026-10-26T01:53:25.43Z" },
 ]
 
 [[package]]
@@ -824,20 +847,6 @@ wheels = [
 ]
 
 [[package]]
-name = "pydantic-settings"
-version = "2.15.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pydantic" },
-    { name = "python-dotenv" },
-    { name = "typing-inspection" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/68/ca/31c57507b13119d7d3cfa1576dad2911a4861e3be07b579395f4e9d393f9/pydantic_settings-2.15.0.tar.gz", hash = "sha256:694b793e84f766ba76a90ebdefc01d0a9a045dab0382bee70393da93712ad117", size = 261253, upload-time = "2026-08-07T09:24:57.419Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/30/a4/2bffa9f8e804325a09867f0e9d30795c80ea9f8d62560bd1b6ad6220eb2f/pydantic_settings-2.15.0-py3-none-any.whl", hash = "sha256:0ba092c291c94baceb5eff768aa0d56400a457585bc0175925a5a5510303da42", size = 69413, upload-time = "2026-08-07T09:24:55.839Z" },
-]
-
-[[package]]
 name = "pygments"
 version = "2.21.0"
 source = { registry = "https://pypi.org/simple" }
@@ -904,11 +913,11 @@ wheels = [
 
 [[package]]
 name = "python-dotenv"
-version = "1.2.3"
+version = "1.2.4"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/6a/53/ed9d74092561d4b01a2ef1349d52cdbc135e526c245f366b089cfca6de49/python_dotenv-1.2.3.tar.gz", hash = "sha256:a20a594dabeaa385725aa239d5244871c143ecb356add8a20fcf23773a6c3a35", size = 58945, upload-time = "2026-08-16T16:54:54.067Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/74/26/2fbeedb218a787a5eea551c7532cac4e009f83d689dd2faa0d0353473f86/python_dotenv-1.2.4.tar.gz", hash = "sha256:f0d53e69935a851c0dcc78f3ab7aaccd8cabef0b92382b576b824212902873c0", size = 60824, upload-time = "2026-10-01T05:36:10Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0d/17/c5c6b53ddc18f297992099b3d9ec16c855c0ccc83263a21fe4d1c625ec6c/python_dotenv-1.2.3-py3-none-any.whl", hash = "sha256:904552145e8bfed22162c09dab1c2b9b54fefa7b23ba780f4f26ca0316b0f0d9", size = 22780, upload-time = "2026-08-16T16:54:52.473Z" },
+    { url = "https://files.pythonhosted.org/packages/60/d1/38f3a3405989a89ac18390803e70c6ad7c7760da4f9b83cbeca0c44a0c72/python_dotenv-1.2.4-py3-none-any.whl", hash = "sha256:42269a8a5b3fd54ffa6f3d84b18abed50064717576b4ecf03dc4a55d8aa04fdc", size = 23266, upload-time = "2026-10-01T05:36:08.633Z" },
 ]
 
 [[package]]
