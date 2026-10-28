@@ -16,7 +16,7 @@ from pygount import SourceAnalysis
 
 from src.embedding_server_key import embedding_server_key
 
-FILES_SQL = "SELECT path, ext, size FROM './' ORDER BY path"
+FILES_SQL = "SELECT path, ext, size FROM './**' ORDER BY path"
 FILES_SCHEMA = {"path": pl.String, "ext": pl.String, "size": pl.Int64}
 ANALYSIS = Path(__file__).resolve().parents[2]
 EXECUTE_TEST_SUITE_DIR = ANALYSIS / "execute-test-suite"
@@ -373,7 +373,7 @@ class Codebase:
         self.run_id = run_id
         self.reference = None if reference is None else Path(reference)
         self.run: dict | None = None
-        rows = DirSQL(str(self.path)).query(FILES_SQL)
+        rows = DirSQL(str(self.path), no_ignore=True).query(FILES_SQL)
         self.files = pl.DataFrame(
             [row for row in rows if not self._excluded(row["path"])], schema=FILES_SCHEMA
         )

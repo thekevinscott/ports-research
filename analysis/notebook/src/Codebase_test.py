@@ -236,6 +236,20 @@ def describe_codebase():
     def it_counts_included_files(tree):
         assert Codebase(tree, exclude=EXCLUDE).file_count == 1
 
+    def it_lists_files_the_port_gitignores(tree):
+        (tree / ".git").mkdir()
+        (tree / ".gitignore").write_text("pkg\n")
+        assert Codebase(tree, exclude=EXCLUDE).files["path"].to_list() == ["pkg/a.py"]
+
+    def it_lists_files_at_every_depth(tree):
+        deep = tree / "pkg" / "sub" / "deeper"
+        deep.mkdir(parents=True)
+        (deep / "b.py").write_text(SOURCE)
+        assert Codebase(tree, exclude=EXCLUDE).files["path"].to_list() == [
+            "pkg/a.py",
+            "pkg/sub/deeper/b.py",
+        ]
+
     def it_counts_every_physical_line_including_blank_and_comment_lines(tree):
         assert Codebase(tree, exclude=EXCLUDE).lines == 4
 

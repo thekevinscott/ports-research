@@ -97,6 +97,14 @@ def describe_runs_under():
         write_v2_run(tmp_path / EXPERIMENT / "runs" / "killed", exit_code=137)
         assert [run["run_id"] for run in runs_under(tmp_path, runs_table(), EXPERIMENT)] == ["ok"]
 
+    def it_lists_runs_the_experiment_gitignores(tmp_path):
+        # Each experiment folder gitignores /runs (DVC tracks them); the scan must still see them.
+        (tmp_path / ".git").mkdir()
+        (tmp_path / EXPERIMENT / "runs").mkdir(parents=True)
+        (tmp_path / EXPERIMENT / ".gitignore").write_text("/runs\n")
+        write_v2_run(tmp_path / EXPERIMENT / "runs" / "ok")
+        assert [run["run_id"] for run in runs_under(tmp_path, runs_table(), EXPERIMENT)] == ["ok"]
+
     def it_lists_killed_runs_when_asked(tmp_path):
         write_v2_run(tmp_path / EXPERIMENT / "runs" / "ok")
         write_v2_run(tmp_path / EXPERIMENT / "runs" / "killed", exit_code=137)
