@@ -16,6 +16,10 @@
 .setup-flow > div, .big-steps > div, .flag-grid > div { background: #fff; border: 1px solid var(--line); border-top: 5px solid var(--accent); border-radius: 7px; padding: 21px 19px; min-height: 155px; }
 .setup-flow strong, .big-steps strong, .flag-grid strong { display: block; font-size: 1.45rem; margin-bottom: 15px; }
 .setup-flow span, .big-steps span, .flag-grid span { display: block; color: var(--muted); font-size: 1rem; line-height: 1.3; }
+.v1-recap { display: grid; grid-template-columns: .7fr 1.2fr 1fr 1.4fr 1.1fr; gap: 9px; margin-top: 20px; }
+.v1-recap > div { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 11px 10px; min-height: 84px; }
+.v1-recap strong { display: block; color: var(--accent); font-size: 1.06rem; line-height: 1.15; white-space: nowrap; }
+.v1-recap span { display: block; color: var(--muted); font-size: .68rem; line-height: 1.22; margin-top: 7px; }
 .leak-word { font-family: ui-monospace, monospace; font-size: 3.2rem; font-weight: 700; color: var(--accent); margin: 22px 0; }
 .leak-lines { max-width: 850px; font: 1.6rem/1.34 ui-serif, Georgia, serif; }
 .memory-link { display: inline-block; margin-top: 36px; font-size: 1rem; color: #286586; text-decoration: underline; }
@@ -37,6 +41,7 @@
 .two-findings img { display: block; width: 100%; height: 230px; object-fit: contain; }
 .model-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 72px; }
 .model-grid > div { border-top: 5px solid var(--accent); padding: 23px 12px; background: #fff; font-size: 1.3rem; font-weight: 700; }
+.evaluation-placeholder { margin-top: 95px; color: var(--muted); font: 1.6rem ui-serif, Georgia, serif; }
 .backup-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 8px; }
 .backup-grid > div { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 5px; min-width: 0; }
 .backup-grid img { width: 100%; height: 255px; object-fit: contain; }

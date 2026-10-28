@@ -25,69 +25,15 @@ layout: cover
   <div><strong>Compare</strong><span>Agent port ↔ handwritten implementation</span></div>
 </div>
 
+<div class="v1-recap">
+  <div><strong>40</strong><span>ports</span></div>
+  <div><strong>6.5M · ~13m</strong><span>median tokens · time / port</span></div>
+  <div><strong>smaller · faster</strong><span>vs handwritten</span></div>
+  <div><strong>0.0171 / 0.0416</strong><span>embedding · port↔port / port↔reference</span></div>
+  <div><strong>½</strong><span>test-setup results discarded · __pycache__</span></div>
+</div>
+
 <div class="source">Published article · 2026-09-15</div>
-
----
-layout: section
----
-
-<div class="section-index">A / V1</div>
-
-# The Agent, Uh,<br>Finds a Way
-
-<div class="section-subtitle">__pycache__</div>
-
----
-
-<div class="eyebrow">A · WHAT WE ASKED</div>
-
-# Port Python → TypeScript
-
-<div class="big-steps">
-  <div><strong>Python source</strong><span>Visible to the agent</span></div>
-  <div><strong>TypeScript target</strong><span>Hidden from the agent</span></div>
-  <div><strong>Tests</strong><span>Withheld in selected conditions</span></div>
-</div>
-
-<div class="source">Published article · V1 · claude-opus-5, high effort</div>
-
----
-
-<div class="eyebrow">A · WHAT IT PRODUCED</div>
-
-# It found the missing tests
-
-<div class="leak-word">__pycache__</div>
-
-<div class="leak-lines">“The agents discovered the <code>__pycache__</code> folders and were able to reconstruct the missing tests.”</div>
-
-<a class="memory-link" href="https://github.com/thekevinscott/ports-research/blob/v1.1/packages/gbnf-experiment/data/20260909T005215Z_9a3e20fe/transcript/-workspace/memory/gbnf-reference-tests-in-pycache.md">Agent transcript memory: gbnf-reference-tests-in-pycache.md ↗</a>
-
-<div class="source">Published article · agent transcript memory file</div>
-
----
-
-<div class="eyebrow">A · WHAT EVALUATION SHOWED</div>
-
-# Eight saw the bytecode. Four used it.
-
-<div class="result-split">
-  <div><strong>8</strong><span>saw the bytecode</span></div>
-  <div><strong>4</strong><span>used it</span></div>
-  <div><strong>½</strong><span>test-setup results discarded</span></div>
-</div>
-
-<div class="result-note">Cached test bytecode reached the agent when tests were meant to be withheld.</div>
-
-<div class="source">Python → TypeScript · Published article</div>
-
----
-
-<div class="eyebrow">A · TAKEAWAY</div>
-
-# Lesson
-
-<div class="lesson-todo">TODO: Kevin</div>
 
 ---
 layout: section
@@ -180,7 +126,7 @@ layout: section
 
 # Port size · files and LOC
 
-<ModelsEffortChart initial-measure="file_count" />
+<ModelsEffortChart initial-measure="file_count" show-setup-footnote />
 
 <div class="source">v2-models-effort · n=12 per cell and direction · 2026-10-28</div>
 
@@ -188,11 +134,9 @@ layout: section
 
 <div class="eyebrow">C · WHAT EVALUATION SHOWED</div>
 
-# Wall time and tokens
+# Held-out behaviour
 
-<ModelsEffortChart show-setup-footnote />
-
-<div class="source">v2-models-effort · n=12 per cell and direction · 2026-10-28</div>
+<div class="evaluation-placeholder">numbers arriving from the notebook rerun</div>
 
 ---
 
@@ -201,22 +145,6 @@ layout: section
 # Lesson
 
 <div class="lesson-todo">TODO: Kevin</div>
-
----
-
-<div class="eyebrow">BACKUP · V1 RESULTS</div>
-
-# Smaller, faster; my code was the outlier
-
-<div class="backup-grid">
-  <div><img src="/size-python-to-typescript.svg"><span>Size · Python → TypeScript</span></div>
-  <div><img src="/ladder-ref-ratio-python-to-typescript.svg"><span>Speed · Python → TypeScript</span></div>
-  <div><img src="/port-to-port-matrix-python-to-typescript.svg"><span>Similarity · Python → TypeScript</span></div>
-</div>
-
-<div class="backup-numbers">Embedding distance · port ↔ port <b>0.0171</b> · port ↔ reference <b>0.0416</b></div>
-
-<div class="source">Published article · V1 · Python → TypeScript</div>
 
 ---
 
@@ -233,3 +161,63 @@ layout: section
 ---
 
 # Questions
+
+---
+
+<div class="eyebrow">BACKUP · V1 RESULTS</div>
+
+# V1 size, speed, similarity
+
+<div class="backup-grid">
+  <div><img src="/size-python-to-typescript.svg"><span>Size · Python → TypeScript</span></div>
+  <div><img src="/ladder-ref-ratio-python-to-typescript.svg"><span>Speed · Python → TypeScript</span></div>
+  <div><img src="/port-to-port-matrix-python-to-typescript.svg"><span>Similarity · Python → TypeScript</span></div>
+</div>
+
+<div class="backup-numbers">Embedding distance · port ↔ port <b>0.0171</b> · port ↔ reference <b>0.0416</b></div>
+
+<div class="source">Published article · V1 · Python → TypeScript</div>
+
+---
+
+<div class="eyebrow">BACKUP · V1 · __pycache__ · WHAT WE ASKED</div>
+
+# Port Python → TypeScript
+
+<div class="big-steps">
+  <div><strong>Python source</strong><span>Visible to the agent</span></div>
+  <div><strong>TypeScript target</strong><span>Hidden from the agent</span></div>
+  <div><strong>Tests</strong><span>Withheld in selected conditions</span></div>
+</div>
+
+<div class="source">Published article · V1 · claude-opus-5, high effort</div>
+
+---
+
+<div class="eyebrow">BACKUP · V1 · __pycache__ · WHAT IT PRODUCED</div>
+
+# It found the missing tests
+
+<div class="leak-word">__pycache__</div>
+
+<div class="leak-lines">“The agents discovered the <code>__pycache__</code> folders and were able to reconstruct the missing tests.”</div>
+
+<a class="memory-link" href="https://github.com/thekevinscott/ports-research/blob/v1.1/packages/gbnf-experiment/data/20260909T005215Z_9a3e20fe/transcript/-workspace/memory/gbnf-reference-tests-in-pycache.md">Agent transcript memory: gbnf-reference-tests-in-pycache.md ↗</a>
+
+<div class="source">Published article · agent transcript memory file</div>
+
+---
+
+<div class="eyebrow">BACKUP · V1 · __pycache__ · WHAT EVALUATION SHOWED</div>
+
+# Eight saw the bytecode. Four used it.
+
+<div class="result-split">
+  <div><strong>8</strong><span>saw the bytecode</span></div>
+  <div><strong>4</strong><span>used it</span></div>
+  <div><strong>½</strong><span>test-setup results discarded</span></div>
+</div>
+
+<div class="result-note">Cached test bytecode reached the agent when tests were meant to be withheld.</div>
+
+<div class="source">Python → TypeScript · Published article</div>
