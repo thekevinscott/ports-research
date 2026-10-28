@@ -33,7 +33,12 @@ def output(tmp_path: Path) -> Path:
 def run(agent, source, output):
     async def run():
         return await port_codebase(
-            agent=agent, prompt="Port it.", source=source, output=output, artifacts=output.parent / "artifacts"
+            agent=agent,
+            prompt="Port it.",
+            source=source,
+            output=output,
+            artifacts=output.parent / "artifacts",
+            memory="4g",
         )
 
     return run
@@ -43,7 +48,7 @@ def describe_port_codebase():
     async def it_builds_its_box_from_the_packaged_dockerfile(run, box, agent):
         await run()
 
-        assert box.boxes == [{"agent": agent, "dockerfile": PACKAGE / "Dockerfile", "allow": ()}]
+        assert box.boxes == [{"agent": agent, "dockerfile": PACKAGE / "Dockerfile", "allow": (), "memory": "4g"}]
 
     async def it_mounts_the_source_read_only_and_the_output_read_write(run, box, source, output):
         await run()

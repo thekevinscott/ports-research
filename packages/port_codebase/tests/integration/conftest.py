@@ -17,8 +17,10 @@ class FakeBotbox:
     stdout = ""
     exit_code = 0
 
-    def __init__(self, agent: Any, *, dockerfile: Path | None = None, allow: tuple[str, ...] = ()) -> None:
-        self.boxes.append({"agent": agent, "dockerfile": dockerfile, "allow": allow})
+    def __init__(
+        self, agent: Any, *, dockerfile: Path | None = None, allow: tuple[str, ...] = (), memory: str | None = None
+    ) -> None:
+        self.boxes.append({"agent": agent, "dockerfile": dockerfile, "allow": allow, "memory": memory})
 
     async def __aenter__(self) -> "FakeBotbox":
         return self

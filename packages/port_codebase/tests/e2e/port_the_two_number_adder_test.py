@@ -130,6 +130,7 @@ def ported(tmp_path_factory, two_number_adder: Path):
                 source=source,
                 output=output,
                 artifacts=session.artifacts,
+                memory="8g",
             )
         except Exception as failure:  # noqa: BLE001
             session.failure = failure
@@ -222,6 +223,7 @@ def describe_a_missing_source():
                 source=tmp_path / "missing",
                 output=output,
                 artifacts=tmp_path / "artifacts",
+                memory="8g",
             )
 
         assert not output.exists()

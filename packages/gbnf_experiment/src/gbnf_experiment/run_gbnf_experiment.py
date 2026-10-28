@@ -27,6 +27,7 @@ async def run_gbnf_experiment(
     include_source_integration_tests: bool,
     include_target_integration_tests: bool,
     debug: bool,
+    memory: str,
 ) -> None:
     tests = dict(
         include_unit_tests=include_unit_tests,
@@ -66,6 +67,7 @@ async def run_gbnf_experiment(
             source=prepared_filesystem.reference_implementation_directory,
             output=prepared_filesystem.ported_implementation_directory,
             artifacts=run_directory,
+            memory=memory,
         )
         stdout = (run_directory / "stdout.txt").read_text()
         report = json.loads(stdout) if stdout else {}

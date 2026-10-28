@@ -88,6 +88,7 @@ def describe_the_box():
             source=reference,
             output=tmp_path / "output",
             artifacts=tmp_path / "artifacts",
+            memory="8g",
         )
 
         stdout = (tmp_path / "artifacts" / "stdout.txt").read_text()

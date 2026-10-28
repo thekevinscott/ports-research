@@ -55,6 +55,7 @@ CONFIG = {
     "include_source_integration_tests": False,
     "include_target_integration_tests": False,
     "debug": False,
+    "memory": "8g",
 }
 
 
@@ -475,6 +476,18 @@ def describe_cli():
         assert (output / "ported_implementation" / "ported.py").is_file()
         assert list(output.parent.iterdir()) == [output]
         assert list(working_folder.iterdir()) == []
+
+    def it_caps_the_box_at_8g_by_default(home, working_folder, output, docker_daemon, boxes):
+        result = CliRunner().invoke(cli, ["--source-language", "javascript", "--output", str(output)])
+        assert result.exit_code == 0, result.output
+        assert [box["memory"] for box in boxes] == ["8g"]
+
+    def it_caps_the_box_at_the_memory_given(home, working_folder, output, docker_daemon, boxes):
+        result = CliRunner().invoke(
+            cli, ["--source-language", "javascript", "--memory", "4g", "--output", str(output)]
+        )
+        assert result.exit_code == 0, result.output
+        assert [box["memory"] for box in boxes] == ["4g"]
 
     def it_prepares_the_condition_its_flags_name(home, working_folder, output, docker_daemon, builds):
         CliRunner().invoke(
