@@ -82,19 +82,19 @@ layout: section
 # Takeaways
 
 ---
-src: ./results/takeaways.md
+src: ./takeaways/takeaways.md
 ---
 
 ---
-src: ./results/for-the-money.md
+src: ./takeaways/for-the-money.md
 ---
 
 ---
-src: ./results/takeaway-house-style.md
+src: ./takeaways/house-style.md
 ---
 
 ---
-src: ./results/takeaway-tests.md
+src: ./takeaways/tests.md
 ---
 
 ---
