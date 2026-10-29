@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const props = defineProps({
   src: { type: String, required: true },
@@ -21,6 +21,7 @@ const MEASURES = [
   ['embedding_distance', 'Embedding distance'],
   ['behavior_agreement_pct', 'Behaviour %'],
   ['api_agreement_pct', 'API %'],
+  ['ladder_ref_ratio', 'Parse time ÷ reference'],
 ]
 const DIRECTIONS = [
   ['python→javascript', 'Python → TypeScript', '#5d85a0'],
@@ -91,8 +92,26 @@ function nice(value) {
 }
 const displayed = computed(() => rows.value.filter(row => layout.groups.some(group => group.rows.some(r => r.match(row)))))
 const referenceValues = computed(() => DIRECTIONS.map(([direction]) => reference.value[direction]?.[selected.value] ?? null))
-const maximum = computed(() => percent.value ? 100 : nice(Math.max(1e-9, ...referenceValues.value.filter(v => v !== null), ...displayed.value.map(row => Number(row[selected.value]) || 0))))
-function position(value) { return 8 + (Number(value) / maximum.value) * (vw.value - 16) }
+const domainMax = computed(() => percent.value ? 100 : Math.max(1e-9, ...referenceValues.value.filter(v => v !== null), ...displayed.value.map(row => Number(row[selected.value]) || 0)))
+const range = ref(null)
+const knob = ref(null)
+watch(selected, () => { range.value = null })
+const lo = computed(() => range.value?.[0] ?? 0)
+const hi = computed(() => range.value?.[1] ?? domainMax.value)
+function position(value) { return 8 + ((Number(value) - lo.value) / (hi.value - lo.value)) * (vw.value - 16) }
+function visible(value) { return value >= lo.value && value <= hi.value }
+function sliderX(value) { return 8 + (value / domainMax.value) * (vw.value - 16) }
+function grab(which, event) {
+  event.currentTarget.setPointerCapture(event.pointerId)
+  knob.value = which
+}
+function slide(event) {
+  if (!knob.value) return
+  const px = new DOMPoint(event.clientX, event.clientY).matrixTransform(event.currentTarget.ownerSVGElement.getScreenCTM().inverse()).x
+  const value = Math.max(0, Math.min(domainMax.value, ((px - 8) / (vw.value - 16)) * domainMax.value))
+  const gap = domainMax.value / 50
+  range.value = knob.value === 'lo' ? [Math.min(value, hi.value - gap), hi.value] : [lo.value, Math.max(value, lo.value + gap)]
+}
 function median(values) {
   if (!values.length) return null
   const sorted = [...values].sort((a, b) => a - b)
@@ -106,28 +125,33 @@ function formatted(value) {
   if (selected.value === 'cost_usd') return `$${value.toFixed(2)}`
   if (percent.value) return `${Math.round(value)}%`
   if (selected.value === 'embedding_distance') return value.toFixed(3)
+  if (selected.value === 'ladder_ref_ratio') return value.toFixed(2)
   return Number.isInteger(value) ? String(value) : value.toFixed(0)
 }
 function series(direction, match) {
   const values = rows.value
-    .filter(row => row.direction === direction && match(row))
+    .filter(row => row.direction === direction && match(row) && row[selected.value] !== undefined && row[selected.value] !== '')
     .map(row => ({ id: row.run_id, value: Number(row[selected.value]) }))
-    .filter(row => row.value === row.value && row[selected.value] !== '')
+    .filter(row => row.value === row.value)
   return { values, median: median(values.map(row => row.value)) }
 }
 const groups = computed(() => layout.groups.map(group => ({
   ...group,
   rows: group.rows.map(row => ({ ...row, series: DIRECTIONS.map(([direction]) => series(direction, row.match)) })),
 })))
-const ticks = [0, 0.25, 0.5, 0.75, 1]
+const ticks = computed(() => {
+  const step = nice((hi.value - lo.value) / 4)
+  const first = Math.ceil(lo.value / step) * step
+  return Array.from({ length: Math.floor((hi.value - first) / step) + 1 }, (_, i) => first + i * step).map(value => (value - lo.value) / (hi.value - lo.value))
+})
 const lanes = props.by === 'pooled' ? 24 : 4
-const rowHeight = twoLabels ? 19 : props.by === 'pooled' ? 220 : 38
+const rowHeight = twoLabels ? 16 : props.by === 'pooled' ? 220 : 38
 </script>
 
 <template>
   <div class="strips" :class="{ two: twoLabels, pooled: by === 'pooled' }">
     <div class="tabs">
-      <button v-for="[key, label] in choices" :key="key" :class="{ active: selected === key }" @click.stop="selected = key">{{ label }}</button>
+      <template v-if="choices.length > 1"><button v-for="[key, label] in choices" :key="key" :class="{ active: selected === key }" @click.stop="selected = key">{{ label }}</button></template>
       <span>one dot = one run &nbsp;·&nbsp; tick = median</span>
     </div>
     <div v-if="rows.length" class="panel" ref="panel">
@@ -143,9 +167,9 @@ const rowHeight = twoLabels ? 19 : props.by === 'pooled' ? 220 : 38
             <line v-for="tick in ticks" :key="tick" :x1="8 + tick * (vw - 16)" :x2="8 + tick * (vw - 16)" y1="0" :y2="rowHeight" stroke="#eceae4" />
             <template v-for="(run, which) in row.series" :key="which">
               <template v-if="shown[which]">
-              <circle v-for="(point, index) in run.values" :key="point.id" :cx="position(point.value)" :cy="4 + ((index + which * 2) % lanes) * ((rowHeight - 8) / (lanes - 1))" r="2.4" :fill="DIRECTIONS[which][2]" opacity=".7"><title>{{ point.id }}: {{ formatted(point.value) }}</title></circle>
-              <line v-if="run.median !== null" :x1="position(run.median)" :x2="position(run.median)" :y1="2" :y2="rowHeight - 2" :stroke="DIRECTIONS[which][2]" stroke-width="2.4" opacity=".85" />
-              <line v-if="referenceValues[which] !== null" :x1="position(referenceValues[which])" :x2="position(referenceValues[which])" y1="0" :y2="rowHeight" :stroke="REFERENCE_COLOR" stroke-width="1.6" stroke-dasharray="3 2"><title>reference {{ DIRECTIONS[which][1] }}: {{ formatted(referenceValues[which]) }}</title></line>
+              <template v-for="(point, index) in run.values" :key="point.id"><circle v-if="visible(point.value)" :cx="position(point.value)" :cy="4 + ((index + which * 2) % lanes) * ((rowHeight - 8) / (lanes - 1))" r="2.4" :fill="DIRECTIONS[which][2]" opacity=".7"><title>{{ point.id }}: {{ formatted(point.value) }}</title></circle></template>
+              <line v-if="run.median !== null && visible(run.median)" :x1="position(run.median)" :x2="position(run.median)" :y1="2" :y2="rowHeight - 2" :stroke="DIRECTIONS[which][2]" stroke-width="2.4" opacity=".85" />
+              <line v-if="referenceValues[which] !== null && visible(referenceValues[which])" :x1="position(referenceValues[which])" :x2="position(referenceValues[which])" y1="0" :y2="rowHeight" :stroke="REFERENCE_COLOR" stroke-width="1.6" stroke-dasharray="3 2"><title>reference {{ DIRECTIONS[which][1] }}: {{ formatted(referenceValues[which]) }}</title></line>
               </template>
             </template>
           </svg></div>
@@ -154,8 +178,17 @@ const rowHeight = twoLabels ? 19 : props.by === 'pooled' ? 220 : 38
       <div class="row axis">
         <span v-for="header in layout.headers" :key="header"></span>
         <div class="ticks">
-          <span v-for="tick in ticks" :key="tick" :style="{ left: `calc(1% + ${tick} * 98%)` }" :class="{ first: tick === 0, last: tick === 1 }">{{ formatted(maximum * tick) }}</span>
+          <span v-for="tick in ticks" :key="tick" :style="{ left: `calc(1% + ${tick} * 98%)` }" :class="{ first: tick === 0, last: tick === 1 }">{{ formatted(lo + (hi - lo) * tick) }}</span>
         </div>
+      </div>
+      <div class="row slider">
+        <span v-for="header in layout.headers" :key="header"></span>
+        <div class="strip"><svg :viewBox="`0 0 ${vw} 18`" height="18" aria-hidden="true">
+          <line :x1="8" :x2="vw - 8" y1="9" y2="9" class="track" />
+          <line :x1="sliderX(lo)" :x2="sliderX(hi)" y1="9" y2="9" class="selected" />
+          <circle v-for="which in ['lo', 'hi']" :key="which" :cx="sliderX(which === 'lo' ? lo : hi)" cy="9" r="6" class="knob"
+            @pointerdown.stop.prevent="grab(which, $event)" @pointermove.stop="slide" @pointerup.stop="knob = null" @pointercancel.stop="knob = null" />
+        </svg></div>
       </div>
     </div>
     <div v-else class="loading">Loading run measurements…</div>
@@ -163,8 +196,8 @@ const rowHeight = twoLabels ? 19 : props.by === 'pooled' ? 220 : 38
 </template>
 
 <style scoped>
-.strips { margin-top: 6px; }
-.tabs { display:flex; align-items:center; gap:6px; margin-bottom:9px; }
+.strips { margin-top: 3px; }
+.tabs { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
 .tabs button { border:1px solid #cdd6de; background:#fff; border-radius:16px; padding:4px 11px; font-size:12px; font-weight:700; color:#415369; cursor:pointer; }
 .tabs button.active { background:#17243a; color:#fff; border-color:#17243a; }
 .tabs span { margin-left:auto; color:#61718a; font-size:11px; }
@@ -182,12 +215,17 @@ const rowHeight = twoLabels ? 19 : props.by === 'pooled' ? 220 : 38
 .head { height:18px; color:#61718a; }
 .head .label { font-weight:700; font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:#61718a; }
 .legend { display:flex; gap:12px; padding-left:1%; }
-.legend button { border:none; background:none; padding:0 4px; font:inherit; color:#17243a; cursor:pointer; }
+.legend button { border:none; background:none; padding:0 4px; font:inherit; color:#17243a; cursor:pointer; white-space:nowrap; }
 .legend button.off { opacity:.35; text-decoration:line-through; }
 .legend i { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; vertical-align:-1px; }
 .reference-key { padding:0 4px; color:#17243a; }
 .reference-key i { width:0; height:10px; border-radius:0; border-left:2px dashed #1f1f1f; vertical-align:-2px; }
 .axis { height:15px; }
+.slider { height:18px; }
+.slider svg { width:100%; display:block; overflow:visible; }
+.slider .track { stroke:#e4e3de; stroke-width:4; stroke-linecap:round; }
+.slider .selected { stroke:#94a3b8; stroke-width:4; stroke-linecap:round; }
+.slider .knob { fill:#fff; stroke:#334155; stroke-width:1.5; cursor:ew-resize; touch-action:none; }
 .ticks { position:relative; height:14px; }
 .ticks span { position:absolute; top:0; transform:translateX(-50%); font-size:10px; color:#61718a; white-space:nowrap; }
 .ticks span.first { transform:none; }

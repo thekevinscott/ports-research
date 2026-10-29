@@ -65,7 +65,22 @@ onMounted(async () => {
 })
 
 const categories = CATEGORIES[props.by]
-const pad = { left: 40, right: 8, top: 8, bottom: categories.items.length > 4 ? 30 : 20 }
+const pad = { left: 52, right: 8, top: 8, bottom: categories.items.length > 4 ? 30 : 20 }
+const uid = Math.random().toString(36).slice(2, 8)
+const ranges = ref({})
+const knob = ref(null)
+function grab(measure, which, event) {
+  event.currentTarget.setPointerCapture(event.pointerId)
+  knob.value = { measure, which }
+}
+function slide(panel, event) {
+  if (!knob.value || knob.value.measure !== panel.measure) return
+  const py = new DOMPoint(event.clientX, event.clientY).matrixTransform(event.currentTarget.ownerSVGElement.getScreenCTM().inverse()).y
+  const value = Math.max(0, Math.min(panel.domainMax, ((pad.top + plotH - py) / plotH) * panel.domainMax))
+  const gap = panel.domainMax / 50
+  const [lo, hi] = [panel.lo, panel.hi]
+  ranges.value = { ...ranges.value, [panel.measure]: knob.value.which === 'lo' ? [Math.min(value, hi - gap), hi] : [lo, Math.max(value, lo + gap)] }
+}
 const plotW = props.width - pad.left - pad.right
 const plotH = props.height - pad.top - pad.bottom
 const band = plotW / categories.items.length
@@ -90,9 +105,12 @@ const panels = computed(() => props.measures.map(measure => {
   const percent = measure.endsWith('_pct')
   const all = rows.value.map(row => row[measure]).filter(v => v !== undefined && v !== '').map(v => scaled(measure, v))
   const refs = DIRECTIONS.map(([direction]) => referenceFor(measure, direction)).filter(v => v !== null)
-  const step = percent ? 25 : niceStep(Math.max(1e-9, ...all, ...refs) / 4)
-  const max = percent ? 100 : step * Math.ceil(Math.max(1e-9, ...all, ...refs) / step)
-  const y = value => pad.top + plotH - (value / max) * plotH
+  const domainStep = percent ? 25 : niceStep(Math.max(1e-9, ...all, ...refs) / 4)
+  const domainMax = percent ? 100 : domainStep * Math.ceil(Math.max(1e-9, ...all, ...refs) / domainStep)
+  const [lo, hi] = ranges.value[measure] ?? [0, domainMax]
+  const step = niceStep((hi - lo) / 4)
+  const y = value => pad.top + plotH - ((value - lo) / (hi - lo)) * plotH
+  const sliderY = value => pad.top + plotH - (value / domainMax) * plotH
   const directions = DIRECTIONS.map(([direction, label, color]) => ({
     direction, label, color,
     reference: referenceFor(measure, direction),
@@ -103,8 +121,9 @@ const panels = computed(() => props.measures.map(measure => {
       return { ...item, column, points, median: median(points.map(p => p.value)) }
     }),
   }))
-  const ticks = Array.from({ length: Math.round(max / step) + 1 }, (_, i) => i * step)
-  return { measure, label: LABELS[measure] ?? measure, max, y, ticks, directions, any: all.length > 0 }
+  const first = Math.ceil(lo / step) * step
+  const ticks = Array.from({ length: Math.floor((hi - first) / step) + 1 }, (_, i) => first + i * step)
+  return { measure, label: LABELS[measure] ?? measure, lo, hi, domainMax, y, sliderY, ticks, directions, any: all.length > 0 }
 }).filter(panel => panel.any))
 function tick(value, measure) {
   if (measure === 'embedding_distance') return value.toFixed(3)
@@ -122,15 +141,27 @@ function tick(value, measure) {
       <template v-for="(direction, which) in DIRECTIONS" :key="direction[0]">
         <span class="direction" :style="{ color: direction[2] }">{{ direction[1] }}</span>
         <svg v-for="panel in panels" :key="panel.measure" :width="width" :height="height" :viewBox="`0 0 ${width} ${height}`">
+          <defs><clipPath :id="`clip-${uid}-${panel.measure}-${which}`"><rect :x="pad.left - 1" :y="pad.top - 4" :width="plotW + 2" :height="plotH + 8" /></clipPath></defs>
+          <g class="y-slider">
+            <line x1="8" x2="8" :y1="pad.top" :y2="pad.top + plotH" class="track" />
+            <line x1="8" x2="8" :y1="panel.sliderY(panel.hi)" :y2="panel.sliderY(panel.lo)" class="selected" />
+            <circle v-for="which2 in ['lo', 'hi']" :key="which2" cx="8" :cy="panel.sliderY(which2 === 'lo' ? panel.lo : panel.hi)" r="5" class="knob"
+              @pointerdown.stop.prevent="grab(panel.measure, which2, $event)" @pointermove.stop="slide(panel, $event)" @pointerup.stop="knob = null" @pointercancel.stop="knob = null" />
+          </g>
           <g v-for="t in panel.ticks" :key="t">
             <line :x1="pad.left" :x2="pad.left + plotW" :y1="panel.y(t)" :y2="panel.y(t)" stroke="#e6e3dc" />
             <text :x="pad.left - 5" :y="panel.y(t) + 3" class="tick" text-anchor="end">{{ tick(t, panel.measure) }}</text>
           </g>
+          <g :clip-path="`url(#clip-${uid}-${panel.measure}-${which})`">
           <line v-if="panel.directions[which].reference !== null" :x1="pad.left" :x2="pad.left + plotW" :y1="panel.y(panel.directions[which].reference)" :y2="panel.y(panel.directions[which].reference)" stroke="#1f1f1f" stroke-width="1.4" stroke-dasharray="4 3" />
           <text v-if="panel.directions[which].reference !== null" :x="pad.left + plotW" :y="panel.y(panel.directions[which].reference) - 3" class="ref" text-anchor="end">reference</text>
           <g v-for="group in panel.directions[which].groups" :key="group.key">
             <circle v-for="point in group.points" :key="point.id" :cx="pad.left + (group.column + 0.5) * band + point.jitter" :cy="panel.y(point.value)" r="3" :fill="direction[2]" opacity=".6"><title>{{ point.id }}: {{ point.value }}</title></circle>
-            <line v-if="group.median !== null" :x1="pad.left + (group.column + 0.15) * band" :x2="pad.left + (group.column + 0.85) * band" :y1="panel.y(group.median)" :y2="panel.y(group.median)" :stroke="direction[2]" stroke-width="2.2" />
+            <line v-if="group.median !== null" :x1="pad.left + (group.column + 0.15) * band" :x2="pad.left + (group.column + 0.85) * band" :y1="panel.y(group.median)" :y2="panel.y(group.median)" stroke="#1f1f1f" stroke-width="4.6" stroke-linecap="round" />
+            <line v-if="group.median !== null" :x1="pad.left + (group.column + 0.15) * band" :x2="pad.left + (group.column + 0.85) * band" :y1="panel.y(group.median)" :y2="panel.y(group.median)" :stroke="direction[2]" stroke-width="2.4" stroke-linecap="round" />
+          </g>
+          </g>
+          <g v-for="group in panel.directions[which].groups" :key="`label-${group.key}`">
             <text :x="pad.left + (group.column + 0.5) * band" :y="pad.top + plotH + 12" class="cat" :class="{ tilt: categories.items.length > 4 }" :transform="categories.items.length > 4 ? `rotate(-30 ${pad.left + (group.column + 0.5) * band} ${pad.top + plotH + 12})` : ''" :text-anchor="categories.items.length > 4 ? 'end' : 'middle'">{{ group.label }}</text>
           </g>
           <line :x1="pad.left" :x2="pad.left + plotW" :y1="pad.top + plotH" :y2="pad.top + plotH" stroke="#b9c3cc" />
@@ -149,4 +180,7 @@ function tick(value, measure) {
 .tick, .cat, .ref { font-size: 9.5px; fill: #61718a; }
 .ref { font-size: 8.5px; fill: #1f1f1f; }
 .key { margin-top: 4px; font-size: 10.5px; color: #61718a; }
+.y-slider .track { stroke: #e4e3de; stroke-width: 4; stroke-linecap: round; }
+.y-slider .selected { stroke: #94a3b8; stroke-width: 4; stroke-linecap: round; }
+.y-slider .knob { fill: #fff; stroke: #334155; stroke-width: 1.5; cursor: ns-resize; touch-action: none; }
 </style>

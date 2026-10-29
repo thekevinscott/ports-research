@@ -5,9 +5,9 @@ title: Can an Agent Port a Codebase?
 layout: cover
 ---
 
-<div class="eyebrow">PORTS · 2026-10-29</div>
+<div class="eyebrow">NYC AI Co-working · 2026-10-29</div>
 
-# How Faithfully Can an Agent<br>Port a Codebase?
+# Asking Agents To<br>Port Codebases
 
 <div class="cover-meta">Kevin Scott</div>
 
@@ -15,15 +15,34 @@ layout: cover
 
 <div class="eyebrow">OVERVIEW</div>
 
-# One repo, two hand-written implementations, 576 agent ports
+# One library, two hand-written versions, 617 agent ports
 
-<div class="overview">
-  <div><strong>Why care</strong><span>Ports are everywhere and maintained by hand: a Python library with a TypeScript twin, a Rust rewrite of a C tool. If an agent can port faithfully, the twin can track the original for free. If it can't, we need to know how it drifts.</span></div>
-  <div><strong>What I ran</strong><span>My own grammar parser, <code>gbnf</code>, written by hand in Python and TypeScript. An agent in a locked-down container ports one to the other. 192 runs vary which tests it sees. 384 runs vary model and effort.</span></div>
-  <div><strong>What I'll show</strong><span>Tokens, time, files and lines of code. Similarity to my code, by diff. Whether repeats agree with each other. Held-out tests. What giving the agent tests changes. And how the agents found the tests I withheld.</span></div>
+<div class="toc">
+  <div>
+    <div class="toc-section"><i>01</i> Methodology</div>
+    <ol>
+      <li>The library: <code>gbnf</code>, hand-written in Python and TypeScript</li>
+      <li>The prompt the agent gets</li>
+      <li>The <code>__pycache__</code> leak</li>
+      <li>Three experiments: pilot, models × effort, tests</li>
+    </ol>
+  </div>
+  <div>
+    <div class="toc-section"><i>02</i> Results</div>
+    <ol>
+      <li>Tokens, time, cost, files, lines of code</li>
+      <li>Which model and effort, for the money</li>
+      <li>Similarity to the handwritten reference</li>
+      <li>Held-out tests: does the port behave like the reference?</li>
+      <li>Do repeats of one setting agree with each other?</li>
+      <li>How long the agent took</li>
+      <li>What effect do the tests the agent sees have?</li>
+    </ol>
+    <div class="toc-section last"><i>03</i> One practical lesson</div>
+  </div>
 </div>
 
-<div class="source">v2-tests-configuration · 8 conditions × 2 directions × 12 · v2-models-effort · 4 models × 4 efforts × 2 directions × 12</div>
+<div class="source">V1 pilot 42 ports · v2-models-effort 383 ports (4 models × 4 efforts × 2 directions × 12) · v2-tests-configuration 192 ports (8 conditions × 2 directions × 12)</div>
 
 ---
 layout: section
@@ -58,15 +77,15 @@ src: ./results/overall-stats.md
 ---
 
 ---
+src: ./results/for-the-money.md
+---
+
+---
 src: ./results/similarity.md
 ---
 
 ---
 src: ./results/tests-behavior.md
----
-
----
-src: ./results/tests-effect.md
 ---
 
 ---
@@ -77,12 +96,20 @@ src: ./results/port-matrix.md
 src: ./results/speed.md
 ---
 
+---
+src: ./results/tests-effect.md
+---
+
 
 ---
 layout: section
 ---
 
 # One practical lesson
+
+---
+src: ./results/lesson.md
+---
 
 ---
 
