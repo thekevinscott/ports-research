@@ -6,5 +6,5 @@ const show = computed(() => currentSlideRoute.value?.meta?.slide?.frontmatter?.q
 </script>
 
 <template>
-  <QrCode v-if="show" class="slide-qr" url="https://thekevinscott.com/talks/2026/october/nyc-ai-coworking/slides/" :size="64" />
+  <QrCode v-if="show" class="slide-qr" url="https://thekevinscott.com/talks/2026/october/nyc-ai-coworking/slides/" :size="32" />
 </template>
