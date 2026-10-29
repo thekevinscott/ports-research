@@ -1,4 +1,4 @@
-<div class="eyebrow">TAKEAWAY 3 · TESTS CHANGED WHAT THE PORT DID, NOT HOW BIG IT WAS</div>
+<div class="eyebrow">TAKEAWAY 3 · SOURCE-LANGUAGE TESTS ALONE BROKE THE PORT. TARGET-LANGUAGE TESTS FIXED IT.</div>
 
 # The wrong tests bought broken ports. The right ones bought tokens.
 
