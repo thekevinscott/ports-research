@@ -4,24 +4,30 @@
 
 <div class="big-steps lines">
   <div><strong>The codebase</strong>
-    <span><a href="https://github.com/thekevinscott/gbnf" target="_blank">gbnf</a>: a string library for GBNF grammars</span>
-    <span>Python, 1,305 lines</span>
-    <span>TypeScript, 1,129 lines</span>
-    <span>Both written by hand</span>
-    <span>Language-agnostic tests</span>
+    <ul>
+      <li><a href="https://github.com/thekevinscott/gbnf" target="_blank">gbnf</a>: a string library for GBNF grammars</li>
+      <li>Two implementations, written by hand
+        <ul>
+          <li>Python, 1,305 lines</li>
+          <li>TypeScript, 1,129 lines</li>
+        </ul>
+      </li>
+      <li>Language-agnostic tests</li>
+    </ul>
   </div>
   <div><strong>Why small</strong>
-    <span>Porting at scale gets the attention</span>
-    <span>I want reproducible ports</span>
-    <span>One reference library</span>
-    <span>that spawns the others</span>
-    <span>SDKs. Open source libraries.</span>
+    <ul>
+      <li>Porting at scale gets the attention</li>
+      <li>I want reproducible ports: one reference library that spawns the others</li>
+      <li>SDKs. Open source libraries.</li>
+    </ul>
   </div>
   <div><strong>The experiment</strong>
-    <span>617 ports of the same library</span>
-    <span>Both directions</span>
-    <span>4 models × 4 effort levels</span>
-    <span>Every combination of tests</span>
-    <span>the agent gets to see</span>
+    <ul>
+      <li>617 ports of the same library</li>
+      <li>Both directions</li>
+      <li>4 models × 4 effort levels</li>
+      <li>Every combination of tests the agent gets to see</li>
+    </ul>
   </div>
 </div>
