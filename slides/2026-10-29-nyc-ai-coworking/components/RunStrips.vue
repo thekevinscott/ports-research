@@ -88,8 +88,9 @@ function nice(value) {
   const step = [1, 2, 2.5, 4, 5, 10].find(candidate => candidate * power >= value)
   return step * power
 }
+const displayed = computed(() => rows.value.filter(row => layout.groups.some(group => group.rows.some(r => r.match(row)))))
 const referenceValues = computed(() => DIRECTIONS.map(([direction]) => reference.value[direction]?.[selected.value] ?? null))
-const maximum = computed(() => percent.value ? 100 : nice(Math.max(1e-9, ...referenceValues.value.filter(v => v !== null), ...rows.value.map(row => Number(row[selected.value]) || 0))))
+const maximum = computed(() => percent.value ? 100 : nice(Math.max(1e-9, ...referenceValues.value.filter(v => v !== null), ...displayed.value.map(row => Number(row[selected.value]) || 0))))
 function position(value) { return 8 + (Number(value) / maximum.value) * (vw.value - 16) }
 function median(values) {
   if (!values.length) return null
