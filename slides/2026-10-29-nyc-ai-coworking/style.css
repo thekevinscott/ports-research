@@ -145,3 +145,4 @@
 .money td.ran { color: var(--muted); }
 .money + .nb-note { margin-top: 6px; }
 .cover-qr { position: absolute; right: 78px; bottom: 86px; padding: 10px; background: #fff; border-radius: 8px; }
+.big-asterisk { position: absolute; bottom: 64px; left: 56px; color: var(--accent); font-size: 1.5rem; font-weight: 800; }
