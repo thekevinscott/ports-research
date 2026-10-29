@@ -96,6 +96,10 @@ layout: section
 </div>
 
 ---
+src: ./backup/followups.md
+---
+
+---
 
 <div class="eyebrow">B · NOTEBOOK · STATISTICAL ANALYSIS</div>
 

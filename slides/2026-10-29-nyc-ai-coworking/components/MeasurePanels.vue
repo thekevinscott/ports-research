@@ -18,6 +18,7 @@ const LABELS = {
   file_count: 'Files',
   loc: 'LOC',
   diff_lines_changed: 'Diff lines vs reference',
+  reference_diff_similarity_pct: 'Line similarity to reference (%)',
   embedding_distance: 'Embedding distance',
   behavior_agreement_pct: 'Behaviour agreement (%)',
   api_agreement_pct: 'API agreement (%)',

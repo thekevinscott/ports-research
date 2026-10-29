@@ -1,0 +1,414 @@
+run_id,model,effort,direction,status,agreements,pairs,confusion,error
+20261015T032706Z_23746cc0,claude-sonnet-5-5,medium,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261015T032706Z_859c5be6,claude-opus-5-5,medium,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261015T032706Z_a3bbc625,claude-fable-5-1,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T032706Z_c966b40f,claude-sonnet-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T032706Z_cb7b8d2b,claude-haiku-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T032706Z_d23e1a04,claude-haiku-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261015T032906Z_057c40e9,claude-opus-5-5,medium,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261015T033005Z_24bea0eb,claude-fable-5-1,medium,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T033405Z_49bf4b63,claude-sonnet-5-5,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T033636Z_3bb69e17,claude-fable-5-1,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T033841Z_e8e8d832,claude-fable-5-1,medium,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T034243Z_29f2c30c,claude-sonnet-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T034313Z_e49d15b4,claude-opus-5-5,medium,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261015T034349Z_2d01af76,claude-haiku-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T034443Z_fede5861,claude-haiku-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261015T034839Z_0c3220a4,claude-opus-5-5,medium,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261015T035119Z_ec8fc853,claude-fable-5-1,medium,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T035335Z_5770e20c,claude-haiku-5-5,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T035340Z_33343e8a,claude-sonnet-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T035441Z_dd17e59e,claude-opus-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T035633Z_d7f098d3,claude-opus-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T035651Z_2ece0ec5,claude-haiku-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261015T040048Z_d1cdd99a,claude-sonnet-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T040118Z_84d29b1c,claude-fable-5-1,medium,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261015T040307Z_0fb26709,claude-haiku-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261015T040315Z_8e7979af,claude-opus-5-5,medium,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261015T040331Z_a2f38c9b,claude-fable-5-1,medium,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261015T040549Z_446e3f30,claude-sonnet-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T040753Z_a6e309e6,claude-haiku-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T041044Z_80fb8d52,claude-sonnet-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T041336Z_aef4b62e,claude-fable-5-1,medium,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261015T041447Z_34300fb5,claude-opus-5-5,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T041715Z_c1711c1f,claude-fable-5-1,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261015T041904Z_84343240,claude-opus-5-5,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T042004Z_7314f11e,claude-sonnet-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T042251Z_4cd8a835,claude-sonnet-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T042251Z_cb3b9b7f,claude-haiku-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T042402Z_1980108f,claude-opus-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T042632Z_767b7c9e,claude-haiku-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261015T042723Z_f20c20c2,claude-fable-5-1,medium,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T062355Z_727c5728,claude-opus-5-5,medium,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261015T062355Z_8c2de8bf,claude-haiku-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261015T062355Z_951af042,claude-opus-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T062355Z_b6af551e,claude-fable-5-1,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T062355Z_c235abac,claude-haiku-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T062355Z_ebdb2ffd,claude-sonnet-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T062638Z_44c30467,claude-sonnet-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T062858Z_b7dde871,claude-fable-5-1,medium,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T063242Z_7f73d371,claude-fable-5-1,medium,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T063307Z_b3bc39bc,claude-fable-5-1,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T063519Z_63a1a8b5,claude-haiku-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T063635Z_cf3ed6a1,claude-opus-5-5,medium,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T064049Z_b518f4df,claude-sonnet-5-5,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T064105Z_5d6fb05d,claude-sonnet-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T064255Z_092f4d3f,claude-opus-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T064412Z_9315073f,claude-fable-5-1,medium,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T064521Z_6216950b,claude-opus-5-5,medium,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T065052Z_a386ff15,claude-sonnet-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T065327Z_3f028641,claude-fable-5-1,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T065350Z_3db2a0f0,claude-haiku-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T065609Z_9643fed2,claude-opus-5-5,medium,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261015T065655Z_1c0c6a4a,claude-sonnet-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T065722Z_6e297398,claude-sonnet-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T065849Z_9df9a55c,claude-haiku-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T065920Z_f20b5fee,claude-opus-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T070307Z_f166ae0c,claude-fable-5-1,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T070758Z_7404d113,claude-opus-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T070800Z_0edb5a6a,claude-haiku-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261015T070813Z_13fcbb7c,claude-fable-5-1,medium,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T071049Z_509c1ce6,claude-sonnet-5-5,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T071402Z_c68b45f8,claude-fable-5-1,medium,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T071549Z_b904f073,claude-sonnet-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T071725Z_60db9ff2,claude-fable-5-1,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T071744Z_f4bd4af4,claude-haiku-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T071748Z_55542999,claude-sonnet-5-5,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T071926Z_439bc0e2,claude-haiku-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261015T071934Z_08b45864,claude-opus-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T071947Z_542d9f16,claude-opus-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T072613Z_468ebe45,claude-opus-5-5,medium,javascript→python,driven,688,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>accept"": 106, ""reject>reject"": 241}",
+20261015T072623Z_5f1f92d3,claude-fable-5-1,medium,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T072751Z_23dc2460,claude-sonnet-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T072841Z_8e83e57a,claude-fable-5-1,medium,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261015T073033Z_05b8accb,claude-haiku-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T073501Z_5f0c25b4,claude-opus-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T073505Z_c509ce4a,claude-haiku-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T073651Z_0a2a97c3,claude-sonnet-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T073851Z_9cb477e0,claude-haiku-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T074129Z_fca843b1,claude-sonnet-5-5,medium,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T074305Z_4a4321bb,claude-opus-5-5,medium,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T074324Z_3b8e4e92,claude-haiku-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261015T074350Z_78bd13e4,claude-opus-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T074401Z_833bcecf,claude-fable-5-1,medium,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261015T074439Z_4f98cca4,claude-sonnet-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T074642Z_9fa5e655,claude-fable-5-1,medium,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261015T080534Z_08b2cc12,claude-haiku-5-5,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T080534Z_57be5b50,claude-fable-5-1,low,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T154057Z_12e978be,claude-haiku-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261015T154057Z_e3cc6442,claude-sonnet-5-5,high,javascript→python,driven,688,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>accept"": 106, ""reject>reject"": 241}",
+20261015T154557Z_dfdd5db3,claude-haiku-5-5,max,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T154738Z_9cd2e53d,claude-haiku-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T160016Z_11f0405d,claude-sonnet-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T160029Z_b1a2b5ed,claude-fable-5-1,high,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T183537Z_5ace59bd,claude-sonnet-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T183537Z_5b39c884,claude-fable-5-1,high,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T183537Z_a99e3fa2,claude-opus-5-5,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261015T192727Z_42c7dc82,claude-sonnet-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T192727Z_8518a3d4,claude-sonnet-5-5,max,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261015T192727Z_a5b2f6d2,claude-haiku-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T192727Z_ca876c86,claude-haiku-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261015T215716Z_48c85996,claude-haiku-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261015T215716Z_719942fc,claude-haiku-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261015T215716Z_9bb4badc,claude-sonnet-5-5,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261015T220621Z_ece1c692,claude-opus-5-5,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261015T223302Z_dd519b23,claude-fable-5-1,low,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261015T223443Z_ff85fdf4,claude-opus-5-5,high,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261016T002948Z_d836c9b9,claude-haiku-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T005903Z_5cc9c4bc,claude-opus-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261016T005903Z_a925dae5,claude-haiku-5-5,max,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261016T005903Z_c3c2a66c,claude-sonnet-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T005903Z_f57365d9,claude-sonnet-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T010104Z_0f452686,claude-haiku-5-5,medium,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T010659Z_a679ff9c,claude-fable-5-1,max,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261016T011949Z_a2770a19,claude-fable-5-1,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T015451Z_cbccf579,claude-haiku-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T030859Z_023b0a35,claude-haiku-5-5,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T030859Z_46345e1b,claude-haiku-5-5,high,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T030859Z_93d03123,claude-sonnet-5-5,max,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T030859Z_e1c6ff3d,claude-sonnet-5-5,high,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261016T030859Z_ed29e21b,claude-opus-5-5,max,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T031334Z_1cc1070e,claude-sonnet-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T034002Z_ea711d7c,claude-haiku-5-5,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261016T034713Z_d58b38ed,claude-haiku-5-5,max,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T040615Z_4c45a885,claude-sonnet-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T040915Z_c10b6ebd,claude-haiku-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T041316Z_b6ee94c1,claude-opus-5-5,low,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261016T041817Z_6034b286,claude-haiku-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T043720Z_b87e120f,claude-opus-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T044801Z_c3a0f9fa,claude-opus-5-5,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261016T044822Z_e763bd1c,claude-sonnet-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T044933Z_6b77117e,claude-opus-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T044947Z_8662fcd6,claude-sonnet-5-5,low,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T045521Z_369ec4c8,claude-opus-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T045529Z_d8474f98,claude-opus-5-5,low,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261016T050245Z_b4be54c0,claude-haiku-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T050257Z_addbece1,claude-sonnet-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T050755Z_3ac2f5b9,claude-opus-5-5,max,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261016T051056Z_1693bd7b,claude-haiku-5-5,high,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T052518Z_b5c1c514,claude-sonnet-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T054139Z_3ead0e64,claude-haiku-5-5,max,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T054933Z_a93f877a,claude-sonnet-5-5,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T055143Z_e019bce2,claude-opus-5-5,max,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261016T061413Z_c7fbfe03,claude-sonnet-5-5,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261016T061441Z_a5d733dd,claude-opus-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T061722Z_4c875952,claude-opus-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261016T062746Z_e99b070b,claude-sonnet-5-5,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261016T063732Z_a0061134,claude-haiku-5-5,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T064218Z_ca38921e,claude-opus-5-5,high,python→javascript,loaded_failing,449,799,"{""accept>reject"": 350, ""error>error"": 77, ""reject>reject"": 372}",
+20261016T064249Z_978c3e86,claude-sonnet-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T064327Z_883dca35,claude-opus-5-5,high,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261016T064748Z_7a235aa8,claude-haiku-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T071112Z_be3adf66,claude-opus-5-5,max,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T071539Z_d26b0110,claude-haiku-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T082730Z_9fd5a602,claude-sonnet-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T082730Z_a25b7a4c,claude-haiku-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T084258Z_8cee4d8d,claude-sonnet-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T085914Z_15f82317,claude-opus-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T085914Z_55b74ecc,claude-sonnet-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T090335Z_84602ec3,claude-sonnet-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T090510Z_a684d70b,claude-sonnet-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T093008Z_4408165b,claude-haiku-5-5,xhigh,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T093244Z_1623a99a,claude-haiku-5-5,max,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T094340Z_9321f4f2,claude-sonnet-5-5,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T095039Z_047b34d8,claude-haiku-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T095551Z_c2071c8f,claude-sonnet-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T095829Z_e6bc5fa7,claude-haiku-5-5,xhigh,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T095830Z_39cf973b,claude-opus-5-5,low,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T095833Z_d41b9333,claude-haiku-5-5,max,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T100158Z_8c57771c,claude-haiku-5-5,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T101103Z_42c0855d,claude-haiku-5-5,high,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T102346Z_50e372f5,claude-opus-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T102550Z_a93af49d,claude-sonnet-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T102652Z_e386909e,claude-sonnet-5-5,low,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T102920Z_b7349055,claude-opus-5-5,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261016T104326Z_fd965052,claude-opus-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T104406Z_85611d48,claude-opus-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T104626Z_3e725b95,claude-haiku-5-5,max,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T111145Z_ce29e706,claude-haiku-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T112552Z_12a9dd94,claude-haiku-5-5,low,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T112558Z_c9a62987,claude-opus-5-5,max,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261016T113319Z_afbe8339,claude-sonnet-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T113823Z_531c47cc,claude-haiku-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T115627Z_6c2f61ea,claude-sonnet-5-5,max,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261016T132518Z_01117619,claude-sonnet-5-5,high,python→javascript,loaded_failing,449,799,"{""accept>reject"": 350, ""error>error"": 77, ""reject>reject"": 372}",
+20261016T132518Z_49caf611,claude-sonnet-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T132518Z_57b103b6,claude-sonnet-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T132518Z_a39108b0,claude-haiku-5-5,high,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T132518Z_c85d02b4,claude-haiku-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T133236Z_4d82c98e,claude-haiku-5-5,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T133723Z_5dd305b9,claude-haiku-5-5,xhigh,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T134506Z_a4f2e0be,claude-opus-5-5,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261016T134612Z_ea10d004,claude-haiku-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T135417Z_cdeda4c3,claude-sonnet-5-5,high,javascript→python,driven,688,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>accept"": 106, ""reject>reject"": 241}",
+20261016T135618Z_00c44fb2,claude-opus-5-5,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261016T135806Z_32b0229b,claude-opus-5-5,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261016T140123Z_eb5c4d40,claude-opus-5-5,low,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T140213Z_e8f03a6c,claude-opus-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261016T140530Z_36707fd9,claude-sonnet-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261016T140734Z_07cbaeef,claude-sonnet-5-5,low,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T140946Z_6dd707ab,claude-haiku-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T141059Z_eeec4e38,claude-opus-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T141203Z_ba5d20ff,claude-haiku-5-5,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T142140Z_d212d731,claude-haiku-5-5,high,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T151822Z_8a181d1c,claude-haiku-5-5,xhigh,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261016T151822Z_ac3c229a,claude-fable-5-1,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261016T151822Z_b88fc3f0,claude-fable-5-1,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261016T153807Z_57d13afa,claude-fable-5-1,max,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261016T154405Z_4ae5d899,claude-fable-5-1,max,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261016T154707Z_89281f03,claude-haiku-5-5,max,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T201320Z_1a8fdceb,claude-fable-5-1,xhigh,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261016T201320Z_9a849db4,claude-fable-5-1,max,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261016T201320Z_bd85d2be,claude-opus-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261016T210335Z_4d158ae5,claude-fable-5-1,max,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261016T211542Z_b0ed5753,claude-fable-5-1,max,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261016T211737Z_2ac65437,claude-fable-5-1,xhigh,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261017T020314Z_25944351,claude-opus-5-5,max,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T020314Z_8560337c,claude-fable-5-1,max,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261017T023933Z_6d2b805b,claude-opus-5-5,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T024330Z_c7427be9,claude-fable-5-1,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T030631Z_dfb57d1e,claude-fable-5-1,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261017T030941Z_5e414561,claude-opus-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261017T124448Z_1504c019,claude-fable-5-1,max,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T124448Z_3295a762,claude-fable-5-1,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T124448Z_8680a3ae,claude-opus-5-5,max,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T140628Z_5bdc50d9,claude-fable-5-1,high,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261017T140628Z_7ff29cfa,claude-fable-5-1,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261017T140628Z_a4299be1,claude-sonnet-5-5,low,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T140628Z_c78012c1,claude-sonnet-5-5,high,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261017T140628Z_fd1ff645,claude-sonnet-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261017T140934Z_18024b75,claude-opus-5-5,low,python→javascript,loaded_failing,449,799,"{""accept>reject"": 350, ""error>error"": 77, ""reject>reject"": 372}",
+20261017T141045Z_b6a33d31,claude-haiku-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261017T141630Z_6c98c7fb,claude-haiku-5-5,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261017T141753Z_c5b2e870,claude-haiku-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261017T142154Z_463c1f27,claude-fable-5-1,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261017T142302Z_2e15cbab,claude-haiku-5-5,xhigh,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261017T142654Z_6f2ac83d,claude-haiku-5-5,high,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261017T143954Z_825e08fe,claude-fable-5-1,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T144511Z_3c318f76,claude-fable-5-1,low,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261017T144905Z_cdbb3a9d,claude-fable-5-1,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T145510Z_b5feb62b,claude-sonnet-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T145529Z_480bbf5d,claude-opus-5-5,high,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261017T145644Z_14ca7e3a,claude-opus-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T150755Z_21b649ee,claude-sonnet-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261017T150931Z_8f22baf5,claude-opus-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261017T150942Z_87a02ac8,claude-haiku-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261017T151200Z_99e21935,claude-sonnet-5-5,low,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T151409Z_e4fc1eab,claude-sonnet-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T151646Z_fda78be3,claude-haiku-5-5,xhigh,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261017T151840Z_d96d3064,claude-haiku-5-5,low,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T152601Z_e5ae25fd,claude-opus-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T152607Z_573d918d,claude-sonnet-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261017T174414Z_0973797c,claude-haiku-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T174414Z_65784245,claude-haiku-5-5,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261017T174414Z_6ec401f8,claude-opus-5-5,low,python→javascript,driven,774,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>error"": 5, ""reject>reject"": 347}",
+20261017T174414Z_bda9970d,claude-sonnet-5-5,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261017T174414Z_d063fa91,claude-haiku-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261017T174601Z_38b6d733,claude-haiku-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T174724Z_fea40a88,claude-opus-5-5,high,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261017T175320Z_e5f397a1,claude-sonnet-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261017T175457Z_cbbbf807,claude-opus-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T175705Z_199789f2,claude-sonnet-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T180306Z_971d6d74,claude-opus-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261017T180458Z_76dacc45,claude-haiku-5-5,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 352, ""accept>reject"": 18, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261017T180726Z_32b916b9,claude-haiku-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261017T181203Z_3ed78b89,claude-sonnet-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261017T181240Z_994f03de,claude-opus-5-5,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T181323Z_e575f21a,claude-sonnet-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261017T181551Z_5bfde8fc,claude-sonnet-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T182324Z_27998186,claude-haiku-5-5,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261017T183054Z_a01fbde5,claude-opus-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261017T183547Z_6f903a17,claude-sonnet-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T183600Z_dfce512a,claude-opus-5-5,low,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T183721Z_ff9439b6,claude-sonnet-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261017T183852Z_bb02a79b,claude-haiku-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261017T183908Z_5926a78e,claude-sonnet-5-5,high,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261017T183947Z_71da47b6,claude-opus-5-5,high,python→javascript,driven,774,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>error"": 5, ""reject>reject"": 347}",
+20261017T184059Z_d2c53842,claude-haiku-5-5,xhigh,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261017T184432Z_db5d720b,claude-sonnet-5-5,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261017T185204Z_a9c4712f,claude-sonnet-5-5,low,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T185324Z_cf33d566,claude-haiku-5-5,xhigh,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261017T185331Z_2f51ee13,claude-sonnet-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T185334Z_dcc07682,claude-opus-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261017T185445Z_9aaf4c83,claude-haiku-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T191216Z_f0a62116,claude-opus-5-5,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T191809Z_0db46089,claude-haiku-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261017T191904Z_0bcd6f04,claude-haiku-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261017T192119Z_2d30b54b,claude-opus-5-5,low,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T192656Z_bf865f31,claude-sonnet-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T192734Z_c29532ea,claude-opus-5-5,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T193148Z_ceceabb2,claude-opus-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T193250Z_265260aa,claude-opus-5-5,high,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261017T193328Z_0d2ddf4e,claude-opus-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261017T193739Z_e89b1341,claude-haiku-5-5,xhigh,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261017T194301Z_90ab8e13,claude-haiku-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T194703Z_1493c05b,claude-sonnet-5-5,high,javascript→python,driven,688,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>accept"": 106, ""reject>reject"": 241}",
+20261017T195007Z_bdd68396,claude-sonnet-5-5,low,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T195231Z_caeef3b7,claude-haiku-5-5,low,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T195325Z_3b1144d1,claude-sonnet-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T195536Z_5cb054b6,claude-haiku-5-5,xhigh,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261017T201047Z_a94d8752,claude-sonnet-5-5,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261017T201420Z_b4688200,claude-opus-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261017T201531Z_50423746,claude-haiku-5-5,xhigh,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261017T201714Z_63272a5e,claude-haiku-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T202136Z_798baea8,claude-opus-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T203132Z_35416f7e,claude-opus-5-5,high,javascript→python,driven,688,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>accept"": 106, ""reject>reject"": 241}",
+20261017T203411Z_11ce633c,claude-sonnet-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T203559Z_576b064d,claude-opus-5-5,low,python→javascript,loaded_failing,444,799,"{""accept>reject"": 350, ""error>error"": 77, ""reject>error"": 5, ""reject>reject"": 367}",
+20261017T203601Z_33e30d68,claude-sonnet-5-5,low,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T203939Z_07b70532,claude-opus-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261017T204350Z_a3171a02,claude-opus-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T205350Z_a1728946,claude-opus-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261017T205644Z_cd351069,claude-haiku-5-5,xhigh,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261017T205706Z_e0c9e4cc,claude-sonnet-5-5,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261017T205752Z_445d16aa,claude-haiku-5-5,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 352, ""accept>reject"": 18, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261017T205931Z_c129290c,claude-opus-5-5,high,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261017T210009Z_c67b7091,claude-opus-5-5,xhigh,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T211158Z_9027437c,claude-sonnet-5-5,high,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261017T212444Z_aed27a8f,claude-opus-5-5,low,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T212715Z_89ee97e7,claude-sonnet-5-5,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T213117Z_776522f3,claude-opus-5-5,low,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T213415Z_17d00ac8,claude-haiku-5-5,xhigh,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261017T213744Z_1d7dd16d,claude-sonnet-5-5,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261017T214510Z_1197e8f7,claude-opus-5-5,low,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261017T220124Z_97fa7aa7,claude-haiku-5-5,xhigh,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ImportError: cannot import name 'RuleEnd' from 'gbnf' (/home/duncan/work/code/research/port
+20261020-212438-calm-shadow,claude-haiku-5-5,max,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261020-212438-polished-sound,claude-haiku-5-5,xhigh,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261020-212438-wild-king,claude-haiku-5-5,high,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261020-222136-bitter-scene,claude-haiku-5-5,max,python→javascript,not_loaded,0,799,"{""accept>crash"": 350, ""error>crash"": 77, ""reject>crash"": 372}",no src/index.ts
+20261020-222136-soft-truth,claude-haiku-5-5,xhigh,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261021-002503-lively-violet,claude-fable-5-1,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261021-015429-cold-wave,claude-fable-5-1,max,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261021-015429-hidden-credit,claude-haiku-5-5,max,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261021-015429-holy-recipe,claude-opus-5-5,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261021-015429-jolly-water,claude-fable-5-1,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261021-015429-orange-hall,claude-fable-5-1,high,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261021-015429-quiet-silence,claude-fable-5-1,low,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261021-015429-round-fog,claude-fable-5-1,low,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261021-015429-shiny-mode,claude-fable-5-1,xhigh,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261021-015429-square-band,claude-opus-5-5,high,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261026-020726-blue-star,claude-fable-5-1,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261026-020726-cold-cake,claude-fable-5-1,low,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-020726-cold-queen,claude-fable-5-1,low,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-020726-empty-wildflower,claude-fable-5-1,low,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-020726-jolly-leaf,claude-fable-5-1,low,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-020726-lingering-cherry,claude-fable-5-1,low,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-020726-lucky-cake,claude-fable-5-1,low,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-020726-mute-mud,claude-fable-5-1,low,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261026-020726-nameless-hall,claude-fable-5-1,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261026-020726-nameless-pine,claude-fable-5-1,low,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-020726-plain-darkness,claude-fable-5-1,low,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261026-020726-rapid-poetry,claude-fable-5-1,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261026-020726-throbbing-rain,claude-fable-5-1,low,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-020726-twilight-sun,claude-fable-5-1,low,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-020726-wandering-mud,claude-fable-5-1,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261026-020726-wild-block,claude-fable-5-1,low,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261026-111547-aged-king,claude-fable-5-1,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261026-111547-blue-dew,claude-fable-5-1,high,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-111547-dark-unit,claude-fable-5-1,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261026-111547-fancy-bird,claude-fable-5-1,high,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261026-111547-lively-union,claude-fable-5-1,high,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-111547-plain-tooth,claude-fable-5-1,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261026-111547-proud-queen,claude-fable-5-1,high,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-111547-shy-resonance,claude-fable-5-1,high,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-111547-solitary-union,claude-fable-5-1,high,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261026-111547-spring-dream,claude-fable-5-1,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261026-111547-wild-darkness,claude-fable-5-1,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261026-191627-calm-mouse,claude-fable-5-1,high,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-191627-mute-king,claude-fable-5-1,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261026-191627-old-fire,claude-fable-5-1,high,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261026-191627-patient-lab,claude-fable-5-1,high,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261026-191627-rough-king,claude-fable-5-1,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261026-191627-snowy-star,claude-fable-5-1,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261026-191627-tight-wave,claude-fable-5-1,high,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261027-040249-crimson-lab,claude-opus-5-5,high,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261027-040249-odd-pine,claude-opus-5-5,high,javascript→python,driven,688,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>accept"": 106, ""reject>reject"": 241}",
+20261027-112907-white-resonance,claude-opus-5-5,high,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261027-114410-jolly-wood,claude-sonnet-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261027-151736-black-wave,claude-sonnet-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261027-151736-late-night,claude-sonnet-5-5,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261028-034150-nameless-leaf,claude-fable-5-1,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261028-034150-young-bird,claude-opus-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261028-095511-broken-lab,claude-sonnet-5-5,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261028-095511-calm-frog,claude-fable-5-1,xhigh,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261028-095511-dry-moon,claude-fable-5-1,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261028-095511-floral-smoke,claude-fable-5-1,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261028-095511-holy-boat,claude-fable-5-1,xhigh,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261028-095511-holy-sea,claude-sonnet-5-5,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261028-095511-odd-darkness,claude-fable-5-1,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261028-095511-odd-hill,claude-opus-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261028-095511-plain-bush,claude-fable-5-1,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261028-095511-plain-river,claude-fable-5-1,xhigh,python→javascript,loaded_failing,77,799,"{""accept>error"": 350, ""error>error"": 77, ""reject>error"": 372}",
+20261028-095511-polished-fog,claude-opus-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261028-095511-quiet-night,claude-sonnet-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261028-095511-royal-voice,claude-fable-5-1,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261028-095511-small-night,claude-fable-5-1,xhigh,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261028-095511-snowy-flower,claude-haiku-5-5,xhigh,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261028-095511-soft-recipe,claude-fable-5-1,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261028-095511-spring-union,claude-fable-5-1,xhigh,python→javascript,loaded_failing,449,799,"{""accept>reject"": 350, ""error>error"": 77, ""reject>reject"": 372}",
+20261028-095511-wispy-pond,claude-fable-5-1,xhigh,javascript→python,not_loaded,0,799,"{""accept>crash"": 370, ""error>crash"": 82, ""reject>crash"": 347}",ModuleNotFoundError: No module named 'gbnf'
+20261028-095511-yellow-moon,claude-opus-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261028-232823-late-queen,claude-sonnet-5-5,xhigh,javascript→python,loaded_failing,318,799,"{""accept>error"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>error"": 106, ""reject>reject"": 241}",
+20261028-232823-plain-voice,claude-fable-5-1,xhigh,python→javascript,driven,779,799,"{""accept>accept"": 350, ""error>error"": 77, ""reject>accept"": 20, ""reject>reject"": 352}",
+20261028-232823-shiny-forest,claude-opus-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",
+20261028-232823-wispy-water,claude-opus-5-5,xhigh,javascript→python,driven,794,799,"{""accept>accept"": 370, ""error>error"": 77, ""error>reject"": 5, ""reject>reject"": 347}",

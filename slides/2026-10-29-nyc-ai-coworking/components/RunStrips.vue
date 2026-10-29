@@ -17,6 +17,7 @@ const MEASURES = [
   ['file_count', 'Files'],
   ['loc', 'LOC'],
   ['diff_lines_changed', 'Diff lines'],
+  ['reference_diff_similarity_pct', 'Similarity %'],
   ['embedding_distance', 'Embedding distance'],
   ['behavior_agreement_pct', 'Behaviour %'],
   ['api_agreement_pct', 'API %'],
