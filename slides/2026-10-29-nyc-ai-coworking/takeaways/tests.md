@@ -1,4 +1,4 @@
-<div class="eyebrow">TAKEAWAY 3 · SOURCE-LANGUAGE TESTS ALONE BROKE THE PORT. TARGET-LANGUAGE TESTS FIXED IT.</div>
+<div class="eyebrow">TAKEAWAY 3 · SOURCE-LANGUAGE INTEGRATION TESTS BROKE THE PORT. TARGET-LANGUAGE TESTS FIXED IT.</div>
 
 # The wrong tests bought broken ports. The right ones bought tokens.
 

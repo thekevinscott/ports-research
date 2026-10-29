@@ -1,4 +1,4 @@
-<div class="eyebrow">TAKEAWAY 2 · THE AGENT HAS A HOUSE STYLE. YOUR PORT IS THE OUTLIER.</div>
+<div class="eyebrow">TAKEAWAY 2 · THE AGENT HAS A HOUSE STYLE. HANDWRITTEN IMPLEMENTATIONS ARE THE OUTLIER.</div>
 
 # Ports agree with each other more than with the handwritten port
 
