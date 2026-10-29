@@ -11,7 +11,7 @@ layout: cover
 
 <div class="cover-meta">Kevin Scott</div>
 
-<QrCode class="cover-qr" url="https://thekevinscott.com/talks/2026-10-29-nyc-ai-coworking/slides/" :size="150" />
+<QrCode class="cover-qr" url="https://thekevinscott.com/talks/2026/october/nyc-ai-coworking/slides/" :size="150" />
 
 ---
 
@@ -104,9 +104,9 @@ class: chart-takeaway
 
 <div class="end-layout">
   <div>
-    <div class="end-link">Slides: <strong>thekevinscott.com/talks/2026-10-29-nyc-ai-coworking/slides</strong><br><span class="end-sub">Data and code: github.com/thekevinscott/ports-research</span></div>
+    <div class="end-link">Slides: <strong>thekevinscott.com/talks/2026/october/nyc-ai-coworking/slides</strong><br><span class="end-sub">Data and code: github.com/thekevinscott/ports-research</span></div>
   </div>
-  <QrCode url="https://thekevinscott.com/talks/2026-10-29-nyc-ai-coworking/slides/" :size="240" />
+  <QrCode url="https://thekevinscott.com/talks/2026/october/nyc-ai-coworking/slides/" :size="240" />
 </div>
 
 ---
