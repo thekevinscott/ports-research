@@ -18,15 +18,15 @@ const LABELS = {
   file_count: 'Files',
   loc: 'LOC',
   diff_lines_changed: 'Diff lines vs reference',
-  reference_diff_similarity_pct: 'Line similarity to reference (%)',
+  reference_diff_similarity_pct: 'Lines shared with reference (%)',
   embedding_distance: 'Embedding distance',
   behavior_agreement_pct: 'Behaviour agreement (%)',
   api_agreement_pct: 'API agreement (%)',
   ladder_ref_ratio: 'Ladder time ÷ reference (1 = same speed)',
 }
 const DIRECTIONS = [
-  ['python→javascript', 'Python → TypeScript', '#5d85a0'],
-  ['javascript→python', 'TypeScript → Python', '#e36836'],
+  ['python→javascript', 'Python → TypeScript', '#5d85a0', 'handwritten TypeScript'],
+  ['javascript→python', 'TypeScript → Python', '#e36836', 'handwritten Python'],
 ]
 const CATEGORIES = {
   condition: {
@@ -158,7 +158,7 @@ function tick(value, measure) {
           </g>
           <g :clip-path="`url(#clip-${uid}-${panel.measure}-${which})`">
           <line v-if="panel.directions[which].reference !== null" :x1="pad.left" :x2="pad.left + plotW" :y1="panel.y(panel.directions[which].reference)" :y2="panel.y(panel.directions[which].reference)" stroke="#1f1f1f" stroke-width="1.4" stroke-dasharray="4 3" />
-          <text v-if="panel.directions[which].reference !== null" :x="pad.left + plotW" :y="panel.y(panel.directions[which].reference) - 3" class="ref" text-anchor="end">reference</text>
+          <text v-if="panel.directions[which].reference !== null" :x="pad.left + plotW" :y="panel.y(panel.directions[which].reference) - 3" class="ref" text-anchor="end">{{ referenceLine === null ? direction[3] : 'reference' }}</text>
           <g v-for="group in panel.directions[which].groups" :key="group.key">
             <circle v-for="point in group.points" :key="point.id" :cx="pad.left + (group.column + 0.5) * band + point.jitter" :cy="panel.y(point.value)" r="3" :fill="direction[2]" opacity=".6"><title>{{ point.id }}: {{ point.value }}</title></circle>
             <line v-if="group.median !== null" :x1="pad.left + (group.column + 0.15) * band" :x2="pad.left + (group.column + 0.85) * band" :y1="panel.y(group.median)" :y2="panel.y(group.median)" stroke="#1f1f1f" stroke-width="4.6" stroke-linecap="round" />
@@ -172,7 +172,7 @@ function tick(value, measure) {
         </svg>
       </template>
     </div>
-    <div class="key">one dot = one run &nbsp;·&nbsp; bar = median &nbsp;·&nbsp; dashed = handwritten reference</div>
+    <div class="key">one dot = one run &nbsp;·&nbsp; bar = median &nbsp;·&nbsp; dashed = the handwritten version in the target language</div>
   </div>
 </template>
 

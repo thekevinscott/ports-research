@@ -129,3 +129,10 @@
 .toc-section i { font-style: normal; color: var(--accent); font-size: .85rem; letter-spacing: .14em; margin-right: 12px; vertical-align: 2px; }
 .toc ol { margin: 0; padding-left: 1.6em; color: var(--muted); font-size: .94rem; line-height: 1.32; }
 .toc ol li::marker { color: var(--accent); font-weight: 700; }
+
+.takeaway-list { display: flex; flex-direction: column; gap: 14px; margin-top: 10px; }
+.takeaway-item { display: flex; gap: 18px; align-items: flex-start; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+.takeaway-item i { font-style: normal; font-weight: 800; color: var(--accent); font-size: 1.9rem; line-height: 1; min-width: 34px; }
+.takeaway-item b { display: block; color: var(--ink); font-size: 1.32rem; line-height: 1.2; margin-bottom: 4px; }
+.takeaway-item span { color: var(--muted); font-size: .95rem; line-height: 1.35; }
+.tabs-row { display: flex; margin-top: 6px; }

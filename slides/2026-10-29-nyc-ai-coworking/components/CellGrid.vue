@@ -1,8 +1,9 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { experiment, experiments } from './experiment.js'
 
 const props = defineProps({
-  src: { type: String, required: true },
+  sources: { type: Object, required: true },
   direction: { type: String, required: true },
   field: { type: String, default: 'pair_lines_median' },
   title: { type: String, default: '' },
@@ -16,21 +17,41 @@ const MODELS = [
   ['claude-haiku-5-5', 'Haiku'],
 ]
 const EFFORTS = [['low', 'low'], ['medium', 'medium'], ['high', 'high'], ['xhigh', 'very high']]
+const UNIT = [['off', 'no unit tests'], ['on', 'unit tests']]
+const INTEGRATION = [['none', 'none'], ['source', 'source'], ['target', 'target'], ['both', 'both']]
+const CONDITION = {
+  'off:none': 'none', 'off:source': 'source', 'off:target': 'target', 'off:both': 'source + target',
+  'on:none': 'unit', 'on:source': 'unit + source', 'on:target': 'unit + target', 'on:both': 'all',
+}
+const LAYOUTS = {
+  'models-effort': { rows: MODELS, cols: EFFORTS, key: row => `${row.model}:${row.effort}`, at: (r, c) => `${r}:${c}` },
+  tests: { rows: UNIT, cols: INTEGRATION, key: row => row.condition, at: (r, c) => CONDITION[`${r}:${c}`] },
+}
 const RAMP = ['#eef5fd', '#86b6ef', '#3987e5', '#256abf', '#0d366b']
 
+const active = computed(() => experiments[experiment.value].key)
+const layout = computed(() => LAYOUTS[active.value])
+const cache = new Map()
 const data = ref(null)
-onMounted(async () => {
-  const response = await fetch(props.src)
-  if (!response.ok) throw new Error(`${props.src}: HTTP ${response.status}`)
-  data.value = await response.json()
-})
+async function load() {
+  const src = props.sources[active.value]
+  if (!cache.has(src)) {
+    const response = await fetch(src)
+    if (!response.ok) throw new Error(`${src}: HTTP ${response.status}`)
+    cache.set(src, await response.json())
+  }
+  data.value = cache.get(src)
+}
+watch(active, load, { immediate: true })
 
-const cells = computed(() => (data.value ?? []).filter(row => row.direction === props.direction).map(row => ({
-  row: MODELS.findIndex(([id]) => id === row.model),
-  col: EFFORTS.findIndex(([id]) => id === row.effort),
-  value: row[props.field],
-  ...row,
-})).filter(c => c.row >= 0 && c.col >= 0))
+const cells = computed(() => {
+  const { rows, cols, key, at } = layout.value
+  const byKey = new Map((data.value ?? []).filter(row => row.direction === props.direction).map(row => [key(row), row]))
+  return rows.flatMap(([r], row) => cols.map(([c], col) => {
+    const found = byKey.get(at(r, c))
+    return found ? { row, col, value: found[props.field], ...found } : null
+  })).filter(Boolean)
+})
 const span = computed(() => {
   const values = cells.value.map(c => c.value)
   return [Math.max(...values), Math.min(...values)]
@@ -48,18 +69,18 @@ function colour(value) {
   const [a, b] = [RAMP[i], RAMP[i + 1]]
   return `#${hex(mix(a.slice(1, 3), b.slice(1, 3)))}${hex(mix(a.slice(3, 5), b.slice(3, 5)))}${hex(mix(a.slice(5, 7), b.slice(5, 7)))}`
 }
-const left = 52
+const left = computed(() => active.value === 'tests' ? 84 : 52)
 const top = 18
 </script>
 
 <template>
   <div class="block">
     <div v-if="title" class="title">{{ title }}</div>
-    <svg v-if="data" :width="left + EFFORTS.length * cell" :height="top + MODELS.length * cell" :viewBox="`0 0 ${left + EFFORTS.length * cell} ${top + MODELS.length * cell}`">
-      <text v-for="([id, label], i) in EFFORTS" :key="id" :x="left + (i + 0.5) * cell" :y="top - 6" class="label" text-anchor="middle">{{ label }}</text>
-      <text v-for="([id, label], i) in MODELS" :key="id" :x="left - 6" :y="top + (i + 0.5) * cell + 4" class="label" text-anchor="end">{{ label }}</text>
-      <g v-for="c in cells" :key="c.model + c.effort">
-        <rect :x="left + c.col * cell + 1" :y="top + c.row * cell + 1" :width="cell - 2" :height="cell - 2" :fill="colour(c.value)" rx="3"><title>{{ c.model }} {{ c.effort }}: median {{ c.pair_lines_median }} diff lines between ports ({{ c.pair_pct_median }}% similar) over {{ c.pairs }} pairs of {{ c.ports }} ports; median {{ c.reference_lines_median }} lines vs the reference</title></rect>
+    <svg v-if="data" :width="left + layout.cols.length * cell" :height="top + layout.rows.length * cell" :viewBox="`0 0 ${left + layout.cols.length * cell} ${top + layout.rows.length * cell}`">
+      <text v-for="([id, label], i) in layout.cols" :key="id" :x="left + (i + 0.5) * cell" :y="top - 6" class="label" text-anchor="middle">{{ label }}</text>
+      <text v-for="([id, label], i) in layout.rows" :key="id" :x="left - 6" :y="top + (i + 0.5) * cell + 4" class="label" text-anchor="end">{{ label }}</text>
+      <g v-for="c in cells" :key="c.row + ':' + c.col">
+        <rect :x="left + c.col * cell + 1" :y="top + c.row * cell + 1" :width="cell - 2" :height="cell - 2" :fill="colour(c.value)" rx="3"><title>{{ c.model }} {{ c.effort ?? c.condition }}: median {{ c.pair_lines_median }} diff lines between ports ({{ c.pair_pct_median }}% similar) over {{ c.pairs }} pairs of {{ c.ports }} ports; median {{ c.reference_lines_median }} lines vs the reference</title></rect>
         <text :x="left + (c.col + 0.5) * cell" :y="top + (c.row + 0.5) * cell + 5" class="value" text-anchor="middle" :fill="t(c.value) > 0.5 ? '#fff' : '#17243a'">{{ c.value }}</text>
       </g>
     </svg>

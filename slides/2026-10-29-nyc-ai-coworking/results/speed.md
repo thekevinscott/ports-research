@@ -1,6 +1,6 @@
 <div class="eyebrow">RESULTS · SPEED OF THE PORTED LIBRARY</div>
 
-<div class="explain">Port and reference parse the same 22-grammar ladder, up to JSON nested 8,192 deep. <b>Value</b> = port's median parse time ÷ reference's. Dashed line = same speed; left of it is faster than the hand-written code. Unloadable ports have no dot.</div>
+<div class="explain">Port and reference parse the same 22-grammar ladder, up to JSON nested 8,192 deep. <b>Value</b> = port's median parse time ÷ reference's. Dashed line = same speed; left of it is faster than the hand-written code. Unloadable ports have no dot. <b>Models × effort</b>: the timing batch is still running, serially; only the ports timed so far are shown.</div>
 
 <RunStrips compact :sources="{ 'models-effort': '/models-effort-ladder.csv', tests: '/tests-configuration-ladder.csv' }" initial-measure="ladder_ref_ratio" :measures="['ladder_ref_ratio']" :reference-line="1" />
 

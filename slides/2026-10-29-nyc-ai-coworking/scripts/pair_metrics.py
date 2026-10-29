@@ -17,6 +17,9 @@ sys.path.insert(0, str(NOTEBOOK))
 from src.Codebase import exclude_args, pinned_reference, run_git_diff  # noqa: E402
 from src.corpus import EXCLUDE_BY_LANGUAGE, REFERENCE  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).parent))
+from run_metrics import condition  # noqa: E402
+
 EFFORTS = ["low", "medium", "high", "xhigh"]
 
 
@@ -25,23 +28,28 @@ def main() -> None:
     parser.add_argument("--runs-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--notebook", type=Path, required=True)
+    parser.add_argument("--by", choices=["model-effort", "condition"], default="model-effort")
     args = parser.parse_args()
     pinned_reference()
     cells: dict[tuple, list[Path]] = {}
     for run_json in sorted(args.runs_root.glob("*/run.json")):
         run = json.loads(run_json.read_text())
         params = run.get("params") or {}
-        if run.get("exit_code") != 0 or run.get("excluded") or params.get("effort") not in EFFORTS:
+        if run.get("exit_code") != 0 or run.get("excluded"):
+            continue
+        if args.by == "model-effort" and params.get("effort") not in EFFORTS:
             continue
         target = "javascript" if params["source-language"] == "python" else "python"
         if not any(path.is_file() for path in (run_json.parent / "ported_implementation").rglob("*")):
             print(f"skipped {run_json.parent.name}: empty port", file=sys.stderr, flush=True)
             continue
-        cells.setdefault((f"{params['source-language']}→{target}", params["model"], params["effort"]), []).append(
+        cell = (params["model"], params["effort"]) if args.by == "model-effort" else ("claude-opus-5-5", condition(params))
+        cells.setdefault((f"{params['source-language']}→{target}", *cell), []).append(
             run_json.parent / "ported_implementation"
         )
     rows = []
     for (direction, model, effort), ports in sorted(cells.items()):
+        key = "effort" if args.by == "model-effort" else "condition"
         target = direction.split("→")[1]
         exclude = exclude_args(EXCLUDE_BY_LANGUAGE[target])
         pairs = [
@@ -53,7 +61,7 @@ def main() -> None:
             {
                 "direction": direction,
                 "model": model,
-                "effort": effort,
+                key: effort,
                 "ports": len(ports),
                 "pair_lines_median": round(statistics.median(lines(d) for d in pairs)),
                 "pair_pct_median": round(statistics.median(d["similarity_pct"] for d in pairs), 1),

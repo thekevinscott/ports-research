@@ -31,11 +31,10 @@ layout: cover
     <div class="toc-section"><i>02</i> Results</div>
     <ol>
       <li>Tokens, time, cost, files, lines of code</li>
+      <li>How fast the ported library runs</li>
       <li>Similarity to the handwritten reference</li>
       <li>Held-out tests: does the port behave like the reference?</li>
       <li>Do repeats of one setting agree with each other?</li>
-      <li>How fast the ported library runs</li>
-      <li>What effect do the tests the agent sees have?</li>
     </ol>
     <div class="toc-section last"><i>03</i> Takeaways</div>
     <ol>
@@ -81,6 +80,10 @@ src: ./results/overall-stats.md
 ---
 
 ---
+src: ./results/speed.md
+---
+
+---
 src: ./results/similarity.md
 ---
 
@@ -92,20 +95,10 @@ src: ./results/tests-behavior.md
 src: ./results/port-matrix.md
 ---
 
----
-src: ./results/speed.md
----
 
 ---
-src: ./results/tests-effect.md
+src: ./results/takeaways.md
 ---
-
-
----
-layout: section
----
-
-# Takeaways
 
 ---
 src: ./results/for-the-money.md

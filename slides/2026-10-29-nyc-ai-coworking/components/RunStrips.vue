@@ -1,6 +1,7 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { experiment, experiments } from './experiment.js'
+import ExperimentTabs from './ExperimentTabs.vue'
 
 const props = defineProps({
   src: { type: String, default: null },
@@ -20,16 +21,16 @@ const MEASURES = [
   ['cost_usd', 'Cost'],
   ['file_count', 'Files'],
   ['loc', 'LOC'],
-  ['diff_lines_changed', 'Diff lines'],
-  ['reference_diff_similarity_pct', 'Similarity %'],
+  ['diff_lines_changed', 'Diff lines vs reference'],
+  ['reference_diff_similarity_pct', 'Lines shared with reference %'],
   ['embedding_distance', 'Embedding distance'],
   ['behavior_agreement_pct', 'Behaviour %'],
   ['api_agreement_pct', 'API %'],
   ['ladder_ref_ratio', 'Parse time ÷ reference'],
 ]
 const DIRECTIONS = [
-  ['python→javascript', 'Python → TypeScript', '#5d85a0'],
-  ['javascript→python', 'TypeScript → Python', '#e36836'],
+  ['python→javascript', 'Python → TypeScript', '#5d85a0', 'handwritten TypeScript'],
+  ['javascript→python', 'TypeScript → Python', '#e36836', 'handwritten Python'],
 ]
 const LAYOUTS = {
   'model-effort': {
@@ -74,7 +75,6 @@ const currentSrc = computed(() => active.value ? props.sources[active.value.key]
 const currentBy = computed(() => active.value ? active.value.by : props.by)
 const layout = computed(() => LAYOUTS[currentBy.value])
 const twoLabels = computed(() => layout.value.headers.length === 2)
-function pick(index) { experiment.value = index }
 
 const cache = new Map()
 async function fetchRows(src) {
@@ -185,12 +185,12 @@ const rowHeight = computed(() => twoLabels.value ? (props.compact ? 14 : 18) : c
   <div class="strips" :class="{ two: twoLabels, pooled: currentBy === 'pooled' }">
     <div class="tabs">
       <template v-if="choices.length > 1"><button v-for="[key, label] in choices" :key="key" :class="{ active: selected === key }" @click.stop="selected = key">{{ label }}</button></template>
-      <span v-if="active" class="experiments"><button v-for="(entry, index) in experiments" :key="entry.key" :class="{ active: experiment === index }" @click.stop="pick(index)">{{ entry.label }}</button></span>
+      <ExperimentTabs v-if="active" />
     </div>
     <div v-if="rows.length" class="panel" ref="panel">
       <div class="row head">
         <span v-for="header in layout.headers" :key="header" class="label">{{ header }}</span>
-        <span class="legend"><button v-for="([key, label, color], which) in DIRECTIONS" :key="key" :class="{ off: !shown[which] }" @click.stop="shown[which] = !shown[which]"><i :style="{ background: color }"></i>{{ label }}</button><span v-if="referenceLine === null && referenceValues.some(v => v !== null)" class="reference-key"><i></i>handwritten reference</span></span>
+        <span class="legend"><button v-for="([key, label, color], which) in DIRECTIONS" :key="key" :class="{ off: !shown[which] }" @click.stop="shown[which] = !shown[which]"><i :style="{ background: color }"></i>{{ label }}</button><template v-if="referenceLine === null"><span v-for="([key, , color, target], which) in DIRECTIONS" :key="key + target" v-show="referenceValues[which] !== null" class="reference-key"><i :style="{ borderColor: color }"></i>{{ target }}</span></template></span>
       </div>
       <div v-for="group in groups" :key="group.label" class="group">
         <span class="label group-label" :style="{ gridRow: `span ${group.rows.length}` }">{{ group.label }}</span>
@@ -202,7 +202,7 @@ const rowHeight = computed(() => twoLabels.value ? (props.compact ? 14 : 18) : c
               <template v-if="shown[which]">
               <template v-for="(point, index) in run.values" :key="point.id"><circle v-if="visible(point.value)" :cx="position(point.value)" :cy="4 + ((index + which * 2) % lanes) * ((rowHeight - 8) / (lanes - 1))" r="2.4" :fill="DIRECTIONS[which][2]" opacity=".7"><title>{{ point.id }}: {{ formatted(point.value) }}</title></circle></template>
               <line v-if="run.median !== null && visible(run.median)" :x1="position(run.median)" :x2="position(run.median)" :y1="2" :y2="rowHeight - 2" :stroke="DIRECTIONS[which][2]" stroke-width="2.4" opacity=".85" />
-              <line v-if="referenceValues[which] !== null && visible(referenceValues[which])" :x1="position(referenceValues[which])" :x2="position(referenceValues[which])" y1="0" :y2="rowHeight" :stroke="REFERENCE_COLOR" stroke-width="1.6" stroke-dasharray="3 2"><title>reference {{ DIRECTIONS[which][1] }}: {{ formatted(referenceValues[which]) }}</title></line>
+              <line v-if="referenceValues[which] !== null && visible(referenceValues[which])" :x1="position(referenceValues[which])" :x2="position(referenceValues[which])" y1="0" :y2="rowHeight" :stroke="referenceLine === null ? DIRECTIONS[which][2] : REFERENCE_COLOR" stroke-width="1.6" stroke-dasharray="3 2"><title>{{ DIRECTIONS[which][3] }}: {{ formatted(referenceValues[which]) }}</title></line>
               </template>
             </template>
           </svg></div>
@@ -235,9 +235,6 @@ const rowHeight = computed(() => twoLabels.value ? (props.compact ? 14 : 18) : c
 .tabs button { border:1px solid #cdd6de; background:#fff; border-radius:16px; padding:4px 11px; font-size:12px; font-weight:700; color:#415369; cursor:pointer; }
 .tabs button.active { background:#17243a; color:#fff; border-color:#17243a; }
 .note { text-align:right; color:#61718a; font-size:9.5px; margin-top:3px; }
-.experiments { display:inline-flex; gap:2px; padding:3px; margin-left:auto; background:#e6ebf1; border-radius:9px; }
-.experiments button { border:none; background:none; border-radius:6px; padding:4px 11px; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#61718a; cursor:pointer; }
-.experiments button.active { background:#fff; color:#17243a; box-shadow:0 1px 2px rgba(23,36,58,.18); }
 .panel { background:#fff; border:1px solid #dbe0e4; border-radius:7px; padding:2px 14px 4px; --cols: 118px 1fr; }
 .strips.two .panel { --cols: 48px 50px 1fr; }
 .row, .group { display:grid; grid-template-columns: var(--cols); align-items:center; column-gap:6px; font-size:10.5px; line-height:1.3; }
