@@ -11,6 +11,8 @@ layout: cover
 
 <div class="cover-meta">Kevin Scott</div>
 
+<QrCode class="cover-qr" url="https://thekevinscott.com/talks/2026-10-29-nyc-ai-coworking/" :size="150" />
+
 ---
 
 <div class="eyebrow">OVERVIEW</div>
@@ -74,9 +76,10 @@ src: ./results/tests-behavior.md
 ---
 
 ---
-src: ./results/port-matrix.md
+layout: section
 ---
 
+# Takeaways
 
 ---
 src: ./results/takeaways.md
@@ -100,13 +103,17 @@ src: ./results/takeaway-tests.md
 <div class="end-layout">
   <div>
     <h1>The End. Questions?</h1>
-    <div class="end-link">Slides and data: <strong>github.com/thekevinscott/ports-research</strong><br><span class="end-sub">slides/2026-10-29-nyc-ai-coworking</span></div>
+    <div class="end-link">Slides: <strong>thekevinscott.com/talks/2026-10-29-nyc-ai-coworking</strong><br><span class="end-sub">Data and code: github.com/thekevinscott/ports-research</span></div>
   </div>
-  <QrCode url="https://github.com/thekevinscott/ports-research/tree/main/slides/2026-10-29-nyc-ai-coworking" :size="240" />
+  <QrCode url="https://thekevinscott.com/talks/2026-10-29-nyc-ai-coworking/" :size="240" />
 </div>
 
 ---
 src: ./backup/followups.md
+---
+
+---
+src: ./results/port-matrix.md
 ---
 
 ---

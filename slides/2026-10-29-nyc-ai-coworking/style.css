@@ -144,3 +144,4 @@
 .money td.hot { color: var(--accent); font-weight: 700; }
 .money td.ran { color: var(--muted); }
 .money + .nb-note { margin-top: 6px; }
+.cover-qr { position: absolute; right: 78px; bottom: 86px; padding: 10px; background: #fff; border-radius: 8px; }
