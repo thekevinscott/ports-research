@@ -17,4 +17,4 @@
 
 <div class="nb-note">Spend is every API call in the transcripts priced at Claude API list rates, summed; tokens are input, output and cache reads and writes from the transcripts. Agent time is wall-clock inside the container, summed, not calendar time: batches ran in parallel over about two weeks. Haiku used the most tokens of any model and the least money.</div>
 
-<div class="source">v2-models-effort (413 runs) and v2-tests-configuration (192 runs) · <code>public/models-effort-runs.csv</code>, <code>public/tests-configuration-runs.csv</code>, <code>public/models-effort-status.csv</code> · 2026-10-29</div>
+<div class="source">v2-models-effort (413 runs) and v2-tests-configuration (192 runs) · <code>public/models-effort-runs.csv</code>, <code>public/tests-configuration-runs.csv</code>, <code>public/models-effort-status.csv</code><span class="date">2026-10-29</span></div>

@@ -19,4 +19,4 @@
 
 <div class="nb-note">The reference lives at <code>/input/python/gbnf</code> and <code>/input/javascript/src</code>. Similarity and the held-out driver match paths against that layout, so a port that keeps the <code>python/</code> prefix, or puts the TypeScript under <code>gbnf/</code> instead of <code>src/</code>, scores near 0 before a line is compared. Haiku's 1–3 % TypeScript → Python similarity is this. The one cell both experiments share, Opus medium with unit + source tests: 6 of 12 Python → TypeScript ports lack <code>src/index.ts</code> under the long prompt, 0 of 12 under the short one. Part of "not loaded" on the held-out slide is the prompt, not the model.</div>
 
-<div class="source">v2-models-effort · top-level directories of each <code>ported_implementation/</code> · 2026-10-29</div>
+<div class="source">v2-models-effort · top-level directories of each <code>ported_implementation/</code><span class="date">2026-10-29</span></div>

@@ -29,4 +29,4 @@ The following test suites are included:
 </div>
 </div>
 
-<div class="source">Run 20261028-032612-bold-tooth (python → typescript), blank lines and Dockerfiles collapsed; full text in <code>public/long-prompt.txt</code> · 2026-10-29</div>
+<div class="source">Run 20261028-032612-bold-tooth (python → typescript), blank lines and Dockerfiles collapsed; full text in <code>public/long-prompt.txt</code><span class="date">2026-10-29</span></div>

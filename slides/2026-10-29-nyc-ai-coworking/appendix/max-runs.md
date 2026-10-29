@@ -24,4 +24,4 @@
 
 <div class="nb-note">Medians over the runs that exist. max roughly doubles wall time and spend over very high for every model; it does not move size, diff lines or the held-out scores on this evidence. The charts hide max because its cells are 1 to 9 runs against 12 everywhere else.</div>
 
-<div class="source">v2-models-effort · max runs banked through 2026-10-29 · 2026-10-29</div>
+<div class="source">v2-models-effort · max runs banked through 2026-10-29<span class="date">2026-10-29</span></div>

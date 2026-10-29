@@ -6,7 +6,7 @@ layout: cover
 qr: false
 ---
 
-<div class="eyebrow">NYC AI Co-working · 2026-10-29</div>
+<div class="eyebrow">NYC AI Co-working<span class="date">2026-10-29</span></div>
 
 # Asking Agents To<br>Port Codebases
 

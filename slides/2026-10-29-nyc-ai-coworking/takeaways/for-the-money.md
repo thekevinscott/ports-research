@@ -25,4 +25,4 @@
 
 <div class="nb-note">$ per port that ran = the cell's total spend ÷ ports the held-out driver could load and run, so failed attempts are priced in. Orange = under $12.</div>
 
-<div class="source">v2-models-effort · cost = every API call in the run's transcript priced at Claude API list rates (input, output, cache writes, cache reads) · n = 12 per cell and direction · <code>public/models-effort-cost.csv</code>, <code>public/models-effort-status.csv</code> · 2026-10-29</div>
+<div class="source">v2-models-effort · cost = every API call in the run's transcript priced at Claude API list rates (input, output, cache writes, cache reads) · n = 12 per cell and direction · <code>public/models-effort-cost.csv</code>, <code>public/models-effort-status.csv</code><span class="date">2026-10-29</span></div>

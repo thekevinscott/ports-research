@@ -14,4 +14,4 @@
 
 <div class="nb-note">Median embedding distance, lower = closer. Every pair of the 383 ports in a direction (18,145 / 18,336 pairs), and each port against the handwritten implementation (191 / 192 ports). Closest cross-model pair of models: Fable ↔ Opus at 0.018 (Python → TypeScript), Haiku ↔ Sonnet at 0.040 (TypeScript → Python).</div>
 
-<div class="source">v2-models-effort · 4 models × 4 efforts, pooled · <code>measure-embedding</code> chamfer distance · <code>public/models-effort-embedding-pairs.json</code> · 2026-10-29</div>
+<div class="source">v2-models-effort · 4 models × 4 efforts, pooled · <code>measure-embedding</code> chamfer distance · <code>public/models-effort-embedding-pairs.json</code><span class="date">2026-10-29</span></div>

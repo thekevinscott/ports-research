@@ -7,4 +7,4 @@
   <CellGrid :sources="{ 'models-effort': '/models-effort-pairs.json', tests: '/tests-configuration-pairs.json' }" direction="javascript→python" title="TypeScript → Python" />
 </div>
 
-<div class="source">models × effort: 4 models × 4 efforts · tests: 8 test conditions, Opus medium · 12 ports per cell and direction · each grid on its own colour scale · <code>public/models-effort-pairs.json</code>, <code>public/tests-configuration-pairs.json</code> from <code>scripts/pair_metrics.py</code> · 2026-10-29</div>
+<div class="source">models × effort: 4 models × 4 efforts · tests: 8 test conditions, Opus medium · 12 ports per cell and direction · each grid on its own colour scale · <code>public/models-effort-pairs.json</code>, <code>public/tests-configuration-pairs.json</code> from <code>scripts/pair_metrics.py</code><span class="date">2026-10-29</span></div>

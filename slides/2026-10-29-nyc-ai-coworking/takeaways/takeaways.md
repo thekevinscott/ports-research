@@ -8,4 +8,4 @@
 <div class="takeaway-item"><i>3</i><div><b>Target-language integration tests are cheap insurance. Source-language tests on their own are not enough, and can hurt.</b><span>Target tests did not beat no tests: 88 – 95 % held-out API agreement either way. But they were the only tests that told the agent the interface. Source-language tests alone: 7 – 8 of 12 ports would not load. Target tests undid that, for fewer tokens than no tests.</span></div></div>
 </div>
 
-<div class="source">v2-models-effort (383 runs) and v2-tests-configuration (192 runs) · one drill-down slide per takeaway follows · 2026-10-29</div>
+<div class="source">v2-models-effort (383 runs) and v2-tests-configuration (192 runs) · one drill-down slide per takeaway follows<span class="date">2026-10-29</span></div>

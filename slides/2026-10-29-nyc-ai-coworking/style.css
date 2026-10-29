@@ -2,6 +2,7 @@
 .slidev-layout { background: var(--paper); color: var(--ink); padding: 42px 56px; font-family: ui-sans-serif, system-ui, sans-serif; }
 .slidev-layout h1 { font-family: ui-serif, Georgia, serif; font-weight: 650; letter-spacing: -.035em; font-size: 2.45rem; line-height: 1.12; max-width: 930px; margin: 8px 0 24px; color: var(--ink); }
 .eyebrow { font-size: .79rem; font-weight: 800; letter-spacing: .16em; color: var(--accent); text-transform: uppercase; }
+.source .date { display: block; }
 .source { position: absolute; bottom: 21px; left: 56px; right: 56px; padding-right: 48px; color: var(--muted); font-size: .64rem; letter-spacing: .03em; border-top: 1px solid var(--line); padding-top: 7px; }
 .slidev-layout.cover { background: radial-gradient(circle at 79% 18%, #425c79 0, #17243a 38%, #101a29 100%); color: #fff; padding: 86px 78px; }
 .cover h1 { color: #fff; font-size: 4.7rem; line-height: 1.04; margin: 42px 0 24px; }
