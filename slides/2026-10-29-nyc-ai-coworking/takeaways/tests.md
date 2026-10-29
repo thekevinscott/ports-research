@@ -1,4 +1,4 @@
-<div class="eyebrow">TAKEAWAY 3 · SOURCE-LANGUAGE INTEGRATION TESTS BROKE THE PORT. TARGET-LANGUAGE TESTS FIXED IT.</div>
+<div class="eyebrow">TAKEAWAY 3 · TARGET-LANGUAGE INTEGRATION TESTS ARE CHEAP INSURANCE</div>
 
 # Held-out API agreement by the test suites the agent was given
 
@@ -13,6 +13,6 @@
 </tbody>
 </table>
 
-<div class="nb-note">Median held-out API agreement over 12 runs per cell, Opus medium: the share of the held-out driver's calls the port answers like the handwritten implementation. A port that did not load scores 0 %. Orange = most ports in the cell would not load. Target tests do not beat no tests; they undo what source tests broke.</div>
+<div class="nb-note">Median held-out API agreement over 12 runs per cell, Opus medium: the share of the held-out driver's calls the port answers like the handwritten implementation. A port that did not load scores 0 %. Orange = most ports in the cell would not load. Target tests do not beat no tests. They are the only condition that told the agent the interface the driver expects; given source tests alone, the agent chose its own package layout and the driver could not import it. Target integration tests also cost fewer tokens than no tests.</div>
 
 <div class="source">v2-tests-configuration · n = 12 per cell and direction · drivers in <code>analysis/measure-behavior/drivers/</code> · <code>public/tests-configuration-runs.csv</code> · 2026-10-29</div>
