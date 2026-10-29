@@ -12,6 +12,6 @@
 </tbody>
 </table>
 
-<div class="nb-note">Median held-out API agreement over 12 runs per cell, Opus medium: the share of the held-out driver's calls the port answers like the handwritten implementation. Orange = most ports in the cell would not load.</div>
+<div class="nb-note">Median held-out API agreement over 12 runs per cell, Opus medium: the share of the held-out driver's calls the port answers like the handwritten implementation. Orange = most ports in the cell would not load. Target tests do not beat no tests; they undo what source tests broke.</div>
 
 <div class="source">v2-tests-configuration · n = 12 per cell and direction · drivers in <code>analysis/measure-behavior/drivers/</code> · <code>public/tests-configuration-runs.csv</code> · 2026-10-29</div>
