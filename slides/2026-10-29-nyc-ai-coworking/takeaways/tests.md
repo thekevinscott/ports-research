@@ -1,6 +1,6 @@
 <div class="eyebrow">TAKEAWAY 3 · SOURCE-LANGUAGE INTEGRATION TESTS BROKE THE PORT. TARGET-LANGUAGE TESTS FIXED IT.</div>
 
-# The wrong tests bought broken ports. The right ones bought tokens.
+# Held-out API agreement by the test suites the agent was given
 
 <table class="nb-table money pairs">
 <thead><tr><th>tests the agent was given</th><th>Python → TypeScript</th><th>TypeScript → Python</th></tr></thead>

@@ -1,290 +1,310 @@
-[
- {
-  "model": "claude-fable-5-1",
-  "effort": "low",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0096,
-  "port_reference_median": 0.036
- },
- {
-  "model": "claude-fable-5-1",
-  "effort": "medium",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.011,
-  "port_reference_median": 0.0363
- },
- {
-  "model": "claude-fable-5-1",
-  "effort": "high",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.009,
-  "port_reference_median": 0.0354
- },
- {
-  "model": "claude-fable-5-1",
-  "effort": "xhigh",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0105,
-  "port_reference_median": 0.035
- },
- {
-  "model": "claude-fable-5-1",
-  "effort": "low",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0244,
-  "port_reference_median": 0.0668
- },
- {
-  "model": "claude-fable-5-1",
-  "effort": "medium",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0219,
-  "port_reference_median": 0.0699
- },
- {
-  "model": "claude-fable-5-1",
-  "effort": "high",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.028,
-  "port_reference_median": 0.0724
- },
- {
-  "model": "claude-fable-5-1",
-  "effort": "xhigh",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0249,
-  "port_reference_median": 0.0705
- },
- {
-  "model": "claude-opus-5-5",
-  "effort": "low",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0143,
-  "port_reference_median": 0.0464
- },
- {
-  "model": "claude-opus-5-5",
-  "effort": "medium",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0127,
-  "port_reference_median": 0.038
- },
- {
-  "model": "claude-opus-5-5",
-  "effort": "high",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0157,
-  "port_reference_median": 0.0413
- },
- {
-  "model": "claude-opus-5-5",
-  "effort": "xhigh",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0267,
-  "port_reference_median": 0.0488
- },
- {
-  "model": "claude-opus-5-5",
-  "effort": "low",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.1364,
-  "port_reference_median": 0.0692
- },
- {
-  "model": "claude-opus-5-5",
-  "effort": "medium",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0366,
-  "port_reference_median": 0.0737
- },
- {
-  "model": "claude-opus-5-5",
-  "effort": "high",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.045,
-  "port_reference_median": 0.0733
- },
- {
-  "model": "claude-opus-5-5",
-  "effort": "xhigh",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0499,
-  "port_reference_median": 0.071
- },
- {
-  "model": "claude-sonnet-5-5",
-  "effort": "low",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0141,
-  "port_reference_median": 0.0496
- },
- {
-  "model": "claude-sonnet-5-5",
-  "effort": "medium",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0159,
-  "port_reference_median": 0.0496
- },
- {
-  "model": "claude-sonnet-5-5",
-  "effort": "high",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0128,
-  "port_reference_median": 0.0439
- },
- {
-  "model": "claude-sonnet-5-5",
-  "effort": "xhigh",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0211,
-  "port_reference_median": 0.0432
- },
- {
-  "model": "claude-sonnet-5-5",
-  "effort": "low",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0437,
-  "port_reference_median": 0.0662
- },
- {
-  "model": "claude-sonnet-5-5",
-  "effort": "medium",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0112,
-  "port_reference_median": 0.0645
- },
- {
-  "model": "claude-sonnet-5-5",
-  "effort": "high",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0259,
-  "port_reference_median": 0.0679
- },
- {
-  "model": "claude-sonnet-5-5",
-  "effort": "xhigh",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0355,
-  "port_reference_median": 0.0696
- },
- {
-  "model": "claude-haiku-5-5",
-  "effort": "low",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0167,
-  "port_reference_median": 0.0466
- },
- {
-  "model": "claude-haiku-5-5",
-  "effort": "medium",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0159,
-  "port_reference_median": 0.0473
- },
- {
-  "model": "claude-haiku-5-5",
-  "effort": "high",
-  "direction": "python\u2192javascript",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0175,
-  "port_reference_median": 0.049
- },
- {
-  "model": "claude-haiku-5-5",
-  "effort": "xhigh",
-  "direction": "python\u2192javascript",
-  "ports": 11,
-  "pairs": 55,
-  "port_port_median": 0.0166,
-  "port_reference_median": 0.047
- },
- {
-  "model": "claude-haiku-5-5",
-  "effort": "low",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0269,
-  "port_reference_median": 0.0632
- },
- {
-  "model": "claude-haiku-5-5",
-  "effort": "medium",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0256,
-  "port_reference_median": 0.0619
- },
- {
-  "model": "claude-haiku-5-5",
-  "effort": "high",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0246,
-  "port_reference_median": 0.0604
- },
- {
-  "model": "claude-haiku-5-5",
-  "effort": "xhigh",
-  "direction": "javascript\u2192python",
-  "ports": 12,
-  "pairs": 66,
-  "port_port_median": 0.0335,
-  "port_reference_median": 0.0632
+{
+ "cells": [
+  {
+   "model": "claude-fable-5-1",
+   "effort": "low",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0096,
+   "port_reference_median": 0.036
+  },
+  {
+   "model": "claude-fable-5-1",
+   "effort": "medium",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.011,
+   "port_reference_median": 0.0363
+  },
+  {
+   "model": "claude-fable-5-1",
+   "effort": "high",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.009,
+   "port_reference_median": 0.0354
+  },
+  {
+   "model": "claude-fable-5-1",
+   "effort": "xhigh",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0105,
+   "port_reference_median": 0.035
+  },
+  {
+   "model": "claude-fable-5-1",
+   "effort": "low",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0244,
+   "port_reference_median": 0.0668
+  },
+  {
+   "model": "claude-fable-5-1",
+   "effort": "medium",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0219,
+   "port_reference_median": 0.0699
+  },
+  {
+   "model": "claude-fable-5-1",
+   "effort": "high",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.028,
+   "port_reference_median": 0.0724
+  },
+  {
+   "model": "claude-fable-5-1",
+   "effort": "xhigh",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0249,
+   "port_reference_median": 0.0705
+  },
+  {
+   "model": "claude-opus-5-5",
+   "effort": "low",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0143,
+   "port_reference_median": 0.0464
+  },
+  {
+   "model": "claude-opus-5-5",
+   "effort": "medium",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0127,
+   "port_reference_median": 0.038
+  },
+  {
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0157,
+   "port_reference_median": 0.0413
+  },
+  {
+   "model": "claude-opus-5-5",
+   "effort": "xhigh",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0267,
+   "port_reference_median": 0.0488
+  },
+  {
+   "model": "claude-opus-5-5",
+   "effort": "low",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.1364,
+   "port_reference_median": 0.0692
+  },
+  {
+   "model": "claude-opus-5-5",
+   "effort": "medium",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0366,
+   "port_reference_median": 0.0737
+  },
+  {
+   "model": "claude-opus-5-5",
+   "effort": "high",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.045,
+   "port_reference_median": 0.0733
+  },
+  {
+   "model": "claude-opus-5-5",
+   "effort": "xhigh",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0499,
+   "port_reference_median": 0.071
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "effort": "low",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0141,
+   "port_reference_median": 0.0496
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "effort": "medium",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0159,
+   "port_reference_median": 0.0496
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "effort": "high",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0128,
+   "port_reference_median": 0.0439
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "effort": "xhigh",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0211,
+   "port_reference_median": 0.0432
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "effort": "low",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0437,
+   "port_reference_median": 0.0662
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "effort": "medium",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0112,
+   "port_reference_median": 0.0645
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "effort": "high",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0259,
+   "port_reference_median": 0.0679
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "effort": "xhigh",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0355,
+   "port_reference_median": 0.0696
+  },
+  {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0167,
+   "port_reference_median": 0.0466
+  },
+  {
+   "model": "claude-haiku-5-5",
+   "effort": "medium",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0159,
+   "port_reference_median": 0.0473
+  },
+  {
+   "model": "claude-haiku-5-5",
+   "effort": "high",
+   "direction": "python\u2192javascript",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0175,
+   "port_reference_median": 0.049
+  },
+  {
+   "model": "claude-haiku-5-5",
+   "effort": "xhigh",
+   "direction": "python\u2192javascript",
+   "ports": 11,
+   "pairs": 55,
+   "port_port_median": 0.0166,
+   "port_reference_median": 0.047
+  },
+  {
+   "model": "claude-haiku-5-5",
+   "effort": "low",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0269,
+   "port_reference_median": 0.0632
+  },
+  {
+   "model": "claude-haiku-5-5",
+   "effort": "medium",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0256,
+   "port_reference_median": 0.0619
+  },
+  {
+   "model": "claude-haiku-5-5",
+   "effort": "high",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0246,
+   "port_reference_median": 0.0604
+  },
+  {
+   "model": "claude-haiku-5-5",
+   "effort": "xhigh",
+   "direction": "javascript\u2192python",
+   "ports": 12,
+   "pairs": 66,
+   "port_port_median": 0.0335,
+   "port_reference_median": 0.0632
+  }
+ ],
+ "pooled": {
+  "python\u2192javascript": {
+   "same_model_effort": 0.0145,
+   "same_model_other_effort": 0.0167,
+   "different_model": 0.022,
+   "port_reference": 0.0442,
+   "pairs": 18145,
+   "ports": 191
+  },
+  "javascript\u2192python": {
+   "same_model_effort": 0.0281,
+   "same_model_other_effort": 0.034,
+   "different_model": 0.0496,
+   "port_reference": 0.068,
+   "pairs": 18336,
+   "ports": 192
+  }
  }
-]
+}
