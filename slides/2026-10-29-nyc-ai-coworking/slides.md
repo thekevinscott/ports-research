@@ -17,32 +17,10 @@ layout: cover
 
 # One library, two hand-written versions, 617 agent ports
 
-<div class="toc">
-  <div>
-    <div class="toc-section"><i>01</i> Methodology</div>
-    <ol>
-      <li>The library: <code>gbnf</code>, hand-written in Python and TypeScript</li>
-      <li>The prompt the agent gets</li>
-      <li>The <code>__pycache__</code> leak</li>
-      <li>Three experiments: pilot, models × effort, tests</li>
-    </ol>
-  </div>
-  <div>
-    <div class="toc-section"><i>02</i> Results</div>
-    <ol>
-      <li>Tokens, time, cost, files, lines of code</li>
-      <li>How fast the ported library runs</li>
-      <li>Similarity to the handwritten reference</li>
-      <li>Held-out tests: does the port behave like the reference?</li>
-      <li>Do repeats of one setting agree with each other?</li>
-    </ol>
-    <div class="toc-section last"><i>03</i> Takeaways</div>
-    <ol>
-      <li>Which model and effort, for the money</li>
-      <li>The agent has a house style; your port is the outlier</li>
-      <li>Tests bought tokens, not code</li>
-    </ol>
-  </div>
+<div class="toc toc-plain">
+  <div class="toc-section"><i>01</i> Overview</div>
+  <div class="toc-section"><i>02</i> Methodology</div>
+  <div class="toc-section"><i>03</i> Results</div>
 </div>
 
 <div class="source">V1 pilot 42 ports · v2-models-effort 383 ports (4 models × 4 efforts × 2 directions × 12) · v2-tests-configuration 192 ports (8 conditions × 2 directions × 12)</div>
