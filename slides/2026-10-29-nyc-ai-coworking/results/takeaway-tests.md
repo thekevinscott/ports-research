@@ -1,11 +1,11 @@
-<div class="eyebrow">TAKEAWAY 3 · TESTS BOUGHT TOKENS, NOT CODE</div>
+<div class="eyebrow">TAKEAWAY 3 · TESTS CHANGED WHAT THE PORT DID, NOT HOW BIG IT WAS</div>
 
-# Handing the agent tests changed how much it spent, not how much it wrote
+# The wrong tests bought broken ports. The right ones bought tokens.
 
-<div class="finding-line"><strong>910 – 1,064</strong><span>median lines of code per port across all eight test conditions, both directions. Files: 32 to 38. The port is the same size whether the agent saw no tests, unit tests, integration tests, or all three.</span></div>
-<div class="finding-line"><strong>2 – 3×</strong><span>tokens when unit tests were in the mix: 2.5 to 3.3 M per port versus 0.8 to 1.6 M without them.</span></div>
-<div class="finding-line"><strong>8 of 12</strong><span>TypeScript → Python ports the held-out driver could not load when the agent saw only unit tests, and 8 of 12 with only source-language integration tests. With no tests: 1 of 12. With all three: 0 of 12, and every port scored 90 % or better.</span></div>
+<div class="finding-line"><strong>910 – 1,064</strong><span>median lines per port across all eight test conditions, both directions; files 32 – 38. Size moved under 15 %.</span></div>
+<div class="finding-line"><strong>0 – 9 % vs 95 %</strong><span>TypeScript → Python held-out API agreement with only source-language tests or only unit tests, versus 95 % with no tests and 95 % whenever target-language tests were in the set. Behaviour: 0 – 40 % vs 99 %. 8 of 12 ports in each of those two conditions would not load; with no tests, 1 of 12; with target-language tests, 0 – 1 of 12.</span></div>
+<div class="finding-line"><strong>2 – 3×</strong><span>tokens whenever unit tests were in the set (2.5 – 3.3 M versus 0.8 – 1.6 M). Target-language integration tests alone cost 0.9× of no tests, with the same 95 % agreement.</span></div>
 
-<div class="study-line">Partial test context cost more than none, in tokens and in ports that would not load. The full set cost the most and every port loaded.</div>
+<div class="study-line">No tests worked. Source-language or unit tests alone broke the port; target-language tests fixed it; unit tests on top doubled the bill. Python → TypeScript, same shape, smaller gaps: source-only 7 of 12 at 0 % API, all three 12 of 12 above 96 % behaviour.</div>
 
-<div class="source">v2-tests-configuration · Opus medium · n=12 per condition and direction · <code>public/tests-configuration-runs.csv</code> · 2026-10-29</div>
+<div class="source">v2-tests-configuration · Opus medium · n = 12 successful runs per cell (267 attempts, 75 non-zero exits dropped) · medians · "would not load" = in the held-out driver · <code>public/tests-configuration-runs.csv</code> · 2026-10-29</div>
