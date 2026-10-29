@@ -178,7 +178,7 @@ const ticks = computed(() => {
   return Array.from({ length: Math.floor((hi.value - first) / step) + 1 }, (_, i) => first + i * step).map(value => (value - lo.value) / (hi.value - lo.value))
 })
 const lanes = computed(() => currentBy.value === 'pooled' ? 24 : 4)
-const rowHeight = computed(() => twoLabels.value ? (props.compact ? 14 : 18) : currentBy.value === 'pooled' ? 220 : currentBy.value === 'condition' ? (props.compact ? 30 : 36) : 38)
+const rowHeight = computed(() => twoLabels.value ? (props.compact ? 14 : 18) : currentBy.value === 'pooled' ? 220 : currentBy.value === 'condition' ? (props.compact ? 26 : 36) : 38)
 </script>
 
 <template>
