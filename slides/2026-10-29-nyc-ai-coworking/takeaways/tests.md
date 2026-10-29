@@ -5,10 +5,10 @@
 <table class="nb-table money pairs">
 <thead><tr><th>tests the agent was given</th><th>Python → TypeScript</th><th>TypeScript → Python</th></tr></thead>
 <tbody>
-<tr><td>unit + source integration</td><td>88 %</td><td class="hot">9 %</td></tr>
 <tr><td>no tests</td><td>88 %</td><td>95 %</td></tr>
+<tr><td>source integration</td><td class="hot">0 %</td><td class="hot">0 %</td></tr>
 <tr><td>target integration</td><td>88 %</td><td>95 %</td></tr>
-<tr><td>all three</td><td>88 %</td><td>95 %</td></tr>
+<tr><td>source + target integration</td><td>87 %</td><td>95 %</td></tr>
 </tbody>
 </table>
 
