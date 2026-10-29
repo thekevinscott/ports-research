@@ -1,15 +1,15 @@
 <div class="eyebrow">RESULTS · SPEED OF THE PORTED LIBRARY</div>
 
-<div class="explain">Port and handwritten reference parse the same ladder of grammars, from a one-character literal to JSON nested 8,192 deep. <b>Value</b> = port's median parse time ÷ reference's. 1 = same speed; lower is faster than the hand-written code. Ports the driver could not load have no dot.</div>
+<div class="explain">Port and reference parse the same 22-grammar ladder, up to JSON nested 8,192 deep. <b>Value</b> = port's median parse time ÷ reference's. Dashed line = same speed; left of it is faster than the hand-written code. Unloadable ports have no dot.</div>
 
 <div class="speed-pair">
   <div>
     <div class="prompt-label">Tests experiment · Opus medium · by tests seen</div>
-    <MeasurePanels src="/tests-configuration-ladder.csv" by="condition" :measures="['ladder_ref_ratio']" :reference-line="1" :width="360" :height="122" />
+    <RunStrips src="/tests-configuration-ladder.csv" by="condition" initial-measure="ladder_ref_ratio" :measures="['ladder_ref_ratio']" :reference-line="1" />
   </div>
   <div>
     <div class="prompt-label">Models × effort · batch in progress</div>
-    <RunStrips src="/models-effort-ladder.csv" by="model-effort" initial-measure="ladder_ref_ratio" :measures="['ladder_ref_ratio']" />
+    <RunStrips src="/models-effort-ladder.csv" by="model-effort" initial-measure="ladder_ref_ratio" :measures="['ladder_ref_ratio']" :reference-line="1" />
   </div>
 </div>
 

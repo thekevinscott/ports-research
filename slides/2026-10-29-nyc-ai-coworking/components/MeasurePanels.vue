@@ -75,7 +75,8 @@ function grab(measure, which, event) {
 }
 function slide(panel, event) {
   if (!knob.value || knob.value.measure !== panel.measure) return
-  const py = new DOMPoint(event.clientX, event.clientY).matrixTransform(event.currentTarget.ownerSVGElement.getScreenCTM().inverse()).y
+  const rect = event.currentTarget.ownerSVGElement.getBoundingClientRect()
+  const py = ((event.clientY - rect.top) / rect.height) * props.height
   const value = Math.max(0, Math.min(panel.domainMax, ((pad.top + plotH - py) / plotH) * panel.domainMax))
   const gap = panel.domainMax / 50
   const [lo, hi] = [panel.lo, panel.hi]
@@ -106,8 +107,11 @@ const panels = computed(() => props.measures.map(measure => {
   const all = rows.value.map(row => row[measure]).filter(v => v !== undefined && v !== '').map(v => scaled(measure, v))
   const refs = DIRECTIONS.map(([direction]) => referenceFor(measure, direction)).filter(v => v !== null)
   const domainStep = percent ? 25 : niceStep(Math.max(1e-9, ...all, ...refs) / 4)
-  const domainMax = percent ? 100 : domainStep * Math.ceil(Math.max(1e-9, ...all, ...refs) / domainStep)
-  const [lo, hi] = ranges.value[measure] ?? [0, domainMax]
+  const domainMax = percent ? 100 : domainStep * Math.ceil(Math.max(1e-9, ...all, ...refs) * 1.06 / domainStep)
+  const extentMin = Math.min(...all, ...refs)
+  const extentMax = Math.max(...all, ...refs)
+  const margin = (extentMax - extentMin) * 0.06
+  const [lo, hi] = ranges.value[measure] ?? (extentMax > extentMin ? [Math.max(0, extentMin - margin), extentMax + margin] : [0, domainMax])
   const step = niceStep((hi - lo) / 4)
   const y = value => pad.top + plotH - ((value - lo) / (hi - lo)) * plotH
   const sliderY = value => pad.top + plotH - (value / domainMax) * plotH

@@ -31,14 +31,17 @@ layout: cover
     <div class="toc-section"><i>02</i> Results</div>
     <ol>
       <li>Tokens, time, cost, files, lines of code</li>
-      <li>Which model and effort, for the money</li>
       <li>Similarity to the handwritten reference</li>
       <li>Held-out tests: does the port behave like the reference?</li>
       <li>Do repeats of one setting agree with each other?</li>
-      <li>How long the agent took</li>
+      <li>How fast the ported library runs</li>
       <li>What effect do the tests the agent sees have?</li>
     </ol>
-    <div class="toc-section last"><i>03</i> One practical lesson</div>
+    <div class="toc-section last"><i>03</i> Takeaways</div>
+    <ol>
+      <li>One practical lesson</li>
+      <li>Which model and effort, for the money</li>
+    </ol>
   </div>
 </div>
 
@@ -77,10 +80,6 @@ src: ./results/overall-stats.md
 ---
 
 ---
-src: ./results/for-the-money.md
----
-
----
 src: ./results/similarity.md
 ---
 
@@ -109,6 +108,10 @@ layout: section
 
 ---
 src: ./results/lesson.md
+---
+
+---
+src: ./results/for-the-money.md
 ---
 
 ---

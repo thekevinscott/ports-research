@@ -7,6 +7,7 @@ const props = defineProps({
   initialMeasure: { type: String, default: 'wall_minutes' },
   measures: { type: Array, default: null },
   reference: { type: String, default: null },
+  referenceLine: { type: Number, default: null },
 })
 const REFERENCE_COLOR = '#1f1f1f'
 
@@ -91,13 +92,21 @@ function nice(value) {
   return step * power
 }
 const displayed = computed(() => rows.value.filter(row => layout.groups.some(group => group.rows.some(r => r.match(row)))))
-const referenceValues = computed(() => DIRECTIONS.map(([direction]) => reference.value[direction]?.[selected.value] ?? null))
-const domainMax = computed(() => percent.value ? 100 : Math.max(1e-9, ...referenceValues.value.filter(v => v !== null), ...displayed.value.map(row => Number(row[selected.value]) || 0)))
+const referenceValues = computed(() => DIRECTIONS.map(([direction]) => props.referenceLine ?? reference.value[direction]?.[selected.value] ?? null))
+const extent = computed(() => {
+  const values = [...referenceValues.value.filter(v => v !== null), ...displayed.value.map(row => row[selected.value]).filter(v => v !== undefined && v !== '').map(Number)]
+  if (!values.length) return [0, 1]
+  const [min, max] = [Math.min(...values), Math.max(...values)]
+  if (max <= min) return [0, max || 1]
+  const margin = (max - min) * 0.03
+  return [min >= 0 ? Math.max(0, min - margin) : min - margin, max + margin]
+})
+const domainMax = computed(() => percent.value ? 100 : extent.value[1])
 const range = ref(null)
 const knob = ref(null)
 watch(selected, () => { range.value = null })
-const lo = computed(() => range.value?.[0] ?? 0)
-const hi = computed(() => range.value?.[1] ?? domainMax.value)
+const lo = computed(() => range.value?.[0] ?? extent.value[0])
+const hi = computed(() => range.value?.[1] ?? extent.value[1])
 function position(value) { return 8 + ((Number(value) - lo.value) / (hi.value - lo.value)) * (vw.value - 16) }
 function visible(value) { return value >= lo.value && value <= hi.value }
 function sliderX(value) { return 8 + (value / domainMax.value) * (vw.value - 16) }
@@ -107,7 +116,8 @@ function grab(which, event) {
 }
 function slide(event) {
   if (!knob.value) return
-  const px = new DOMPoint(event.clientX, event.clientY).matrixTransform(event.currentTarget.ownerSVGElement.getScreenCTM().inverse()).x
+  const rect = event.currentTarget.ownerSVGElement.getBoundingClientRect()
+  const px = ((event.clientX - rect.left) / rect.width) * vw.value
   const value = Math.max(0, Math.min(domainMax.value, ((px - 8) / (vw.value - 16)) * domainMax.value))
   const gap = domainMax.value / 50
   range.value = knob.value === 'lo' ? [Math.min(value, hi.value - gap), hi.value] : [lo.value, Math.max(value, lo.value + gap)]
@@ -140,12 +150,12 @@ const groups = computed(() => layout.groups.map(group => ({
   rows: group.rows.map(row => ({ ...row, series: DIRECTIONS.map(([direction]) => series(direction, row.match)) })),
 })))
 const ticks = computed(() => {
-  const step = nice((hi.value - lo.value) / 4)
+  const step = nice((hi.value - lo.value) / 5)
   const first = Math.ceil(lo.value / step) * step
   return Array.from({ length: Math.floor((hi.value - first) / step) + 1 }, (_, i) => first + i * step).map(value => (value - lo.value) / (hi.value - lo.value))
 })
 const lanes = props.by === 'pooled' ? 24 : 4
-const rowHeight = twoLabels ? 16 : props.by === 'pooled' ? 220 : 38
+const rowHeight = twoLabels ? 16 : props.by === 'pooled' ? 220 : props.by === 'condition' ? 32 : 38
 </script>
 
 <template>
@@ -157,7 +167,7 @@ const rowHeight = twoLabels ? 16 : props.by === 'pooled' ? 220 : 38
     <div v-if="rows.length" class="panel" ref="panel">
       <div class="row head">
         <span v-for="header in layout.headers" :key="header" class="label">{{ header }}</span>
-        <span class="legend"><button v-for="([key, label, color], which) in DIRECTIONS" :key="key" :class="{ off: !shown[which] }" @click.stop="shown[which] = !shown[which]"><i :style="{ background: color }"></i>{{ label }}</button><span v-if="referenceValues.some(v => v !== null)" class="reference-key"><i></i>handwritten reference</span></span>
+        <span class="legend"><button v-for="([key, label, color], which) in DIRECTIONS" :key="key" :class="{ off: !shown[which] }" @click.stop="shown[which] = !shown[which]"><i :style="{ background: color }"></i>{{ label }}</button><span v-if="referenceLine === null && referenceValues.some(v => v !== null)" class="reference-key"><i></i>handwritten reference</span></span>
       </div>
       <div v-for="group in groups" :key="group.label" class="group">
         <span class="label group-label" :style="{ gridRow: `span ${group.rows.length}` }">{{ group.label }}</span>
@@ -178,7 +188,7 @@ const rowHeight = twoLabels ? 16 : props.by === 'pooled' ? 220 : 38
       <div class="row axis">
         <span v-for="header in layout.headers" :key="header"></span>
         <div class="ticks">
-          <span v-for="tick in ticks" :key="tick" :style="{ left: `calc(1% + ${tick} * 98%)` }" :class="{ first: tick === 0, last: tick === 1 }">{{ formatted(lo + (hi - lo) * tick) }}</span>
+          <span v-for="tick in ticks" :key="tick" :style="{ left: `calc(1% + ${tick} * 98%)` }" :class="{ first: tick < 0.04, last: tick > 0.96 }">{{ formatted(lo + (hi - lo) * tick) }}</span>
         </div>
       </div>
       <div class="row slider">
@@ -212,13 +222,13 @@ const rowHeight = twoLabels ? 16 : props.by === 'pooled' ? 220 : 38
 .label { font-weight:700; color:#17243a; }
 .sub { font-weight:400; color:#61718a; }
 .group-label { align-self:center; }
-.head { height:18px; color:#61718a; }
+.head { min-height:18px; color:#61718a; }
 .head .label { font-weight:700; font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:#61718a; }
-.legend { display:flex; gap:12px; padding-left:1%; }
+.legend { display:flex; flex-wrap:wrap; gap:2px 12px; padding-left:1%; }
 .legend button { border:none; background:none; padding:0 4px; font:inherit; color:#17243a; cursor:pointer; white-space:nowrap; }
 .legend button.off { opacity:.35; text-decoration:line-through; }
 .legend i { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; vertical-align:-1px; }
-.reference-key { padding:0 4px; color:#17243a; }
+.reference-key { padding:0 4px; color:#17243a; white-space:nowrap; }
 .reference-key i { width:0; height:10px; border-radius:0; border-left:2px dashed #1f1f1f; vertical-align:-2px; }
 .axis { height:15px; }
 .slider { height:18px; }

@@ -22,7 +22,7 @@
 .big-steps em b { color: var(--ink); }
 .explain { margin: 4px 0 2px; max-width: 1100px; color: var(--ink); font-size: .86rem; line-height: 1.32; }
 .explain b { color: var(--accent); }
-.speed-pair { display: grid; grid-template-columns: 460px 1fr; gap: 20px; margin-top: 4px; align-items: start; }
+.speed-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; margin-top: 4px; align-items: start; }
 .speed-pair .prompt-label { margin-bottom: 2px; }
 .v1-recap { display: grid; grid-template-columns: .7fr 1.2fr 1fr 1.4fr 1.1fr; gap: 9px; margin-top: 20px; }
 .v1-recap > div { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 11px 10px; min-height: 84px; }
@@ -125,7 +125,7 @@
 .end-sub { color: #61718a; font-size: 15px; }
 .toc { display: grid; grid-template-columns: 1fr 1.15fr; gap: 48px; margin-top: 14px; }
 .toc-section { font-size: 1.35rem; font-weight: 700; color: var(--ink); border-bottom: 2px solid var(--accent); padding-bottom: 6px; margin-bottom: 10px; }
-.toc-section.last { margin-top: 16px; border-bottom: none; }
+.toc-section.last { margin-top: 8px; border-bottom: none; }
 .toc-section i { font-style: normal; color: var(--accent); font-size: .85rem; letter-spacing: .14em; margin-right: 12px; vertical-align: 2px; }
-.toc ol { margin: 0; padding-left: 1.6em; color: var(--muted); font-size: 1.02rem; line-height: 1.55; }
+.toc ol { margin: 0; padding-left: 1.6em; color: var(--muted); font-size: .98rem; line-height: 1.42; }
 .toc ol li::marker { color: var(--accent); font-weight: 700; }
