@@ -12,6 +12,7 @@ const props = defineProps({
   measures: { type: Array, default: null },
   reference: { type: String, default: null },
   referenceLine: { type: Number, default: null },
+  oneDirection: { type: Boolean, default: false },
 })
 const REFERENCE_COLOR = '#1f1f1f'
 
@@ -69,7 +70,8 @@ const reference = ref({})
 const panel = ref(null)
 const vw = ref(800)
 const selected = ref(props.initialMeasure)
-const shown = ref([true, true])
+const shown = ref(props.oneDirection ? [true, false] : [true, true])
+function toggle(which) { shown.value = props.oneDirection ? [which === 0, which === 1] : shown.value.map((on, i) => i === which ? !on : on) }
 const active = computed(() => props.sources ? experiments[experiment.value] : null)
 const currentSrc = computed(() => active.value ? props.sources[active.value.key] : props.src)
 const currentBy = computed(() => active.value ? active.value.by : props.by)
@@ -113,10 +115,10 @@ function nice(value) {
   const step = [1, 2, 2.5, 4, 5, 10].find(candidate => candidate * power >= value)
   return step * power
 }
-const displayed = computed(() => rows.value.filter(row => layout.value.groups.some(group => group.rows.some(r => r.match(row)))))
+const displayed = computed(() => rows.value.filter(row => shown.value[DIRECTIONS.findIndex(([key]) => key === row.direction)] !== false && layout.value.groups.some(group => group.rows.some(r => r.match(row)))))
 const referenceValues = computed(() => DIRECTIONS.map(([direction]) => props.referenceLine ?? reference.value[direction]?.[selected.value] ?? null))
 const extent = computed(() => {
-  const values = [...referenceValues.value.filter(v => v !== null), ...displayed.value.map(row => row[selected.value]).filter(v => v !== undefined && v !== '').map(Number)]
+  const values = [...referenceValues.value.filter((v, i) => v !== null && shown.value[i]), ...displayed.value.map(row => row[selected.value]).filter(v => v !== undefined && v !== '').map(Number)]
   if (!values.length) return [0, 1]
   const [min, max] = [Math.min(...values), Math.max(...values)]
   if (max <= min) return [0, max || 1]
@@ -190,7 +192,7 @@ const rowHeight = computed(() => twoLabels.value ? (props.compact ? 14 : 18) : c
     <div v-if="rows.length" class="panel" ref="panel">
       <div class="row head">
         <span v-for="header in layout.headers" :key="header" class="label">{{ header }}</span>
-        <span class="legend"><button v-for="([key, label, color], which) in DIRECTIONS" :key="key" :class="{ off: !shown[which] }" @click.stop="shown[which] = !shown[which]"><i :style="{ background: color }"></i>{{ label }}</button><template v-if="referenceLine === null"><span v-for="([key, , color, target], which) in DIRECTIONS" :key="key + target" v-show="referenceValues[which] !== null" class="reference-key"><i :style="{ borderColor: color }"></i>{{ target }}</span></template></span>
+        <span class="legend"><button v-for="([key, label, color], which) in DIRECTIONS" :key="key" :class="{ off: !shown[which] }" @click.stop="toggle(which)"><i :style="{ background: color }"></i>{{ label }}</button><template v-if="referenceLine === null"><span v-for="([key, , color, target], which) in DIRECTIONS" :key="key + target" v-show="referenceValues[which] !== null" class="reference-key"><i :style="{ borderColor: color }"></i>{{ target }}</span></template></span>
       </div>
       <div v-for="group in groups" :key="group.label" class="group">
         <span class="label group-label" :style="{ gridRow: `span ${group.rows.length}` }">{{ group.label }}</span>

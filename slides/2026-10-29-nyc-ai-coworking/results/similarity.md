@@ -1,7 +1,7 @@
 <div class="eyebrow">RESULTS · SIMILARITY TO THE HANDWRITTEN REFERENCE</div>
 
 
-<RunStrips compact :sources="{ 'models-effort': '/models-effort-runs.csv', tests: '/tests-configuration-runs.csv' }" initial-measure="embedding_distance" :measures="['embedding_distance', 'reference_diff_similarity_pct', 'diff_lines_changed']" />
+<RunStrips compact :sources="{ 'models-effort': '/models-effort-runs.csv', tests: '/tests-configuration-runs.csv' }" initial-measure="embedding_distance" :measures="['embedding_distance', 'reference_diff_similarity_pct', 'diff_lines_changed']" one-direction />
 
 <div class="big-asterisk">* needs normalization: none of these compare across directions</div>
 
