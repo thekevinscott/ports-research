@@ -240,7 +240,7 @@ const rowHeight = computed(() => twoLabels.value ? (props.compact ? 14 : 18) : c
 .experiments button.active { background:#fff; color:#17243a; box-shadow:0 1px 2px rgba(23,36,58,.18); }
 .panel { background:#fff; border:1px solid #dbe0e4; border-radius:7px; padding:2px 14px 4px; --cols: 118px 1fr; }
 .strips.two .panel { --cols: 48px 50px 1fr; }
-.row, .group { display:grid; grid-template-columns: var(--cols); align-items:center; column-gap:6px; font-size:10.5px; }
+.row, .group { display:grid; grid-template-columns: var(--cols); align-items:center; column-gap:6px; font-size:10.5px; line-height:1.3; }
 .group { border-top:1.5px solid #b9c3cc; }
 .group .sub, .group .strip { border-top:1px solid #d9e0e4; }
 .group .sub { align-self:stretch; display:flex; align-items:center; }
