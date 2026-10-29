@@ -149,3 +149,5 @@
 .chart-takeaway h1 { font-size: 1.7rem; margin: 2px 0 10px; }
 .chart-takeaway .study-line { margin-top: 6px; font-size: .95rem; }
 .big-steps a { color: var(--accent); text-decoration: underline; }
+.big-steps.lines span { font-size: 1.05rem; line-height: 1.35; margin: 0 0 10px; }
+.big-steps.lines strong { margin-bottom: 20px; }
