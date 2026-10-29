@@ -1,0 +1,20 @@
+{
+  "name": "ports-talk-2026-10-29",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "slidev --remote --port 3030",
+    "build": "slidev build"
+  },
+  "devDependencies": {
+    "@slidev/cli": "^53.0.0",
+    "@slidev/theme-default": "^0.25.0",
+    "playwright-chromium": "^1.64.1",
+    "vega": "^6.4.0",
+    "vega-embed": "^7.3.0",
+    "vega-lite": "^6.5.0"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  }
+}

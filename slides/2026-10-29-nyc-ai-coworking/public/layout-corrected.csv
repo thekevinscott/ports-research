@@ -1,0 +1,135 @@
+run_id,model,effort,direction,relocation,similarity_before,similarity_after,similarity_renamed
+20261015T032706Z_cb7b8d2b,claude-haiku-5-5,medium,python→javascript,gbnf → src,17.341,39.126,
+20261015T032706Z_d23e1a04,claude-haiku-5-5,medium,javascript→python,python/gbnf → gbnf; python/* → .,1.188,32.064,
+20261015T034349Z_2d01af76,claude-haiku-5-5,medium,python→javascript,gbnf → src,9.722,39.239,
+20261015T034443Z_fede5861,claude-haiku-5-5,medium,javascript→python,src/gbnf → gbnf,10.276,34.231,
+20261015T035441Z_dd17e59e,claude-opus-5-5,medium,python→javascript,"gbnf → src; root index.ts re-export left in place; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 46 files",7.497,7.633,39.784
+20261015T035651Z_2ece0ec5,claude-haiku-5-5,medium,javascript→python,python/gbnf → gbnf; python/* → .,10.825,34.508,
+20261015T040048Z_d1cdd99a,claude-sonnet-5-5,medium,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",0.0,0.07,27.042
+20261015T040307Z_0fb26709,claude-haiku-5-5,medium,javascript→python,python/gbnf → gbnf; python/* → .,2.922,35.062,
+20261015T040753Z_a6e309e6,claude-haiku-5-5,medium,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",10.091,10.161,39.804
+20261015T041044Z_80fb8d52,claude-sonnet-5-5,medium,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",1.194,1.264,27.528
+20261015T041715Z_c1711c1f,claude-fable-5-1,medium,javascript→python,python/gbnf → gbnf,0.0,32.658,
+20261015T042004Z_7314f11e,claude-sonnet-5-5,medium,python→javascript,"gbnf → src; root index.ts re-export left in place; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",1.201,1.271,28.178
+20261015T042251Z_cb3b9b7f,claude-haiku-5-5,medium,python→javascript,gbnf → src,15.406,39.901,
+20261015T042632Z_767b7c9e,claude-haiku-5-5,medium,javascript→python,python/src/gbnf → gbnf; python/* → .,0.0,33.088,
+20261015T062355Z_8c2de8bf,claude-haiku-5-5,medium,javascript→python,python/src/gbnf → gbnf; python/* → .,0.0,32.667,
+20261015T062355Z_c235abac,claude-haiku-5-5,medium,python→javascript,typescript/src → src; typescript/* → .,0.948,36.311,
+20261015T062355Z_ebdb2ffd,claude-sonnet-5-5,medium,python→javascript,"gbnf → src; root index.ts re-export left in place; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",0.0,0.07,26.89
+20261015T063519Z_63a1a8b5,claude-haiku-5-5,medium,python→javascript,src/gbnf → src,14.281,38.586,
+20261015T064255Z_092f4d3f,claude-opus-5-5,medium,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 47 files",7.176,7.309,38.272
+20261015T065052Z_a386ff15,claude-sonnet-5-5,medium,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",1.221,1.293,27.504
+20261015T065350Z_3db2a0f0,claude-haiku-5-5,medium,python→javascript,gbnf → src,2.229,32.063,
+20261015T065849Z_9df9a55c,claude-haiku-5-5,medium,python→javascript,gbnf → src,1.654,37.972,
+20261015T065920Z_f20b5fee,claude-opus-5-5,medium,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 44 files",5.93,6.059,36.868
+20261015T070800Z_0edb5a6a,claude-haiku-5-5,medium,javascript→python,python/src/gbnf → gbnf; python/* → .,2.8,33.309,
+20261015T071744Z_f4bd4af4,claude-haiku-5-5,medium,python→javascript,gbnf → src,10.613,35.281,
+20261015T071926Z_439bc0e2,claude-haiku-5-5,medium,javascript→python,src/gbnf → gbnf,0.0,33.208,
+20261015T071947Z_542d9f16,claude-opus-5-5,medium,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 44 files",9.479,9.614,37.576
+20261015T072751Z_23dc2460,claude-sonnet-5-5,medium,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",1.193,1.263,28.201
+20261015T073501Z_5f0c25b4,claude-opus-5-5,medium,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 45 files",6.335,6.471,37.534
+20261015T073505Z_c509ce4a,claude-haiku-5-5,medium,python→javascript,gbnf → src,13.837,39.444,
+20261015T073851Z_9cb477e0,claude-haiku-5-5,medium,python→javascript,typescript/src → src; typescript/* → .,21.974,40.879,
+20261015T074305Z_4a4321bb,claude-opus-5-5,medium,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 48 files",7.443,7.579,39.467
+20261015T074324Z_3b8e4e92,claude-haiku-5-5,medium,javascript→python,python/src/gbnf → gbnf; python/* → .,1.593,36.024,
+20261015T154057Z_12e978be,claude-haiku-5-5,low,javascript→python,python/src/gbnf → gbnf; python/* → .,0.0,31.485,
+20261015T154557Z_dfdd5db3,claude-haiku-5-5,max,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 24 files",5.082,5.154,36.006
+20261015T154738Z_9cd2e53d,claude-haiku-5-5,xhigh,python→javascript,gbnf → src,3.267,36.225,
+20261015T160016Z_11f0405d,claude-sonnet-5-5,xhigh,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 55 files",1.053,1.119,25.609
+20261015T192727Z_ca876c86,claude-haiku-5-5,high,python→javascript,gbnf → src,20.292,41.418,
+20261015T215716Z_48c85996,claude-haiku-5-5,low,javascript→python,src/gbnf → gbnf,0.0,33.058,
+20261016T002948Z_d836c9b9,claude-haiku-5-5,low,javascript→python,src/gbnf → gbnf,11.048,35.552,
+20261016T010104Z_0f452686,claude-haiku-5-5,medium,javascript→python,python/src/gbnf → gbnf; python/* → .,0.0,32.65,
+20261016T015451Z_cbccf579,claude-haiku-5-5,high,javascript→python,python/src/gbnf → gbnf; python/* → .,3.894,34.631,
+20261016T030859Z_93d03123,claude-sonnet-5-5,max,python→javascript,"gbnf → src; root index.ts re-export left in place; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 59 files",0.939,0.998,20.018
+20261016T030859Z_ed29e21b,claude-opus-5-5,max,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 49 files",8.605,8.735,36.506
+20261016T031334Z_1cc1070e,claude-sonnet-5-5,high,python→javascript,"gbnf → src; root index.ts re-export left in place; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 27 files",0.0,0.064,25.679
+20261016T034713Z_d58b38ed,claude-haiku-5-5,max,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 26 files",5.232,5.302,33.833
+20261016T040615Z_4c45a885,claude-sonnet-5-5,xhigh,python→javascript,"gbnf → src; root index.ts re-export left in place; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 27 files",5.182,5.316,32.705
+20261016T040915Z_c10b6ebd,claude-haiku-5-5,low,javascript→python,python/src/gbnf → gbnf; python/* → .,1.159,33.043,
+20261016T041817Z_6034b286,claude-haiku-5-5,high,javascript→python,src/gbnf → gbnf,2.117,34.756,
+20261016T043720Z_b87e120f,claude-opus-5-5,high,javascript→python,src/gbnf → gbnf,0.311,32.11,
+20261016T044947Z_8662fcd6,claude-sonnet-5-5,low,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",1.381,1.458,24.242
+20261016T045521Z_369ec4c8,claude-opus-5-5,xhigh,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 51 files",6.642,6.776,34.821
+20261016T050245Z_b4be54c0,claude-haiku-5-5,low,javascript→python,python/gbnf → gbnf; python/* → .,4.676,36.123,
+20261016T050257Z_addbece1,claude-sonnet-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 31 files",0.0,0.065,25.769
+20261016T064748Z_7a235aa8,claude-haiku-5-5,high,javascript→python,python/src/gbnf → gbnf; python/* → .,1.87,35.204,
+20261016T071112Z_be3adf66,claude-opus-5-5,max,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 47 files",8.156,8.281,33.689
+20261016T071539Z_d26b0110,claude-haiku-5-5,high,python→javascript,typescript/gbnf → src; typescript/* → .,0.0,34.733,
+20261016T082730Z_9fd5a602,claude-sonnet-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 30 files",1.098,1.167,28.483
+20261016T082730Z_a25b7a4c,claude-haiku-5-5,low,javascript→python,python/src/gbnf → gbnf; python/* → .,0.954,31.697,
+20261016T085914Z_15f82317,claude-opus-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 46 files",9.956,10.16,39.482
+20261016T090510Z_a684d70b,claude-sonnet-5-5,xhigh,python→javascript,"gbnf → src; root index.ts re-export left in place; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 51 files",10.223,10.292,36.226
+20261016T093008Z_4408165b,claude-haiku-5-5,xhigh,javascript→python,python/src/gbnf → gbnf; python/* → .,0.0,32.653,
+20261016T093244Z_1623a99a,claude-haiku-5-5,max,javascript→python,python/src/gbnf → gbnf; python/* → .,0.0,31.316,
+20261016T095039Z_047b34d8,claude-haiku-5-5,low,javascript→python,python/gbnf → gbnf; python/* → .,3.659,33.644,
+20261016T095551Z_c2071c8f,claude-sonnet-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 28 files",0.337,0.404,27.619
+20261016T095830Z_39cf973b,claude-opus-5-5,low,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 45 files",1.162,1.235,25.935
+20261016T095833Z_d41b9333,claude-haiku-5-5,max,python→javascript,gbnf → src,10.658,35.597,
+20261016T102652Z_e386909e,claude-sonnet-5-5,low,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",1.292,1.368,23.632
+20261016T104406Z_85611d48,claude-opus-5-5,xhigh,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 46 files",10.158,10.295,38.847
+20261016T104626Z_3e725b95,claude-haiku-5-5,max,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 26 files",5.267,5.336,37.076
+20261016T111145Z_ce29e706,claude-haiku-5-5,high,javascript→python,python/gbnf → gbnf; python/* → .,12.235,37.302,
+20261016T112552Z_12a9dd94,claude-haiku-5-5,low,python→javascript,typescript/src → src; typescript/* → .,13.062,40.757,
+20261016T113823Z_531c47cc,claude-haiku-5-5,high,python→javascript,typescript/gbnf → src; typescript/* → .,2.501,34.873,
+20261016T132518Z_49caf611,claude-sonnet-5-5,xhigh,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 53 files",0.0,0.06,23.484
+20261016T132518Z_c85d02b4,claude-haiku-5-5,high,javascript→python,python/src/gbnf → gbnf; python/* → .,0.0,35.424,
+20261016T134612Z_ea10d004,claude-haiku-5-5,low,javascript→python,python/gbnf → gbnf; python/* → .,2.228,35.515,
+20261016T140123Z_eb5c4d40,claude-opus-5-5,low,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 43 files",7.997,8.744,33.632
+20261016T140734Z_07cbaeef,claude-sonnet-5-5,low,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",1.251,1.325,23.547
+20261016T140946Z_6dd707ab,claude-haiku-5-5,low,javascript→python,python/gbnf → gbnf; python/* → .,1.569,35.142,
+20261016T141059Z_eeec4e38,claude-opus-5-5,xhigh,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 45 files",7.281,7.417,35.386
+20261016T154707Z_89281f03,claude-haiku-5-5,max,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",8.328,8.397,38.307
+20261016T201320Z_1a8fdceb,claude-fable-5-1,xhigh,javascript→python,src/gbnf → gbnf,8.081,36.952,
+20261016T201320Z_bd85d2be,claude-opus-5-5,xhigh,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 48 files",5.268,5.331,34.431
+20261016T211737Z_2ac65437,claude-fable-5-1,xhigh,javascript→python,src/gbnf → gbnf,6.165,34.602,
+20261017T124448Z_8680a3ae,claude-opus-5-5,max,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 47 files",10.133,10.267,36.4
+20261017T140628Z_a4299be1,claude-sonnet-5-5,low,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",1.238,1.311,23.881
+20261017T141045Z_b6a33d31,claude-haiku-5-5,low,javascript→python,python/src/gbnf → gbnf; python/* → .,1.287,36.097,
+20261017T141753Z_c5b2e870,claude-haiku-5-5,high,javascript→python,python/src/gbnf → gbnf; python/* → .,1.104,34.989,
+20261017T145510Z_b5feb62b,claude-sonnet-5-5,xhigh,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 50 files",1.417,1.481,26.023
+20261017T145644Z_14ca7e3a,claude-opus-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 47 files",9.779,9.98,39.786
+20261017T150942Z_87a02ac8,claude-haiku-5-5,high,javascript→python,python/gbnf → gbnf; python/* → .,0.0,34.083,
+20261017T151200Z_99e21935,claude-sonnet-5-5,low,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 24 files",1.383,1.46,22.666
+20261017T151409Z_e4fc1eab,claude-sonnet-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 26 files",0.399,0.466,28.21
+20261017T151646Z_fda78be3,claude-haiku-5-5,xhigh,javascript→python,python/src/gbnf → gbnf; python/* → .,1.193,34.405,
+20261017T151840Z_d96d3064,claude-haiku-5-5,low,python→javascript,typescript/gbnf → src; typescript/* → .,2.364,35.1,
+20261017T152601Z_e5ae25fd,claude-opus-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 44 files",9.29,9.486,38.927
+20261017T174414Z_0973797c,claude-haiku-5-5,xhigh,python→javascript,gbnf → src,10.37,34.774,
+20261017T174414Z_d063fa91,claude-haiku-5-5,high,javascript→python,src/gbnf → gbnf,8.911,37.096,
+20261017T174601Z_38b6d733,claude-haiku-5-5,high,python→javascript,gbnf → src,7.031,37.145,
+20261017T175457Z_cbbbf807,claude-opus-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 46 files",7.176,7.309,36.811
+20261017T175705Z_199789f2,claude-sonnet-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 28 files",0.0,0.066,27.759
+20261017T181551Z_5bfde8fc,claude-sonnet-5-5,xhigh,python→javascript,"gbnf → src; root index.ts re-export left in place; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 52 files",9.709,9.775,34.676
+20261017T183547Z_6f903a17,claude-sonnet-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 28 files",0.0,0.067,27.011
+20261017T183852Z_bb02a79b,claude-haiku-5-5,low,javascript→python,src/gbnf → gbnf,2.528,32.119,
+20261017T184059Z_d2c53842,claude-haiku-5-5,xhigh,javascript→python,python/src/gbnf → gbnf; python/* → .,0.806,35.46,
+20261017T185204Z_a9c4712f,claude-sonnet-5-5,low,python→javascript,"gbnf → src; root index.ts re-export left in place; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",0.0,0.073,25.783
+20261017T185331Z_2f51ee13,claude-sonnet-5-5,xhigh,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 51 files",2.228,2.296,28.359
+20261017T185445Z_9aaf4c83,claude-haiku-5-5,high,python→javascript,gbnf → src,5.505,34.439,
+20261017T191809Z_0db46089,claude-haiku-5-5,high,javascript→python,python/gbnf → gbnf; python/* → .,1.274,33.803,
+20261017T191904Z_0bcd6f04,claude-haiku-5-5,high,javascript→python,python/src/gbnf → gbnf; python/* → .,1.042,33.214,
+20261017T192656Z_bf865f31,claude-sonnet-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 37 files",0.0,0.065,26.081
+20261017T193148Z_ceceabb2,claude-opus-5-5,xhigh,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 45 files",10.463,10.596,37.587
+20261017T193739Z_e89b1341,claude-haiku-5-5,xhigh,javascript→python,python/src/gbnf → gbnf; python/* → .,0.0,30.829,
+20261017T194301Z_90ab8e13,claude-haiku-5-5,high,python→javascript,gbnf → src,10.291,38.992,
+20261017T195007Z_bdd68396,claude-sonnet-5-5,low,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",1.298,1.375,24.819
+20261017T195231Z_caeef3b7,claude-haiku-5-5,low,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 26 files",8.866,8.935,38.185
+20261017T195325Z_3b1144d1,claude-sonnet-5-5,xhigh,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 46 files",1.043,1.108,31.346
+20261017T201531Z_50423746,claude-haiku-5-5,xhigh,javascript→python,python/src/gbnf → gbnf; python/* → .,9.463,34.974,
+20261017T201714Z_63272a5e,claude-haiku-5-5,xhigh,python→javascript,gbnf → src,8.583,38.87,
+20261017T202136Z_798baea8,claude-opus-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 45 files",10.58,10.782,38.814
+20261017T203411Z_11ce633c,claude-sonnet-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 33 files",1.328,1.391,25.988
+20261017T203601Z_33e30d68,claude-sonnet-5-5,low,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",6.615,6.689,35.749
+20261017T204350Z_a3171a02,claude-opus-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 44 files",7.021,7.222,37.579
+20261017T210009Z_c67b7091,claude-opus-5-5,xhigh,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 46 files",8.418,8.481,33.734
+20261017T211158Z_9027437c,claude-sonnet-5-5,high,python→javascript,"gbnf → src; renamed under src/ to kebab-case: 3 dir names (grammar_graph, grammar_parser, rules_builder), 25 files",0.337,0.405,28.128
+20261017T213415Z_17d00ac8,claude-haiku-5-5,xhigh,javascript→python,python/src/gbnf → gbnf; python/* → .,3.242,35.925,
+20261020-212438-calm-shadow,claude-haiku-5-5,max,python→javascript,gbnf → src,18.226,37.694,
+20261020-212438-wild-king,claude-haiku-5-5,high,javascript→python,python/gbnf → gbnf; python/* → .,4.767,35.546,
+20261020-222136-bitter-scene,claude-haiku-5-5,max,python→javascript,gbnf → src,8.196,36.639,
+20261020-222136-soft-truth,claude-haiku-5-5,xhigh,javascript→python,python/src/gbnf → gbnf; python/* → .,1.981,35.259,
+20261021-015429-shiny-mode,claude-fable-5-1,xhigh,javascript→python,src/gbnf → gbnf,7.129,34.209,
+20261028-095511-small-night,claude-fable-5-1,xhigh,javascript→python,python/gbnf → gbnf; python/* → .,3.118,33.262,
+20261028-095511-snowy-flower,claude-haiku-5-5,xhigh,javascript→python,src/gbnf → gbnf,0.0,35.683,
+20261028-095511-wispy-pond,claude-fable-5-1,xhigh,javascript→python,src/gbnf → gbnf,6.524,32.56,

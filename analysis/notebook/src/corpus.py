@@ -38,7 +38,7 @@ EXCLUDE_BY_LANGUAGE = {
 def runs_under(root, table, experiment, *, include_nonzero_exit=False):
     """Completed runs under root: every V1 run, and the V2 runs filed under the experiment."""
     # A fresh DirSQL scan every run, so a run banked since the last refresh is picked up.
-    db = DirSQL(str(root), tables=[table])
+    db = DirSQL(str(root), tables=[table], no_ignore=True)
     runs = completed_runs(db, table.name, include_nonzero_exit=include_nonzero_exit)
     return [run for run in runs if not is_v2(run) or run["experiment"] == experiment]
 
