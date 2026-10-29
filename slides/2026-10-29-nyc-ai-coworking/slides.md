@@ -102,7 +102,6 @@ src: ./results/takeaway-tests.md
 
 <div class="end-layout">
   <div>
-    <h1>The End. Questions?</h1>
     <div class="end-link">Slides: <strong>thekevinscott.com/talks/2026-10-29-nyc-ai-coworking</strong><br><span class="end-sub">Data and code: github.com/thekevinscott/ports-research</span></div>
   </div>
   <QrCode url="https://thekevinscott.com/talks/2026-10-29-nyc-ai-coworking/" :size="240" />
