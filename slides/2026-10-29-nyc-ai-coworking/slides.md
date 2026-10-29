@@ -17,7 +17,7 @@ layout: cover
 
 <div class="eyebrow">OVERVIEW</div>
 
-# One library, two versions, 617 agent ports
+# I asked an agent to port my codebase
 
 <div class="toc toc-plain">
   <div class="toc-section"><i>01</i> Overview</div>

@@ -144,6 +144,8 @@
 .money td.hot { color: var(--accent); font-weight: 700; }
 .money td.ran { color: var(--muted); }
 .money + .nb-note { margin-top: 6px; }
+.pairs { font-size: 1.05rem; margin-top: 18px; }
+.pairs th, .pairs td { padding: 6px 22px; }
 .cover-qr { position: absolute; right: 78px; bottom: 86px; padding: 10px; background: #fff; border-radius: 8px; }
 .chart-takeaway h1 { font-size: 1.7rem; margin: 2px 0 10px; }
 .chart-takeaway .study-line { margin-top: 6px; font-size: .95rem; }

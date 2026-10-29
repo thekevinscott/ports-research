@@ -2,7 +2,17 @@
 
 # Ports agree with each other more than with the handwritten port
 
-<RunStrips compact src="/models-effort-runs.csv" by="model-effort" initial-measure="embedding_distance" :measures="['embedding_distance', 'reference_diff_similarity_pct']" one-direction />
+<table class="nb-table money pairs">
+<thead><tr><th>model</th><th colspan="2">Python → TypeScript</th><th colspan="2">TypeScript → Python</th></tr>
+<tr><th></th><th>port ↔ port</th><th>port ↔ handwritten</th><th>port ↔ port</th><th>port ↔ handwritten</th></tr></thead>
+<tbody>
+<tr><td>Fable</td><td class="hot">0.010</td><td>0.036</td><td class="hot">0.025</td><td>0.070</td></tr>
+<tr><td>Opus</td><td class="hot">0.016</td><td>0.044</td><td class="hot">0.042</td><td>0.072</td></tr>
+<tr><td>Sonnet</td><td class="hot">0.016</td><td>0.047</td><td class="hot">0.026</td><td>0.066</td></tr>
+<tr><td>Haiku</td><td class="hot">0.017</td><td>0.047</td><td class="hot">0.027</td><td>0.062</td></tr>
+</tbody>
+</table>
 
+<div class="nb-note">Median embedding distance, lower = closer. port ↔ port: every pair of ports from the same model and effort (264 pairs per model and direction). port ↔ handwritten: each port against the handwritten implementation (48 per model and direction).</div>
 
-<div class="source">v2-models-effort · port to port, same model and effort: 66 % / 61 % of lines shared (66 pairs per cell, median of cell medians, <code>public/models-effort-pairs.json</code>, appendix) · <code>measure-embedding</code> · 2026-10-29</div>
+<div class="source">v2-models-effort · all four efforts pooled · <code>measure-embedding</code> chamfer distance · <code>public/models-effort-embedding-pairs.json</code> · 2026-10-29</div>

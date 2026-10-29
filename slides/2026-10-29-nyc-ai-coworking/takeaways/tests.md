@@ -2,8 +2,16 @@
 
 # The wrong tests bought broken ports. The right ones bought tokens.
 
-<RunStrips compact src="/tests-configuration-runs.csv" by="condition" initial-measure="api_agreement_pct" :measures="['api_agreement_pct', 'behavior_agreement_pct', 'total_tokens']" />
+<table class="nb-table money pairs">
+<thead><tr><th>tests the agent was given</th><th>Python → TypeScript</th><th>TypeScript → Python</th></tr></thead>
+<tbody>
+<tr><td>unit + source integration</td><td>88 %</td><td class="hot">9 %</td></tr>
+<tr><td>no tests</td><td>88 %</td><td>95 %</td></tr>
+<tr><td>target integration</td><td>88 %</td><td>95 %</td></tr>
+<tr><td>all three</td><td>88 %</td><td>95 %</td></tr>
+</tbody>
+</table>
 
-<div class="study-line">No tests: 95 % held-out API agreement. Unit or source-language tests alone: 8 of 12 ports would not load. Target-language tests brought it back to 95 %. Unit tests on top: 2 – 3× the tokens.</div>
+<div class="nb-note">Median held-out API agreement over 12 runs per cell, Opus medium: the share of the held-out driver's calls the port answers like the handwritten implementation. Orange = most ports in the cell would not load.</div>
 
-<div class="source">v2-tests-configuration · Opus medium · n = 12 successful runs per cell · "would not load" = in the held-out driver · <code>public/tests-configuration-runs.csv</code> · 2026-10-29</div>
+<div class="source">v2-tests-configuration · n = 12 per cell and direction · drivers in <code>analysis/measure-behavior/drivers/</code> · <code>public/tests-configuration-runs.csv</code> · 2026-10-29</div>
