@@ -3,6 +3,7 @@ theme: default
 colorSchema: light
 title: Asking Agents to Port Codebases
 layout: cover
+qr: false
 ---
 
 <div class="eyebrow">NYC AI Co-working · 2026-10-29</div>
@@ -100,7 +101,8 @@ class: chart-takeaway
 ---
 
 ---
-
+qr: false
+---
 
 <div class="end-layout">
   <div>
@@ -108,6 +110,10 @@ class: chart-takeaway
   </div>
   <QrCode url="https://thekevinscott.com/talks/2026/october/nyc-ai-coworking/slides/" :size="240" />
 </div>
+
+---
+src: ./methodology/pycache.md
+---
 
 ---
 src: ./appendix/port-matrix.md
