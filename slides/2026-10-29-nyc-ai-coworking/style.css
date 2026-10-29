@@ -3,7 +3,7 @@
 .slidev-layout h1 { font-family: ui-serif, Georgia, serif; font-weight: 650; letter-spacing: -.035em; font-size: 2.45rem; line-height: 1.12; max-width: 930px; margin: 8px 0 24px; color: var(--ink); }
 .eyebrow { font-size: .79rem; font-weight: 800; letter-spacing: .16em; color: var(--accent); text-transform: uppercase; }
 .source .date { display: block; }
-.source { position: absolute; bottom: 21px; left: 56px; right: 56px; padding-right: 48px; color: var(--muted); font-size: .64rem; letter-spacing: .03em; border-top: 1px solid var(--line); padding-top: 7px; }
+.source { position: absolute; bottom: 21px; left: 56px; right: 56px; padding-right: 48px; min-height: 36px; color: var(--muted); font-size: .64rem; letter-spacing: .03em; border-top: 1px solid var(--line); padding-top: 7px; }
 .slidev-layout.cover { background: radial-gradient(circle at 79% 18%, #425c79 0, #17243a 38%, #101a29 100%); color: #fff; padding: 86px 78px; }
 .cover h1 { color: #fff; font-size: 4.7rem; line-height: 1.04; margin: 42px 0 24px; }
 .cover .eyebrow { color: #ffb47b; }
@@ -154,9 +154,10 @@
 .chart-takeaway .study-line { margin-top: 6px; font-size: .95rem; }
 .big-steps a { color: var(--accent); text-decoration: underline; }
 .big-steps.lines span { font-size: 1.05rem; line-height: 1.35; margin: 0 0 10px; }
-.big-steps.lines strong { margin-bottom: 20px; }
+.big-steps.lines strong { margin-bottom: 14px; }
+.big-steps.lines > div { padding: 18px 19px 12px; }
 .big-steps.lines ul { list-style: disc; margin: 0; padding-left: 20px; color: var(--muted); font-size: 1.05rem; line-height: 1.35; }
-.big-steps.lines li { margin: 0 0 9px; }
+.big-steps.lines li { margin: 0 0 6px; }
 .big-steps.lines ul ul { margin-top: 6px; }
 .big-steps.lines ul ul li { margin-bottom: 4px; }
 .prompt-text mark, .source mark { background: #ffe66d; color: inherit; padding: 0 3px; border-radius: 2px; }

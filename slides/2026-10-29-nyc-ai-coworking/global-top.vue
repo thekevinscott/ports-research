@@ -2,7 +2,10 @@
 import { computed } from 'vue'
 import { useNav } from '@slidev/client'
 const { currentSlideRoute } = useNav()
-const show = computed(() => currentSlideRoute.value?.meta?.slide?.frontmatter?.qr !== false)
+const show = computed(() => {
+  const fm = currentSlideRoute.value?.meta?.slide?.frontmatter
+  return fm?.qr !== false && fm?.layout !== 'section'
+})
 </script>
 
 <template>
