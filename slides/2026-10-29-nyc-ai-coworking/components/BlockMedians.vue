@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { withBase } from './experiment.js'
 
 const props = defineProps({
   src: { type: String, required: true },
@@ -20,7 +21,7 @@ const RAMP = ['#eef5fd', '#86b6ef', '#3987e5', '#256abf', '#0d366b']
 
 const data = ref(null)
 onMounted(async () => {
-  const response = await fetch(props.src)
+  const response = await fetch(withBase(props.src))
   if (!response.ok) throw new Error(`${props.src}: HTTP ${response.status}`)
   data.value = await response.json()
 })

@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { experiment, experiments } from './experiment.js'
+import { experiment, experiments, withBase } from './experiment.js'
 
 const props = defineProps({
   sources: { type: Object, required: true },
@@ -36,7 +36,7 @@ const data = ref(null)
 async function load() {
   const src = props.sources[active.value]
   if (!cache.has(src)) {
-    const response = await fetch(src)
+    const response = await fetch(withBase(src))
     if (!response.ok) throw new Error(`${src}: HTTP ${response.status}`)
     cache.set(src, await response.json())
   }

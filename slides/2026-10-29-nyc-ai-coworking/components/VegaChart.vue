@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
+import { withBase } from './experiment.js'
 import embed from 'vega-embed'
 
 const props = defineProps({
@@ -50,7 +51,7 @@ function restyle(layer) {
 
 async function render() {
   const specs = await Promise.all(props.srcs.map(async (src) => {
-    const response = await fetch(src)
+    const response = await fetch(withBase(src))
     if (!response.ok) throw new Error(`${src}: HTTP ${response.status}`)
     return response.json()
   }))

@@ -1,6 +1,6 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
-import { experiment, experiments } from './experiment.js'
+import { experiment, experiments, withBase } from './experiment.js'
 import ExperimentTabs from './ExperimentTabs.vue'
 
 const props = defineProps({
@@ -78,7 +78,7 @@ const twoLabels = computed(() => layout.value.headers.length === 2)
 
 const cache = new Map()
 async function fetchRows(src) {
-  const response = await fetch(src)
+  const response = await fetch(withBase(src))
   if (!response.ok) throw new Error(`${src}: HTTP ${response.status}`)
   const [header, ...lines] = (await response.text()).trim().split(/\r?\n/)
   const keys = header.split(',')
@@ -101,7 +101,7 @@ async function load() {
 }
 watch(currentSrc, load)
 onMounted(async () => {
-  if (props.reference) reference.value = await (await fetch(props.reference)).json()
+  if (props.reference) reference.value = await (await fetch(withBase(props.reference))).json()
   await load()
 })
 

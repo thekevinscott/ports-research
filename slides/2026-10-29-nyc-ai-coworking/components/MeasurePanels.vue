@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { withBase } from './experiment.js'
 
 const props = defineProps({
   src: { type: String, required: true },
@@ -56,8 +57,8 @@ const CATEGORIES = {
 const rows = ref([])
 const reference = ref({})
 onMounted(async () => {
-  if (props.reference) reference.value = await (await fetch(props.reference)).json()
-  const response = await fetch(props.src)
+  if (props.reference) reference.value = await (await fetch(withBase(props.reference))).json()
+  const response = await fetch(withBase(props.src))
   if (!response.ok) throw new Error(`${props.src}: HTTP ${response.status}`)
   const [header, ...lines] = (await response.text()).trim().split(/\r?\n/)
   const keys = header.split(',')
