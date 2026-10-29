@@ -8,4 +8,6 @@
   <div>Language-agnostic integration tests</div>
 </div>
 
+<div class="nb-note">Python: 1,305 lines of code in 42 files · TypeScript: 1,129 lines in 42 files · tests excluded</div>
+
 <img src="/gbnf-flow.svg?v=3" class="flow-diagram" />

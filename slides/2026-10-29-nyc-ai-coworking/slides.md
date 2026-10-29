@@ -26,6 +26,10 @@ layout: cover
 <div class="source">V1 pilot 42 ports · v2-models-effort 383 ports (4 models × 4 efforts × 2 directions × 12) · v2-tests-configuration 192 ports (8 conditions × 2 directions × 12)</div>
 
 ---
+src: ./overview.md
+---
+
+---
 layout: section
 ---
 
@@ -40,11 +44,11 @@ src: ./methodology/prompt.md
 ---
 
 ---
-src: ./methodology/pycache.md
+src: ./methodology/experiments.md
 ---
 
 ---
-src: ./methodology/experiments.md
+src: ./methodology/pycache.md
 ---
 
 ---

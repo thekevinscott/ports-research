@@ -96,6 +96,7 @@
 .pycache-steps span { font-size: .92rem; line-height: 1.38; }
 .pycache-steps code { font-size: .85em; }
 .pycache-quote { margin-top: 30px; font-size: 1.3rem; }
+.pycache-quote.top { margin-top: 14px; margin-bottom: 6px; }
 .pycache-steps.two { grid-template-columns: 1fr 1fr; max-width: 900px; }
 .pycache-steps.two { max-width: none; margin-top: 22px; }
 .pycache-steps.two > div { min-height: 0; padding: 13px 16px; }
