@@ -6,6 +6,7 @@ const props = defineProps({
   src: { type: String, default: null },
   by: { type: String, default: null },
   sources: { type: Object, default: null },
+  compact: { type: Boolean, default: false },
   initialMeasure: { type: String, default: 'wall_minutes' },
   measures: { type: Array, default: null },
   reference: { type: String, default: null },
@@ -177,15 +178,14 @@ const ticks = computed(() => {
   return Array.from({ length: Math.floor((hi.value - first) / step) + 1 }, (_, i) => first + i * step).map(value => (value - lo.value) / (hi.value - lo.value))
 })
 const lanes = computed(() => currentBy.value === 'pooled' ? 24 : 4)
-const rowHeight = computed(() => twoLabels.value ? 16 : currentBy.value === 'pooled' ? 220 : currentBy.value === 'condition' ? 32 : 38)
+const rowHeight = computed(() => twoLabels.value ? (props.compact ? 14 : 18) : currentBy.value === 'pooled' ? 220 : currentBy.value === 'condition' ? (props.compact ? 30 : 36) : 38)
 </script>
 
 <template>
   <div class="strips" :class="{ two: twoLabels, pooled: currentBy === 'pooled' }">
     <div class="tabs">
-      <span v-if="active" class="experiments"><button v-for="(entry, index) in experiments" :key="entry.key" :class="{ active: experiment === index }" @click.stop="pick(index)">{{ entry.label }}</button></span>
       <template v-if="choices.length > 1"><button v-for="[key, label] in choices" :key="key" :class="{ active: selected === key }" @click.stop="selected = key">{{ label }}</button></template>
-      <span class="note">one dot = one run &nbsp;·&nbsp; tick = median</span>
+      <span v-if="active" class="experiments"><button v-for="(entry, index) in experiments" :key="entry.key" :class="{ active: experiment === index }" @click.stop="pick(index)">{{ entry.label }}</button></span>
     </div>
     <div v-if="rows.length" class="panel" ref="panel">
       <div class="row head">
@@ -224,6 +224,7 @@ const rowHeight = computed(() => twoLabels.value ? 16 : currentBy.value === 'poo
         </svg></div>
       </div>
     </div>
+    <div v-if="rows.length" class="note">one dot = one run &nbsp;·&nbsp; tick = median</div>
     <div v-else class="loading">Loading run measurements…</div>
   </div>
 </template>
@@ -233,10 +234,10 @@ const rowHeight = computed(() => twoLabels.value ? 16 : currentBy.value === 'poo
 .tabs { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
 .tabs button { border:1px solid #cdd6de; background:#fff; border-radius:16px; padding:4px 11px; font-size:12px; font-weight:700; color:#415369; cursor:pointer; }
 .tabs button.active { background:#17243a; color:#fff; border-color:#17243a; }
-.tabs .note { margin-left:auto; color:#61718a; font-size:11px; }
-.experiments { display:inline-flex; gap:2px; padding:3px; margin-right:12px; background:#17243a; border-radius:9px; }
-.experiments button { border:none; background:none; border-radius:6px; padding:4px 11px; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#b7c3d2; cursor:pointer; }
-.experiments button.active { background:#fff; color:#17243a; }
+.note { text-align:right; color:#61718a; font-size:9.5px; margin-top:3px; }
+.experiments { display:inline-flex; gap:2px; padding:3px; margin-left:auto; background:#e6ebf1; border-radius:9px; }
+.experiments button { border:none; background:none; border-radius:6px; padding:4px 11px; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#61718a; cursor:pointer; }
+.experiments button.active { background:#fff; color:#17243a; box-shadow:0 1px 2px rgba(23,36,58,.18); }
 .panel { background:#fff; border:1px solid #dbe0e4; border-radius:7px; padding:2px 14px 4px; --cols: 118px 1fr; }
 .strips.two .panel { --cols: 48px 50px 1fr; }
 .row, .group { display:grid; grid-template-columns: var(--cols); align-items:center; column-gap:6px; font-size:10.5px; }
