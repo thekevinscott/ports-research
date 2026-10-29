@@ -11,13 +11,13 @@ layout: cover
 
 <div class="cover-meta">Kevin Scott</div>
 
-<QrCode class="cover-qr" url="https://thekevinscott.com/talks/2026-10-29-nyc-ai-coworking/" :size="150" />
+<QrCode class="cover-qr" url="https://thekevinscott.com/talks/2026-10-29-nyc-ai-coworking/slides/" :size="150" />
 
 ---
 
 <div class="eyebrow">OVERVIEW</div>
 
-# One library, two hand-written versions, 617 agent ports
+# One library, two versions, 617 agent ports
 
 <div class="toc toc-plain">
   <div class="toc-section"><i>01</i> Overview</div>
@@ -91,10 +91,12 @@ src: ./takeaways/for-the-money.md
 
 ---
 src: ./takeaways/house-style.md
+class: chart-takeaway
 ---
 
 ---
 src: ./takeaways/tests.md
+class: chart-takeaway
 ---
 
 ---
@@ -102,9 +104,9 @@ src: ./takeaways/tests.md
 
 <div class="end-layout">
   <div>
-    <div class="end-link">Slides: <strong>thekevinscott.com/talks/2026-10-29-nyc-ai-coworking</strong><br><span class="end-sub">Data and code: github.com/thekevinscott/ports-research</span></div>
+    <div class="end-link">Slides: <strong>thekevinscott.com/talks/2026-10-29-nyc-ai-coworking/slides</strong><br><span class="end-sub">Data and code: github.com/thekevinscott/ports-research</span></div>
   </div>
-  <QrCode url="https://thekevinscott.com/talks/2026-10-29-nyc-ai-coworking/" :size="240" />
+  <QrCode url="https://thekevinscott.com/talks/2026-10-29-nyc-ai-coworking/slides/" :size="240" />
 </div>
 
 ---

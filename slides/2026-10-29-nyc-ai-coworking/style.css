@@ -146,3 +146,6 @@
 .money + .nb-note { margin-top: 6px; }
 .cover-qr { position: absolute; right: 78px; bottom: 86px; padding: 10px; background: #fff; border-radius: 8px; }
 .big-asterisk { position: absolute; bottom: 64px; left: 56px; color: var(--accent); font-size: 1.5rem; font-weight: 800; }
+.chart-takeaway h1 { font-size: 1.7rem; margin: 2px 0 10px; }
+.chart-takeaway .study-line { margin-top: 6px; font-size: .95rem; }
+.big-steps a { color: var(--accent); text-decoration: underline; }
