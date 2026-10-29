@@ -1,7 +1,7 @@
 ---
 theme: default
 colorSchema: light
-title: Can an Agent Port a Codebase?
+title: Asking Agents to Port Codebases
 layout: cover
 ---
 
@@ -17,7 +17,7 @@ layout: cover
 
 <div class="eyebrow">OVERVIEW</div>
 
-# I asked an agent to port my codebase
+# Asking Agents to Port Codebases
 
 <div class="toc toc-plain">
   <div class="toc-section"><i>01</i> Overview</div>
