@@ -1,0 +1,203 @@
+run_id,model,effort,status,definition,exported
+20261015T032706Z_859c5be6,claude-opus-5-5,medium,driven,class,yes
+20261015T032706Z_c966b40f,claude-sonnet-5-5,medium,not_loaded,absent,no
+20261015T032706Z_d23e1a04,claude-haiku-5-5,medium,not_loaded,absent,no gbnf/__init__.py
+20261015T033005Z_24bea0eb,claude-fable-5-1,medium,loaded_failing,TypedDict,yes
+20261015T033841Z_e8e8d832,claude-fable-5-1,medium,loaded_failing,TypedDict,yes
+20261015T034243Z_29f2c30c,claude-sonnet-5-5,medium,not_loaded,absent,no
+20261015T034443Z_fede5861,claude-haiku-5-5,medium,not_loaded,absent,no gbnf/__init__.py
+20261015T034839Z_0c3220a4,claude-opus-5-5,medium,driven,class,yes
+20261015T035119Z_ec8fc853,claude-fable-5-1,medium,loaded_failing,TypedDict,yes
+20261015T035340Z_33343e8a,claude-sonnet-5-5,medium,not_loaded,absent,no
+20261015T035633Z_d7f098d3,claude-opus-5-5,medium,not_loaded,absent,no
+20261015T035651Z_2ece0ec5,claude-haiku-5-5,medium,not_loaded,absent,no gbnf/__init__.py
+20261015T040307Z_0fb26709,claude-haiku-5-5,medium,not_loaded,mentioned only,no gbnf/__init__.py
+20261015T040315Z_8e7979af,claude-opus-5-5,medium,driven,class,yes
+20261015T040549Z_446e3f30,claude-sonnet-5-5,medium,not_loaded,absent,no
+20261015T041336Z_aef4b62e,claude-fable-5-1,medium,driven,mentioned only,yes
+20261015T041715Z_c1711c1f,claude-fable-5-1,medium,not_loaded,TypedDict,no gbnf/__init__.py
+20261015T042251Z_4cd8a835,claude-sonnet-5-5,medium,not_loaded,absent,no
+20261015T042402Z_1980108f,claude-opus-5-5,medium,not_loaded,absent,no
+20261015T042632Z_767b7c9e,claude-haiku-5-5,medium,not_loaded,absent,no gbnf/__init__.py
+20261015T042723Z_f20c20c2,claude-fable-5-1,medium,loaded_failing,alias,yes
+20261015T062355Z_8c2de8bf,claude-haiku-5-5,medium,not_loaded,TypedDict,no gbnf/__init__.py
+20261015T062355Z_951af042,claude-opus-5-5,medium,not_loaded,absent,no
+20261015T062638Z_44c30467,claude-sonnet-5-5,medium,not_loaded,absent,no
+20261015T062858Z_b7dde871,claude-fable-5-1,medium,loaded_failing,alias,yes
+20261015T063242Z_7f73d371,claude-fable-5-1,medium,loaded_failing,TypedDict,yes
+20261015T063635Z_cf3ed6a1,claude-opus-5-5,medium,loaded_failing,alias,yes
+20261015T064105Z_5d6fb05d,claude-sonnet-5-5,medium,not_loaded,absent,no
+20261015T064412Z_9315073f,claude-fable-5-1,medium,loaded_failing,TypedDict,yes
+20261015T064521Z_6216950b,claude-opus-5-5,medium,loaded_failing,alias,yes
+20261015T065655Z_1c0c6a4a,claude-sonnet-5-5,medium,not_loaded,absent,no
+20261015T065722Z_6e297398,claude-sonnet-5-5,medium,not_loaded,absent,no
+20261015T070758Z_7404d113,claude-opus-5-5,medium,not_loaded,absent,no
+20261015T070800Z_0edb5a6a,claude-haiku-5-5,medium,not_loaded,absent,no gbnf/__init__.py
+20261015T070813Z_13fcbb7c,claude-fable-5-1,medium,loaded_failing,TypedDict,yes
+20261015T071402Z_c68b45f8,claude-fable-5-1,medium,loaded_failing,TypedDict,yes
+20261015T071549Z_b904f073,claude-sonnet-5-5,medium,not_loaded,absent,no
+20261015T071926Z_439bc0e2,claude-haiku-5-5,medium,not_loaded,TypedDict,no gbnf/__init__.py
+20261015T071934Z_08b45864,claude-opus-5-5,medium,not_loaded,mentioned only,no
+20261015T072613Z_468ebe45,claude-opus-5-5,medium,driven,alias,yes
+20261015T072623Z_5f1f92d3,claude-fable-5-1,medium,loaded_failing,TypedDict,yes
+20261015T073033Z_05b8accb,claude-haiku-5-5,medium,not_loaded,absent,no
+20261015T073651Z_0a2a97c3,claude-sonnet-5-5,medium,not_loaded,absent,no
+20261015T074324Z_3b8e4e92,claude-haiku-5-5,medium,not_loaded,alias,no gbnf/__init__.py
+20261015T074350Z_78bd13e4,claude-opus-5-5,medium,not_loaded,mentioned only,no
+20261015T074439Z_4f98cca4,claude-sonnet-5-5,medium,not_loaded,mentioned only,no
+20261015T080534Z_57be5b50,claude-fable-5-1,low,loaded_failing,TypedDict,yes
+20261015T154057Z_12e978be,claude-haiku-5-5,low,not_loaded,absent,no gbnf/__init__.py
+20261015T154057Z_e3cc6442,claude-sonnet-5-5,high,driven,alias,yes
+20261015T160029Z_b1a2b5ed,claude-fable-5-1,high,loaded_failing,TypedDict,yes
+20261015T183537Z_5ace59bd,claude-sonnet-5-5,high,not_loaded,alias,no
+20261015T183537Z_5b39c884,claude-fable-5-1,high,loaded_failing,TypedDict,yes
+20261015T192727Z_42c7dc82,claude-sonnet-5-5,low,not_loaded,absent,no
+20261015T192727Z_8518a3d4,claude-sonnet-5-5,max,driven,class,yes
+20261015T192727Z_a5b2f6d2,claude-haiku-5-5,high,not_loaded,absent,no
+20261015T215716Z_48c85996,claude-haiku-5-5,low,not_loaded,absent,no gbnf/__init__.py
+20261015T215716Z_719942fc,claude-haiku-5-5,medium,not_loaded,absent,no
+20261015T215716Z_9bb4badc,claude-sonnet-5-5,xhigh,loaded_failing,TypedDict,yes
+20261015T223443Z_ff85fdf4,claude-opus-5-5,high,loaded_failing,TypedDict,yes
+20261016T002948Z_d836c9b9,claude-haiku-5-5,low,not_loaded,absent,no gbnf/__init__.py
+20261016T005903Z_5cc9c4bc,claude-opus-5-5,xhigh,driven,class,yes
+20261016T005903Z_a925dae5,claude-haiku-5-5,max,loaded_failing,TypedDict,yes
+20261016T005903Z_c3c2a66c,claude-sonnet-5-5,low,not_loaded,absent,no
+20261016T005903Z_f57365d9,claude-sonnet-5-5,high,not_loaded,mentioned only,no
+20261016T010104Z_0f452686,claude-haiku-5-5,medium,not_loaded,TypedDict,no gbnf/__init__.py
+20261016T015451Z_cbccf579,claude-haiku-5-5,high,not_loaded,absent,no gbnf/__init__.py
+20261016T030859Z_e1c6ff3d,claude-sonnet-5-5,high,loaded_failing,alias,yes
+20261016T034002Z_ea711d7c,claude-haiku-5-5,xhigh,loaded_failing,TypedDict,yes
+20261016T040915Z_c10b6ebd,claude-haiku-5-5,low,not_loaded,absent,no gbnf/__init__.py
+20261016T041817Z_6034b286,claude-haiku-5-5,high,not_loaded,alias,no gbnf/__init__.py
+20261016T043720Z_b87e120f,claude-opus-5-5,high,not_loaded,alias,no gbnf/__init__.py
+20261016T044822Z_e763bd1c,claude-sonnet-5-5,low,not_loaded,absent,no
+20261016T044933Z_6b77117e,claude-opus-5-5,low,not_loaded,absent,no
+20261016T050245Z_b4be54c0,claude-haiku-5-5,low,not_loaded,alias,no gbnf/__init__.py
+20261016T052518Z_b5c1c514,claude-sonnet-5-5,low,not_loaded,absent,no
+20261016T055143Z_e019bce2,claude-opus-5-5,max,loaded_failing,TypedDict,yes
+20261016T061413Z_c7fbfe03,claude-sonnet-5-5,xhigh,loaded_failing,TypedDict,yes
+20261016T061441Z_a5d733dd,claude-opus-5-5,low,not_loaded,absent,no
+20261016T061722Z_4c875952,claude-opus-5-5,xhigh,driven,class,yes
+20261016T064249Z_978c3e86,claude-sonnet-5-5,high,not_loaded,absent,no
+20261016T064327Z_883dca35,claude-opus-5-5,high,driven,class,yes
+20261016T064748Z_7a235aa8,claude-haiku-5-5,high,not_loaded,mentioned only,no gbnf/__init__.py
+20261016T082730Z_a25b7a4c,claude-haiku-5-5,low,not_loaded,absent,no gbnf/__init__.py
+20261016T084258Z_8cee4d8d,claude-sonnet-5-5,low,not_loaded,absent,no
+20261016T085914Z_55b74ecc,claude-sonnet-5-5,high,not_loaded,mentioned only,yes
+20261016T090335Z_84602ec3,claude-sonnet-5-5,low,not_loaded,absent,no
+20261016T093008Z_4408165b,claude-haiku-5-5,xhigh,not_loaded,TypedDict,no gbnf/__init__.py
+20261016T093244Z_1623a99a,claude-haiku-5-5,max,not_loaded,TypedDict,no gbnf/__init__.py
+20261016T095039Z_047b34d8,claude-haiku-5-5,low,not_loaded,absent,no gbnf/__init__.py
+20261016T102346Z_50e372f5,claude-opus-5-5,low,not_loaded,absent,no
+20261016T102550Z_a93af49d,claude-sonnet-5-5,low,not_loaded,absent,no
+20261016T104326Z_fd965052,claude-opus-5-5,low,not_loaded,absent,no
+20261016T111145Z_ce29e706,claude-haiku-5-5,high,not_loaded,TypedDict,no gbnf/__init__.py
+20261016T113319Z_afbe8339,claude-sonnet-5-5,high,not_loaded,mentioned only,no
+20261016T115627Z_6c2f61ea,claude-sonnet-5-5,max,driven,class,yes
+20261016T132518Z_57b103b6,claude-sonnet-5-5,low,not_loaded,absent,no
+20261016T132518Z_c85d02b4,claude-haiku-5-5,high,not_loaded,TypedDict,no gbnf/__init__.py
+20261016T134506Z_a4f2e0be,claude-opus-5-5,xhigh,loaded_failing,TypedDict,yes
+20261016T134612Z_ea10d004,claude-haiku-5-5,low,not_loaded,absent,no gbnf/__init__.py
+20261016T135417Z_cdeda4c3,claude-sonnet-5-5,high,driven,alias,yes
+20261016T140213Z_e8f03a6c,claude-opus-5-5,low,not_loaded,absent,no
+20261016T140530Z_36707fd9,claude-sonnet-5-5,xhigh,driven,class,yes
+20261016T140946Z_6dd707ab,claude-haiku-5-5,low,not_loaded,TypedDict,no gbnf/__init__.py
+20261016T151822Z_ac3c229a,claude-fable-5-1,xhigh,loaded_failing,TypedDict,yes
+20261016T154405Z_4ae5d899,claude-fable-5-1,max,driven,mentioned only,yes
+20261016T201320Z_1a8fdceb,claude-fable-5-1,xhigh,not_loaded,TypedDict,no gbnf/__init__.py
+20261016T201320Z_9a849db4,claude-fable-5-1,max,loaded_failing,TypedDict,yes
+20261016T211542Z_b0ed5753,claude-fable-5-1,max,loaded_failing,TypedDict,yes
+20261016T211737Z_2ac65437,claude-fable-5-1,xhigh,not_loaded,TypedDict,no gbnf/__init__.py
+20261017T020314Z_8560337c,claude-fable-5-1,max,loaded_failing,TypedDict,yes
+20261017T030631Z_dfb57d1e,claude-fable-5-1,xhigh,loaded_failing,TypedDict,yes
+20261017T030941Z_5e414561,claude-opus-5-5,xhigh,driven,class,yes
+20261017T140628Z_5bdc50d9,claude-fable-5-1,high,loaded_failing,TypedDict,yes
+20261017T140628Z_fd1ff645,claude-sonnet-5-5,high,not_loaded,alias,no
+20261017T141045Z_b6a33d31,claude-haiku-5-5,low,not_loaded,absent,no gbnf/__init__.py
+20261017T141753Z_c5b2e870,claude-haiku-5-5,high,not_loaded,TypedDict,no gbnf/__init__.py
+20261017T142154Z_463c1f27,claude-fable-5-1,xhigh,driven,mentioned only,yes
+20261017T144511Z_3c318f76,claude-fable-5-1,low,loaded_failing,TypedDict,yes
+20261017T145529Z_480bbf5d,claude-opus-5-5,high,driven,class,yes
+20261017T150755Z_21b649ee,claude-sonnet-5-5,low,not_loaded,absent,no
+20261017T150931Z_8f22baf5,claude-opus-5-5,low,not_loaded,absent,no
+20261017T150942Z_87a02ac8,claude-haiku-5-5,high,not_loaded,TypedDict,no gbnf/__init__.py
+20261017T151646Z_fda78be3,claude-haiku-5-5,xhigh,not_loaded,TypedDict,no gbnf/__init__.py
+20261017T152607Z_573d918d,claude-sonnet-5-5,low,not_loaded,absent,no
+20261017T174414Z_d063fa91,claude-haiku-5-5,high,not_loaded,TypedDict,no gbnf/__init__.py
+20261017T174724Z_fea40a88,claude-opus-5-5,high,driven,class,yes
+20261017T175320Z_e5f397a1,claude-sonnet-5-5,low,not_loaded,absent,no
+20261017T180306Z_971d6d74,claude-opus-5-5,low,not_loaded,absent,no
+20261017T180458Z_76dacc45,claude-haiku-5-5,xhigh,loaded_failing,TypedDict,yes
+20261017T180726Z_32b916b9,claude-haiku-5-5,low,not_loaded,absent,no
+20261017T181203Z_3ed78b89,claude-sonnet-5-5,high,not_loaded,absent,no
+20261017T181323Z_e575f21a,claude-sonnet-5-5,xhigh,driven,class,yes
+20261017T183054Z_a01fbde5,claude-opus-5-5,low,not_loaded,absent,no
+20261017T183721Z_ff9439b6,claude-sonnet-5-5,low,not_loaded,absent,no
+20261017T183852Z_bb02a79b,claude-haiku-5-5,low,not_loaded,absent,no gbnf/__init__.py
+20261017T183908Z_5926a78e,claude-sonnet-5-5,high,loaded_failing,alias,yes
+20261017T184059Z_d2c53842,claude-haiku-5-5,xhigh,not_loaded,TypedDict,no gbnf/__init__.py
+20261017T184432Z_db5d720b,claude-sonnet-5-5,xhigh,loaded_failing,TypedDict,yes
+20261017T185334Z_dcc07682,claude-opus-5-5,xhigh,driven,class,yes
+20261017T191809Z_0db46089,claude-haiku-5-5,high,not_loaded,TypedDict,no gbnf/__init__.py
+20261017T191904Z_0bcd6f04,claude-haiku-5-5,high,not_loaded,TypedDict,no gbnf/__init__.py
+20261017T193250Z_265260aa,claude-opus-5-5,high,driven,class,yes
+20261017T193328Z_0d2ddf4e,claude-opus-5-5,low,not_loaded,mentioned only,no
+20261017T193739Z_e89b1341,claude-haiku-5-5,xhigh,not_loaded,TypedDict,no gbnf/__init__.py
+20261017T194703Z_1493c05b,claude-sonnet-5-5,high,driven,alias,yes
+20261017T201047Z_a94d8752,claude-sonnet-5-5,xhigh,loaded_failing,TypedDict,yes
+20261017T201420Z_b4688200,claude-opus-5-5,low,not_loaded,absent,no
+20261017T201531Z_50423746,claude-haiku-5-5,xhigh,not_loaded,TypedDict,no gbnf/__init__.py
+20261017T203132Z_35416f7e,claude-opus-5-5,high,driven,alias,yes
+20261017T203939Z_07b70532,claude-opus-5-5,xhigh,driven,class,yes
+20261017T205350Z_a1728946,claude-opus-5-5,low,not_loaded,absent,no
+20261017T205752Z_445d16aa,claude-haiku-5-5,xhigh,loaded_failing,TypedDict,yes
+20261017T205931Z_c129290c,claude-opus-5-5,high,driven,class,yes
+20261017T213415Z_17d00ac8,claude-haiku-5-5,xhigh,not_loaded,TypedDict,no gbnf/__init__.py
+20261017T214510Z_1197e8f7,claude-opus-5-5,low,not_loaded,absent,no
+20261017T220124Z_97fa7aa7,claude-haiku-5-5,xhigh,not_loaded,TypedDict,no
+20261020-212438-wild-king,claude-haiku-5-5,high,not_loaded,TypedDict,no gbnf/__init__.py
+20261020-222136-soft-truth,claude-haiku-5-5,xhigh,not_loaded,TypedDict,no gbnf/__init__.py
+20261021-015429-cold-wave,claude-fable-5-1,max,loaded_failing,TypedDict,yes
+20261021-015429-orange-hall,claude-fable-5-1,high,loaded_failing,TypedDict,yes
+20261021-015429-round-fog,claude-fable-5-1,low,loaded_failing,TypedDict,yes
+20261021-015429-shiny-mode,claude-fable-5-1,xhigh,not_loaded,mentioned only,no gbnf/__init__.py
+20261021-015429-square-band,claude-opus-5-5,high,driven,class,yes
+20261026-020726-cold-cake,claude-fable-5-1,low,loaded_failing,alias,yes
+20261026-020726-cold-queen,claude-fable-5-1,low,loaded_failing,alias,yes
+20261026-020726-empty-wildflower,claude-fable-5-1,low,loaded_failing,alias,yes
+20261026-020726-jolly-leaf,claude-fable-5-1,low,loaded_failing,alias,yes
+20261026-020726-lingering-cherry,claude-fable-5-1,low,loaded_failing,TypedDict,yes
+20261026-020726-lucky-cake,claude-fable-5-1,low,loaded_failing,TypedDict,yes
+20261026-020726-nameless-pine,claude-fable-5-1,low,loaded_failing,TypedDict,yes
+20261026-020726-throbbing-rain,claude-fable-5-1,low,loaded_failing,TypedDict,yes
+20261026-020726-twilight-sun,claude-fable-5-1,low,loaded_failing,TypedDict,yes
+20261026-111547-blue-dew,claude-fable-5-1,high,loaded_failing,TypedDict,yes
+20261026-111547-fancy-bird,claude-fable-5-1,high,driven,mentioned only,yes
+20261026-111547-lively-union,claude-fable-5-1,high,loaded_failing,TypedDict,yes
+20261026-111547-proud-queen,claude-fable-5-1,high,loaded_failing,TypedDict,yes
+20261026-111547-shy-resonance,claude-fable-5-1,high,loaded_failing,TypedDict,yes
+20261026-191627-calm-mouse,claude-fable-5-1,high,loaded_failing,TypedDict,yes
+20261026-191627-old-fire,claude-fable-5-1,high,driven,mentioned only,yes
+20261026-191627-patient-lab,claude-fable-5-1,high,loaded_failing,TypedDict,yes
+20261027-040249-crimson-lab,claude-opus-5-5,high,loaded_failing,mentioned only,yes
+20261027-040249-odd-pine,claude-opus-5-5,high,driven,alias,yes
+20261027-112907-white-resonance,claude-opus-5-5,high,driven,class,yes
+20261027-114410-jolly-wood,claude-sonnet-5-5,xhigh,driven,class,yes
+20261027-151736-black-wave,claude-sonnet-5-5,xhigh,driven,class,yes
+20261028-034150-nameless-leaf,claude-fable-5-1,xhigh,driven,mentioned only,yes
+20261028-034150-young-bird,claude-opus-5-5,xhigh,driven,class,yes
+20261028-095511-broken-lab,claude-sonnet-5-5,xhigh,loaded_failing,TypedDict,yes
+20261028-095511-dry-moon,claude-fable-5-1,xhigh,loaded_failing,TypedDict,yes
+20261028-095511-holy-sea,claude-sonnet-5-5,xhigh,loaded_failing,TypedDict,yes
+20261028-095511-odd-hill,claude-opus-5-5,xhigh,driven,class,yes
+20261028-095511-polished-fog,claude-opus-5-5,xhigh,driven,class,yes
+20261028-095511-quiet-night,claude-sonnet-5-5,xhigh,driven,class,yes
+20261028-095511-royal-voice,claude-fable-5-1,xhigh,loaded_failing,TypedDict,yes
+20261028-095511-small-night,claude-fable-5-1,xhigh,not_loaded,TypedDict,no gbnf/__init__.py
+20261028-095511-snowy-flower,claude-haiku-5-5,xhigh,not_loaded,TypedDict,no gbnf/__init__.py
+20261028-095511-soft-recipe,claude-fable-5-1,xhigh,loaded_failing,TypedDict,yes
+20261028-095511-wispy-pond,claude-fable-5-1,xhigh,not_loaded,TypedDict,no gbnf/__init__.py
+20261028-095511-yellow-moon,claude-opus-5-5,xhigh,driven,class,yes
+20261028-232823-late-queen,claude-sonnet-5-5,xhigh,loaded_failing,TypedDict,yes
+20261028-232823-shiny-forest,claude-opus-5-5,xhigh,driven,class,yes
+20261028-232823-wispy-water,claude-opus-5-5,xhigh,driven,class,yes

@@ -1,0 +1,68 @@
+You are porting software from one language to another.
+
+The reference is mounted read-only at `/input`.
+
+Write the port to `/target`.
+
+There is no network access.
+
+The sandbox image was built from these two Dockerfiles, the second on top of the first:
+
+```Dockerfile
+FROM node:24.20.0-slim
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git ca-certificates socat && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN npm install -g @anthropic-ai/claude-code@2.1.296
+
+RUN usermod --login user --home /home/user --move-home node && groupmod --new-name user node
+
+# The agent runs as the host's uid, which may not be this one.
+RUN mkdir -p /home/user/.claude/projects && \
+    cd /home/user && chmod 777 . .claude .claude/projects
+
+RUN find / -xdev -perm /6000 -type f -exec chmod a-s {} + && chmod 666 /etc/passwd
+
+COPY --from=botbox --chmod=755 botbox-relay /usr/local/bin/botbox-relay
+
+USER user
+
+ENV DISABLE_AUTOUPDATER=1 \
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    CLAUDE_CONFIG_DIR=/home/user/.claude
+```
+
+```Dockerfile
+FROM botbox-claude:latest
+
+USER root
+
+COPY --from=ghcr.io/astral-sh/uv:0.12.10 /uv /uvx /usr/local/bin/
+ENV UV_PYTHON_INSTALL_DIR=/usr/local/share/uv/python \
+    UV_PYTHON_BIN_DIR=/usr/local/bin
+RUN uv python install --preview-features python-install-default --default 3.14.3
+RUN uv pip install --system --break-system-packages --python 3.14.3 pytest==9.1.1 pytest-describe==3.2.0 \
+    && ln -s "$(dirname "$(uv python find 3.14.3)")/pytest" /usr/local/bin/pytest
+
+RUN npm install -g vitest@2.1.3
+RUN npm install -g pnpm@9.4.0
+ENV NODE_PATH=/usr/local/lib/node_modules
+# ESM resolution ignores NODE_PATH but walks up to /node_modules.
+RUN mkdir /node_modules \
+    && for package in /usr/local/lib/node_modules/*; do ln -s "$package" /node_modules/; done \
+    && chown user /node_modules
+
+USER user
+```
+
+The library itself may specify additional porting instructions below. Paths in them are relative to `/input`.
+
+Port the implementation under python/ to typescript.
+
+The following test suites are included:
+
+- python unit tests: python/gbnf/ (colocated, *_test.py)
+- python integration tests: python/tests/generated/
+

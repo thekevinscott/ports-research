@@ -21,7 +21,7 @@
 <tr><td>Haiku</td><td>very high</td><td class="dim">3</td><td class="dim">8</td><td class="">0 / 11</td><td class="dim">9</td><td class="dim">3</td><td class="">0 / 12</td></tr>
 </table>
 
-<div class="nb-note">Over 413 runs: 102 driven · 123 loaded but failing · 188 not loaded. Driven by effort, both directions pooled (n = 96 each): low 11 · medium 15 · high 30 · very high 36. The behaviour and API slide plots every run; a 0 is a port the driver could not run, not a port that parsed everything wrong.</div>
+<div class="nb-note">Over 413 runs: 102 driven · 123 loaded but failing · 188 not loaded. Driven by effort, both directions pooled (n = 96 each): low 11 · medium 15 · high 30 · very high 36. The behaviour and API slide plots every run. A 0 is a port the driver could not run. A loaded port that accepted nothing the reference accepts lands on a floor: 39.8 % TypeScript → Python (60 ports), 9.6 % Python → TypeScript (58 ports). The 39.8 median on that slide is this floor, not partial correctness.</div>
 
 <div class="source">v2-models-effort · max runs on their own slide · <code>public/models-effort-status.csv</code> from <code>scripts/status_metrics.py</code> · not loaded = every held-out pair crashed · loaded, failing = the port accepted none of the inputs the reference accepts · driven = otherwise · 2026-10-29</div>
 
@@ -167,3 +167,103 @@
 <div class="nb-note">The reference lives at <code>/input/python/gbnf</code> and <code>/input/javascript/src</code>. Similarity and the held-out driver match paths against that layout, so a port that keeps the <code>python/</code> prefix, or puts the TypeScript under <code>gbnf/</code> instead of <code>src/</code>, scores near 0 before a line is compared. Haiku's 1–3 % TypeScript → Python similarity is this. The one cell both experiments share, Opus medium with unit + source tests: 6 of 12 Python → TypeScript ports lack <code>src/index.ts</code> under the long prompt, 0 of 12 under the short one. Part of "not loaded" on the held-out slide is the prompt, not the model.</div>
 
 <div class="source">v2-models-effort · top-level directories of each <code>ported_implementation/</code> · 2026-10-29</div>
+
+---
+
+<div class="eyebrow">BACKUP · WHAT THE STUDY TOOK</div>
+
+<div class="nb-row wide">
+<table class="nb-table small">
+<thead><tr><th></th><th>runs</th><th>spend</th><th>tokens</th><th>agent time</th></tr></thead>
+<tr class=""><td>models × effort (incl. 30 max)</td><td>413</td><td>$1,976</td><td>3,007 M</td><td>130 h</td></tr><tr class=""><td>&nbsp;&nbsp;Fable</td><td>105</td><td>$1,081</td><td>426 M</td><td>39 h</td></tr><tr class=""><td>&nbsp;&nbsp;Opus</td><td>103</td><td>$573</td><td>777 M</td><td>37 h</td></tr><tr class=""><td>&nbsp;&nbsp;Sonnet</td><td>99</td><td>$175</td><td>527 M</td><td>20 h</td></tr><tr class=""><td>&nbsp;&nbsp;Haiku</td><td>106</td><td>$147</td><td>1,277 M</td><td>34 h</td></tr>
+<tr class=""><td>tests experiment (Opus medium)</td><td>192</td><td>$387</td><td>411 M</td><td>23 h</td></tr>
+<tr class="hot"><td>both</td><td>605</td><td>$2,363</td><td>3,418 M</td><td>153 h</td></tr>
+<tr><td colspan="5" class="dim">models × effort spend by what the held-out driver could do with the port</td></tr>
+<tr class=""><td>&nbsp;&nbsp;driver ran the port</td><td>102</td><td>$822</td><td>782 M</td><td>46 h</td></tr><tr class=""><td>&nbsp;&nbsp;loaded, failing</td><td>123</td><td>$686</td><td>815 M</td><td>39 h</td></tr><tr class=""><td>&nbsp;&nbsp;not loaded</td><td>188</td><td>$468</td><td>1,410 M</td><td>46 h</td></tr>
+</table>
+<table class="nb-table small" style="width:auto">
+<thead><tr><th>driven ports</th><th>Python → TypeScript</th><th>TypeScript → Python</th></tr></thead>
+<tr><td>Fable</td><td>32 / 52</td><td>6 / 53</td></tr><tr><td>Opus</td><td>25 / 54</td><td>24 / 49</td></tr><tr><td>Sonnet</td><td>5 / 49</td><td>10 / 50</td></tr><tr><td>Haiku</td><td>0 / 56</td><td>0 / 50</td></tr>
+</table>
+</div>
+
+<div class="nb-note">Spend is Claude Code's <code>total_cost_usd</code> at list price, summed; tokens are input, output and cache reads and writes from the transcripts. Agent time is wall-clock inside the container, summed, not calendar time: batches ran in parallel over about two weeks. Haiku used the most tokens of any model and the least money.</div>
+
+<div class="source">v2-models-effort (413 runs) and v2-tests-configuration (192 runs) · <code>public/models-effort-runs.csv</code>, <code>public/tests-configuration-runs.csv</code>, <code>public/models-effort-status.csv</code> · 2026-10-29</div>
+
+---
+
+<div class="eyebrow">BACKUP · THE PROMPT THE 413 MODEL × EFFORT RUNS GOT</div>
+
+# The long prompt
+
+<div class="prompt-layout">
+<div class="prompt-col">
+<pre class="prompt-text" style="font-size:10px;line-height:1.3;margin:0">You are porting software from one language to another.
+The reference is mounted read-only at `/input`.
+Write the port to `/target`.
+There is no network access.
+The sandbox image was built from these two Dockerfiles, the second on top of the first:
+<span class="dim">[Dockerfile 1, 23 lines: node:24 base, Claude Code 2.1.296, socat, botbox-relay]</span>
+<span class="dim">[Dockerfile 2, 20 lines: uv, Python 3.14.3, pytest, vitest, pnpm]</span>
+The library itself may specify additional porting instructions below. Paths in them are relative to `/input`.
+Port the implementation under python/ to typescript.
+The following test suites are included:
+- python unit tests: python/gbnf/ (colocated, *_test.py)
+- python integration tests: python/tests/generated/</pre>
+</div>
+<div class="prompt-col">
+<div class="prompt-label">Against the short one (slide 5)</div>
+<ul class="prompt-notes">
+<li>2,170 characters against about 450. The two Dockerfiles are 1,565 of them.</li>
+<li>"mounted read-only" is new. The short prompt said only "mounted at /input".</li>
+<li>"There is no network access" moved up; the tool list (uv, pytest, pnpm, vitest) left the prose for the Dockerfiles.</li>
+<li>Two suites listed (unit, source integration) instead of one.</li>
+<li>The Dockerfiles changed twice during the batch (botbox 0.0.20 → 0.1.1 → 0.1.72) and a memory cap was added; all three recorded in the experiment's DEVIATIONS.md.</li>
+</ul>
+</div>
+</div>
+
+<div class="source">Run 20261028-032612-bold-tooth (python → typescript), blank lines and Dockerfiles collapsed; full text in <code>public/long-prompt.txt</code> · 2026-10-29</div>
+
+---
+
+<div class="eyebrow">BACKUP · HELD-OUT TESTS · THE ONE NAME MOST TYPESCRIPT → PYTHON PORTS FAILED ON</div>
+
+# Two shapes of <code>RuleEnd</code>, one driver per side
+
+<div class="nb-row wide">
+<pre class="prompt-text" style="margin:0;font-size:10.5px;line-height:1.35;white-space:pre"># Python reference
+class RuleEnd(Rule): ...          # gbnf/__init__.py exports it
+# Python driver
+from gbnf import GBNF, RuleEnd
+any(isinstance(rule, RuleEnd) for rule in state)</pre>
+<pre class="prompt-text" style="margin:0;font-size:10.5px;line-height:1.35;white-space:pre">// TypeScript reference
+export interface RuleEnd { type: RuleType.END }  // erased
+// TypeScript driver
+const { default: GBNF } = await import(src/index.ts)
+state.some(rule => rule.type === "end")</pre>
+</div>
+
+<table class="nb-table small">
+<thead><tr><th>how the TypeScript → Python port defines <code>RuleEnd</code></th><th>ports</th><th>driven</th><th>loaded, failing</th><th>not loaded</th><th>by model</th></tr></thead>
+<tr><td><code>class RuleEnd(Rule)</code>, like the Python reference</td><td>28</td><td class="hot">28</td><td>0</td><td>0</td><td>21 Opus, 7 Sonnet</td></tr><tr><td>an alias (<code>RuleEnd = …</code>)</td><td>22</td><td class="hot">6</td><td>10</td><td>6</td><td>7 Sonnet, 6 Opus, 6 Fable, 3 Haiku</td></tr><tr><td><code>class RuleEnd(TypedDict)</code>, like the TypeScript interface</td><td>76</td><td class="">0</td><td>49</td><td>27</td><td>40 Fable, 26 Haiku, 7 Sonnet, 3 Opus</td></tr><tr><td>named, but not defined at top level</td><td>17</td><td class="hot">6</td><td>1</td><td>10</td><td>7 Fable, 4 Sonnet, 4 Opus, 2 Haiku</td></tr><tr><td>no <code>RuleEnd</code> anywhere</td><td>59</td><td class="">0</td><td>0</td><td>59</td><td>25 Sonnet, 19 Haiku, 15 Opus</td></tr>
+</table>
+
+<div class="nb-note">202 ports. Every port that wrote the class the Python reference has was driven. A <code>TypedDict</code> mirrors the TypeScript interface and fails the driver's <code>isinstance</code> on every accepted input (the 39.8 % floor) or at import. The TypeScript driver duck-types; it has no equivalent failure.</div>
+
+<div class="source">v2-models-effort · <code>public/models-effort-ruleend.csv</code> from <code>scripts/ruleend_metrics.py</code> · drivers in <code>analysis/measure-behavior/drivers/</code> · 2026-10-29</div>
+
+---
+
+<div class="eyebrow">BACKUP · SIMILARITY ONCE THE PACKAGE IS MOVED TO WHERE THE REFERENCE KEEPS IT</div>
+
+# Move the folder, fix the case, re-measure
+
+<table class="nb-table small" style="width:auto">
+<thead><tr><th>direction</th><th>model</th><th>misplaced ports</th><th>as scored</th><th>folder moved</th><th>also renamed</th><th>final</th></tr></thead>
+<tr><td>TypeScript → Python</td><td>Fable</td><td>6</td><td>6.3</td><td>33.7</td><td>0</td><td class="hot">33.7</td></tr><tr><td>TypeScript → Python</td><td>Opus</td><td>1</td><td>0.3</td><td>32.1</td><td>0</td><td class="hot">32.1</td></tr><tr><td>TypeScript → Python</td><td>Haiku</td><td>41</td><td>1.3</td><td>34.5</td><td>0</td><td class="hot">34.5</td></tr><tr><td>Python → TypeScript</td><td>Opus</td><td>23</td><td>8.0</td><td>8.3</td><td>23</td><td class="hot">37.5</td></tr><tr><td>Python → TypeScript</td><td>Sonnet</td><td>33</td><td>1.2</td><td>1.3</td><td>33</td><td class="hot">27.0</td></tr><tr><td>Python → TypeScript</td><td>Haiku</td><td>30</td><td>8.7</td><td>36.3</td><td>6</td><td class="hot">37.4</td></tr></table>
+
+<div class="nb-note">The 134 ports whose package is not where the reference keeps it, copied to scratch and re-scored with the same git-diff measure after two mechanical fixes, nothing inside any file changed. First the package directory is moved (<code>python/gbnf → gbnf</code>, <code>gbnf → src</code>, and so on). That alone lifts every TypeScript → Python port to 32–35 %. 62 Python → TypeScript ports (all Sonnet, all Opus, 6 Haiku) still match nothing because they name folders <code>rules_builder/</code> where the reference has <code>rules-builder/</code>; lower-casing and dashing those names lifts them to 27–38 %. Medians in the "final" column use the renamed score where a rename was applied. The lowest of the 134 after both fixes is 20.0 %.</div>
+
+<div class="source">v2-models-effort · <code>measure-code-distance git-diff</code>, same excludes as the notebook · <code>public/layout-corrected.csv</code> from <code>scripts/layout_corrected/</code> · 2026-10-29</div>
