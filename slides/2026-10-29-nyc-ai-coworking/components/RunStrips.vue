@@ -1,9 +1,11 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { experiment, experiments } from './experiment.js'
 
 const props = defineProps({
-  src: { type: String, required: true },
-  by: { type: String, required: true },
+  src: { type: String, default: null },
+  by: { type: String, default: null },
+  sources: { type: Object, default: null },
   initialMeasure: { type: String, default: 'wall_minutes' },
   measures: { type: Array, default: null },
   reference: { type: String, default: null },
@@ -66,21 +68,40 @@ const panel = ref(null)
 const vw = ref(800)
 const selected = ref(props.initialMeasure)
 const shown = ref([true, true])
-const layout = LAYOUTS[props.by]
-const twoLabels = layout.headers.length === 2
+const active = computed(() => props.sources ? experiments[experiment.value] : null)
+const currentSrc = computed(() => active.value ? props.sources[active.value.key] : props.src)
+const currentBy = computed(() => active.value ? active.value.by : props.by)
+const layout = computed(() => LAYOUTS[currentBy.value])
+const twoLabels = computed(() => layout.value.headers.length === 2)
+function pick(index) { experiment.value = index }
 
-onMounted(async () => {
-  if (props.reference) reference.value = await (await fetch(props.reference)).json()
-  const response = await fetch(props.src)
-  if (!response.ok) throw new Error(`${props.src}: HTTP ${response.status}`)
+const cache = new Map()
+async function fetchRows(src) {
+  const response = await fetch(src)
+  if (!response.ok) throw new Error(`${src}: HTTP ${response.status}`)
   const [header, ...lines] = (await response.text()).trim().split(/\r?\n/)
   const keys = header.split(',')
-  rows.value = lines.map(line => Object.fromEntries(keys.map((key, index) => [key, line.split(',')[index]])))
+  return lines.map(line => Object.fromEntries(keys.map((key, index) => [key, line.split(',')[index]])))
+}
+function measure() { vw.value = panel.value?.querySelector('.strip')?.clientWidth || 800 }
+let observer = null
+async function load() {
+  const src = currentSrc.value
+  if (!cache.has(src)) cache.set(src, fetchRows(src))
+  rows.value = await cache.get(src)
+  range.value = null
+  await nextTick()
   await new Promise(resolve => requestAnimationFrame(resolve))
-  const strip = panel.value?.querySelector('.strip')
-  if (!strip) return
-  const observer = new ResizeObserver(() => { vw.value = strip.clientWidth || 800 })
-  observer.observe(strip)
+  measure()
+  if (!observer && panel.value) {
+    observer = new ResizeObserver(measure)
+    observer.observe(panel.value)
+  }
+}
+watch(currentSrc, load)
+onMounted(async () => {
+  if (props.reference) reference.value = await (await fetch(props.reference)).json()
+  await load()
 })
 
 const choices = computed(() => MEASURES.filter(([key]) =>
@@ -91,7 +112,7 @@ function nice(value) {
   const step = [1, 2, 2.5, 4, 5, 10].find(candidate => candidate * power >= value)
   return step * power
 }
-const displayed = computed(() => rows.value.filter(row => layout.groups.some(group => group.rows.some(r => r.match(row)))))
+const displayed = computed(() => rows.value.filter(row => layout.value.groups.some(group => group.rows.some(r => r.match(row)))))
 const referenceValues = computed(() => DIRECTIONS.map(([direction]) => props.referenceLine ?? reference.value[direction]?.[selected.value] ?? null))
 const extent = computed(() => {
   const values = [...referenceValues.value.filter(v => v !== null), ...displayed.value.map(row => row[selected.value]).filter(v => v !== undefined && v !== '').map(Number)]
@@ -105,6 +126,7 @@ const domainMax = computed(() => percent.value ? 100 : extent.value[1])
 const range = ref(null)
 const knob = ref(null)
 watch(selected, () => { range.value = null })
+watch(choices, list => { if (list.length && !list.some(([key]) => key === selected.value)) selected.value = list[0][0] })
 const lo = computed(() => range.value?.[0] ?? extent.value[0])
 const hi = computed(() => range.value?.[1] ?? extent.value[1])
 function position(value) { return 8 + ((Number(value) - lo.value) / (hi.value - lo.value)) * (vw.value - 16) }
@@ -145,7 +167,7 @@ function series(direction, match) {
     .filter(row => row.value === row.value)
   return { values, median: median(values.map(row => row.value)) }
 }
-const groups = computed(() => layout.groups.map(group => ({
+const groups = computed(() => layout.value.groups.map(group => ({
   ...group,
   rows: group.rows.map(row => ({ ...row, series: DIRECTIONS.map(([direction]) => series(direction, row.match)) })),
 })))
@@ -154,15 +176,16 @@ const ticks = computed(() => {
   const first = Math.ceil(lo.value / step) * step
   return Array.from({ length: Math.floor((hi.value - first) / step) + 1 }, (_, i) => first + i * step).map(value => (value - lo.value) / (hi.value - lo.value))
 })
-const lanes = props.by === 'pooled' ? 24 : 4
-const rowHeight = twoLabels ? 16 : props.by === 'pooled' ? 220 : props.by === 'condition' ? 32 : 38
+const lanes = computed(() => currentBy.value === 'pooled' ? 24 : 4)
+const rowHeight = computed(() => twoLabels.value ? 16 : currentBy.value === 'pooled' ? 220 : currentBy.value === 'condition' ? 32 : 38)
 </script>
 
 <template>
-  <div class="strips" :class="{ two: twoLabels, pooled: by === 'pooled' }">
+  <div class="strips" :class="{ two: twoLabels, pooled: currentBy === 'pooled' }">
     <div class="tabs">
+      <span v-if="active" class="experiments"><button v-for="(entry, index) in experiments" :key="entry.key" :class="{ active: experiment === index }" @click.stop="pick(index)">{{ entry.label }}</button></span>
       <template v-if="choices.length > 1"><button v-for="[key, label] in choices" :key="key" :class="{ active: selected === key }" @click.stop="selected = key">{{ label }}</button></template>
-      <span>one dot = one run &nbsp;·&nbsp; tick = median</span>
+      <span class="note">one dot = one run &nbsp;·&nbsp; tick = median</span>
     </div>
     <div v-if="rows.length" class="panel" ref="panel">
       <div class="row head">
@@ -210,7 +233,10 @@ const rowHeight = twoLabels ? 16 : props.by === 'pooled' ? 220 : props.by === 'c
 .tabs { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
 .tabs button { border:1px solid #cdd6de; background:#fff; border-radius:16px; padding:4px 11px; font-size:12px; font-weight:700; color:#415369; cursor:pointer; }
 .tabs button.active { background:#17243a; color:#fff; border-color:#17243a; }
-.tabs span { margin-left:auto; color:#61718a; font-size:11px; }
+.tabs .note { margin-left:auto; color:#61718a; font-size:11px; }
+.experiments { display:inline-flex; gap:2px; padding:3px; margin-right:12px; background:#17243a; border-radius:9px; }
+.experiments button { border:none; background:none; border-radius:6px; padding:4px 11px; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#b7c3d2; cursor:pointer; }
+.experiments button.active { background:#fff; color:#17243a; }
 .panel { background:#fff; border:1px solid #dbe0e4; border-radius:7px; padding:2px 14px 4px; --cols: 118px 1fr; }
 .strips.two .panel { --cols: 48px 50px 1fr; }
 .row, .group { display:grid; grid-template-columns: var(--cols); align-items:center; column-gap:6px; font-size:10.5px; }
