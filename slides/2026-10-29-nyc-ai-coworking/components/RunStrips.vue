@@ -107,8 +107,9 @@ onMounted(async () => {
   await load()
 })
 
-const choices = computed(() => MEASURES.filter(([key]) =>
-  (props.measures ? props.measures.includes(key) : true) && rows.value.some(row => row[key] !== undefined && row[key] !== '')))
+const choices = computed(() => MEASURES
+  .filter(([key]) => (props.measures ? props.measures.includes(key) : true) && rows.value.some(row => row[key] !== undefined && row[key] !== ''))
+  .sort(([a], [b]) => props.measures ? props.measures.indexOf(a) - props.measures.indexOf(b) : 0))
 const percent = computed(() => selected.value.endsWith('_pct'))
 function nice(value) {
   const power = 10 ** Math.floor(Math.log10(value))
