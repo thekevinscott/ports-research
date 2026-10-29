@@ -1,4 +1,4 @@
-<div class="eyebrow">RESULTS · DISTANCE BETWEEN PORTS · DO REPEATS OF ONE SETTING AGREE WITH EACH OTHER?</div>
+<div class="eyebrow">APPENDIX · DISTANCE BETWEEN PORTS · DO REPEATS OF ONE SETTING AGREE WITH EACH OTHER?</div>
 
 <div class="tabs-row"><ExperimentTabs /></div>
 
