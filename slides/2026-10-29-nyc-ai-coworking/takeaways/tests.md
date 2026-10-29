@@ -1,4 +1,4 @@
-<div class="eyebrow">TAKEAWAY 3 · TARGET-LANGUAGE INTEGRATION TESTS ARE CHEAP INSURANCE</div>
+<div class="eyebrow">TAKEAWAY 3 · TARGET-LANGUAGE INTEGRATION TESTS ARE CHEAP INSURANCE. SOURCE-LANGUAGE TESTS ARE NOT ENOUGH, AND CAN HURT.</div>
 
 # Held-out API agreement by the test suites the agent was given
 
