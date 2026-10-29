@@ -1,4 +1,4 @@
-<div class="eyebrow">TAKEAWAY · WHICH MODEL AND EFFORT, FOR THE MONEY?</div>
+<div class="eyebrow">TAKEAWAY 1 · WHICH MODEL AND EFFORT, FOR THE MONEY?</div>
 
 <table class="nb-table small">
 <thead><tr><th>model</th><th>effort</th><th colspan="3">Python → TypeScript</th><th colspan="3">TypeScript → Python</th></tr>

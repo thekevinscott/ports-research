@@ -125,7 +125,7 @@
 .end-sub { color: #61718a; font-size: 15px; }
 .toc { display: grid; grid-template-columns: 1fr 1.15fr; gap: 48px; margin-top: 14px; }
 .toc-section { font-size: 1.35rem; font-weight: 700; color: var(--ink); border-bottom: 2px solid var(--accent); padding-bottom: 6px; margin-bottom: 10px; }
-.toc-section.last { margin-top: 8px; border-bottom: none; }
+.toc-section.last { margin-top: 4px; border-bottom: none; }
 .toc-section i { font-style: normal; color: var(--accent); font-size: .85rem; letter-spacing: .14em; margin-right: 12px; vertical-align: 2px; }
-.toc ol { margin: 0; padding-left: 1.6em; color: var(--muted); font-size: .98rem; line-height: 1.42; }
+.toc ol { margin: 0; padding-left: 1.6em; color: var(--muted); font-size: .94rem; line-height: 1.32; }
 .toc ol li::marker { color: var(--accent); font-weight: 700; }

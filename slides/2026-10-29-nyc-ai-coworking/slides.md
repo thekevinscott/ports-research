@@ -39,8 +39,9 @@ layout: cover
     </ol>
     <div class="toc-section last"><i>03</i> Takeaways</div>
     <ol>
-      <li>One practical lesson</li>
       <li>Which model and effort, for the money</li>
+      <li>The agent has a house style; your port is the outlier</li>
+      <li>Tests bought tokens, not code</li>
     </ol>
   </div>
 </div>
@@ -104,14 +105,18 @@ src: ./results/tests-effect.md
 layout: section
 ---
 
-# One practical lesson
-
----
-src: ./results/lesson.md
----
+# Takeaways
 
 ---
 src: ./results/for-the-money.md
+---
+
+---
+src: ./results/takeaway-house-style.md
+---
+
+---
+src: ./results/takeaway-tests.md
 ---
 
 ---
