@@ -1,6 +1,7 @@
 [experiments]
 path = "experiments/{experiment}"
-mode = "matrix"
+[experiment]
+continues = false
 [files]
 path = "experiments/{experiment}/files/"
 [runs]
