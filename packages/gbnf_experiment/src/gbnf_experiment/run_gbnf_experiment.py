@@ -68,6 +68,8 @@ async def run_gbnf_experiment(
             output=prepared_filesystem.ported_implementation_directory,
             artifacts=run_directory,
             memory=memory,
+            container=f"ports-{run_directory.name}",
+            resume=prepared_filesystem.continuation,
         )
         error = reported_error(agent, (run_directory / "stdout.txt").read_text())
         if error is not None or result.exit_code != 0:

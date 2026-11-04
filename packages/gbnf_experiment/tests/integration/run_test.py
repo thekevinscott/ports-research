@@ -526,3 +526,70 @@ def describe_cli():
         assert result.exit_code == 1
         assert "API Error: 429 rate limited" in str(result.exception)
         assert (output / "result.json").is_file()
+
+
+def describe_the_kept_container():
+    @pytest.fixture
+    def run_directory(data_directory):
+        directory = data_directory / "brave-otter"
+        directory.mkdir(parents=True)
+        return directory
+
+    @pytest.fixture
+    def attempt(run_directory, docker_daemon, claude_home):
+        async def attempt():
+            agent = ClaudeAgent(model="claude-opus-5", effort="high", host_home=claude_home)
+            await run_gbnf_experiment(agent=agent, run_directory=run_directory, **CONFIG)
+
+        return attempt
+
+    @pytest.fixture
+    def interrupted(attempt, port_result, exit_code):
+        async def interrupted():
+            port_result.update(is_error=True, result="interrupted")
+            exit_code[0] = 1
+            with pytest.raises(Exception, match="interrupted"):
+                await attempt()
+            port_result.update(is_error=False, result="done")
+            exit_code[0] = 0
+
+        return interrupted
+
+    async def it_keeps_a_fresh_run_under_the_run_directory_s_name(attempt, porting_calls, run_directory):
+        for name in ("run.json", "run.lock", "stdout.log", "stderr.log"):
+            (run_directory / name).write_text("")
+
+        await attempt()
+
+        [call] = porting_calls
+        assert call["keep"] == "ports-brave-otter"
+        assert "--continue" not in call["command"]
+
+    async def it_continues_the_banked_session_in_a_populated_run_directory(
+        attempt, interrupted, porting_calls
+    ):
+        await interrupted()
+
+        await attempt()
+
+        [_, resumed] = porting_calls
+        assert resumed["restart"] == "ports-brave-otter"
+        assert "--continue" in resumed["command"]
+        assert resumed["sessions"] == [Path(TRANSCRIPT_PATH).relative_to(".claude/projects").as_posix()]
+
+    async def it_banks_only_the_resumed_report_as_the_result(attempt, interrupted, run_directory):
+        await interrupted()
+
+        await attempt()
+
+        assert json.loads((run_directory / "result.json").read_text())["result"] == "done"
+
+    async def it_removes_the_container_and_its_volume_on_exit_0(attempt, removed):
+        await attempt()
+
+        assert removed == ["container:ports-brave-otter", "volume:botbox-run-token-of-ports-brave-otter"]
+
+    async def it_leaves_the_container_when_the_agent_fails(interrupted, removed):
+        await interrupted()
+
+        assert removed == []

@@ -157,6 +157,40 @@ def describe_the_run_directory():
             PreparedFilesystem(source_language="javascript", **TESTS, debug=False)
 
 
+def describe_a_continuation():
+    def it_is_fresh_beside_only_the_runners_files(config, prepare_reference_implementation, run_directory):
+        for name in ("run.json", "run.lock", "stdout.log", "stderr.log"):
+            (run_directory / name).write_text("")
+
+        filesystem = PreparedFilesystem(source_language="javascript", **TESTS, debug=False, run_directory=run_directory)
+
+        assert filesystem.continuation is False
+
+    @pytest.mark.parametrize("left", ["transcript", "ported_implementation"])
+    def it_continues_a_run_directory_holding_ports_files(
+        config, prepare_reference_implementation, run_directory, left
+    ):
+        (run_directory / left).mkdir()
+
+        filesystem = PreparedFilesystem(source_language="javascript", **TESTS, debug=False, run_directory=run_directory)
+
+        assert filesystem.continuation is True
+        assert filesystem.ported_implementation_directory.is_dir()
+        assert filesystem.transcript_directory.is_dir()
+
+    def it_puts_the_banked_sessions_back_where_the_agent_reads_them(
+        config, prepare_reference_implementation, subprocess_module, docker_module, run_directory
+    ):
+        banked = run_directory / "transcript" / AGENT.sessions_dir / "-target" / "session.jsonl"
+        banked.parent.mkdir(parents=True)
+        banked.write_text("{}\n")
+        filesystem = PreparedFilesystem(source_language="javascript", **TESTS, debug=False, run_directory=run_directory)
+
+        with filesystem.recording(AGENT, **CONDITION):
+            assert (run_directory / "transcripts" / "-target" / "session.jsonl").read_text() == "{}\n"
+            assert not (run_directory / "transcript" / AGENT.sessions_dir).exists()
+
+
 def describe_the_manifest_at_the_start_of_the_run():
     def it_exists_once_recording_starts(filesystem):
         with filesystem.recording(AGENT, **CONDITION):
