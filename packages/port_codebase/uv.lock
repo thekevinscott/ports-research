@@ -20,15 +20,15 @@ repo-name-checker = false
 
 [[package]]
 name = "botbox"
-version = "0.1.77"
+version = "0.1.91"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "json5" },
     { name = "posix-tools" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d0/47/271188d92a7ce18017b23f8751a29526249d3ccbbc7e998b48c906b79fd9/botbox-0.1.77.tar.gz", hash = "sha256:f34144309bc01bd0776596ffcfc9a15fd03ad48c9b930bdeb1b747f9aafa86ec", size = 69975, upload-time = "2026-10-28T01:50:22.612Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e2/d6/a12bb360b8281238e01a85da71f25d62ae5c19f80fa8656632af130a6eb1/botbox-0.1.91.tar.gz", hash = "sha256:380a3bf35e3ba225e646208ab439448c622c79558f266093d6ebd360cbb1a222", size = 67967, upload-time = "2026-11-04T15:39:00.831Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9c/a3/8bfc23023dfbc05e5aca5661469fb417cfd5f3ab5e9bd8a12888ba23ec99/botbox-0.1.77-py3-none-any.whl", hash = "sha256:485174b6e9e161a9e58c0629d7f6355f636e1a24dd9755e8ab6020ae23e2e60d", size = 63262, upload-time = "2026-10-28T01:50:20.899Z" },
+    { url = "https://files.pythonhosted.org/packages/0c/01/a0420d4f93b6056bfd2da403ef8946e6943e4d9f26701ab3f32da002e082/botbox-0.1.91-py3-none-any.whl", hash = "sha256:bb8c6416a7a7ba09c20ea25f84c0186343d3a13abaadcee2478af9f9d70a3255", size = 57951, upload-time = "2026-11-04T15:38:59.416Z" },
 ]
 
 [[package]]
@@ -175,7 +175,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "botbox", specifier = ">=0.1.77,<0.2" },
+    { name = "botbox", specifier = ">=0.1.91,<0.2" },
     { name = "pathspec", specifier = ">=1.1.1" },
     { name = "prompt", editable = "../prompt" },
 ]
@@ -191,11 +191,11 @@ dev = [
 
 [[package]]
 name = "posix-tools"
-version = "0.0.10"
+version = "0.0.14"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/4b/85/c7fa03485a6a5bf1ea148ab4311c692755bc0549736f0983f8ab5320d20b/posix_tools-0.0.10.tar.gz", hash = "sha256:b8235614ccec1a8ed8f3ec85532a666203d72dcd33ac838c2c6a5493d41bf290", size = 28590, upload-time = "2026-10-26T01:53:26.772Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/61/9e/a0ac030596db5898221bd4d51d842f1333d03b664768bf9384c591c87a07/posix_tools-0.0.14.tar.gz", hash = "sha256:344fe1bd63ec03061df4763acbcc09a0731de13075a9dfc4b8e2ecfbfc54a4e5", size = 28882, upload-time = "2026-11-01T17:09:20.065Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7d/4c/aee0336f197751dfecdcbd7082bd582121248848e17b75cd550695010e56/posix_tools-0.0.10-py3-none-any.whl", hash = "sha256:c73d07b754a8f3942b1b98a671c30f57785f8445785917f94e883c3cc492da7c", size = 5421, upload-time = "2026-10-26T01:53:25.43Z" },
+    { url = "https://files.pythonhosted.org/packages/57/03/8b3b6feaa2dfd6973b9afc81e675061b15c882904dd389ca654bbd7b69c3/posix_tools-0.0.14-py3-none-any.whl", hash = "sha256:1abb38eaa1d3011814e8bc2cf597dd69845bfec2ffa5721aa76598c921774fa2", size = 6006, upload-time = "2026-11-01T17:09:18.806Z" },
 ]
 
 [[package]]
