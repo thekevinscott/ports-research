@@ -68,6 +68,8 @@ async def run_gbnf_experiment(
             output=prepared_filesystem.ported_implementation_directory,
             artifacts=run_directory,
             memory=memory,
+            container=f"ports-{run_directory.name}",
+            resume=prepared_filesystem.continuation,
         )
         stdout = (run_directory / "stdout.txt").read_text()
         report = json.loads(stdout) if stdout else {}

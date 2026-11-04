@@ -559,3 +559,22 @@ def describe_a_failed_agent():
             await experiment()
         assert write_manifest.call_args.kwargs["error"] == "API Error: 429 rate limited"
         assert write_manifest.call_args.kwargs["completed_at"] is not None
+
+
+def describe_the_kept_container():
+    async def it_is_named_after_the_run_directory(experiment, port_codebase):
+        await experiment()
+
+        assert port_codebase.call_args.kwargs["container"] == "ports-brave-otter"
+
+    async def it_starts_fresh_in_an_empty_run_directory(experiment, port_codebase):
+        await experiment()
+
+        assert port_codebase.call_args.kwargs["resume"] is False
+
+    async def it_resumes_a_run_directory_holding_ports_files(experiment, port_codebase, run_directory):
+        (run_directory / "ported_implementation").mkdir()
+
+        await experiment()
+
+        assert port_codebase.call_args.kwargs["resume"] is True
