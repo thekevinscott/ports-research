@@ -47,3 +47,6 @@ node_modules/
 
 # labnotes runner daemon socket, present while runs are going.
 /.labnotes.sock
+
+# Hosted on the Hugging Face dataset thekevinscott/porting-experiments; see AGENTS.md.
+experiments/
