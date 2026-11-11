@@ -22,13 +22,14 @@ gitignored.
 - Branch names use **dashes only**: lowercase letters, digits, and `-`.
   No slashes, no spaces (e.g., `whitelist-assembly`, not `feat/whitelist-assembly`).
 - Do all editing, building, and testing inside `.worktrees/<branch>/`.
-- **Run data lives only in the root checkout's `data/` and `experiments/*/runs/`.** Never read or write
-  `.worktrees/*/data/` or `.worktrees/*/experiments/*/runs/`. Runs go through labnotes from the root checkout, which
+- **Run data lives only in the root checkout's `data/` and `experiments/`.** Never read or write
+  `.worktrees/*/data/` or `.worktrees/*/experiments/`. Runs go through labnotes from the root checkout, which
   files each one under `experiments/<experiment>/runs/<run>/`; the CLI's `--output`
-  is that run folder. Each `experiments/<experiment>/runs`,
+  is that run folder. `experiments/` is gitignored and lives on the Hugging Face
+  dataset `thekevinscott/porting-experiments`: to bank runs, from the root
+  checkout, `hf upload thekevinscott/porting-experiments experiments . --repo-type=dataset`.
   `data/sessions`, `data/orphans`, `data/judge` and `data/walkthroughs` are
-  DVC-tracked: after `git pull`, run `dvc pull`; after banking runs,
-  `dvc add experiments/<experiment>/runs`, commit the `.dvc` file, `dvc push`.
+  DVC-tracked: after `git pull`, run `dvc pull`.
 - **When the PR merges, clean up in this order.** Leaving stale worktrees and
   branches behind makes it impossible to see what is actually in flight.
   1. `cd` to the root checkout first. Never skip this — removing a worktree
@@ -129,14 +130,16 @@ them."
 ## Experiment designs — always
 
 **`experiments/<name>/experiment.toml` is the source of truth for an
-experiment's design, and it is always committed.** Kevin, 2026-10-16: "we always need to
-keep yaml updated as the source of truth, and committed."
+experiment's design, and it is always uploaded.** Kevin, 2026-10-16: "we always need to
+keep yaml updated as the source of truth, and committed." Kevin, 2026-11-11:
+"The experiments/ folder should be gitignored, and the entire experiments
+folder should be checked into hugging face."
 
 - Membership is the experiment folder: a run under
   `experiments/<experiment>/runs/` belongs to it unless its `run.json` says
   `excluded`. labnotes counts runs toward `repeats`.
 - Any change to what is being run (models, levels, prompt, test
-  configuration) lands in experiment.toml in the same PR, before or with the
+  configuration) lands in experiment.toml and is uploaded before or with the
   launch. A run made with a command the file does not reflect is a
   deviation; record it as a dated line in the experiment's folder, not in a chat.
 - Scheduling order and concurrency are not design and do not go in the file.

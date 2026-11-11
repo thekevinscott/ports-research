@@ -4,4 +4,4 @@
 
 ## Querying with dirsql
 
-See [experiments/README.md](../experiments/README.md).
+See the [experiments README](https://huggingface.co/datasets/thekevinscott/porting-experiments) on Hugging Face.
