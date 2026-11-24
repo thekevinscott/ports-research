@@ -559,3 +559,28 @@ def describe_a_failed_agent():
             await experiment()
         assert write_manifest.call_args.kwargs["error"] == "API Error: 429 rate limited"
         assert write_manifest.call_args.kwargs["completed_at"] is not None
+
+
+CODEX_COMPLETED = (
+    '{"type": "thread.started", "thread_id": "t-1"}\n'
+    '{"type": "turn.started"}\n'
+    '{"type": "item.completed", "item": {"type": "agent_message", "text": "Done."}}\n'
+    '{"type": "turn.completed", "usage": {"input_tokens": 10, "output_tokens": 2}}\n'
+)
+CODEX_FAILED = (
+    '{"type": "thread.started", "thread_id": "t-1"}\n'
+    '{"type": "turn.started"}\n'
+    '{"type": "error", "message": "Reconnecting... 1/5"}\n'
+    '{"type": "turn.failed", "error": {"message": "You have hit your usage limit."}}\n'
+)
+
+
+def describe_a_codex_agent():
+    async def it_passes_a_completed_event_stream(experiment, port_codebase):
+        port_codebase.stdout = CODEX_COMPLETED
+        await experiment()
+
+    async def it_raises_with_the_failed_turn_s_message(experiment, port_codebase):
+        port_codebase.stdout = CODEX_FAILED
+        with pytest.raises(AgentFailed, match="You have hit your usage limit."):
+            await experiment()

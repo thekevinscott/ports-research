@@ -4,7 +4,7 @@ from pathlib import Path
 import click
 from dotenv import dotenv_values
 
-from botbox import ClaudeAgent
+from botbox import ClaudeAgent, CodexAgent
 
 from gbnf_experiment import config
 from gbnf_experiment.run_gbnf_experiment import run_gbnf_experiment
@@ -48,6 +48,9 @@ def cli(
 ) -> None:
     """One run, written into --output."""
     click.echo(f"*** auth: {auth} ***")
+    claude = model.startswith("claude-")
+    if not claude and auth == "api":
+        raise click.ClickException("--auth api is Claude-only; Codex runs on the ChatGPT login")
     api_key = None
     if auth == "api":
         env_path = config.REPO_ROOT / ".env"
@@ -58,7 +61,11 @@ def cli(
             raise click.ClickException(f"Missing or blank ANTHROPIC_API_KEY in {env_path}")
     run_directory = output.resolve()
     run_directory.mkdir(parents=True, exist_ok=True)
-    agent = ClaudeAgent(model=model, effort=effort, api_key=api_key)
+    agent = (
+        ClaudeAgent(model=model, effort=effort, api_key=api_key)
+        if claude
+        else CodexAgent(model=model, effort=effort, host_home=config.CODEX_HOME)
+    )
     asyncio.run(
         run_gbnf_experiment(
             agent=agent,

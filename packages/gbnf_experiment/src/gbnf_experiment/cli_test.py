@@ -45,6 +45,12 @@ def claude_agent():
         yield m
 
 
+@pytest.fixture(autouse=True)
+def codex_agent():
+    with patch("gbnf_experiment.cli.CodexAgent", autospec=True) as m:
+        yield m
+
+
 @pytest.fixture
 def invoke(output):
     def run(argv: list[str], *, with_output=True):
@@ -192,6 +198,14 @@ def describe_cli():
         invoke([*SOURCE_LANGUAGE, "--model", "claude-sonnet-4-5"])
         assert claude_agent.call_args.kwargs["model"] == "claude-sonnet-4-5"
 
+    def it_runs_a_non_claude_model_on_codex_with_the_codex_login(
+        gbnf_experiment, claude_agent, codex_agent, config, invoke
+    ):
+        invoke([*SOURCE_LANGUAGE, "--model", "gpt-5.6-luna", "--effort", "low"])
+        codex_agent.assert_called_once_with(model="gpt-5.6-luna", effort="low", host_home=config.CODEX_HOME)
+        claude_agent.assert_not_called()
+        assert gbnf_experiment.call_args.kwargs["agent"] is codex_agent.return_value
+
 
 
 @pytest.fixture(autouse=True)
@@ -236,6 +250,13 @@ def describe_auth():
         assert result.exit_code != 0
         assert "ANTHROPIC_API_KEY" in result.output
         claude_agent.assert_not_called()
+        gbnf_experiment.assert_not_called()
+
+    def it_rejects_api_mode_for_codex(gbnf_experiment, codex_agent, config, invoke):
+        (config.REPO_ROOT / ".env").write_text(f"ANTHROPIC_API_KEY={API_KEY}\n")
+        result = invoke([*SOURCE_LANGUAGE, "--model", "gpt-5.6-luna", "--auth", "api"])
+        assert result.exit_code != 0
+        codex_agent.assert_not_called()
         gbnf_experiment.assert_not_called()
 
     def it_rejects_an_unknown_auth_mode(gbnf_experiment, invoke):

@@ -48,7 +48,7 @@ def describe_port_codebase():
     async def it_builds_its_box_from_the_packaged_dockerfile(run, box, agent):
         await run()
 
-        assert box.boxes == [{"agent": agent, "dockerfile": PACKAGE / "Dockerfile", "allow": (), "memory": "4g"}]
+        assert box.boxes == [{"agent": agent, "dockerfile": PACKAGE / "Dockerfile.claude", "allow": (), "memory": "4g"}]
 
     async def it_mounts_the_source_read_only_and_the_output_read_write(run, box, source, output):
         await run()

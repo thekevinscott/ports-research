@@ -18,6 +18,17 @@ class AgentFailed(Exception):
     pass
 
 
+def reported_error(stdout: str) -> str | None:
+    """Claude Code prints one JSON report; Codex prints one event per line."""
+    for line in stdout.splitlines():
+        event = json.loads(line)
+        if event.get("is_error"):
+            return event.get("result", "the agent reported an error")
+        if event.get("type") == "turn.failed":
+            return event["error"]["message"]
+    return None
+
+
 async def run_gbnf_experiment(
     *,
     agent: Agent,
@@ -69,7 +80,6 @@ async def run_gbnf_experiment(
             artifacts=run_directory,
             memory=memory,
         )
-        stdout = (run_directory / "stdout.txt").read_text()
-        report = json.loads(stdout) if stdout else {}
-        if report.get("is_error") or result.exit_code != 0:
-            raise AgentFailed(report.get("result", f"the agent exited {result.exit_code}"))
+        error = reported_error((run_directory / "stdout.txt").read_text())
+        if error is not None or result.exit_code != 0:
+            raise AgentFailed(error or f"the agent exited {result.exit_code}")
