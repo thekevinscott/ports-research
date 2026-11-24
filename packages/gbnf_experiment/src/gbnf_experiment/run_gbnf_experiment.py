@@ -1,10 +1,10 @@
-import json
 from pathlib import Path
 
 from botbox import Agent
 from port_codebase import port_codebase
 from prompt import Prompt
 from gbnf_experiment.condition_name import condition_name
+from gbnf_experiment.reported_error import reported_error
 from gbnf_experiment.prepare_filesystem import PreparedFilesystem
 from gbnf_experiment.suites_information import LANGUAGE_NAMES, suites_information
 
@@ -69,7 +69,6 @@ async def run_gbnf_experiment(
             artifacts=run_directory,
             memory=memory,
         )
-        stdout = (run_directory / "stdout.txt").read_text()
-        report = json.loads(stdout) if stdout else {}
-        if report.get("is_error") or result.exit_code != 0:
-            raise AgentFailed(report.get("result", f"the agent exited {result.exit_code}"))
+        error = reported_error(agent, (run_directory / "stdout.txt").read_text())
+        if error is not None or result.exit_code != 0:
+            raise AgentFailed(error or f"the agent exited {result.exit_code}")

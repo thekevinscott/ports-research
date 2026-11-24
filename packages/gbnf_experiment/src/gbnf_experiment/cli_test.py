@@ -41,7 +41,13 @@ def gbnf_experiment():
 
 @pytest.fixture(autouse=True)
 def claude_agent():
-    with patch("gbnf_experiment.cli.ClaudeAgent", autospec=True) as m:
+    with patch("gbnf_experiment.make_agent.ClaudeAgent", autospec=True) as m:
+        yield m
+
+
+@pytest.fixture(autouse=True)
+def codex_agent():
+    with patch("gbnf_experiment.make_agent.CodexAgent", autospec=True) as m:
         yield m
 
 
@@ -192,11 +198,25 @@ def describe_cli():
         invoke([*SOURCE_LANGUAGE, "--model", "claude-sonnet-4-5"])
         assert claude_agent.call_args.kwargs["model"] == "claude-sonnet-4-5"
 
+    def it_runs_a_gpt_model_on_codex(gbnf_experiment, claude_agent, codex_agent, invoke):
+        invoke([*SOURCE_LANGUAGE, "--model", "gpt-5.6-luna", "--effort", "low"])
+        codex_agent.assert_called_once_with(model="gpt-5.6-luna", effort="low", api_key=None)
+        claude_agent.assert_not_called()
+        assert gbnf_experiment.call_args.kwargs["agent"] is codex_agent.return_value
+
+    def it_rejects_a_model_with_no_agent(gbnf_experiment, claude_agent, codex_agent, invoke):
+        result = invoke([*SOURCE_LANGUAGE, "--model", "llama-4"])
+        assert result.exit_code != 0
+        assert "llama-4" in result.output
+        claude_agent.assert_not_called()
+        codex_agent.assert_not_called()
+        gbnf_experiment.assert_not_called()
+
 
 
 @pytest.fixture(autouse=True)
 def config(tmp_path):
-    with patch("gbnf_experiment.cli.config", autospec=True) as m:
+    with patch("gbnf_experiment.make_agent.config", autospec=True) as m:
         m.REPO_ROOT = tmp_path
         yield m
 
@@ -205,7 +225,7 @@ def describe_auth():
     @pytest.mark.parametrize("auth_option", [[], ["--auth", "subscription"]])
     def it_runs_on_the_subscription_without_reading_env(gbnf_experiment, claude_agent, config, invoke, auth_option):
         (config.REPO_ROOT / ".env").write_text(f"ANTHROPIC_API_KEY={API_KEY}\n")
-        with patch("gbnf_experiment.cli.dotenv_values", create=True) as read_env:
+        with patch("gbnf_experiment.make_agent.dotenv_values", create=True) as read_env:
             result = invoke([*SOURCE_LANGUAGE, *auth_option])
         assert result.exit_code == 0, result.output
         read_env.assert_not_called()
@@ -237,6 +257,20 @@ def describe_auth():
         assert "ANTHROPIC_API_KEY" in result.output
         claude_agent.assert_not_called()
         gbnf_experiment.assert_not_called()
+
+    def it_bills_codex_to_the_openai_key_from_the_repo_env(gbnf_experiment, codex_agent, config, invoke):
+        (config.REPO_ROOT / ".env").write_text(f"ANTHROPIC_API_KEY={API_KEY}\nOPENAI_API_KEY=sk-openai-test\n")
+        result = invoke([*SOURCE_LANGUAGE, "--model", "gpt-5.6-luna", "--auth", "api"])
+        assert result.exit_code == 0, result.output
+        assert codex_agent.call_args.kwargs["api_key"] == "sk-openai-test"
+        assert "sk-openai-test" not in result.output
+
+    def it_rejects_codex_api_mode_without_an_openai_key(gbnf_experiment, codex_agent, config, invoke):
+        (config.REPO_ROOT / ".env").write_text(f"ANTHROPIC_API_KEY={API_KEY}\n")
+        result = invoke([*SOURCE_LANGUAGE, "--model", "gpt-5.6-luna", "--auth", "api"])
+        assert result.exit_code != 0
+        assert "OPENAI_API_KEY" in result.output
+        codex_agent.assert_not_called()
 
     def it_rejects_an_unknown_auth_mode(gbnf_experiment, invoke):
         result = invoke([*SOURCE_LANGUAGE, "--auth", "other"])

@@ -1,11 +1,15 @@
 from pathlib import Path
 
-from botbox import Agent, Botbox, RunResult
+from botbox import Agent, Botbox, ClaudeAgent, CodexAgent, RunResult
 
 from prompt import Prompt
 
 PROMPT_PATH = Path(__file__).parent / "prompts" / "prompt.txt"
-DOCKERFILE = Path(__file__).parent / "Dockerfile"
+# Botbox layers these on the agent's own image, so each starts FROM it.
+DOCKERFILES = {
+    ClaudeAgent: Path(__file__).parent / "Dockerfile.claude",
+    CodexAgent: Path(__file__).parent / "Dockerfile.codex",
+}
 
 
 async def port_codebase(
@@ -18,14 +22,15 @@ async def port_codebase(
     """
     if not source.exists():
         raise FileNotFoundError(f"source {source} does not exist")
+    dockerfile = DOCKERFILES[agent.__class__]
     output.mkdir(parents=True, exist_ok=True)
     rendered = Prompt(
         PROMPT_PATH,
         agent_dockerfile=agent.dockerfile.read_text().rstrip("\n"),
-        dockerfile=DOCKERFILE.read_text().rstrip("\n"),
+        dockerfile=dockerfile.read_text().rstrip("\n"),
         upstream=prompt,
     )
-    async with Botbox(agent, dockerfile=DOCKERFILE, memory=memory) as box:
+    async with Botbox(agent, dockerfile=dockerfile, memory=memory) as box:
         return await box.run(
             agent.command(str(rendered)),
             mounts=((source, "/input", "ro"), (output, "/target", "rw")),

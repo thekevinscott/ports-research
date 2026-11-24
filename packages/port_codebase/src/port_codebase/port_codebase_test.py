@@ -2,10 +2,12 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
+from botbox import ClaudeAgent, CodexAgent
 
-from port_codebase.port_codebase import DOCKERFILE, PROMPT_PATH, port_codebase
+from port_codebase.port_codebase import PROMPT_PATH, port_codebase
 
 AGENT_DOCKERFILE = "FROM node:24-slim\nRUN npm install -g some-cli\n"
+CLAUDE_DOCKERFILE = Path(__file__).parent / "Dockerfile.claude"
 
 
 @pytest.fixture
@@ -24,7 +26,7 @@ def prompt_class():
 
 @pytest.fixture
 def agent(tmp_path):
-    agent = Mock(name="agent")
+    agent = Mock(spec=ClaudeAgent, name="agent")
     agent.command.side_effect = lambda prompt: f"cli {prompt}"
     agent.dockerfile = tmp_path / "agent" / "Dockerfile"
     agent.dockerfile.parent.mkdir()
@@ -60,10 +62,17 @@ def call(botbox, agent, source, output, tmp_path):
 
 
 def describe_port_codebase():
-    async def it_builds_the_box_from_the_packaged_dockerfile(call, botbox, agent):
+    async def it_builds_a_claude_box_from_the_claude_dockerfile(call, botbox, agent):
         await call()
 
-        botbox.assert_called_once_with(agent, dockerfile=Path(__file__).parent / "Dockerfile", memory="8g")
+        botbox.assert_called_once_with(agent, dockerfile=CLAUDE_DOCKERFILE, memory="8g")
+
+    async def it_builds_a_codex_box_from_the_codex_dockerfile(call, botbox, agent):
+        agent.__class__ = CodexAgent
+
+        await call()
+
+        botbox.assert_called_once_with(agent, dockerfile=Path(__file__).parent / "Dockerfile.codex", memory="8g")
 
     async def it_requires_a_memory_cap(botbox, agent, source, output, tmp_path):
         with pytest.raises(TypeError, match="memory"):
@@ -79,7 +88,7 @@ def describe_port_codebase():
         prompt_class.assert_called_once_with(
             PROMPT_PATH,
             agent_dockerfile=AGENT_DOCKERFILE.rstrip("\n"),
-            dockerfile=DOCKERFILE.read_text().rstrip("\n"),
+            dockerfile=CLAUDE_DOCKERFILE.read_text().rstrip("\n"),
             upstream="Port it.\n",
         )
         assert botbox.return_value.run.call_args.args == ("cli the rendered prompt",)
@@ -89,7 +98,7 @@ def describe_port_codebase():
 
         [command] = botbox.return_value.run.call_args.args
         assert AGENT_DOCKERFILE.rstrip("\n") in command
-        assert DOCKERFILE.read_text().rstrip("\n") in command
+        assert CLAUDE_DOCKERFILE.read_text().rstrip("\n") in command
         assert command.index("FROM node:24-slim") < command.index("FROM botbox-claude")
 
     async def it_rereads_the_agents_dockerfile_on_every_call(call, botbox, agent):

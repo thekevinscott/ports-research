@@ -5,7 +5,7 @@ from unittest.mock import DEFAULT, Mock, patch
 
 import pytest
 
-from botbox import RunResult
+from botbox import ClaudeAgent, CodexAgent, RunResult
 from prompt import Prompt
 
 from gbnf_experiment.run_gbnf_experiment import PROMPT_PATH, AgentFailed, run_gbnf_experiment
@@ -93,7 +93,7 @@ def write_manifest():
         yield m
 
 
-AGENT = Mock(name="agent", model="claude-opus-5", effort="high")
+AGENT = Mock(spec=ClaudeAgent, name="agent", model="claude-opus-5", effort="high")
 AGENT.sessions_dir = ".claude/projects"
 
 CONFIG = {
@@ -173,7 +173,7 @@ def describe_run():
         prepare_reference_implementation,
         port_codebase,
     ):
-        chosen = Mock(name="chosen", model="claude-sonnet-4-5", effort="max")
+        chosen = Mock(spec=ClaudeAgent, name="chosen", model="claude-sonnet-4-5", effort="max")
         chosen.sessions_dir = ".claude/projects"
         await experiment(agent=chosen)
         assert port_codebase.call_args.kwargs["agent"] is chosen
@@ -347,7 +347,7 @@ def describe_the_manifest():
         port_codebase,
         write_manifest,
     ):
-        chosen = Mock(name="agent", model="claude-sonnet-4-5", effort="low")
+        chosen = Mock(spec=ClaudeAgent, name="agent", model="claude-sonnet-4-5", effort="low")
         chosen.sessions_dir = ".claude/projects"
         await experiment(
             agent=chosen,
@@ -382,7 +382,7 @@ def describe_the_manifest():
         write_manifest,
     ):
         """The manifest's image id has to name the harness the port actually ran under."""
-        chosen = Mock(name="chosen", model="claude-sonnet-4-5", effort="max")
+        chosen = Mock(spec=ClaudeAgent, name="chosen", model="claude-sonnet-4-5", effort="max")
         chosen.sessions_dir = ".claude/projects"
 
         await experiment(agent=chosen)
@@ -559,3 +559,40 @@ def describe_a_failed_agent():
             await experiment()
         assert write_manifest.call_args.kwargs["error"] == "API Error: 429 rate limited"
         assert write_manifest.call_args.kwargs["completed_at"] is not None
+
+
+CODEX_COMPLETED = (
+    '{"type": "thread.started", "thread_id": "t-1"}\n'
+    '{"type": "turn.started"}\n'
+    '{"type": "item.completed", "item": {"type": "agent_message", "text": "Done."}}\n'
+    '{"type": "turn.completed", "usage": {"input_tokens": 10, "output_tokens": 2}}\n'
+)
+CODEX_FAILED = (
+    '{"type": "thread.started", "thread_id": "t-1"}\n'
+    '{"type": "turn.started"}\n'
+    '{"type": "error", "message": "Reconnecting... 1/5"}\n'
+    '{"type": "turn.failed", "error": {"message": "You have hit your usage limit."}}\n'
+)
+
+
+CODEX = Mock(spec=CodexAgent, name="codex", model="gpt-5.6-luna", effort="low")
+CODEX.sessions_dir = ".codex/sessions"
+
+
+def describe_a_codex_agent():
+    async def it_passes_a_completed_event_stream(experiment, port_codebase):
+        port_codebase.stdout = CODEX_COMPLETED
+        await experiment(agent=CODEX)
+
+    async def it_raises_with_the_failed_turn_s_message(experiment, port_codebase):
+        port_codebase.stdout = CODEX_FAILED
+        with pytest.raises(AgentFailed, match="You have hit your usage limit."):
+            await experiment(agent=CODEX)
+
+
+def describe_an_agent_with_no_report_format():
+    async def it_raises_rather_than_guess(experiment, port_codebase):
+        other = Mock(name="other", model="pi-model", effort="low")
+        other.sessions_dir = ".pi/sessions"
+        with pytest.raises(TypeError, match="No report format"):
+            await experiment(agent=other)

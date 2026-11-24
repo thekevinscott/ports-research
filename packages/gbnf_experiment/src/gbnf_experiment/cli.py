@@ -2,11 +2,8 @@ import asyncio
 from pathlib import Path
 
 import click
-from dotenv import dotenv_values
 
-from botbox import ClaudeAgent
-
-from gbnf_experiment import config
+from gbnf_experiment.make_agent import make_agent
 from gbnf_experiment.run_gbnf_experiment import run_gbnf_experiment
 
 DEFAULT_MODEL = "claude-opus-5"
@@ -48,17 +45,9 @@ def cli(
 ) -> None:
     """One run, written into --output."""
     click.echo(f"*** auth: {auth} ***")
-    api_key = None
-    if auth == "api":
-        env_path = config.REPO_ROOT / ".env"
-        if not env_path.is_file():
-            raise click.ClickException(f"Missing {env_path}; ANTHROPIC_API_KEY is required for --auth api")
-        api_key = dotenv_values(env_path, interpolate=False).get("ANTHROPIC_API_KEY")
-        if not api_key or not api_key.strip():
-            raise click.ClickException(f"Missing or blank ANTHROPIC_API_KEY in {env_path}")
+    agent = make_agent(model=model, effort=effort, auth=auth)
     run_directory = output.resolve()
     run_directory.mkdir(parents=True, exist_ok=True)
-    agent = ClaudeAgent(model=model, effort=effort, api_key=api_key)
     asyncio.run(
         run_gbnf_experiment(
             agent=agent,
