@@ -1,10 +1,10 @@
-import json
 from pathlib import Path
 
 from botbox import Agent
 from port_codebase import port_codebase
 from prompt import Prompt
 from gbnf_experiment.condition_name import condition_name
+from gbnf_experiment.reported_error import reported_error
 from gbnf_experiment.prepare_filesystem import PreparedFilesystem
 from gbnf_experiment.suites_information import LANGUAGE_NAMES, suites_information
 
@@ -16,17 +16,6 @@ PROMPT_PATH = Path(__file__).parent / "prompts" / "prompt.txt"
 
 class AgentFailed(Exception):
     pass
-
-
-def reported_error(stdout: str) -> str | None:
-    """Claude Code prints one JSON report; Codex prints one event per line."""
-    for line in stdout.splitlines():
-        event = json.loads(line)
-        if event.get("is_error"):
-            return event.get("result", "the agent reported an error")
-        if event.get("type") == "turn.failed":
-            return event["error"]["message"]
-    return None
 
 
 async def run_gbnf_experiment(
@@ -80,6 +69,6 @@ async def run_gbnf_experiment(
             artifacts=run_directory,
             memory=memory,
         )
-        error = reported_error((run_directory / "stdout.txt").read_text())
+        error = reported_error(agent, (run_directory / "stdout.txt").read_text())
         if error is not None or result.exit_code != 0:
             raise AgentFailed(error or f"the agent exited {result.exit_code}")
