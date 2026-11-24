@@ -200,9 +200,18 @@ def describe_cli():
 
     def it_runs_a_gpt_model_on_codex(gbnf_experiment, claude_agent, codex_agent, invoke):
         invoke([*SOURCE_LANGUAGE, "--model", "gpt-5.6-luna", "--effort", "low"])
-        codex_agent.assert_called_once_with(model="gpt-5.6-luna", effort="low", api_key=None)
+        codex_agent.assert_called_once_with(model="gpt-5.6-luna", effort="low", api_key=None, host_home=None)
         claude_agent.assert_not_called()
         assert gbnf_experiment.call_args.kwargs["agent"] is codex_agent.return_value
+
+    def it_runs_codex_on_the_login_folder_given(gbnf_experiment, codex_agent, invoke, tmp_path):
+        invoke([*SOURCE_LANGUAGE, "--model", "gpt-5.6-luna", "--codex-home", str(tmp_path)])
+        assert codex_agent.call_args.kwargs["host_home"] == tmp_path
+
+    def it_rejects_a_codex_home_that_does_not_exist(gbnf_experiment, invoke, tmp_path):
+        result = invoke([*SOURCE_LANGUAGE, "--model", "gpt-5.6-luna", "--codex-home", str(tmp_path / "missing")])
+        assert result.exit_code != 0
+        gbnf_experiment.assert_not_called()
 
     def it_rejects_a_model_with_no_agent(gbnf_experiment, claude_agent, codex_agent, invoke):
         result = invoke([*SOURCE_LANGUAGE, "--model", "llama-4"])

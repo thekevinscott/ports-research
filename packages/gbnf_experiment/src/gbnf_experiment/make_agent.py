@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import click
 from dotenv import dotenv_values
 
@@ -6,11 +8,13 @@ from botbox import Agent, ClaudeAgent, CodexAgent
 from gbnf_experiment import config
 
 
-def make_agent(*, model: str, effort: str, auth: str) -> Agent:
+def make_agent(*, model: str, effort: str, auth: str, codex_home: Path | None = None) -> Agent:
     if model.startswith("claude-"):
         return ClaudeAgent(model=model, effort=effort, api_key=api_key("ANTHROPIC_API_KEY", auth))
     if model.startswith("gpt-"):
-        return CodexAgent(model=model, effort=effort, api_key=api_key("OPENAI_API_KEY", auth))
+        return CodexAgent(
+            model=model, effort=effort, api_key=api_key("OPENAI_API_KEY", auth), host_home=codex_home
+        )
     raise click.ClickException(f"No agent for model {model!r}: expected claude-* or gpt-*")
 
 
