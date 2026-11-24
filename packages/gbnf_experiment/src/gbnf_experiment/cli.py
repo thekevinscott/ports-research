@@ -49,6 +49,8 @@ def cli(
     """One run, written into --output."""
     click.echo(f"*** auth: {auth} ***")
     claude = model.startswith("claude-")
+    if not claude and not model.startswith("gpt-"):
+        raise click.ClickException(f"No agent for model {model!r}: expected claude-* or gpt-*")
     if not claude and auth == "api":
         raise click.ClickException("--auth api is Claude-only; Codex runs on the ChatGPT login")
     api_key = None
