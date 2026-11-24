@@ -35,9 +35,13 @@ class PreparedFilesystem:
         )
         self.run_directory = run_directory
         self.ported_implementation_directory = self.run_directory / "ported_implementation"
-        self.ported_implementation_directory.mkdir(parents=True)
         self.transcript_directory = self.run_directory / "transcript"
-        self.transcript_directory.mkdir()
+        # The runner writes its own files here first; only ports' own mean a run to continue.
+        self.continuation = (
+            self.ported_implementation_directory.exists() or self.transcript_directory.exists()
+        )
+        self.ported_implementation_directory.mkdir(parents=True, exist_ok=True)
+        self.transcript_directory.mkdir(exist_ok=True)
 
     def recording(self, agent: Agent, **condition) -> "Recording":
         return Recording(self, agent, condition)
@@ -81,6 +85,9 @@ class Recording:
         self.result: RunResult | None = None
 
     def __enter__(self):
+        banked = self.filesystem.transcript_directory / self.agent.sessions_dir
+        if banked.exists():
+            banked.rename(self.filesystem.run_directory / "transcripts")
         _write_manifest(
             self.filesystem.run_directory,
             timestamp=self.filesystem.timestamp,

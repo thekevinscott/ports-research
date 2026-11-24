@@ -31,7 +31,7 @@ def output(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def run(agent, source, output):
-    async def run():
+    async def run(resume=False):
         return await port_codebase(
             agent=agent,
             prompt="Port it.",
@@ -39,6 +39,8 @@ def run(agent, source, output):
             output=output,
             artifacts=output.parent / "artifacts",
             memory="4g",
+            container="ports-run",
+            resume=resume,
         )
 
     return run
@@ -95,3 +97,34 @@ def describe_port_codebase():
         await run()
 
         assert output.is_dir()
+
+    async def it_keeps_a_fresh_run_under_the_callers_name(run, box):
+        await run()
+
+        [call] = box.runs
+        assert call["keep"] == "ports-run"
+
+    async def it_resumes_the_kept_container_with_continue(run, box):
+        await run(resume=True)
+
+        [call] = box.runs
+        assert call["restart"] == "ports-run"
+        words = shlex.split(call["command"])
+        assert words[:3] == ["claude", "-p", "Continue the port where you left off."]
+        assert "--continue" in words
+
+    @pytest.mark.parametrize("resume", [False, True])
+    async def it_removes_the_kept_container_and_its_volume_on_exit_0(run, box, removed, resume):
+        box.exit_code = 0
+
+        await run(resume=resume)
+
+        assert removed == ["container:ports-run", "volume:botbox-run-token-of-ports-run"]
+
+    @pytest.mark.parametrize("resume", [False, True])
+    async def it_leaves_the_kept_container_when_the_agent_fails(run, box, removed, resume):
+        box.exit_code = 1
+
+        await run(resume=resume)
+
+        assert removed == []

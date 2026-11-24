@@ -145,9 +145,21 @@ def botbox(boxes, porting_calls, port_result, exit_code, oom_killed, agent_stder
         async def __aexit__(self, *exc_info):
             return None
 
-        async def run(self, command, *, mounts=(), workdir=None, output):
+        async def run(self, command, *, mounts=(), workdir=None, output, keep=None):
+            return await self.port(command, mounts=mounts, output=output, keep=keep)
+
+        async def restart(self, name, command, *, mounts=(), workdir=None, output):
+            return await self.port(command, mounts=mounts, output=output, restart=name)
+
+        async def port(self, command, *, mounts, output, **container):
             porting_calls.append(
                 {
+                    **container,
+                    "sessions": sorted(
+                        path.relative_to(output / "transcripts").as_posix()
+                        for path in (output / "transcripts").rglob("*")
+                        if path.is_file()
+                    ),
                     "prompt": shlex.split(command)[2],
                     "command": shlex.split(command),
                     "volumes": mounts,
@@ -161,7 +173,9 @@ def botbox(boxes, porting_calls, port_result, exit_code, oom_killed, agent_stder
                 }
             )
             (volume_source(mounts, "/target") / "ported.py").write_text("class GBNF: ...")
-            (output / "stdout.txt").write_text(json.dumps(port_result))
+            # A restart appends to the streams already in output, as botbox does.
+            with (output / "stdout.txt").open("a" if "restart" in container else "w") as stdout:
+                stdout.write(json.dumps(port_result))
             (output / "stderr.txt").write_text(agent_stderr[0])
             (output / "proxy.log").write_text(PROXY_LOG)
             transcript = output / "transcripts" / Path(TRANSCRIPT_PATH).relative_to(".claude/projects")
@@ -170,6 +184,40 @@ def botbox(boxes, porting_calls, port_result, exit_code, oom_killed, agent_stder
             return RunResult(exit_code=exit_code[0], oom_killed=oom_killed[0])
 
     with patch("port_codebase.port_codebase.Botbox", FakeBotbox):
+        yield
+
+
+@pytest.fixture
+def removed() -> list:
+    """The kept containers and volumes removed, as `container:<name>` and `volume:<name>`."""
+    return []
+
+
+@pytest.fixture(autouse=True)
+def kept_containers(removed):
+    """The daemon calls port_codebase makes to remove a kept container and its volume."""
+
+    class FakeContainer:
+        def __init__(self, name):
+            self.name = name
+
+        async def inspect(self):
+            return {"Config": {"Labels": {"botbox.run": f"token-of-{self.name}"}}}
+
+        async def remove(self):
+            removed.append(f"container:{self.name}")
+
+    class FakeVolume:
+        def __init__(self, name):
+            self.name = name
+
+        async def remove(self):
+            removed.append(f"volume:{self.name}")
+
+    with (
+        patch("port_codebase.port_codebase.Container", FakeContainer),
+        patch("port_codebase.port_codebase.Volume", FakeVolume),
+    ):
         yield
 
 
