@@ -41,13 +41,13 @@ def gbnf_experiment():
 
 @pytest.fixture(autouse=True)
 def claude_agent():
-    with patch("gbnf_experiment.cli.ClaudeAgent", autospec=True) as m:
+    with patch("gbnf_experiment.make_agent.ClaudeAgent", autospec=True) as m:
         yield m
 
 
 @pytest.fixture(autouse=True)
 def codex_agent():
-    with patch("gbnf_experiment.cli.CodexAgent", autospec=True) as m:
+    with patch("gbnf_experiment.make_agent.CodexAgent", autospec=True) as m:
         yield m
 
 
@@ -216,7 +216,7 @@ def describe_cli():
 
 @pytest.fixture(autouse=True)
 def config(tmp_path):
-    with patch("gbnf_experiment.cli.config", autospec=True) as m:
+    with patch("gbnf_experiment.make_agent.config", autospec=True) as m:
         m.REPO_ROOT = tmp_path
         yield m
 
@@ -225,7 +225,7 @@ def describe_auth():
     @pytest.mark.parametrize("auth_option", [[], ["--auth", "subscription"]])
     def it_runs_on_the_subscription_without_reading_env(gbnf_experiment, claude_agent, config, invoke, auth_option):
         (config.REPO_ROOT / ".env").write_text(f"ANTHROPIC_API_KEY={API_KEY}\n")
-        with patch("gbnf_experiment.cli.dotenv_values", create=True) as read_env:
+        with patch("gbnf_experiment.make_agent.dotenv_values", create=True) as read_env:
             result = invoke([*SOURCE_LANGUAGE, *auth_option])
         assert result.exit_code == 0, result.output
         read_env.assert_not_called()
