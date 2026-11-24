@@ -50,3 +50,4 @@ node_modules/
 
 # Hosted on the Hugging Face dataset thekevinscott/porting-experiments; see AGENTS.md.
 experiments/
+/codex-home

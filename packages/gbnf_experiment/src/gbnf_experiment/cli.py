@@ -30,6 +30,11 @@ INCLUDE = click.Choice(["0", "1"])
 @click.option("--effort", default="high", show_default=True)
 @click.option("--model", default=DEFAULT_MODEL, show_default=True)
 @click.option("--auth", type=click.Choice(["subscription", "api"]), default="subscription")
+@click.option(
+    "--codex-home",
+    type=click.Path(exists=True, file_okay=False, path_type=Path),
+    help="The Codex login folder to run gpt-* models on. Default: ~/.codex.",
+)
 @click.option("--memory", default="8g", show_default=True, help="The agent container's memory cap, in Docker's size format.")
 def cli(
     source_language: str,
@@ -42,10 +47,11 @@ def cli(
     model: str,
     auth: str,
     memory: str,
+    codex_home: Path | None,
 ) -> None:
     """One run, written into --output."""
     click.echo(f"*** auth: {auth} ***")
-    agent = make_agent(model=model, effort=effort, auth=auth)
+    agent = make_agent(model=model, effort=effort, auth=auth, codex_home=codex_home)
     run_directory = output.resolve()
     run_directory.mkdir(parents=True, exist_ok=True)
     asyncio.run(
