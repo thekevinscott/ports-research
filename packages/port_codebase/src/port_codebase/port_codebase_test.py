@@ -2,6 +2,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
+from botbox import ClaudeAgent, CodexAgent
 
 from port_codebase.port_codebase import PROMPT_PATH, port_codebase
 
@@ -25,8 +26,7 @@ def prompt_class():
 
 @pytest.fixture
 def agent(tmp_path):
-    agent = Mock(name="agent")
-    agent.image = "botbox-claude:latest"
+    agent = Mock(spec=ClaudeAgent, name="agent")
     agent.command.side_effect = lambda prompt: f"cli {prompt}"
     agent.dockerfile = tmp_path / "agent" / "Dockerfile"
     agent.dockerfile.parent.mkdir()
@@ -68,7 +68,7 @@ def describe_port_codebase():
         botbox.assert_called_once_with(agent, dockerfile=CLAUDE_DOCKERFILE, memory="8g")
 
     async def it_builds_a_codex_box_from_the_codex_dockerfile(call, botbox, agent):
-        agent.image = "botbox-codex:latest"
+        agent.__class__ = CodexAgent
 
         await call()
 
