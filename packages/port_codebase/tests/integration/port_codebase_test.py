@@ -31,7 +31,7 @@ def output(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def run(agent, source, output):
-    async def run(resume=False):
+    async def run():
         return await port_codebase(
             agent=agent,
             prompt="Port it.",
@@ -40,7 +40,6 @@ def run(agent, source, output):
             artifacts=output.parent / "artifacts",
             memory="4g",
             container="ports-run",
-            resume=resume,
         )
 
     return run
@@ -104,8 +103,10 @@ def describe_port_codebase():
         [call] = box.runs
         assert call["keep"] == "ports-run"
 
-    async def it_resumes_the_kept_container_with_continue(run, box):
-        await run(resume=True)
+    async def it_resumes_the_kept_container_with_continue(run, box, kept):
+        kept.add("ports-run")
+
+        await run()
 
         [call] = box.runs
         assert call["restart"] == "ports-run"
@@ -113,18 +114,39 @@ def describe_port_codebase():
         assert words[:3] == ["claude", "-p", "Continue the port where you left off."]
         assert "--continue" in words
 
-    @pytest.mark.parametrize("resume", [False, True])
-    async def it_removes_the_kept_container_and_its_volume_on_exit_0(run, box, removed, resume):
-        box.exit_code = 0
+    async def it_runs_fresh_over_an_empty_output_with_no_container_kept(run, box, output):
+        output.mkdir()
 
-        await run(resume=resume)
+        await run()
+
+        [call] = box.runs
+        assert call["keep"] == "ports-run"
+
+    async def it_refuses_a_non_empty_output_with_no_container_kept(run, box, output):
+        output.mkdir()
+        (output / "ported.py").write_text("")
+
+        with pytest.raises(FileExistsError, match="ports-run"):
+            await run()
+
+        assert box.runs == []
+
+    @pytest.mark.parametrize("resume", [False, True])
+    async def it_removes_the_kept_container_and_its_volume_on_exit_0(run, box, removed, kept, resume):
+        box.exit_code = 0
+        if resume:
+            kept.add("ports-run")
+
+        await run()
 
         assert removed == ["container:ports-run", "volume:botbox-run-token-of-ports-run"]
 
     @pytest.mark.parametrize("resume", [False, True])
-    async def it_leaves_the_kept_container_when_the_agent_fails(run, box, removed, resume):
+    async def it_leaves_the_kept_container_when_the_agent_fails(run, box, removed, kept, resume):
         box.exit_code = 1
+        if resume:
+            kept.add("ports-run")
 
-        await run(resume=resume)
+        await run()
 
         assert removed == []

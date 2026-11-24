@@ -4,6 +4,7 @@ import shlex
 from unittest.mock import patch
 
 import pytest
+from adocker import DockerException
 from botbox import RunResult
 
 from gbnf_experiment import config
@@ -124,8 +125,14 @@ def box_error() -> list:
     return []
 
 
+@pytest.fixture
+def kept() -> set:
+    """The names of the containers the daemon holds."""
+    return set()
+
+
 @pytest.fixture(autouse=True)
-def botbox(boxes, porting_calls, port_result, exit_code, oom_killed, agent_stderr, box_error):
+def botbox(boxes, porting_calls, port_result, exit_code, oom_killed, agent_stderr, box_error, kept):
     """Botbox, faked where port_codebase imports it.
 
     Standing in for the model, the run writes a plausible port into /target and
@@ -146,6 +153,7 @@ def botbox(boxes, porting_calls, port_result, exit_code, oom_killed, agent_stder
             return None
 
         async def run(self, command, *, mounts=(), workdir=None, output, keep=None):
+            kept.add(keep)
             return await self.port(command, mounts=mounts, output=output, keep=keep)
 
         async def restart(self, name, command, *, mounts=(), workdir=None, output):
@@ -194,7 +202,7 @@ def removed() -> list:
 
 
 @pytest.fixture(autouse=True)
-def kept_containers(removed):
+def kept_containers(removed, kept):
     """The daemon calls port_codebase makes to remove a kept container and its volume."""
 
     class FakeContainer:
@@ -202,9 +210,12 @@ def kept_containers(removed):
             self.name = name
 
         async def inspect(self):
+            if self.name not in kept:
+                raise DockerException(["container", "inspect", self.name], 1, f"Error: No such container: {self.name}\n")
             return {"Config": {"Labels": {"botbox.run": f"token-of-{self.name}"}}}
 
         async def remove(self):
+            kept.discard(self.name)
             removed.append(f"container:{self.name}")
 
     class FakeVolume:

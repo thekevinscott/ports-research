@@ -565,6 +565,16 @@ def describe_the_kept_container():
         assert call["keep"] == "ports-brave-otter"
         assert "--continue" not in call["command"]
 
+    async def it_starts_fresh_over_empty_ports_folders_with_no_container_kept(attempt, porting_calls, run_directory):
+        (run_directory / "ported_implementation").mkdir()
+        (run_directory / "transcript").mkdir()
+
+        await attempt()
+
+        [call] = porting_calls
+        assert call["keep"] == "ports-brave-otter"
+        assert "--continue" not in call["command"]
+
     async def it_continues_the_banked_session_in_a_populated_run_directory(
         attempt, interrupted, porting_calls
     ):

@@ -602,15 +602,3 @@ def describe_the_kept_container():
         await experiment()
 
         assert port_codebase.call_args.kwargs["container"] == "ports-brave-otter"
-
-    async def it_starts_fresh_in_an_empty_run_directory(experiment, port_codebase):
-        await experiment()
-
-        assert port_codebase.call_args.kwargs["resume"] is False
-
-    async def it_resumes_a_run_directory_holding_ports_files(experiment, port_codebase, run_directory):
-        (run_directory / "ported_implementation").mkdir()
-
-        await experiment()
-
-        assert port_codebase.call_args.kwargs["resume"] is True

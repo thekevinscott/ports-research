@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from adocker import Container, Volume
+from adocker import Container, DockerException, Volume
 from botbox import Agent, Botbox, ClaudeAgent, CodexAgent, RunResult
 
 from prompt import Prompt
@@ -23,20 +23,23 @@ async def port_codebase(
     artifacts: Path,
     memory: str,
     container: str,
-    resume: bool,
 ) -> RunResult:
     """Run the agent on `prompt` with `source` at /input (ro) and `output` at /target (rw).
 
     The prompt carries both Dockerfiles as they are on disk at call time, so the agent
     reads the image it is actually in.
 
-    The agent container is kept as `container` until the agent exits 0. With `resume`, the
-    kept container is restarted and the agent continues its last session.
+    The agent container is kept as `container` until the agent exits 0. If `container` is
+    already kept, it is restarted and the agent continues its last session. With no kept
+    container, a non-empty `output` is refused.
     """
     if not source.exists():
         raise FileNotFoundError(f"source {source} does not exist")
     dockerfile = DOCKERFILES[agent.__class__]
     output.mkdir(parents=True, exist_ok=True)
+    resume = await is_kept(container)
+    if not resume and any(output.iterdir()):
+        raise FileExistsError(f"{output} is not empty and there is no kept container {container} to resume")
     mounts = ((source, "/input", "ro"), (output, "/target", "rw"))
     async with Botbox(agent, dockerfile=dockerfile, memory=memory) as box:
         if resume:
@@ -64,6 +67,16 @@ async def port_codebase(
     if result.exit_code == 0:
         await remove_kept(container)
     return result
+
+
+async def is_kept(name: str) -> bool:
+    try:
+        await Container(name).inspect()
+    except DockerException as error:
+        if "No such container" in error.stderr:
+            return False
+        raise
+    return True
 
 
 async def remove_kept(name: str) -> None:

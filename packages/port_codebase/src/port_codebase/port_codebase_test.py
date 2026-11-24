@@ -2,6 +2,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
+from adocker import DockerException
 from botbox import ClaudeAgent, CodexAgent
 
 from port_codebase.port_codebase import CONTINUE_PROMPT, PROMPT_PATH, port_codebase
@@ -11,21 +12,43 @@ CLAUDE_DOCKERFILE = Path(__file__).parent / "Dockerfile.claude"
 
 
 @pytest.fixture
-def botbox():
+def kept():
+    """The names of the containers the daemon holds."""
+    return set()
+
+
+@pytest.fixture
+def botbox(kept):
     with patch("port_codebase.port_codebase.Botbox", autospec=True) as mock:
-        mock.return_value.__aenter__.return_value = mock.return_value
-        mock.return_value.run.return_value.exit_code = 1
-        mock.return_value.restart.return_value.exit_code = 1
+        box = mock.return_value
+        box.__aenter__.return_value = box
+        box.run.return_value.exit_code = 1
+        box.restart.return_value.exit_code = 1
+
+        def run(*args, keep, **kwargs):
+            kept.add(keep)
+            return box.run.return_value
+
+        box.run.side_effect = run
         yield mock
 
 
 @pytest.fixture
-def docker():
+def docker(kept):
     with (
         patch("port_codebase.port_codebase.Container", autospec=True) as container,
         patch("port_codebase.port_codebase.Volume", autospec=True) as volume,
     ):
-        container.return_value.inspect.return_value = {"Config": {"Labels": {"botbox.run": "abc123"}}}
+
+        def inspect():
+            [name] = container.call_args.args
+            if name not in kept:
+                raise DockerException(
+                    ["container", "inspect", name], 1, f"Error: No such container: {name}\n"
+                )
+            return {"Config": {"Labels": {"botbox.run": "abc123"}}}
+
+        container.return_value.inspect.side_effect = inspect
         yield container, volume
 
 
@@ -60,7 +83,7 @@ def output(tmp_path):
 
 @pytest.fixture
 def call(botbox, docker, agent, source, output, tmp_path):
-    async def call(prompt="Port it.\n", resume=False):
+    async def call(prompt="Port it.\n"):
         return await port_codebase(
             agent=agent,
             prompt=prompt,
@@ -69,7 +92,6 @@ def call(botbox, docker, agent, source, output, tmp_path):
             artifacts=tmp_path / "artifacts",
             memory="8g",
             container="ports-run",
-            resume=resume,
         )
 
     return call
@@ -92,7 +114,7 @@ def describe_port_codebase():
         with pytest.raises(TypeError, match="memory"):
             await port_codebase(
                 agent=agent, prompt="Port it.", source=source, output=output, artifacts=tmp_path / "artifacts",
-                container="ports-run", resume=False,
+                container="ports-run",
             )
 
         botbox.assert_not_called()
@@ -116,8 +138,9 @@ def describe_port_codebase():
         assert CLAUDE_DOCKERFILE.read_text().rstrip("\n") in command
         assert command.index("FROM node:24-slim") < command.index("FROM botbox-claude")
 
-    async def it_rereads_the_agents_dockerfile_on_every_call(call, botbox, agent):
+    async def it_rereads_the_agents_dockerfile_on_every_call(call, botbox, agent, kept):
         await call()
+        kept.clear()
         agent.dockerfile.write_text("FROM node:25-slim\n")
 
         await call()
@@ -164,7 +187,7 @@ def describe_port_codebase():
             await port_codebase(
                 agent=agent, prompt="Port it.", source=tmp_path / "gone",
                 output=output, artifacts=tmp_path / "artifacts", memory="8g",
-                container="ports-run", resume=False,
+                container="ports-run",
             )
 
         assert not output.exists()
@@ -175,8 +198,12 @@ def describe_port_codebase():
 
         assert botbox.return_value.run.call_args.kwargs["keep"] == "ports-run"
 
-    async def it_resumes_by_restarting_the_kept_container_with_continue(call, botbox, source, output, tmp_path):
-        await call(resume=True)
+    async def it_resumes_by_restarting_the_kept_container_with_continue(call, botbox, kept, source, output, tmp_path):
+        kept.add("ports-run")
+        output.mkdir(parents=True)
+        (output / "ported.py").write_text("")
+
+        await call()
 
         botbox.return_value.run.assert_not_called()
         botbox.return_value.restart.assert_called_once_with(
@@ -187,24 +214,54 @@ def describe_port_codebase():
             output=tmp_path / "artifacts",
         )
 
+    async def it_runs_fresh_when_the_output_is_empty_and_no_container_was_kept(call, botbox, output):
+        output.mkdir(parents=True)
+
+        await call()
+
+        botbox.return_value.restart.assert_not_called()
+        assert botbox.return_value.run.call_args.kwargs["keep"] == "ports-run"
+
+    async def it_refuses_a_non_empty_output_with_no_container_kept(call, botbox, output):
+        output.mkdir(parents=True)
+        (output / "ported.py").write_text("")
+
+        with pytest.raises(FileExistsError, match="ports-run"):
+            await call()
+
+        botbox.assert_not_called()
+
+    async def it_raises_a_daemon_failure_other_than_a_missing_container(call, botbox, docker):
+        container, _ = docker
+        container.return_value.inspect.side_effect = DockerException(["container", "inspect"], 1, "Cannot connect")
+
+        with pytest.raises(DockerException, match="Cannot connect"):
+            await call()
+
+        botbox.assert_not_called()
+
     @pytest.mark.parametrize("resume", [False, True])
-    async def it_removes_the_kept_container_and_its_volume_on_exit_0(call, botbox, docker, resume):
+    async def it_removes_the_kept_container_and_its_volume_on_exit_0(call, botbox, docker, kept, resume):
         container, volume = docker
+        if resume:
+            kept.add("ports-run")
         botbox.return_value.run.return_value.exit_code = 0
         botbox.return_value.restart.return_value.exit_code = 0
 
-        await call(resume=resume)
+        await call()
 
-        container.assert_called_once_with("ports-run")
+        container.assert_called_with("ports-run")
         container.return_value.remove.assert_awaited_once()
         volume.assert_called_once_with("botbox-run-abc123")
         volume.return_value.remove.assert_awaited_once()
 
     @pytest.mark.parametrize("resume", [False, True])
-    async def it_leaves_the_kept_container_when_the_agent_fails(call, docker, resume):
+    async def it_leaves_the_kept_container_when_the_agent_fails(call, docker, kept, resume):
         container, volume = docker
+        if resume:
+            kept.add("ports-run")
 
-        await call(resume=resume)
+        await call()
 
         container.return_value.remove.assert_not_called()
         volume.return_value.remove.assert_not_called()
