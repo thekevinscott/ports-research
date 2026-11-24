@@ -4,7 +4,7 @@ from pathlib import Path
 import click
 from dotenv import dotenv_values
 
-from botbox import ClaudeAgent, CodexAgent
+from botbox import Agent, ClaudeAgent, CodexAgent
 
 from gbnf_experiment import config
 from gbnf_experiment.run_gbnf_experiment import run_gbnf_experiment
@@ -48,26 +48,9 @@ def cli(
 ) -> None:
     """One run, written into --output."""
     click.echo(f"*** auth: {auth} ***")
-    claude = model.startswith("claude-")
-    if not claude and not model.startswith("gpt-"):
-        raise click.ClickException(f"No agent for model {model!r}: expected claude-* or gpt-*")
-    if not claude and auth == "api":
-        raise click.ClickException("--auth api is Claude-only; Codex runs on the ChatGPT login")
-    api_key = None
-    if auth == "api":
-        env_path = config.REPO_ROOT / ".env"
-        if not env_path.is_file():
-            raise click.ClickException(f"Missing {env_path}; ANTHROPIC_API_KEY is required for --auth api")
-        api_key = dotenv_values(env_path, interpolate=False).get("ANTHROPIC_API_KEY")
-        if not api_key or not api_key.strip():
-            raise click.ClickException(f"Missing or blank ANTHROPIC_API_KEY in {env_path}")
+    agent = make_agent(model=model, effort=effort, auth=auth)
     run_directory = output.resolve()
     run_directory.mkdir(parents=True, exist_ok=True)
-    agent = (
-        ClaudeAgent(model=model, effort=effort, api_key=api_key)
-        if claude
-        else CodexAgent(model=model, effort=effort, host_home=config.CODEX_HOME)
-    )
     asyncio.run(
         run_gbnf_experiment(
             agent=agent,
@@ -80,3 +63,23 @@ def cli(
             memory=memory,
         )
     )
+
+
+def make_agent(*, model: str, effort: str, auth: str) -> Agent:
+    if model.startswith("claude-"):
+        return ClaudeAgent(model=model, effort=effort, api_key=api_key("ANTHROPIC_API_KEY", auth))
+    if model.startswith("gpt-"):
+        return CodexAgent(model=model, effort=effort, api_key=api_key("OPENAI_API_KEY", auth))
+    raise click.ClickException(f"No agent for model {model!r}: expected claude-* or gpt-*")
+
+
+def api_key(name: str, auth: str) -> str | None:
+    if auth != "api":
+        return None
+    env_path = config.REPO_ROOT / ".env"
+    if not env_path.is_file():
+        raise click.ClickException(f"Missing {env_path}; {name} is required for --auth api")
+    key = dotenv_values(env_path, interpolate=False).get(name)
+    if not key or not key.strip():
+        raise click.ClickException(f"Missing or blank {name} in {env_path}")
+    return key

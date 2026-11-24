@@ -11,8 +11,6 @@ PREPARED_DIRECTORY = CACHE_HOME / "ports" / "gbnf-experiment" / "prepared"
 ROOT_DIRECTORY = PACKAGE_ROOT
 DOCKER_DIRECTORY = PACKAGE_ROOT / "docker"
 PREPARE_DOCKER_DIRECTORY = DOCKER_DIRECTORY / "gbnf-prepare"
-# The ChatGPT login Codex runs on.
-CODEX_HOME = Path.home() / "work/code/research/SPAR/optimizing-llms-with-small-interpretable-updates/.codex-configuration"
 # The merge of GBNF PR #81: nearest upstream ancestor of the v0 clone's local commits.
 GBNF_COMMIT = "13f1aca495d11e160fffd68c4ba299a2415909d8"
 

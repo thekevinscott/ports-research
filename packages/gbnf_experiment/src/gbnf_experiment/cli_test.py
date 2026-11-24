@@ -198,11 +198,9 @@ def describe_cli():
         invoke([*SOURCE_LANGUAGE, "--model", "claude-sonnet-4-5"])
         assert claude_agent.call_args.kwargs["model"] == "claude-sonnet-4-5"
 
-    def it_runs_a_gpt_model_on_codex_with_the_codex_login(
-        gbnf_experiment, claude_agent, codex_agent, config, invoke
-    ):
+    def it_runs_a_gpt_model_on_codex(gbnf_experiment, claude_agent, codex_agent, invoke):
         invoke([*SOURCE_LANGUAGE, "--model", "gpt-5.6-luna", "--effort", "low"])
-        codex_agent.assert_called_once_with(model="gpt-5.6-luna", effort="low", host_home=config.CODEX_HOME)
+        codex_agent.assert_called_once_with(model="gpt-5.6-luna", effort="low", api_key=None)
         claude_agent.assert_not_called()
         assert gbnf_experiment.call_args.kwargs["agent"] is codex_agent.return_value
 
@@ -260,12 +258,19 @@ def describe_auth():
         claude_agent.assert_not_called()
         gbnf_experiment.assert_not_called()
 
-    def it_rejects_api_mode_for_codex(gbnf_experiment, codex_agent, config, invoke):
+    def it_bills_codex_to_the_openai_key_from_the_repo_env(gbnf_experiment, codex_agent, config, invoke):
+        (config.REPO_ROOT / ".env").write_text(f"ANTHROPIC_API_KEY={API_KEY}\nOPENAI_API_KEY=sk-openai-test\n")
+        result = invoke([*SOURCE_LANGUAGE, "--model", "gpt-5.6-luna", "--auth", "api"])
+        assert result.exit_code == 0, result.output
+        assert codex_agent.call_args.kwargs["api_key"] == "sk-openai-test"
+        assert "sk-openai-test" not in result.output
+
+    def it_rejects_codex_api_mode_without_an_openai_key(gbnf_experiment, codex_agent, config, invoke):
         (config.REPO_ROOT / ".env").write_text(f"ANTHROPIC_API_KEY={API_KEY}\n")
         result = invoke([*SOURCE_LANGUAGE, "--model", "gpt-5.6-luna", "--auth", "api"])
         assert result.exit_code != 0
+        assert "OPENAI_API_KEY" in result.output
         codex_agent.assert_not_called()
-        gbnf_experiment.assert_not_called()
 
     def it_rejects_an_unknown_auth_mode(gbnf_experiment, invoke):
         result = invoke([*SOURCE_LANGUAGE, "--auth", "other"])
