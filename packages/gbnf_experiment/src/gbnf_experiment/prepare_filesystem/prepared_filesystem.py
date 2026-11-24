@@ -36,10 +36,6 @@ class PreparedFilesystem:
         self.run_directory = run_directory
         self.ported_implementation_directory = self.run_directory / "ported_implementation"
         self.transcript_directory = self.run_directory / "transcript"
-        # The runner writes its own files here first; only ports' own mean a run to continue.
-        self.continuation = (
-            self.ported_implementation_directory.exists() or self.transcript_directory.exists()
-        )
         self.ported_implementation_directory.mkdir(parents=True, exist_ok=True)
         self.transcript_directory.mkdir(exist_ok=True)
 
